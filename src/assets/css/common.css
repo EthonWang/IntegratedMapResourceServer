@@ -1,0 +1,11 @@
+.flexRowCenter{
+    display: flex;
+    justify-content: center;
+}
+
+.flexRowSpaceBetween{
+    display: flex;
+    justify-content: space-between;
+}
+
+
