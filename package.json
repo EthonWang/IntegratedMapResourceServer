@@ -12,6 +12,7 @@
     "core-js": "^3.6.5",
     "element-ui": "^2.15.6",
     "mapbox-gl": "^2.7.0",
+    "sortablejs": "^1.15.0",
     "vue": "^2.6.11",
     "vue-router": "^3.5.3"
   },

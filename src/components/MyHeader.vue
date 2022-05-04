@@ -1,18 +1,21 @@
 <template>
   <header>
-    <a href="#" class="logo">Mapbox</a>
+    <a href="#" class="logo"><h2>Mapbox</h2></a>
     <ul class="navigation">
       <li>
-        <router-link to="/Map/MyData">我的数据</router-link>
+        <router-link to="/Map/MyData"><h3>我的数据</h3></router-link>
       </li>
       <li>
-        <router-link to="/Map/MyProject">我的项目</router-link>
+        <router-link to="/Map/MyProject"><h3>我的项目</h3></router-link>
       </li>
       <li>
-        <router-link target="_blank" to="/MapEditor">临时地图编辑</router-link>
+        <router-link target="_blank" to="/MapEditor"><h3>临时地图编辑</h3></router-link>
+      </li>
+      <li>
+        <router-link to="/Map/MyTest"><h3>测试</h3></router-link>
       </li>
     </ul>
-    <div>asdasd</div>
+    <div>wyjq</div>
   </header>
 </template> 
 
@@ -36,34 +39,31 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 0.2rem 0.4rem 0 rgb(0 0 0 / 8%);
+  box-shadow: 0 2px 4px 0 rgb(0 0 0 / 8%);
   background: rgba(255, 255, 255, 1);
-  padding: 0px 10rem;
-  height: 6rem;
+  padding: 0px 100px;
+  height: 60px;
 }
 header .logo {
   position: relative;
-  font-size: 2.5rem;
   color: rgb(0, 0, 0);
   text-decoration: none;
-  font-weight: 600;
 }
 header .navigation {
   display: flex;
   justify-content: center;
-  min-width: 45rem;
+  min-width: 450px;
 }
 header .navigation li {
   list-style: none;
-  margin: 0 2rem;
+  margin: 0 20px;
 }
 header .navigation li a {
   text-decoration: none;
   color: rgb(0, 0, 0);
-  font-weight: 600;
-  letter-spacing: 0.1rem;
-  font-size: 2rem;
+  letter-spacing: 1px;
 }
+
 /* header .navigation li a:hover {
   color: #051dec !important;
 } */
