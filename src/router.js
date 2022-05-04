@@ -4,6 +4,8 @@ import MainPage from "./pages/MainPage"
 import MapEditor from "./pages/MapEditor"
 import MyData from "./pages/MyData"
 import MyProject from "./pages/MyProject"
+import MapProjectEditor from "./pages/MapProjectEditor"
+import TestPage from "./pages/TestPage"
 
 const mapBaseRoute="/Map";
 
@@ -24,13 +26,19 @@ const route = new VueRouter({
 				{
 					path:mapBaseRoute+"/MyProject",
 					component:MyProject
+				},
+				{
+					path:mapBaseRoute+"/MyTest",
+					component:TestPage
 				}
 			]
-		},
-
-		{
-            path: '/MapEditor',
+		},{
+			path: "/MapEditor",
 			component: MapEditor
+		},
+		{
+            path: "/MapEditor/:mapProjectId",
+			component: MapProjectEditor
         },
 	]
 })
