@@ -1,6 +1,6 @@
 <template>
   <div class="myDataPage">
-<!--    shp文件管理-->
+    <!--    shp文件管理-->
     <div class="page-part">
       <div class="leftUpload">
         <el-divider content-position="center">Shapefile文件上传</el-divider>
@@ -105,7 +105,7 @@
     </div>
     <el-divider></el-divider>
 
-<!--    图标文件管理-->
+    <!--    图标文件管理-->
     <div class="page-part">
       <div class="leftUpload">
         <el-divider content-position="center">图标文件上传</el-divider>
@@ -194,8 +194,8 @@ import config from "../config";
 export default {
   data() {
     return {
-      shpUploadUrl: config.requestUrl + "shp/uploadShp",
-      symbolUploadUrl: config.requestUrl + "symbol/uploadSymbol",
+      shpUploadUrl: config.requestUrl + "/shp/uploadShp",
+      symbolUploadUrl: config.requestUrl + "/symbol/uploadSymbol",
 
       //shp页
       shpTableData: [],
@@ -205,7 +205,7 @@ export default {
       shpSearchInput: "",
 
       //图标页
-      symbolTableData:[],
+      symbolTableData: [],
       symbolCurrentPage: 1,
       symbolPageSize: 10,
       symbolTotalDataCount: 0,
@@ -271,7 +271,6 @@ export default {
     },
 
 
-
     handleShpSizeChange(val) {
       this.shpPageSize = val;
       this.getShpDataList();
@@ -302,6 +301,13 @@ export default {
       });
     },
 
+    handleDownload(shpId) {
+      window.location.href =
+          config.requestUrl + "/shp/downloadShp?shpId=" + shpId;
+    },
+
+
+    //图标部分
     getSymbolList() {
       requestApi.getSymbolList({
         asc: false,
@@ -360,7 +366,8 @@ export default {
       });
     },
   },
-};
+}
+;
 </script>
 
 <style>

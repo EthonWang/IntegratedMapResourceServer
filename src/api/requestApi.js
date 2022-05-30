@@ -79,6 +79,14 @@ export default {
     },
     copyMapProject(data){
         return instance.post("/mapProject/copyMapProject",data)
+    },
+
+    //tilejson
+    createTileJson(data){
+        return instance.post("/createTileJson",data)
+    },
+    deleteTileJson(tileJsonId){
+        return instance.get("/deleteTileJson/"+tileJsonId+".json")
     }
 
 

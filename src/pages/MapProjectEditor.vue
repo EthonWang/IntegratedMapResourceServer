@@ -50,7 +50,7 @@
         <el-button type="info" slot="reference" @click="test">test</el-button>
       </div>
 
-      <!--      shp图层-->
+      <!--      图层列表-->
       <el-divider class="divider">图层</el-divider>
       <div class="layerTable">
         <el-table :data="layers" ref="shpLayerTable" row-key="id" size="mini" @cell-click="handleLayerClick()"
@@ -130,12 +130,12 @@
       <div v-show="nameEdit === false" class="editBoardTitle" @click="nameEdit = true">
         <div> {{ layers[nowLayerIndex]['id'] }}</div>
         <i class="el-icon-edit"></i>
-      </div>  
+      </div>
       <div v-show="nameEdit === true" class="editBoardTitle" >
         <el-input v-model="layers[nowLayerIndex]['id']" size="mini" @change="nameEdit=false"></el-input>
         <i class="el-icon-check" @click="nameEdit=false"></i>
-      </div>        
-      <el-tabs value="first">      
+      </div>
+      <el-tabs value="first">
         <el-tab-pane label="样式设置" name="first">
         <!--    圆点图层编辑面板-->
           <el-tabs :before-leave='leaveTab' v-if="editorShow=='circleEditorShow'" type="border-card" value="first" tab-position="left">
@@ -147,14 +147,14 @@
                     v-model="layers[nowLayerIndex].paint['circle-color']"
                     @change="handlePaintChange(layers[nowLayerIndex]['id'],'circle-color',layers[nowLayerIndex].paint['circle-color'])"
                     :predefine="predefineColors">
-                </el-color-picker>          
+                </el-color-picker>
                 <el-input v-model="layers[nowLayerIndex].paint['circle-color']"
                           @change="handlePaintChange(layers[nowLayerIndex]['id'],'circle-color',layers[nowLayerIndex].paint['circle-color'])"
                           placeholder="something" style="width:50%"></el-input>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='circle-color' @callback="callback"></ConditionRender>
-            </el-tab-pane>          
+            </el-tab-pane>
             <el-tab-pane label="半径" name="second">
               <h3>半径（px）</h3>&nbsp;
               <span v-if="!menuButtonShow">Zoom Range</span>
@@ -222,7 +222,7 @@
                                 label="描述文字">
                 </el-input-number>
               </el-row>
-              <el-divider></el-divider>                
+              <el-divider></el-divider>
               <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='circle-stroke-width' @callback="callback"></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="边线透明度" name="sixth">
@@ -290,7 +290,7 @@
                 <el-input-number v-model="layers[nowLayerIndex].paint['circle-translate'][1]"
                                 :step="1"
                                 @change="handlePaintChange(layers[nowLayerIndex]['id'],'circle-translate',layers[nowLayerIndex].paint['circle-translate'])">
-                </el-input-number>              
+                </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='circle-translate' @callback="callback"></ConditionRender>
@@ -352,18 +352,18 @@
           <el-tabs :before-leave='leaveTab' v-if="editorShow=='lineEditorShow'" type="border-card" value="first" tab-position="left">
             <el-tab-pane label="颜色" name="first">
               <h3>线颜色</h3>&nbsp;
-              <span v-if="!menuButtonShow">Zoom Range</span>              
+              <span v-if="!menuButtonShow">Zoom Range</span>
               <el-row v-if="menuButtonShow" style="display:flex;margin-top:10px">
                 <el-color-picker
                     v-model="layers[nowLayerIndex].paint['line-color']"
                     @change="handlePaintChange(layers[nowLayerIndex]['id'],'line-color',layers[nowLayerIndex].paint['line-color'])"
                     :predefine="predefineColors">
-                </el-color-picker>                
+                </el-color-picker>
                 <el-input v-model="layers[nowLayerIndex].paint['line-color']"
                           @change="handlePaintChange(layers[nowLayerIndex]['id'],'line-color',layers[nowLayerIndex].paint['line-color'])"
                           placeholder="something"></el-input>
               </el-row>
-              <el-divider></el-divider>              
+              <el-divider></el-divider>
               <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='line-color' @callback="callback"></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="线宽" name="second">
@@ -377,7 +377,7 @@
                                 label="描述文字">
                 </el-input-number>
               </el-row>
-              <el-divider></el-divider> 
+              <el-divider></el-divider>
               <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='line-width' @callback="callback"></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="透明度" name="third">
@@ -407,10 +407,10 @@
             </el-tab-pane>
             <el-tab-pane label="虚线" name="forth">
               <h3>虚线</h3>&nbsp;
-              <span v-if="!menuButtonShow">Zoom Range</span>             
+              <span v-if="!menuButtonShow">Zoom Range</span>
               <el-row v-if="layers[nowLayerIndex].paint['line-dasharray'].length == 0" style="margin-top:10px">
                 <el-col class="displayBox">未设置过滤条件</el-col>
-              </el-row>              
+              </el-row>
               <el-row v-if="menuButtonShow" style="margin-top:10px">
                 <div class="flexRowSpaceAround"
                     v-for="(item, index) in layers[nowLayerIndex].paint['line-dasharray']"
@@ -425,9 +425,9 @@
                                   label="描述文字">
                   </el-input-number>&nbsp;
                   <el-button type="danger" icon="el-icon-delete" size="mini" circle @click="layers[nowLayerIndex].paint['line-dasharray'].splice(index,1)"></el-button>
-                </div>                 
+                </div>
                 <el-button type="primary" round @click="layers[nowLayerIndex].paint['line-dasharray'].push(0)">添加虚线设置
-                </el-button>                
+                </el-button>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='line-dasharray' @callback="callback"></ConditionRender>
@@ -486,7 +486,7 @@
                 <el-input-number v-model="layers[nowLayerIndex].paint['line-translate'][1]"
                                 :step="1"
                                 @change="handlePaintChange(layers[nowLayerIndex]['id'],'line-translate',layers[nowLayerIndex].paint['line-translate'])">
-                </el-input-number>             
+                </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='line-translate' @callback="callback"></ConditionRender>
@@ -521,7 +521,7 @@
               </el-row>
               <el-divider></el-divider>
               <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='line-offset' @callback="callback"></ConditionRender>
-              
+
             </el-tab-pane>
             <el-tab-pane label="线帽" name="tentn">
               <h3>线帽</h3>&nbsp;
@@ -632,11 +632,11 @@
                 </el-input-number>
               </el-row>
               <el-row v-if="menuButtonShow" style="display:flex">
-                <h4>y轴(px):&nbsp;</h4>                
+                <h4>y轴(px):&nbsp;</h4>
                 <el-input-number v-model="layers[nowLayerIndex].paint['fill-translate'][1]"
                                 :step="1"
                                 @change="handlePaintChange(layers[nowLayerIndex]['id'],'fill-translate',layers[nowLayerIndex].paint['fill-translate'])">
-                </el-input-number>              
+                </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='fill-translate' @callback="callback"></ConditionRender>
@@ -664,13 +664,13 @@
               <el-row v-if="menuButtonShow" style="margin-top:10px;display:flex">
                 <el-switch v-model="layers[nowLayerIndex].paint['fill-antialias']"
                           @change="handlePaintChange(layers[nowLayerIndex]['id'],'fill-antialias',layers[nowLayerIndex].paint['fill-antialias'])">
-                </el-switch>            
+                </el-switch>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='fill-antialias' @callback="callback"></ConditionRender>
             </el-tab-pane>
 
-          </el-tabs>  
+          </el-tabs>
         <!--    图标图层编辑面板-->
           <el-tabs :before-leave='leaveTab' v-if="editorShow=='symbolEditorShow'" type="border-card" value="first" tab-position="left">
             <el-tab-pane label="图标">
@@ -773,20 +773,20 @@
                 </el-option>
               </el-select>
             </el-tab-pane>
-          </el-tabs>                  
+          </el-tabs>
         </el-tab-pane>
         <el-tab-pane label="数据设置" name="second">
           <h4>数据源配置</h4>
           <el-form label-position= "right" label-width= 100px>
             <el-form-item label="数据源">
               <span>{{ layers[nowLayerIndex]["source"] }}</span>
-            </el-form-item>  
+            </el-form-item>
             <el-form-item label="数据源图层">
               <span>{{ layers[nowLayerIndex]["source-layer"] }}</span>
-            </el-form-item>  
+            </el-form-item>
             <el-form-item label="图层名称">
               <span>{{ layers[nowLayerIndex]["name"] }}</span>
-            </el-form-item>                                                 
+            </el-form-item>
             <el-form-item label="图层类型">
               <el-select v-model="layers[this.nowLayerIndex].type" placeholder="请选择图层类型">
                 <el-option
@@ -796,7 +796,7 @@
                   :value="item.value">
                 </el-option>
               </el-select>
-            </el-form-item>            
+            </el-form-item>
           </el-form>
           <el-divider></el-divider>
           <el-row type="flex" justify="space-between" align="middle">
@@ -821,7 +821,7 @@
                   :label="item.label"
                   :value="item.value">
                 </el-option>
-              </el-select> 
+              </el-select>
             </el-col>
             <el-col :span="5">
               <el-select v-model="filterCondition[index]['type']" placeholder="==" size="small">
@@ -839,7 +839,7 @@
                   <i class="el-icon-circle-plus"></i>
                 </template>
               </el-input>
-            </el-col> 
+            </el-col>
             <el-popover
               placement="right"
               width="400"
@@ -865,9 +865,9 @@
                 <el-table-column
                   type="selection"
                   width="50">
-                </el-table-column>                       
+                </el-table-column>
                 <el-table-column
-                  prop="value"              
+                  prop="value"
                   align="right">
                   <template slot="header" >
                     <el-input
@@ -876,14 +876,14 @@
                       placeholder="搜索"
                       prefix-icon="el-icon-search" />
                   </template>
-                </el-table-column>                          
+                </el-table-column>
               </el-table>
               <el-button type="text" icon="el-icon-circle-plus" slot="reference" @click="handleFilterValue(item,index)"></el-button>
-            </el-popover>                  
+            </el-popover>
           </el-row>
           <el-col v-if="filterCondition == []" class="displayBox">未设置过滤条件</el-col>
           <el-button type="text" icon="el-icon-circle-plus-outline"
-          @click="filterCondition.push({options:'',type:'==',value:''})">添加过滤条件</el-button> 
+          @click="filterCondition.push({options:'',type:'==',value:''})">添加过滤条件</el-button>
           <el-divider></el-divider>
           <h4>显示级别配置</h4>
           <el-form label-position="top">
@@ -893,18 +893,18 @@
                 :min="zoomRange[0]"
                 v-model="layers[nowLayerIndex]['minzoom']"
                 show-input >
-              </el-slider>              
-            </el-form-item>          
+              </el-slider>
+            </el-form-item>
             <el-form-item label="最大级别">
               <el-slider
                 :max="zoomRange[1]"
                 :min="layers[nowLayerIndex]['minzoom']"
                 v-model="layers[nowLayerIndex]['maxzoom']"
                 show-input >
-              </el-slider>              
-            </el-form-item>                
-          </el-form>  
-        </el-tab-pane>      
+              </el-slider>
+            </el-form-item>
+          </el-form>
+        </el-tab-pane>
 
       </el-tabs>
       <i class="el-icon-close close-button" @click="handleCloseEditBoard"></i>
@@ -920,6 +920,9 @@
 import mapboxgl from "mapbox-gl";
 import requestApi from "../api/requestApi";
 import layerStyleProperties from "../assets/js/layerStyleProperties";
+import initTileJson from "../assets/js/initTileJson";
+import myConfig from "../config";
+
 import Sortable from "sortablejs";
 import ConditionRender from "../components/ConditionRender"
 
@@ -940,6 +943,7 @@ export default {
       //左侧shp图层树
       layersNameObject: {}, //检测重复  后端字段为layerTree
       layersName: [], //加载的图层id集合，用于展示图层按index的排列
+      sourceNameObject:{}, //检测source重复
 
       //mapbox地图
       mapProjectInfo: {},
@@ -967,7 +971,7 @@ export default {
 
       //过滤条件配置
       filterWay: "满足所有条件",
-      filterCondition: [{option:'',type:'==',value:[]}],  
+      filterCondition: [{option:'',type:'==',value:[]}],
       filterOptions: [{value:'',label:''},],
       filterTypes: [{value:'==',label:'=='},{value:'!=',label:'!='},{value:'>',label:'>'},{value:'>=',label:'>='},{value:'<',label:'<'},{value:'<=',label:'<='},{value:'in',label:'in'},{value:'!in',label:'!in'},{value:'has',label:'has'},{value:'!has',label:'!has'}],
       filterValue: [{value:'a',id:'a'},{value:'2',id:'2'},{value:'3',id:'3'},{value:'4',id:'4'},{value:'5',id:'5'},{value:'6'},{value:'7',id:'7'},{value:'8',id:'8'},{value:'9',id:'9'}],
@@ -975,7 +979,7 @@ export default {
       filterValueSelect: [],
       multipleSelection: [],
       nowFilterIndex: 0,
-      search: '',      
+      search: '',
 
       predefineColors: [
         '#ff4500',
@@ -987,12 +991,11 @@ export default {
         '#c71585'],
 
       //图标数据
-      symbolTableData:[],
+      symbolTableData: [],
       currentPageSymbol: 1,
       pageSizeSymbol: 5,
       searchInputSymbol: "",
       totalDataCountSymbol: 0,
-
 
 
     };
@@ -1009,18 +1012,30 @@ export default {
     this.$bus.$off("show");
   },
   methods: {
-    test() {
-      console.log("cccc")
-      map.setLayoutProperty("map_points", "circle-sort-key", 99999);
-      let pt = map.getLayoutProperty('map_points', 'circle-sort-key');
-      console.log("pt sort key", pt)
+    async test() {
+
+      let newTileJson = initTileJson
+      newTileJson.name = "aaa123"
+      newTileJson.tiles = [""]
+
+      let res = await this.createTileJson(newTileJson)
+      if (res.data.code === 0) {
+        return
+      }
+
+      console.log("wait")
+      console.log(res)
+      console.log("aaaa")
+      let sourceId = res.data.data.tileJsonId
+      let tileJsonUrl = myConfig.requestUrl + "/getTileJson/" + sourceId
+      console.log("tileJsonUrl: ", tileJsonUrl)
     },
+
     getMapProjectInfo() {
       requestApi.getMapProjectById(this.mapProjectId)
           .then((res) => {
-            console.log('请求结果：',res)
             this.mapProjectInfo = res.data.data
-            console.log(this.mapProjectInfo);
+            console.log("mapProjectInfo:", this.mapProjectInfo);
             this.center = this.mapProjectInfo.center.split(',')
             this.zoom = this.mapProjectInfo.zoom
             this.sources = this.mapProjectInfo.sources
@@ -1045,7 +1060,6 @@ export default {
       map = new mapboxgl.Map({
         container: "map",
         // glyphs: "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
-
         // style: "mapbox://styles/mapbox/streets-v11", // style URL
         // center: this.center,
         // zoom: this.zoom,
@@ -1062,7 +1076,8 @@ export default {
       // 添加控件缩放按钮和一个指南针.
       var nav = new mapboxgl.NavigationControl();
       map.addControl(nav, "top-right");
-      // 全局缩放
+
+      // 添加全局缩放
       map.addControl(new mapboxgl.FullscreenControl());
 
       //添加定位控件
@@ -1082,18 +1097,16 @@ export default {
 
       //center
       map.on("mousemove", (e) => {
-        // this.center =
-        //     String(e.lngLat.lng.toFixed(8)) +
-        //     "," +
-        //     String(e.lngLat.lat.toFixed(8));
         this.center = String(e.lngLat.lng) + "," + String(e.lngLat.lat)
         this.showCenter = String(e.lngLat.lng.toFixed(5)) + "," + String(e.lngLat.lat.toFixed(5))
       });
 
       //选中某元素
-      map.on('mouseenter',this.layersName,  function () {
+      map.on('mouseenter',this.layersName,  function (e) {
         map.getCanvas().style.cursor = 'pointer';
         // console.log("eeeeeeeeee gid:", e);
+        console.log("eeeeeeeeee gid:", e.features[0].properties.gid);
+        console.log("属性:", e.features)
       });
 
       // Change it back to a pointer when it leaves.
@@ -1143,13 +1156,13 @@ export default {
 
         }
 
-        console.log('selectedFeatures',selectedFeatures)    
+        console.log('selectedFeatures',selectedFeatures)
 
         new mapboxgl.Popup()
         .setLngLat(e.lngLat)
         .setDOMContent(container)
         .addTo(map);
-      });      
+      });
 
 
       // map.on("load", () => {
@@ -1186,7 +1199,7 @@ export default {
         let newSource = {
           sourceName: i,
           sourceType: this.sources[i].type,
-          sourceTiles: this.sources[i].tiles,
+          sourceUrl: this.sources[i].urls,
         }
         this.addSourceToMap(newSource)
       }
@@ -1208,9 +1221,10 @@ export default {
         }
 
         this.mapProjectInfo.zoom = this.zoom
-        this.mapProjectInfo.center = this.center.toString()
+        this.mapProjectInfo.center = this.center
         this.mapProjectInfo.sources = this.sources
-        this.mapProjectInfo.layers = {layers: this.layers}
+        // this.mapProjectInfo.layers = {layers: this.layers}
+        this.mapProjectInfo.layers = this.layers
         this.mapProjectInfo.layerTree = this.layersNameObject
 
         requestApi.updateMapProject(JSON.stringify(this.mapProjectInfo))
@@ -1264,7 +1278,6 @@ export default {
       })
     },
 
-
     handleShowSortChange(newIndex) {
       let aimLayer = this.layers[newIndex];
       this.handleRemoveLayer(aimLayer.id)
@@ -1276,27 +1289,61 @@ export default {
       //更改顺序后更新
       for (const i in this.layers) {
         this.layersName[i] = this.layers[i].id
-      }      
+      }
 
     },
 
     //向shp树添加shp,即source,同时添加shplayer
-    handleAddShpLayer(index, row) {
-      console.log(row)
-      let newSource = {
-        sourceName: row.tableName,
-        sourceType: "vector",
-        sourceTiles: ["http://172.21.212.63:8991/mvt/" + row.tableName + "/{z}/{x}/{y}.pbf"],
-      }
-      if (!Object.prototype.hasOwnProperty.call(this.sources, newSource.sourceName)) {
-        this.sources[newSource.sourceName] = {
-          type: newSource.sourceType,
-          tiles: newSource.sourceTiles,
-        }
-        this.addSourceToMap(newSource)
-      }
-      let geoType = row.geoType
+    async handleAddShpLayer(index, row) {
+      console.log("add shp row: ", row)
+      //旧source写法
+      // let newSource = {
+      //   sourceName: row.tableName,
+      //   sourceType: "vector",
+      //   sourceTiles: ["http://172.21.212.63:8991/mvt/" + row.tableName + "/{z}/{x}/{y}.pbf"],
+      // }
+      // if (!Object.prototype.hasOwnProperty.call(this.sources, newSource.sourceName)) {
+      //   this.sources[newSource.sourceName] = {
+      //     type: newSource.sourceType,
+      //     tiles: newSource.sourceTiles,
+      //   }
+      //   this.addSourceToMap(newSource)
+      // }
 
+      //如果没有添加过source则添加
+      if (!Object.prototype.hasOwnProperty.call(this.sourceNameObject, row.tableName)) {
+        let newTileJson = initTileJson
+        newTileJson.name = row.tableName
+        newTileJson.tiles = [myConfig.requestUrl + "/mvt/" + row.tableName + "/{z}/{x}/{y}.pbf"]
+        let vector_layer={
+              "description": "",
+              "fields": row.attrInfo,
+              "id": row.tableName,
+            }
+        newTileJson.vector_layers=[vector_layer]
+
+        let res = await this.createTileJson(newTileJson)
+        if (res.data.code !== 0) {
+          console.log("添加source失败")
+          return
+        }
+        let sourceId = res.data.data.tileJsonId
+
+        let tileJsonUrl = myConfig.requestUrl + "/getTileJson/" + sourceId + ".json"
+        let newSourceJson = {
+          "sourceName": sourceId,
+          "sourceType": "vector",
+          "sourceUrl": tileJsonUrl
+        }
+        this.addSourceToMap(newSourceJson)
+        this.sources[newSourceJson.sourceName]={
+          type:newSourceJson.sourceType,
+          urls:newSourceJson.sourceUrl
+        }
+        this.sourceNameObject[row.tableName] = sourceId
+      }
+
+      let geoType = row.geoType
       if (row.geoType.indexOf("LINE") !== -1) {
         geoType = "line"
       } else if (row.geoType.indexOf("POLYGON") !== -1) {
@@ -1305,10 +1352,12 @@ export default {
         geoType = "circle"
       }
 
+      //前四个是自己用的属性
       let newLayer = {
         index: index,
         show: true,
         originName: row.originName,
+        shpAttribute:row.attrInfo,
         id: row.originName,
         type: geoType,
         filter: ["all"],
@@ -1317,9 +1366,12 @@ export default {
         metadata: "",
         minzoom: 0,
         paint: layerStyleProperties[geoType].paint,
-        source: newSource.sourceName,
-        "source-layer": "default"
+        source: this.sourceNameObject[row.tableName], //通过记录的source名字与id对应，拿到sourceId
+        // "source-layer": "default"
+        "source-layer":row.tableName
+        // "source-layer":"my22"
       }
+
       if (geoType !== "symbol") {
         newLayer.paint[geoType + "-color"] = "#" + Math.random().toString(16).substr(2, 6)
       }
@@ -1335,19 +1387,44 @@ export default {
       this.addLayerToMap(newLayer)
     },
 
+
+    //生成tilejson
+    async createTileJson(initTileJson) {
+      let data = await requestApi.createTileJson(initTileJson)
+      return data
+    },
+
+    deleteTileJson(tileJsonId) {
+
+      requestApi.deleteTileJson(tileJsonId)
+          .then((res)=>{
+            console.log("delete tileJson: ",res)
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+    },
+
     //向地图添加数据源source
     addSourceToMap(newSource) {
-      console.log("add new source：" + newSource.sourceName)
+      console.log("add new source：", newSource)
 
+      //旧写法
+      // map.addSource(newSource.sourceName, {
+      //   type: newSource.sourceType,
+      //   tiles: newSource.sourceTiles,
+      // })
+
+      //tileJson写法
       map.addSource(newSource.sourceName, {
         type: newSource.sourceType,
-        tiles: newSource.sourceTiles,
+        url: newSource.sourceUrl,
       })
     },
 
     //向地图添加layer
     addLayerToMap(newLayer) {
-      console.log("add new layer：" + newLayer.id)
+      console.log("add new layer：", newLayer)
       map.addLayer(newLayer)
     },
 
@@ -1359,6 +1436,8 @@ export default {
     },
 
     handleLayerEdit(index, row) {
+      console.log("now edit layer: index, row",index, row)
+      this.nowLayerIndex = index
       console.log(index, row)
       this.nowLayerIndex = index;
       this.zoomRange = [this.layers[this.nowLayerIndex].minzoom,this.layers[this.nowLayerIndex].maxzoom]
@@ -1380,8 +1459,8 @@ export default {
     },
 
     handleLayerDelete(index, row) {
-      index, row
-      this.editorShow=""
+      console.log("ready delete layer:", row)
+      this.editorShow = ""
       let aimSource = row.source
       let layerOriginName = row.originName
       let layerid = row.id
@@ -1389,17 +1468,27 @@ export default {
       this.layersName.splice(index, 1)
       this.layersNameObject[layerOriginName] -= 1
       this.handleRemoveLayer(layerid)
+
+      //如果没有layer使用source，则删除source
       if (this.layersNameObject[layerOriginName] === 0) {
         delete this.layersNameObject[layerOriginName]
         this.handleRemoveSource(aimSource)
         delete this.sources[aimSource]
+        for(let key in this.sourceNameObject){
+          if(this.sourceNameObject[key]===aimSource){
+            delete this.sourceNameObject[key]
+            break
+          }
+        }
+        //source没有再使用时,删除后台的tileJson
+        this.deleteTileJson(row.source)
       }
-      
+
     },
 
     handleLayerStyleChange(index, row) {
       index, row
-      console.log("row: ",row)
+      console.log("row: ", row)
       // map.removeLayer(row.id);
       //
       // let newLayer=row
@@ -1412,7 +1501,7 @@ export default {
       // }
     },
 
-    getSymbolList(){
+    getSymbolList() {
       requestApi.getSymbolList({
         asc: false,
         page: this.currentPageSymbol,
@@ -1430,8 +1519,8 @@ export default {
           });
     },
 
-    handleCurrentChangeSymbol(val){
-      this.currentPageSymbol=val
+    handleCurrentChangeSymbol(val) {
+      this.currentPageSymbol = val
       this.getSymbolList()
     },
 
@@ -1440,7 +1529,7 @@ export default {
       map.flyTo({
         center:[101.34948058466824,32.22862318628209]
       });
-      // var render = 
+      // var render =
       //   [
       //   "interpolate",
       //   ["exponential", 0.5],
@@ -1449,7 +1538,7 @@ export default {
       //   "#e2714b",
       //   5,
       //   "#eee695"
-      //   ];        
+      //   ];
       // this.handlePaintChange('ChinaProvince','fill-color',render)
       // this.layers[3].paint['fill-color'] = 0
       // if (row.type === "circle") {
@@ -1485,7 +1574,7 @@ export default {
 
     addItemEvent(item,feature,index){
       //因为item是html元素，在其事件中this指向该元素无法获取vue的实例属性和方法
-      let _this = this;      
+      let _this = this;
       item.onclick = function test(){
         _this.nowLayerIndex = index;
         if (feature.layer.type === "line") {
@@ -1497,8 +1586,8 @@ export default {
         } else {
           _this.editorShow = "symbolEditorShow";
           _this.getSymbolList()
-        }  
-      };      
+        }
+      };
     },
 
     //添加筛选框用户输入的value
@@ -1521,7 +1610,7 @@ export default {
       // this.filterValueSelect = [];
       for (const i in this.filterValueInput) {
         i != 0 && this.filterValueSelect.push({value:this.filterValueInput[i]});
-      }      
+      }
       for (const i in this.multipleSelection) {
         this.filterValueSelect.push(this.multipleSelection[i])
       }
@@ -1537,26 +1626,26 @@ export default {
     },
     callback(layoutOrpaint,attribute,value){
       console.log("layoutOrpaint1:",layoutOrpaint);
-      console.log("attribute1:",attribute);      
-      console.log("value1:",value);      
+      console.log("attribute1:",attribute);
+      console.log("value1:",value);
       this.layers[this.nowLayerIndex][layoutOrpaint][attribute] = value;
-      console.log("layers:",this.layers[this.nowLayerIndex]);  
-      const id = this.layers[this.nowLayerIndex]['id']    
+      console.log("layers:",this.layers[this.nowLayerIndex]);
+      const id = this.layers[this.nowLayerIndex]['id']
       layoutOrpaint == 'layout' && this.handleLayoutChange(id,attribute,value);
       layoutOrpaint == 'paint' && this.handlePaintChange(id,attribute,value);
     },
     leaveTab(activeName, oldActiveName){
-      console.log('activeName',activeName); 
-      console.log('oldActiveName',oldActiveName); 
+      console.log('activeName',activeName);
+      console.log('oldActiveName',oldActiveName);
     },
     test1(){
       console.log('layer',this.layers[0])
-    },    
+    },
 
 
 
 
-  
+
   },
 };
 </script>
@@ -1641,7 +1730,7 @@ h4{
   width:120px;
   height: 40px;
   white-space:nowrap;
-  overflow: hidden;  
+  overflow: hidden;
   text-overflow: ellipsis;
 
 }
@@ -1664,7 +1753,7 @@ h4{
 /* 编辑框导航条tabs */
 .editBoard .el-tabs__header.is-top{
   background-color: rgb(255, 255, 255);
-  width: 300px;  
+  width: 300px;
   margin: 0;
   border-left: 1px solid #e4e7ed;
   border-right: 1px solid #e4e7ed;
@@ -1709,12 +1798,12 @@ h4{
   height: calc(100vh - 81px);
   background-color: white;
   padding: 20px;
-  border: 1px solid #e4e7ed;  
+  border: 1px solid #e4e7ed;
   overflow-y: scroll;
 }
 /* 隐藏样式和数据设置的滚动条 */
 .editBoard .el-tabs.el-tabs--top > .el-tabs__content > .el-tab-pane:nth-child(2)::-webkit-scrollbar
-,.editBoard .el-tabs--border-card > .el-tabs__content::-webkit-scrollbar 
+,.editBoard .el-tabs--border-card > .el-tabs__content::-webkit-scrollbar
 { width: 0; height: 0; color: transparent; }
 /* 属性框样式 */
 .tableCondition .el-table__body-wrapper.is-scrolling-none:hover{
@@ -1728,8 +1817,8 @@ h4{
 }
 .editBoard .el-form.el-form--label-right > .el-form-item .el-form-item__content{
   white-space:nowrap;
-  overflow: hidden;  
-  text-overflow: ellipsis;  
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .editBoard .el-divider--horizontal{
   margin: 12px 0;
@@ -1753,7 +1842,7 @@ h4{
   border-radius: 5px;
   text-align: center;
   /* 将该元素禁用 */
-  pointer-events: none;  
+  pointer-events: none;
 }
 
 .mapStyle {
@@ -1774,8 +1863,8 @@ h4{
   color: black;
   border-radius: 5px;
   white-space:nowrap;
-  overflow: hidden;  
-  text-overflow: ellipsis;  
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .item:hover{
   color: #4264fb;
@@ -1802,7 +1891,7 @@ h4{
   border-radius: 5px;
   text-align: center;
   /* 将该元素禁用 */
-  pointer-events: none;  
+  pointer-events: none;
   color: #d3d3d3;
 }
 /* 筛选条件框样式 */
