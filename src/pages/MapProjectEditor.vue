@@ -1102,7 +1102,7 @@ export default {
       });
 
       //选中某元素
-      map.on('mouseenter',this.layersName,  function () {
+      map.on('mouseenter',this.layersName,  function (e) {
         map.getCanvas().style.cursor = 'pointer';
         // console.log("eeeeeeeeee gid:", e);
         console.log("eeeeeeeeee gid:", e.features[0].properties.gid);
