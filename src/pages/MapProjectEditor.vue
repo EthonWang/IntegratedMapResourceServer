@@ -50,7 +50,7 @@
         <el-button type="info" slot="reference" @click="test">test</el-button>
       </div>
 
-      <!--      shp图层-->
+      <!--      图层列表-->
       <el-divider class="divider">图层</el-divider>
       <div class="layerTable">
         <el-table :data="layers" ref="shpLayerTable" row-key="id" size="mini" @cell-click="handleLayerClick"
@@ -688,9 +688,13 @@
 
 <script>
 import mapboxgl from "mapbox-gl";
+import Sortable from "sortablejs";
+
 import requestApi from "../api/requestApi";
 import layerStyleProperties from "../assets/js/layerStyleProperties";
-import Sortable from "sortablejs";
+import initTileJson from "../assets/js/initTileJson";
+import myConfig from "../config";
+
 
 var map = null;
 
@@ -707,6 +711,7 @@ export default {
 
       //左侧shp图层树
       layersNameObject: {}, //检测重复  后端字段为layerTree
+      sourceNameObject:{}, //检测source重复
 
       //mapbox地图
       mapProjectInfo: {},
@@ -730,12 +735,11 @@ export default {
         '#c71585'],
 
       //图标数据
-      symbolTableData:[],
+      symbolTableData: [],
       currentPageSymbol: 1,
       pageSizeSymbol: 5,
       searchInputSymbol: "",
       totalDataCountSymbol: 0,
-
 
 
     };
@@ -749,21 +753,34 @@ export default {
   },
 
   methods: {
-    test() {
-      console.log("cccc")
-      map.setLayoutProperty("map_points", "circle-sort-key", 99999);
-      let pt = map.getLayoutProperty('map_points', 'circle-sort-key');
-      console.log("pt sort key", pt)
+    async test() {
+
+      let newTileJson = initTileJson
+      newTileJson.name = "aaa123"
+      newTileJson.tiles = [""]
+
+      let res = await this.createTileJson(newTileJson)
+      if (res.data.code === 0) {
+        return
+      }
+
+      console.log("wait")
+      console.log(res)
+      console.log("aaaa")
+      let sourceId = res.data.data.tileJsonId
+      let tileJsonUrl = myConfig.requestUrl + "/getTileJson/" + sourceId
+      console.log("tileJsonUrl: ", tileJsonUrl)
     },
+
     getMapProjectInfo() {
       requestApi.getMapProjectById(this.mapProjectId)
           .then((res) => {
             this.mapProjectInfo = res.data.data
-            console.log(this.mapProjectInfo);
+            console.log("mapProjectInfo:", this.mapProjectInfo);
             this.center = this.mapProjectInfo.center.split(',')
             this.zoom = this.mapProjectInfo.zoom
             this.sources = this.mapProjectInfo.sources
-            this.layers = this.mapProjectInfo.layers.layers
+            this.layers = this.mapProjectInfo.layers
             this.layersNameObject = this.mapProjectInfo.layerTree
             this.createEmptyMap()
             this.initMapWithData()
@@ -781,7 +798,6 @@ export default {
       map = new mapboxgl.Map({
         container: "map",
         // glyphs: "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
-
         // style: "mapbox://styles/mapbox/streets-v11", // style URL
         // center: this.center,
         // zoom: this.zoom,
@@ -798,7 +814,8 @@ export default {
       // 添加控件缩放按钮和一个指南针.
       var nav = new mapboxgl.NavigationControl();
       map.addControl(nav, "top-right");
-      // 全局缩放
+
+      // 添加全局缩放
       map.addControl(new mapboxgl.FullscreenControl());
 
       //添加定位控件
@@ -818,10 +835,6 @@ export default {
 
       //center
       map.on("mousemove", (e) => {
-        // this.center =
-        //     String(e.lngLat.lng.toFixed(8)) +
-        //     "," +
-        //     String(e.lngLat.lat.toFixed(8));
         this.center = String(e.lngLat.lng) + "," + String(e.lngLat.lat)
         this.showCenter = String(e.lngLat.lng.toFixed(5)) + "," + String(e.lngLat.lat.toFixed(5))
       });
@@ -830,6 +843,7 @@ export default {
       map.on('mouseenter', 're', function (e) {
         map.getCanvas().style.cursor = 'pointer';
         console.log("eeeeeeeeee gid:", e.features[0].properties.gid);
+        console.log("属性:", e.features)
       });
 
       // Change it back to a pointer when it leaves.
@@ -872,7 +886,7 @@ export default {
         let newSource = {
           sourceName: i,
           sourceType: this.sources[i].type,
-          sourceTiles: this.sources[i].tiles,
+          sourceUrl: this.sources[i].urls,
         }
         this.addSourceToMap(newSource)
       }
@@ -894,9 +908,10 @@ export default {
         }
 
         this.mapProjectInfo.zoom = this.zoom
-        this.mapProjectInfo.center = this.center.toString()
+        this.mapProjectInfo.center = this.center
         this.mapProjectInfo.sources = this.sources
-        this.mapProjectInfo.layers = {layers: this.layers}
+        // this.mapProjectInfo.layers = {layers: this.layers}
+        this.mapProjectInfo.layers = this.layers
         this.mapProjectInfo.layerTree = this.layersNameObject
 
         requestApi.updateMapProject(JSON.stringify(this.mapProjectInfo))
@@ -950,7 +965,6 @@ export default {
       })
     },
 
-
     handleShowSortChange(newIndex) {
       let aimLayer = this.layers[newIndex];
       this.handleRemoveLayer(aimLayer.id)
@@ -962,22 +976,56 @@ export default {
     },
 
     //向shp树添加shp,即source,同时添加shplayer
-    handleAddShpLayer(index, row) {
-      console.log(row)
-      let newSource = {
-        sourceName: row.tableName,
-        sourceType: "vector",
-        sourceTiles: ["http://172.21.212.63:8991/mvt/" + row.tableName + "/{z}/{x}/{y}.pbf"],
-      }
-      if (!Object.prototype.hasOwnProperty.call(this.sources, newSource.sourceName)) {
-        this.sources[newSource.sourceName] = {
-          type: newSource.sourceType,
-          tiles: newSource.sourceTiles,
-        }
-        this.addSourceToMap(newSource)
-      }
-      let geoType = row.geoType
+    async handleAddShpLayer(index, row) {
+      console.log("add shp row: ", row)
+      //旧source写法
+      // let newSource = {
+      //   sourceName: row.tableName,
+      //   sourceType: "vector",
+      //   sourceTiles: ["http://172.21.212.63:8991/mvt/" + row.tableName + "/{z}/{x}/{y}.pbf"],
+      // }
+      // if (!Object.prototype.hasOwnProperty.call(this.sources, newSource.sourceName)) {
+      //   this.sources[newSource.sourceName] = {
+      //     type: newSource.sourceType,
+      //     tiles: newSource.sourceTiles,
+      //   }
+      //   this.addSourceToMap(newSource)
+      // }
 
+      //如果没有添加过source则添加
+      if (!Object.prototype.hasOwnProperty.call(this.sourceNameObject, row.tableName)) {
+        let newTileJson = initTileJson
+        newTileJson.name = row.tableName
+        newTileJson.tiles = [myConfig.requestUrl + "/mvt/" + row.tableName + "/{z}/{x}/{y}.pbf"]
+        let vector_layer={
+              "description": "",
+              "fields": row.attrInfo,
+              "id": row.tableName,
+            }
+        newTileJson.vector_layers=[vector_layer]
+
+        let res = await this.createTileJson(newTileJson)
+        if (res.data.code !== 0) {
+          console.log("添加source失败")
+          return
+        }
+        let sourceId = res.data.data.tileJsonId
+
+        let tileJsonUrl = myConfig.requestUrl + "/getTileJson/" + sourceId + ".json"
+        let newSourceJson = {
+          "sourceName": sourceId,
+          "sourceType": "vector",
+          "sourceUrl": tileJsonUrl
+        }
+        this.addSourceToMap(newSourceJson)
+        this.sources[newSourceJson.sourceName]={
+          type:newSourceJson.sourceType,
+          urls:newSourceJson.sourceUrl
+        }
+        this.sourceNameObject[row.tableName] = sourceId
+      }
+
+      let geoType = row.geoType
       if (row.geoType.indexOf("LINE") !== -1) {
         geoType = "line"
       } else if (row.geoType.indexOf("POLYGON") !== -1) {
@@ -986,10 +1034,12 @@ export default {
         geoType = "circle"
       }
 
+      //前四个是自己用的属性
       let newLayer = {
         index: index,
         show: true,
         originName: row.originName,
+        shpAttribute:row.attrInfo,
         id: row.originName,
         type: geoType,
         filter: ["all"],
@@ -998,9 +1048,12 @@ export default {
         metadata: "",
         minzoom: 0,
         paint: layerStyleProperties[geoType].paint,
-        source: newSource.sourceName,
-        "source-layer": "default"
+        source: this.sourceNameObject[row.tableName], //通过记录的source名字与id对应，拿到sourceId
+        // "source-layer": "default"
+        "source-layer":row.tableName
+        // "source-layer":"my22"
       }
+
       if (geoType !== "symbol") {
         newLayer.paint[geoType + "-color"] = "#" + Math.random().toString(16).substr(2, 6)
       }
@@ -1016,19 +1069,44 @@ export default {
       this.addLayerToMap(newLayer)
     },
 
+
+    //生成tilejson
+    async createTileJson(initTileJson) {
+      let data = await requestApi.createTileJson(initTileJson)
+      return data
+    },
+
+    deleteTileJson(tileJsonId) {
+
+      requestApi.deleteTileJson(tileJsonId)
+          .then((res)=>{
+            console.log("delete tileJson: ",res)
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+    },
+
     //向地图添加数据源source
     addSourceToMap(newSource) {
-      console.log("add new source：" + newSource.sourceName)
+      console.log("add new source：", newSource)
 
+      //旧写法
+      // map.addSource(newSource.sourceName, {
+      //   type: newSource.sourceType,
+      //   tiles: newSource.sourceTiles,
+      // })
+
+      //tileJson写法
       map.addSource(newSource.sourceName, {
         type: newSource.sourceType,
-        tiles: newSource.sourceTiles,
+        url: newSource.sourceUrl,
       })
     },
 
     //向地图添加layer
     addLayerToMap(newLayer) {
-      console.log("add new layer：" + newLayer.id)
+      console.log("add new layer：", newLayer)
       map.addLayer(newLayer)
     },
 
@@ -1040,7 +1118,7 @@ export default {
     },
 
     handleLayerEdit(index, row) {
-      console.log(index, row)
+      console.log("now edit layer: index, row",index, row)
       this.nowLayerIndex = index
       if (row.type === "line") {
         this.editorShow = 'lineEditorShow'
@@ -1059,24 +1137,34 @@ export default {
     },
 
     handleLayerDelete(index, row) {
-      index, row
-      this.editorShow=""
+      console.log("ready delete layer:", row)
+      this.editorShow = ""
       let aimSource = row.source
       let layerOriginName = row.originName
       let layerid = row.id
       this.layers.splice(index, 1)
       this.layersNameObject[layerOriginName] -= 1
       this.handleRemoveLayer(layerid)
+
+      //如果没有layer使用source，则删除source
       if (this.layersNameObject[layerOriginName] === 0) {
         delete this.layersNameObject[layerOriginName]
         this.handleRemoveSource(aimSource)
         delete this.sources[aimSource]
+        for(let key in this.sourceNameObject){
+          if(this.sourceNameObject[key]===aimSource){
+            delete this.sourceNameObject[key]
+            break
+          }
+        }
+        //source没有再使用时,删除后台的tileJson
+        this.deleteTileJson(row.source)
       }
     },
 
     handleLayerStyleChange(index, row) {
       index, row
-      console.log("row: ",row)
+      console.log("row: ", row)
       // map.removeLayer(row.id);
       //
       // let newLayer=row
@@ -1089,7 +1177,7 @@ export default {
       // }
     },
 
-    getSymbolList(){
+    getSymbolList() {
       requestApi.getSymbolList({
         asc: false,
         page: this.currentPageSymbol,
@@ -1107,8 +1195,8 @@ export default {
           });
     },
 
-    handleCurrentChangeSymbol(val){
-      this.currentPageSymbol=val
+    handleCurrentChangeSymbol(val) {
+      this.currentPageSymbol = val
       this.getSymbolList()
     },
 
