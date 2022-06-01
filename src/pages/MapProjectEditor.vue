@@ -150,7 +150,7 @@
                 </el-color-picker>
                 <el-input v-model="layers[nowLayerIndex].paint['circle-color']"
                           @change="handlePaintChange(layers[nowLayerIndex]['id'],'circle-color',layers[nowLayerIndex].paint['circle-color'])"
-                          placeholder="something" style="width:50%"></el-input>
+                          placeholder="something"></el-input>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='circle-color' @callback="callback"></ConditionRender>
@@ -170,8 +170,8 @@
               <el-divider></el-divider>
               <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='circle-radius' @callback="callback"></ConditionRender>
             </el-tab-pane>
-            <el-tab-pane label="透明度" name="third">
-              <h3>透明度</h3>&nbsp;
+            <el-tab-pane label="不透明度" name="third">
+              <h3>不透明度</h3>&nbsp;
               <span v-if="!menuButtonShow">Zoom Range</span>
               <el-row v-if="menuButtonShow" style="margin-top:10px">
                 <el-slider
@@ -225,8 +225,8 @@
               <el-divider></el-divider>
               <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='circle-stroke-width' @callback="callback"></ConditionRender>
             </el-tab-pane>
-            <el-tab-pane label="边线透明度" name="sixth">
-              <h3>边线透明度</h3>&nbsp;
+            <el-tab-pane label="边线不透明度" name="sixth">
+              <h3>边线不透明度</h3>&nbsp;
               <span v-if="!menuButtonShow">Zoom Range</span>
               <el-row v-if="menuButtonShow" style="margin-top:10px">
                 <el-slider
@@ -380,8 +380,8 @@
               <el-divider></el-divider>
               <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='line-width' @callback="callback"></ConditionRender>
             </el-tab-pane>
-            <el-tab-pane label="透明度" name="third">
-              <h3>透明度</h3>&nbsp;
+            <el-tab-pane label="不透明度" name="third">
+              <h3>不透明度</h3>&nbsp;
               <span v-if="!menuButtonShow">Zoom Range</span>
               <el-row v-if="menuButtonShow" style="margin-top:10px">
                 <el-slider
@@ -566,20 +566,20 @@
               <h3>填充颜色</h3>&nbsp;
               <span v-if="!menuButtonShow">Zoom Range</span>
               <el-row v-if="menuButtonShow" style="display:flex;margin-top:10px">
-                <el-input v-model="layers[nowLayerIndex].paint['fill-color']"
-                          @change="handlePaintChange(layers[nowLayerIndex]['id'],'fill-color',layers[nowLayerIndex].paint['fill-color'])"
-                          placeholder="something"></el-input>
                 <el-color-picker
                     v-model="layers[nowLayerIndex].paint['fill-color']"
                     @change="handlePaintChange(layers[nowLayerIndex]['id'],'fill-color',layers[nowLayerIndex].paint['fill-color'])"
                     :predefine="predefineColors">
-                </el-color-picker>
+                </el-color-picker>                
+                <el-input v-model="layers[nowLayerIndex].paint['fill-color']"
+                          @change="handlePaintChange(layers[nowLayerIndex]['id'],'fill-color',layers[nowLayerIndex].paint['fill-color'])"
+                          placeholder="something"></el-input>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='fill-color' @callback="callback"></ConditionRender>
             </el-tab-pane>
-            <el-tab-pane label="透明度" name="second">
-              <h3>透明度</h3>&nbsp;
+            <el-tab-pane label="不透明度" name="second">
+              <h3>不透明度</h3>&nbsp;
               <span v-if="!menuButtonShow">Zoom Range</span>
               <el-row v-if="menuButtonShow" style="margin-top:10px">
                 <el-slider
@@ -658,7 +658,7 @@
               <el-divider></el-divider>
               <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='fill-translate-anchor' @callback="callback"></ConditionRender>
             </el-tab-pane>
-            <el-tab-pane label="抗锯齿">
+            <el-tab-pane label="抗锯齿" name="sixth">
               <h3>抗锯齿</h3>&nbsp;
               <span v-if="!menuButtonShow">Zoom Range</span>
               <el-row v-if="menuButtonShow" style="margin-top:10px;display:flex">
@@ -669,8 +669,133 @@
               <el-divider></el-divider>
               <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='fill-antialias' @callback="callback"></ConditionRender>
             </el-tab-pane>
-
           </el-tabs>
+        <!--    三维面图层编辑面板-->
+          <el-tabs :before-leave='leaveTab' v-if="editorShow=='fillExtrusionEditorShow'" type="border-card" value="first" tab-position="left">
+            <el-tab-pane label="颜色" name="first">
+              <h3>填充颜色</h3>&nbsp;
+              <span v-if="!menuButtonShow">Zoom Range</span>
+              <el-row v-if="menuButtonShow" style="display:flex;margin-top:10px">
+                <el-color-picker
+                    v-model="layers[nowLayerIndex].paint['fill-extrusion-color']"
+                    @change="handlePaintChange(layers[nowLayerIndex]['id'],'fill-extrusion-color',layers[nowLayerIndex].paint['fill-extrusion-color'])"
+                    :predefine="predefineColors">
+                </el-color-picker>                
+                <el-input v-model="layers[nowLayerIndex].paint['fill-extrusion-color']"
+                          @change="handlePaintChange(layers[nowLayerIndex]['id'],'fill-extrusion-color',layers[nowLayerIndex].paint['fill-extrusion-color'])"
+                          placeholder="something"></el-input>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='fill-extrusion-color' @callback="callback"></ConditionRender>
+            </el-tab-pane>
+            <el-tab-pane label="不透明度" name="second">
+              <h3>不透明度</h3>&nbsp;
+              <span v-if="!menuButtonShow">Zoom Range</span>
+              <el-row v-if="menuButtonShow" style="margin-top:10px">
+                <el-slider
+                    v-model="layers[nowLayerIndex].paint['fill-extrusion-opacity']"
+                    :min=0
+                    :max=1
+                    :marks="{0:'0',0.5:'0.5',1:'1'}"
+                    @change="handlePaintChange(layers[nowLayerIndex]['id'],'fill-extrusion-opacity',layers[nowLayerIndex].paint['fill-extrusion-opacity'])"
+                    :step=0.1>
+                </el-slider>
+                <br>
+                <el-input-number v-model="layers[nowLayerIndex].paint['fill-extrusion-opacity']"
+                                @change="handlePaintChange(layers[nowLayerIndex]['id'],'fill-extrusion-opacity',layers[nowLayerIndex].paint['fill-extrusion-opacity'])"
+                                :min="0"
+                                :max="1"
+                                :step="0.1"
+                                size="medium"
+                                label="描述文字">
+                </el-input-number>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='fill-extrusion-opacity' @callback="callback"></ConditionRender>
+            </el-tab-pane>
+            <el-tab-pane label="高度" name="third">
+              <h3>高度</h3>&nbsp;
+              <br>
+              <span v-if="!menuButtonShow">Zoom Range</span>
+              <el-row v-if="menuButtonShow && layers[nowLayerIndex].paint['fill-extrusion-height']" style="display:flex;margin-top:10px">
+              <el-input v-model="layers[nowLayerIndex].paint['fill-extrusion-height']"
+                        @change="handlePaintChange(layers[nowLayerIndex]['id'],'fill-extrusion-height',layers[nowLayerIndex].paint['fill-extrusion-height'])"
+                        placeholder="something"></el-input>
+              <el-color-picker
+                  v-model="layers[nowLayerIndex].paint['fill-extrusion-height']"
+                  @change="handlePaintChange(layers[nowLayerIndex]['id'],'fill-extrusion-height',layers[nowLayerIndex].paint['fill-extrusion-height'])"
+                  :predefine="predefineColors">
+              </el-color-picker>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='fill-extrusion-height' @callback="callback"></ConditionRender>
+            </el-tab-pane>
+            <el-tab-pane label="底部高度" name="forth">
+              <h3>底部高度</h3>&nbsp;
+              <br>
+              <span v-if="!menuButtonShow">Zoom Range</span>
+              <el-row v-if="menuButtonShow && layers[nowLayerIndex].paint['fill-extrusion-base']" style="display:flex;margin-top:10px">
+              <el-input v-model="layers[nowLayerIndex].paint['fill-extrusion-base']"
+                        @change="handlePaintChange(layers[nowLayerIndex]['id'],'fill-extrusion-base',layers[nowLayerIndex].paint['fill-extrusion-base'])"
+                        placeholder="something"></el-input>
+              <el-color-picker
+                  v-model="layers[nowLayerIndex].paint['fill-extrusion-base']"
+                  @change="handlePaintChange(layers[nowLayerIndex]['id'],'fill-extrusion-base',layers[nowLayerIndex].paint['fill-extrusion-base'])"
+                  :predefine="predefineColors">
+              </el-color-picker>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='fill-extrusion-base' @callback="callback"></ConditionRender>
+            </el-tab-pane>            
+            <el-tab-pane label="平移" name="fifth">
+              <h3>平移</h3>&nbsp;
+              <span v-if="!menuButtonShow">Zoom Range</span>
+              <el-row v-if="menuButtonShow" style="margin-top:10px;display:flex">
+                <h4>x轴(px):&nbsp;</h4>
+                <el-input-number v-model="layers[nowLayerIndex].paint['fill-extrusion-translate'][0]"
+                                :step="1"
+                                @change="handlePaintChange(layers[nowLayerIndex]['id'],'fill-extrusion-translate',layers[nowLayerIndex].paint['fill-extrusion-translate'])">
+                </el-input-number>
+              </el-row>
+              <el-row v-if="menuButtonShow" style="display:flex">
+                <h4>y轴(px):&nbsp;</h4>
+                <el-input-number v-model="layers[nowLayerIndex].paint['fill-extrusion-translate'][1]"
+                                :step="1"
+                                @change="handlePaintChange(layers[nowLayerIndex]['id'],'fill-extrusion-translate',layers[nowLayerIndex].paint['fill-extrusion-translate'])">
+                </el-input-number>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='fill-extrusion-translate' @callback="callback"></ConditionRender>
+            </el-tab-pane>
+            <el-tab-pane label="平移参考" name="sixth">
+              <h3>平移参考</h3>&nbsp;
+              <span v-if="!menuButtonShow">Zoom Range</span>
+              <el-row v-if="menuButtonShow" style="display:flex;margin-top:10px">
+                <el-select v-model="layers[nowLayerIndex].paint['fill-extrusion-translate-anchor']" placeholder="请选择"
+                          @change="handlePaintChange(layers[nowLayerIndex]['id'],'fill-extrusion-translate-anchor',layers[nowLayerIndex].paint['fill-extrusion-translate-anchor'])">
+                  <el-option
+                      v-for="item in ['map','viewport']"
+                      :key="item"
+                      :label="item"
+                      :value="item">
+                  </el-option>
+                </el-select>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='fill-extrusion-translate-anchor' @callback="callback"></ConditionRender>
+            </el-tab-pane>
+            <el-tab-pane label="渐变填充" name="seven">
+              <h3>渐变填充</h3>&nbsp;
+              <span v-if="!menuButtonShow">Zoom Range</span>
+              <el-row v-if="menuButtonShow" style="margin-top:10px;display:flex">
+                <el-switch v-model="layers[nowLayerIndex].paint['fill-extrusion-vertical-gradient']"
+                          @change="handlePaintChange(layers[nowLayerIndex]['id'],'fill-extrusion-vertical-gradient',layers[nowLayerIndex].paint['fill-extrusion-vertical-gradient'])">
+                </el-switch>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='fill-extrusion-vertical-gradient' @callback="callback"></ConditionRender>
+            </el-tab-pane>
+          </el-tabs>          
         <!--    图标图层编辑面板-->
           <el-tabs :before-leave='leaveTab' v-if="editorShow=='symbolEditorShow'" type="border-card" value="first" tab-position="left">
             <el-tab-pane label="图标">
@@ -716,8 +841,8 @@
                               label="描述文字">
               </el-input-number>
             </el-tab-pane>
-            <el-tab-pane label="透明度">
-              <h3>透明度</h3>
+            <el-tab-pane label="不透明度">
+              <h3>不透明度</h3>
               <el-slider
                   v-model="layers[nowLayerIndex].paint['icon-opacity']"
                   :min=0
@@ -785,7 +910,7 @@
               <span>{{ layers[nowLayerIndex]["source-layer"] }}</span>
             </el-form-item>
             <el-form-item label="图层名称">
-              <span>{{ layers[nowLayerIndex]["name"] }}</span>
+              <span>{{ layers[nowLayerIndex]["originName"] }}</span>
             </el-form-item>
             <el-form-item label="图层类型">
               <el-select v-model="layers[this.nowLayerIndex].type" placeholder="请选择图层类型">
@@ -1102,12 +1227,12 @@ export default {
       });
 
       //选中某元素
-      map.on('mouseenter',this.layersName,  function (e) {
-        map.getCanvas().style.cursor = 'pointer';
-        // console.log("eeeeeeeeee gid:", e);
-        console.log("eeeeeeeeee gid:", e.features[0].properties.gid);
-        console.log("属性:", e.features)
-      });
+      // map.on('mouseenter',this.layersName,  function (e) {
+      //   map.getCanvas().style.cursor = 'pointer';
+      //   // console.log("eeeeeeeeee gid:", e);
+      //   console.log("eeeeeeeeee gid:", e.features[0].properties.gid);
+      //   console.log("属性:", e.features)
+      // });
 
       // Change it back to a pointer when it leaves.
       map.on('mouseleave', this.layersName, function () {
@@ -1447,6 +1572,8 @@ export default {
         this.editorShow = 'fillEditorShow'
       } else if (row.type === "circle") {
         this.editorShow = 'circleEditorShow'
+      } else if (row.type === "fillExtrusionEditorShow"){
+        this.editorShow = 'fillExtrusionEditorShow'
       } else {
         this.editorShow = "symbolEditorShow"
         this.getSymbolList()
@@ -1525,7 +1652,7 @@ export default {
     },
 
     handleLayerClick() {
-      console.log(this.layers);
+      console.log('layers:',this.layers);
       map.flyTo({
         center:[101.34948058466824,32.22862318628209]
       });
@@ -1571,22 +1698,26 @@ export default {
       console.log("paint:", layerName, key, value)
       map.setPaintProperty(layerName, key, value);
     },
-
+    //为item添加同handleLayerEdit相同的方法
     addItemEvent(item,feature,index){
       //因为item是html元素，在其事件中this指向该元素无法获取vue的实例属性和方法
       let _this = this;
       item.onclick = function test(){
         _this.nowLayerIndex = index;
+        _this.zoomRange = [_this.layers[index].minzoom,_this.layers[index].maxzoom]
         if (feature.layer.type === "line") {
           _this.editorShow = 'lineEditorShow';
         } else if (feature.layer.type === "fill") {
           _this.editorShow = 'fillEditorShow';
         } else if (feature.layer.type === "circle") {
           _this.editorShow = 'circleEditorShow';
+        } else if (feature.layer.type === "fillExtrusionEditorShow"){
+          _this.editorShow = 'fillExtrusionEditorShow'
         } else {
           _this.editorShow = "symbolEditorShow";
           _this.getSymbolList()
         }
+        _this.menuButtonShowList = [];
       };
     },
 
