@@ -15,7 +15,71 @@
           <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
           <div class="el-upload__tip" slot="tip">tip: 将shp文件压缩(zip格式)后上传！zip名称与shp一致</div>
         </el-upload>
+        <br>
         <el-button size="mini" @click="helloTest()">测试</el-button>
+        <el-button slot="reference" size="mini" type="success" @click="dataBaseShow= true" >添加数据库源</el-button>
+        <el-dialog
+          title="数据库源信息编辑"
+          :visible.sync="dataBaseShow"
+          width="30%"
+          center>
+          <el-form label-position="left" label-width="100px" :model="dataBaseInfo">
+            <el-form-item 
+              label="IP:"
+              :rules="{required: true, message: '请输入ip信息', trigger: 'blur'}">
+              <el-input v-model="dataBaseInfo.ip"></el-input>
+            </el-form-item>
+            <el-form-item 
+              label="端口:"
+              :rules="{required: true, message: '请输入端口号', trigger: 'blur'}">
+              <el-input v-model="dataBaseInfo.port"></el-input>
+            </el-form-item>             
+            <el-form-item 
+              label="数据库名:"
+              :rules="{required: true, message: '请输入数据库名', trigger: 'blur'}">
+              <el-input v-model="dataBaseInfo.dbname"></el-input>
+            </el-form-item>
+            <el-form-item 
+              label="用户名:"
+              :rules="{required: true, message: '请输入用户名', trigger: 'blur'}">
+              <el-input v-model="dataBaseInfo.userName"></el-input>
+            </el-form-item>
+            <el-form-item 
+              label="密码:"
+              :rules="{required: true, message: '请输入密码', trigger: 'blur'}">
+              <el-input v-model="dataBaseInfo.password"></el-input>
+            </el-form-item>                     
+          </el-form>   
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="dataBaseShow = false">取 消</el-button>
+            <el-button type="primary" @click="addDataSource">确 定</el-button>
+          </span>
+        </el-dialog>  
+        <el-table
+          :data="dataBaseList"
+          stripe :row-style="{height:'10px',padding:'0'}"
+          style="width: 100%"
+          height="300" >
+          <el-table-column
+            prop="dbname"
+            label="数据库源"
+            width="200" >
+          </el-table-column>
+          <el-table-column label="操作" min-width="115">
+            <template slot-scope="scope">
+              <el-popconfirm
+                title="确定删除吗？" @confirm="dataBaseDelete(scope.row)">
+                <el-button
+                    slot="reference"
+                    size="mini"
+                    type="danger"
+                    style="  margin-left: 5px;">删除
+                </el-button>
+              </el-popconfirm>              
+
+            </template>        
+          </el-table-column>
+        </el-table>
       </div>
       <el-divider class="deviderHeight" direction="vertical"></el-divider>
       <div class="rightContent">
@@ -196,7 +260,9 @@ export default {
     return {
       shpUploadUrl: config.requestUrl + "/shp/uploadShp",
       symbolUploadUrl: config.requestUrl + "/symbol/uploadSymbol",
-
+      dataBaseInfo: {ip:'',dbname:'',userName:'',password:'',port:''},
+      dataBaseShow: false,
+      dataBaseList: [],
       //shp页
       shpTableData: [],
       shpCurrentPage: 1,
@@ -216,6 +282,8 @@ export default {
   mounted() {
     this.getShpDataList();
     this.getSymbolList();
+    this.getDataSourceList();
+
     // this.rowDrop()
   },
   methods: {
@@ -242,7 +310,16 @@ export default {
             console.log(error);
           });
     },
-
+    addDataSource(){
+      requestApi.addDataSource(this.dataBaseInfo)
+        .then((res) => {
+          console.log(res);
+        }).catch((err) => {
+          console.log(err);
+        })
+      this.getDataSourceList();
+      this.dataBaseShow = false;
+    },
     getShpDataList() {
       requestApi.getShpList({
         asc: false,
@@ -260,7 +337,28 @@ export default {
             console.log(error);
           });
     },
-
+    getDataSourceList(){
+      requestApi.getDataSourceList()
+          .then((res) => {
+            console.log('res:',res)
+            this.dataBaseList = res.data.data;
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+    },
+    dataBaseDelete(row){
+      console.log('111',row.id);
+      requestApi.deleteSourceById(row.id)
+        .then((res)=>{
+            console.log(res)
+        })
+        .catch((error) => {
+          console.log(error);
+        }); 
+      this.getDataSourceList();     
+      
+    },
     handleShpUpSuccess(res) {
       if (res.code != 0) {
         this.$message.error("shp上传成功但导入数据库失败！");

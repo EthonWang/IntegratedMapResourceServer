@@ -32,6 +32,19 @@ export default {
     deleteShp(shpId){
         return instance.get("/shp/deleteShp", {params:{shpId}})
     },
+    getAttrValue(data){
+        return instance.post("/shp/getAttrValue", data)
+    },  
+    getMaxMinAttrValue(data){
+        return instance.post("/shp/getMaxMinAttrValue", data)
+    },      
+    getShpListById(dataSourceId){
+        return instance.get("/getShpListById/"+dataSourceId)
+    },  
+    deleteSourceById(dataSourceId){
+        return instance.get("/deleteSourceById/"+dataSourceId)
+    },
+
 
     //symbol
     getSymbolList(data){
@@ -79,6 +92,12 @@ export default {
     },
     copyMapProject(data){
         return instance.post("/mapProject/copyMapProject",data)
+    },
+    addDataSource(data){
+        return instance.post("/addDataSource",data)
+    },
+    getDataSourceList(){
+        return instance.get("/getDataSourceList")
     },
 
     //tilejson
