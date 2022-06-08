@@ -1199,7 +1199,7 @@ export default {
         let newSource = {
           sourceName: i,
           sourceType: this.sources[i].type,
-          sourceUrl: this.sources[i].urls,
+          sourceUrl: this.sources[i].url,
         }
         this.addSourceToMap(newSource)
       }
@@ -1338,7 +1338,7 @@ export default {
         this.addSourceToMap(newSourceJson)
         this.sources[newSourceJson.sourceName]={
           type:newSourceJson.sourceType,
-          urls:newSourceJson.sourceUrl
+          url:newSourceJson.sourceUrl
         }
         this.sourceNameObject[row.tableName] = sourceId
       }
