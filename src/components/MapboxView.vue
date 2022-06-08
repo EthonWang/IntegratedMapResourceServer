@@ -307,6 +307,21 @@ export default {
             "fill-translate": [0, 0],
             "fill-translate-anchor": "map", // One of "map", "viewport"
           }
+        },
+        "fill-extrusion": {
+          "layout": {
+            "visibility": "visible", //One of "visible", "none"
+            // "fill-extrusion-sort-key":999
+          },
+          "paint": {
+            "fill-extrusion-height": 0,
+            "fill-extrusion-base": 0,
+            "fill-extrusion-color": "#000000",
+            "fill-extrusion-opacity": 1,
+            "fill-extrusion-translate": [0, 0],
+            "fill-extrusion-translate-anchor": "map", // One of "map", "viewport"
+            "fill-extrusion-vertical-gradient": true,
+          }          
         }
       },
 
