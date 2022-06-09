@@ -898,6 +898,7 @@ export default {
     },
     dataOpen(row){
       //初始化data范围渲染的参数  
+      console.log('datarow',row)
       const valueOrigin1 = JSON.parse(JSON.stringify(this.layerSelect[this.layoutOrpaint][this.attribute]));
       const valueOrigin2 = JSON.parse(JSON.stringify(this.layerSelect[this.layoutOrpaint][this.attribute]));
       this.dataValue[0].value = valueOrigin1;
