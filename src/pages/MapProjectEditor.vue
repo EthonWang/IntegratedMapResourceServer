@@ -1060,7 +1060,7 @@ import mapboxgl from "mapbox-gl";
 import requestApi from "../api/requestApi";
 import layerStyleProperties from "../assets/js/layerStyleProperties";
 import initTileJson from "../assets/js/initTileJson";
-import myConfig from "../config";
+// import myConfig from "../config";
 
 import Sortable from "sortablejs";
 import ConditionRender from "../components/ConditionRender"
@@ -1255,7 +1255,8 @@ export default {
       console.log(res)
       console.log("aaaa")
       let sourceId = res.data.data.tileJsonId
-      let tileJsonUrl = myConfig.requestUrl + "/getTileJson/" + sourceId
+      // let tileJsonUrl = myConfig.requestUrl + "/getTileJson/" + sourceId
+      let tileJsonUrl = this.reqUrl+ "/getTileJson/" + sourceId
       console.log("tileJsonUrl: ", tileJsonUrl)
     },
 
@@ -1477,7 +1478,8 @@ export default {
       });
     },
     publish(){
-      this.publishLink = myConfig.requestUrl+'/mapServer/'+this.mapProjectId;
+      // this.publishLink = myConfig.requestUrl+'/mapServer/'+this.mapProjectId;
+      this.publishLink = this.reqUrl+'/mapServer/'+this.mapProjectId;
     },
 
     //打开shp选择框
@@ -1581,10 +1583,15 @@ export default {
       if (!Object.prototype.hasOwnProperty.call(this.sourceNameObject, row.tableName)) {
         let newTileJson = initTileJson
         newTileJson.name = row.tableName
+        // if(this.dataBaseSelect == 'default'){
+        //   newTileJson.tiles = [myConfig.requestUrl + "/mvt/" + row.tableName + "/{z}/{x}/{y}.pbf"]
+        // }else{
+        //   newTileJson.tiles = ["/MultiSource/" + myConfig.requestUrl + "//" + row.tableName + "/{z}/{x}/{y}.pbf"]
+        // }
         if(this.dataBaseSelect == 'default'){
-          newTileJson.tiles = [myConfig.requestUrl + "/mvt/" + row.tableName + "/{z}/{x}/{y}.pbf"]
+          newTileJson.tiles = [this.reqUrl + "/mvt/" + row.tableName + "/{z}/{x}/{y}.pbf"]
         }else{
-          newTileJson.tiles = ["/MultiSource/" + myConfig.requestUrl + "//" + row.tableName + "/{z}/{x}/{y}.pbf"]
+          newTileJson.tiles = ["/MultiSource/" + this.reqUrl + "//" + row.tableName + "/{z}/{x}/{y}.pbf"]
         }
         let vector_layer={
               "description": "",
@@ -1600,7 +1607,8 @@ export default {
         }
         let sourceId = res.data.data.tileJsonId
 
-        let tileJsonUrl = myConfig.requestUrl + "/getTileJson/" + sourceId + ".json"
+        // let tileJsonUrl = myConfig.requestUrl + "/getTileJson/" + sourceId + ".json"
+        let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceId + ".json"
         let newSourceJson = {
           "sourceName": sourceId,
           "sourceType": "vector",

@@ -1,9 +1,10 @@
 import axios from 'axios'
-
-import config from "../config.js"
+import Vue from "vue";
+// import config from "../config.js"
 
 const instance= axios.create({
-    baseURL: config.requestUrl,
+    // baseURL: config.requestUrl,
+    // baseURL:Vue.prototype.reqUrl,
     timeout: 1000,
 });
 
@@ -17,41 +18,44 @@ const instance= axios.create({
 //     return Promise.reject(err)
 // })
 
+// const myBaseUrl=Vue.prototype.reqUrl
+
 export default {
 
     //shpData
     requestTest() {
-        return instance.get("/shp/hello")
+
+        return instance.get(Vue.prototype.reqUrl+"/shp/hello")
     },
     getShpList(data){
-        return instance.post("/shp/getShpList",data)
+        return instance.post(Vue.prototype.reqUrl+"/shp/getShpList",data)
     },
     downloadShp(shpId) {
-        return instance.get("/shp/downloadShp", { params: {shpId}})
+        return instance.get(Vue.prototype.reqUrl+"/shp/downloadShp", { params: {shpId}})
     },
     deleteShp(shpId){
-        return instance.get("/shp/deleteShp", {params:{shpId}})
+        return instance.get(Vue.prototype.reqUrl+"/shp/deleteShp", {params:{shpId}})
     },
     getAttrValue(data){
-        return instance.post("/shp/getAttrValue", data)
+        return instance.post(Vue.prototype.reqUrl+"/shp/getAttrValue", data)
     },  
     getMaxMinAttrValue(data){
-        return instance.post("/shp/getMaxMinAttrValue", data)
+        return instance.post(Vue.prototype.reqUrl+"/shp/getMaxMinAttrValue", data)
     },      
     getShpListById(dataSourceId){
-        return instance.get("/getShpListById/"+dataSourceId)
+        return instance.get(Vue.prototype.reqUrl+"/getShpListById/"+dataSourceId)
     },  
     deleteSourceById(dataSourceId){
-        return instance.get("/deleteSourceById/"+dataSourceId)
+        return instance.get(Vue.prototype.reqUrl+"/deleteSourceById/"+dataSourceId)
     },
 
 
     //symbol
     getSymbolList(data){
-        return instance.post("/symbol/getSymbolList",data)
+        return instance.post(Vue.prototype.reqUrl+"/symbol/getSymbolList",data)
     },
     deleteSymbol(symbolId){
-        return instance.get("/symbol/deleteSymbolById", {params:{symbolId}})
+        return instance.get(Vue.prototype.reqUrl+"/symbol/deleteSymbolById", {params:{symbolId}})
     },
 
 
@@ -74,38 +78,38 @@ export default {
 
     //mapProject
     getMapProjectList(data){
-        return instance.post("/mapProject/getMapProjectList",data)
+        return instance.post(Vue.prototype.reqUrl+"/mapProject/getMapProjectList",data)
     },
     getMapProjectById(mapProjectId){
-        return instance.get("/mapProject/getMapProjectById/"+mapProjectId)
+        return instance.get(Vue.prototype.reqUrl+"/mapProject/getMapProjectById/"+mapProjectId)
     },
     deleteMapProjectById(mapProjectId){
-        return instance.get("/mapProject/deleteMapProjectById/"+mapProjectId)
+        return instance.get(Vue.prototype.reqUrl+"/mapProject/deleteMapProjectById/"+mapProjectId)
     },
     createNewMapProject(data){
-        return instance.post("/mapProject/createNewMapProject",data)
+        return instance.post(Vue.prototype.reqUrl+"/mapProject/createNewMapProject",data)
     },
     updateMapProject(data){
-        return instance.post("/mapProject/updateMapProject",data,{
+        return instance.post(Vue.prototype.reqUrl+"/mapProject/updateMapProject",data,{
             headers: { "Content-Type": "application/json;charset=utf-8"},
         })
     },
     copyMapProject(data){
-        return instance.post("/mapProject/copyMapProject",data)
+        return instance.post(Vue.prototype.reqUrl+"/mapProject/copyMapProject",data)
     },
     addDataSource(data){
-        return instance.post("/addDataSource",data)
+        return instance.post(Vue.prototype.reqUrl+"/addDataSource",data)
     },
     getDataSourceList(){
-        return instance.get("/getDataSourceList")
+        return instance.get(Vue.prototype.reqUrl+"/getDataSourceList")
     },
 
     //tilejson
     createTileJson(data){
-        return instance.post("/createTileJson",data)
+        return instance.post(Vue.prototype.reqUrl+"/createTileJson",data)
     },
     deleteTileJson(tileJsonId){
-        return instance.get("/deleteTileJson/"+tileJsonId+".json")
+        return instance.get(Vue.prototype.reqUrl+"/deleteTileJson/"+tileJsonId+".json")
     }
 
 

@@ -1,5 +1,5 @@
 export default{
-    "attribution": "<h5>wyjq</h5>", //OPTIONAL
+    "attribution": "", //OPTIONAL
     "bounds": [ -180, -85, 180, 85], //OPTIONAL
     "center": [0, 0, 0], //OPTIONAL
 

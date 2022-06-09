@@ -252,14 +252,16 @@
 
 <script>
 import requestApi from "../api/requestApi";
-import config from "../config";
+// import config from "../config";
 // import Sortable from 'sortablejs'
 
 export default {
   data() {
     return {
-      shpUploadUrl: config.requestUrl + "/shp/uploadShp",
-      symbolUploadUrl: config.requestUrl + "/symbol/uploadSymbol",
+      // shpUploadUrl: config.requestUrl + "/shp/uploadShp",
+      // symbolUploadUrl: config.requestUrl + "/symbol/uploadSymbol",
+      shpUploadUrl: this.reqUrl + "/shp/uploadShp",
+      symbolUploadUrl: this.reqUrl + "/symbol/uploadSymbol",
       dataBaseInfo: {ip:'',dbname:'',userName:'',password:'',port:''},
       dataBaseShow: false,
       dataBaseList: [],
@@ -401,7 +403,8 @@ export default {
 
     handleDownload(shpId) {
       window.location.href =
-          config.requestUrl + "/shp/downloadShp?shpId=" + shpId;
+      // config.requestUrl + "/shp/downloadShp?shpId=" + shpId;
+          this.reqUrl + "/shp/downloadShp?shpId=" + shpId;
     },
 
 
