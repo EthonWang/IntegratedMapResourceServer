@@ -13,6 +13,6 @@ export default {
     "modified": "",
     "owner": null,
     "visibility": "private",
-    "sprite": "",
-    "glyphs": "",
+    "sprite": "/store/sprites/mpx_sprite/sprite",
+    "glyphs": "/store/fonts/{fontstack}/{range}.pbf",
 }
