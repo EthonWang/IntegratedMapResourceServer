@@ -51,8 +51,8 @@
                    :disabled="attribute == 'fill-outline-color' && layer['paint']['fill-antialias'] == false" slot="reference" class="menuButton" plain>按属性条件设置样式</el-button>
       </el-popover>            
       <el-button v-if="!attribute.includes('translate-anchor') && !attribute.includes('pitch-alignment') && !attribute.includes('pitch-scale') && !attribute.includes('cap') && !attribute.includes('dasharray') && !attribute.includes('antialias') && attribute.slice(-9) != 'translate' && !attribute.includes('join')  && !attribute.includes('gradient')" 
-                 class="menuButton" plain @click="menuButtonShow = false;formulaShow = true"
-                 :disabled="attribute == 'fill-outline-color' && layer['paint']['fill-antialias'] == false" v-show="false">按表达式设置样式</el-button>
+                 class="menuButton" plain @click="formulaOpen" 
+                 :disabled="attribute == 'fill-outline-color' && layer['paint']['fill-antialias'] == false" >按表达式设置样式</el-button>
       <el-button class="menuButton" plain @click="reset('close')">重置</el-button>
     </el-row>
     <!-- zoom编辑框 -->
@@ -302,16 +302,12 @@
         :show-close = false
         center :close-on-click-modal = false
         :modal= false>
-        <el-row v-if="dataEditIndex != 0" type="flex" justify="space-around" align="middle">
+        <el-row type="flex" justify="space-around" align="middle">
           <span>{{dataSelect}}:</span>
           <el-slider 
             v-model="dataValue[dataEditIndex].data"
             :min="dataRange.min" :max="dataRange.max" style="width:80%"
             ></el-slider>          
-          <!-- <el-input v-model="dataValue[dataEditIndex].data"
-                    placeholder="something" style="width:80%">
-            <template slot="prepend" body-style="padding:0">data:</template>
-          </el-input>               -->
         </el-row>
         <br>
         <el-row v-if="attribute.includes('color')" style="display:flex">         
@@ -386,7 +382,7 @@
         </el-row>         
                  
         <span slot="footer" class="dialog-footer">
-          <el-button v-if="dataEditIndex != 0" @click="dataEditDelete">删除</el-button>
+          <el-button @click="dataEditDelete">删除</el-button>
           <el-button type="primary" @click="dataEditFirm">确 定</el-button>
         </span>            
       </el-dialog>             
@@ -572,7 +568,14 @@
         </span>            
       </el-dialog> 
     </el-row>
-    <el-row v-if="formulaShow">4</el-row>
+    <el-row v-if="formulaShow">
+      <el-input
+        type="textarea"
+        :autosize="{ minRows: 2}"
+        placeholder="请输入内容:[]"
+        v-model="formulaValue"></el-input>
+        <el-button type="success" @click="formulaRender">渲染</el-button>
+    </el-row>
 
     <el-button v-if="!menuButtonShowList[attribute]" class="menuButton" plain @click="reset('open')">重置</el-button>
     <el-button class="menuButton" plain @click="test">test</el-button>
@@ -610,8 +613,11 @@ export default {
       tabName: {'circle-color':'颜色','circle-radius':'半径','circle-opacity':'透明度','circle-stroke-color':'边线颜色','circle-stroke-width':'边线宽度','circle-stroke-opacity':'边线不透明度','circle-blur':'模糊','circle-translate':'平移','circle-translate-anchor':'平移参考','circle-pitch-alignment':'倾斜对齐','circle-pitch-scale':'倾斜缩放',
                 'line-color':'颜色','line-width':'线宽','line-opacity':'不透明度','line-dasharray':'虚线','line-gap-width':'线间隙','line-blur':'模糊','line-translate':'平移','line-translate-anchor':'平移参考','line-offset':'偏移','line-cap':'线帽','line-join':'线连接',
                 'fill-color':'颜色','fill-opacity':'不透明度','fill-outline-color':'边线颜色','fill-translate':'平移','fill-translate-anchor':'平移参考','fill-antialias':'抗锯齿',
-                'fill-extrusion-color':'颜色','fill-extrusion-height':'高度','fill-extrusion-base':'底部高度','fill-extrusion-opacity':'不透明度','fill-extrusion-translate':'平移','fill-extrusion-translate-anchor':'平移参考','fill-extrusion-vertical-gradient':'渐变填充'},
-      numAttribute: ['circle-radius','circle-opacity','circle-stroke-opacity','circle-stroke-width','circle-stroke-opacity','circle-blur','line-width','line-opacity','line-gap-width','line-blur','line-offset','fill-opacity','fill-extrusion-height','fill-extrusion-base','fill-extrusion-opacity'],
+                'fill-extrusion-color':'颜色','fill-extrusion-height':'高度','fill-extrusion-base':'底部高度','fill-extrusion-opacity':'不透明度','fill-extrusion-translate':'平移','fill-extrusion-translate-anchor':'平移参考','fill-extrusion-vertical-gradient':'渐变填充',
+                'icon-image':'图标','icon-size':'图标大小','text-field':'标注字段'},
+      numAttribute: ['circle-radius','circle-opacity','circle-stroke-opacity','circle-stroke-width','circle-stroke-opacity','circle-blur',
+                     'line-width','line-opacity','line-gap-width','line-blur','line-offset','fill-opacity','fill-extrusion-height','fill-extrusion-base','fill-extrusion-opacity',
+                     'icon-size',],
       arrayAttribute: ['circle-translate','line-translate','fill-translate','fill-extrusion-translate'],     //'line-dasharray'另外提出
 
       isNum: false,
@@ -631,7 +637,7 @@ export default {
       dataValue: [{data:0},{data:0}],    
       dataList: [],
       dataRange: {min:0,max:0},
-      dataSearch: '区',
+      dataSearch: '',
       dataSelect: '',
       datalength: 2,
       dataInsertIndex: 1,
@@ -647,12 +653,15 @@ export default {
       allpropValueListLength: 0,
       propEditShow: false,
       propEditIndex: 1,  
-      propSelect: '地点',    
+      propSelect: '',    
       propValueFilter: [],
       propValueList: [],
       propSearch: '区',
       propNowPage: 1,
       propdisable: false,
+
+      //表达式渲染
+      formulaValue: '',
 
 
 
@@ -744,6 +753,7 @@ export default {
         this.layoutOrpaint = 'paint';
       } else{
         this.$message('数据layout和paint属性有误');
+        console.log("attribute：",this.attribute,this.layer.layout)
       }
       // 初始化属性表
       this.propertyList = this.layer.shpAttribute;
@@ -809,9 +819,10 @@ export default {
           const value2 = this.dataValueOrigin;
           this.dataValue = value2;  
           // 将父组件传来的参数设为原来的值
-          const value1 = this.dataValueOrigin[0]['value'];   
+          const value1 = this.dataValueOrigin[0]['value']; 
           this.layer[this.layoutOrpaint][this.attribute] = value1;                       
-          this.dataEditIndex = 0;          
+          this.dataEditIndex = 0;
+          this.dataInsertIndex = 1;          
           console.log('this.dataShow');
         }
         //属性相关
@@ -877,9 +888,6 @@ export default {
       this.propNowPage = currentPage;
       this.propValueListInit();
     },
-    RateFirm(){
-
-    },
     //对zoom变化各行进行处理
     zoomOpen(){
       //初始化zoom条件渲染的参数
@@ -913,8 +921,8 @@ export default {
       this.dataEditShow = true;
 
     },    
-    propOpen(){    
-      // this.propSelect = row.column_name;
+    propOpen(row){    
+      this.propSelect = row.column_name;
       this.propValueListInit();
       //初始化prop条件渲染的参数      
       const valueOrigin1 = JSON.parse(JSON.stringify(this.layerSelect[this.layoutOrpaint][this.attribute]));
@@ -928,6 +936,12 @@ export default {
       this.propertyShow = true;
       this.propEditShow = true;
     },
+    formulaOpen(){
+      this.menuButtonShowList[this.attribute] = false;
+      this.$bus.$emit("show",{param1:this.attribute,param2:false});
+      this.formulaShow = true;
+    },
+
     tableRowClassName({row,rowIndex}){
       row.index = rowIndex;
     },
@@ -978,6 +992,8 @@ export default {
         this.zoomValue = value2;  
         const value1 = this.zoomValueOrigin[0]['value'];   
         this.layer[this.layoutOrpaint][this.attribute] = value1;          
+      }else{
+        this.zoomRender();
       }
     },
     zoomEditFirm(){
@@ -1073,9 +1089,6 @@ export default {
         this.datalength = this.dataValue.length;
         this.dataInsertIndex = 1;
       }
-      console.log('datalength',this.datalength);
-      console.log('dataInsertIndex',this.dataInsertIndex);
-
     },
     dataEditFirm(){
       this.dataEditShow = false;
@@ -1127,28 +1140,46 @@ export default {
           }
         }         
       }
-      console.log('dataCondition:',value);      
       this.$emit("callback",this.layoutOrpaint,this.attribute,value); 
     },
     getDataRange(){
       requestApi.getMaxMinAttrValue({
           "attrName": this.dataSelect,
-          "shpTableName": this.layer.id
+          "shpTableName": this.layer['source-layer']
         })
         .then((res)=>{
           const value = res.data.data;
-          this.dataRange = {min:value.min,max:value.max};
-          this.dataValue[0].data = value.min;
-          this.dataValue[1].data = value.max;      
+          this.dataRange = {min:parseFloat(value.min.toFixed(2)),max:parseFloat(value.max.toFixed(2))};
+          this.dataValue[0].data = parseFloat(value.min);
+          this.dataValue[1].data = parseFloat(value.max);      
           console.log('datarange',this.dataRange);
-
         })
         .catch((err)=>{
           console.log('err',err)
         })
     },    
     dataEditDelete(){
+      this.dataEditShow = false;
+      this.dataValue.splice(this.dataEditIndex,1);
+      // 防止更新内容出错
+      if(this.dataEditIndex != 0)
+        {this.dataEditIndex = Number(this.dataEditIndex) - 1;
+      }
+      //判断，执行类似重置按钮的功能
+      if(this.dataValue.length == 1){
+        this.dataEditIndex = 1;
+        this.menuButtonShowList[this.attribute] = true;
+        [this.dataShow,this.dataShow,this.dataertyShow,this.formulaShow] = [false];
+        this.$bus.$emit("show",{param1:this.attribute,param2:true});
+        const value2 = this.dataValueOrigin;
+        this.dataValue = value2;  
+        const value1 = this.dataValueOrigin[0]['value'];   
+          console.log('dataValueOrigin:',this.dataValueOrigin)  
 
+        this.layer[this.layoutOrpaint][this.attribute] = value1;          
+      }else{
+        this.dataEditFirm();
+      }
     },    
 
     //propperty变化处理
@@ -1160,7 +1191,7 @@ export default {
     propValueListInit(){
       requestApi.getAttrValue({
           "aimAttrName": this.propSelect,
-          "aimShpTableName": this.layer.id,
+          "aimShpTableName": this.layer['source-layer'],
           "page": this.propNowPage,
           "pageSize": 10,
           "searchText": this.propSearch,
@@ -1188,6 +1219,7 @@ export default {
     propEditDelete(){
       this.propEditShow = false;
       this.propValue.splice(this.propEditIndex,1);
+      this.propValueFilter.splice(this.propEditIndex,1)
       // 防止更新内容出错
       if(this.propEditIndex != 0)
         {this.propEditIndex = Number(this.propEditIndex) - 1;
@@ -1202,6 +1234,8 @@ export default {
         this.propValue = value2;  
         const value1 = this.propValueOrigin[0]['value'];   
         this.layer[this.layoutOrpaint][this.attribute] = value1;          
+      }else{
+        this.propEditFirm();        
       }
     },
     propEditFirm(){
@@ -1209,14 +1243,17 @@ export default {
       // let propCondition = ["case",["match",["get",this.propSelect],['坝尾广东省汕头市龙湖区'],true,false,'#00CED1'],this.propValue[0].value];
       //属性条件渲染
       let value = ["case"];
+      let num = 1;
+      console.log('propValueFilter',this.propValueFilter)
       for(let i in this.propValueFilter){
         let template = ["match",["get",this.propSelect],[],true,false];
         for(let j in this.propValueFilter[i]){
-          const value = this.propValueFilter[i][j][this.propSelect];
-          template[2].push(value);
+          const value1 = this.propValueFilter[i][j][this.propSelect];
+          template[2].push(value1);
         }
         value.push(template);
-        value.push(this.propValue[this.propEditIndex].value);
+        value.push(this.propValue[num].value);
+        num++;
       }
       value.push(this.propValue[0].value);
       console.log('propcondition',value)
@@ -1248,6 +1285,36 @@ export default {
     //   if(val.endsWith(',')){val = val.substr(0,val.length-1)}
     //   this.propValueFilter[this.propEditIndex] = val.split(",");
     // },
+
+    //表达式功能
+    formulaRender(){
+      var a = this.formulaValue.replaceAll(" ","");
+      var b = a.replaceAll("\n","");
+      //查找字符串中()和[]的内容
+      var reg1 = new RegExp(/\([^)]*\)/g);
+      var reg2 = new RegExp(/\[[^)]*\]/g);
+      var circleList = b.match(reg1);
+      var squareList = b.match(reg2);
+      var c = b.replaceAll(reg1,"@");
+      var d = c.replaceAll(reg2,"!");
+      var e = d.replaceAll(",","。");
+      for(let i in circleList){
+        var f = e.replace(/@/,circleList[i])
+      console.log('f1',f);
+      console.log('circleList',circleList[i]);
+      }
+      for(let i in squareList){
+        var g = f.replace(/!/,squareList[i])
+      console.log('g1',g);
+      console.log('squareList',squareList[i]);
+      }      
+
+
+      // const value = e.split('。');
+      // console.log('formulaValue2',value);
+      // this.$emit("callback",this.layoutOrpaint,this.attribute,value);      
+
+    },
 
     test(){
       // console.log(tab, event);
