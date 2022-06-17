@@ -1367,6 +1367,7 @@ import layerStyle from "../assets/js/layerStyleProperties";
 
 import Sortable from "sortablejs";
 import ConditionRender from "../components/ConditionRender"
+// import Vue from "vue";
 
 var map = null;
 
@@ -1398,9 +1399,12 @@ export default {
       zoom: 6,
       center: "119,32",
       showCenter: "119,32",
+      sprite:"",
+      glyphs:"",
       sources: {},
       layers: [],
       nowLayerIndex: 0,
+
 
 
 
@@ -1576,6 +1580,8 @@ export default {
             console.log("mapProjectInfo:", this.mapProjectInfo);
             this.center = this.mapProjectInfo.center.split(',');
             this.zoom = this.mapProjectInfo.zoom
+            this.sprite=this.reqUrl+this.mapProjectInfo.sprite
+            this.glyphs=this.reqUrl+this.mapProjectInfo.glyphs
             this.sources = this.mapProjectInfo.sources
             this.layers = this.mapProjectInfo.layers
             this.layersNameObject = this.mapProjectInfo.layerTree
@@ -1606,19 +1612,6 @@ export default {
           "pk.eyJ1Ijoid3lqcSIsImEiOiJjbDBnZDdwajUxMXRzM2htdWxubDh1MzJrIn0.2e2_rdU2nOUvtwltBIZtZg";
       map = new mapboxgl.Map({
         container: "map",
-        // style: {
-        //   version: 8,
-        //   // sources: {},
-        //   // layers: [],
-        //   sprite: "mapbox://sprites/mapbox/bright-v8",
-        //   glyphs: "mapbox://fonts/{username}/{fontstack}/{range}.pbf",
-
-        // }
-        // sprite: "http://172.21.212.63:8991/store/sprites/mpx_sprite/sprite",
-        // glyphs: "http://172.21.212.63:8991/store/fonts/{fontstack}/{range}.pbf"
-        // style: 'mapbox://styles/mapbox/satellite-v9', // style URL
-        // center: this.center,
-        // zoom: this.zoom,
       });
 
       // 添加比例尺
@@ -1742,6 +1735,17 @@ export default {
     initMapWithData() {
       console.log("initMapWithData");
 
+
+      let initStyle={
+          version: 8,
+          sources: {},
+          layers: [],
+          sprite: this.sprite,
+          glyphs:this.glyphs
+        }
+
+      map.setStyle(initStyle)
+
       map.setZoom(this.zoom)
       map.setCenter(this.center)
       //需要按字符串来保存坐标
@@ -1774,6 +1778,8 @@ export default {
 
         this.mapProjectInfo.zoom = this.zoom
         this.mapProjectInfo.center = this.center
+        this.mapProjectInfo.sprite=this.sprite
+        this.mapProjectInfo.glyphs=this.glyphs
         this.mapProjectInfo.sources = this.sources
         // this.mapProjectInfo.layers = {layers: this.layers}
         this.mapProjectInfo.layers = this.layers
