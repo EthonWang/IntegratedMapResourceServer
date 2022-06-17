@@ -822,8 +822,8 @@
               <br>
               <span style="font-size:10px;color:#909399">（该属性需要抗锯齿属性为true）</span>
               <el-row v-if="menuButtonShowList['icon-image']" style="display:flex;margin-top:10px">
-                <el-input v-model="layers[nowLayerIndex].paint['icon-image']"
-                          @change="handlePaintChange(layers[nowLayerIndex]['id'],'icon-image',layers[nowLayerIndex].paint['icon-image'])"
+                <el-input v-model="layers[nowLayerIndex].layout['icon-image']"
+                          @change="handeLayoutChange(layers[nowLayerIndex]['id'],'icon-image',layers[nowLayerIndex].layout['icon-image'])"
                           placeholder="something"></el-input>
                 <el-popover
                   placement="right"
@@ -902,22 +902,56 @@
                               label="描述文字">
               </el-input-number>
             </el-tab-pane>
-            <el-tab-pane label="平移">
-              <h3>平移</h3>
-              <h4>x方向（px）：</h4>
-              <el-input-number v-model="layers[nowLayerIndex].paint['icon-translate'][0]"
-                              :step="1"
-                              @change="handlePaintChange(layers[nowLayerIndex]['id'],'icon-translate',layers[nowLayerIndex].paint['icon-translate'])">
-              </el-input-number>
-              <h4>y方向（px）：</h4>
-              <el-input-number v-model="layers[nowLayerIndex].paint['icon-translate'][1]"
-                              :step="1"
-                              @change="handlePaintChange(layers[nowLayerIndex]['id'],'icon-translate',layers[nowLayerIndex].paint['icon-translate'])">
-              </el-input-number>
+            <el-tab-pane label="允许压盖">
+              <h3>允许压盖</h3>&nbsp;
+              <span v-if="!menuButtonShowList['icon-allow-overlap']">Zoom Range</span>
+              <el-row v-if="menuButtonShowList['icon-allow-overlap']" style="margin-top:10px;display:flex">
+                <el-switch v-model="layers[nowLayerIndex].layout['icon-allow-overlap']"
+                          @change="handleLayoutChange(layers[nowLayerIndex]['id'],'icon-allow-overlap',layers[nowLayerIndex].layout['icon-allow-overlap'])">
+                </el-switch>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='icon-allow-overlap' @callback="callback"></ConditionRender>
             </el-tab-pane>
+            <el-tab-pane label="忽略放置">
+              <h3>忽略放置</h3>&nbsp;
+              <span v-if="!menuButtonShowList['icon-ignore-placement']">Zoom Range</span>
+              <el-row v-if="menuButtonShowList['icon-ignore-placement']" style="margin-top:10px;display:flex">
+                <el-switch v-model="layers[nowLayerIndex].layout['icon-ignore-placement']"
+                          @change="handleLayoutChange(layers[nowLayerIndex]['id'],'icon-ignore-placement',layers[nowLayerIndex].layout['icon-ignore-placement'])">
+                </el-switch>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='icon-ignore-placement' @callback="callback"></ConditionRender>
+            </el-tab-pane>
+            <el-tab-pane label="图标可选">
+              <h3>图标可选</h3>&nbsp;
+              <span v-if="!menuButtonShowList['icon-optional']">Zoom Range</span>
+              <el-row v-if="menuButtonShowList['icon-optional']" style="margin-top:10px;display:flex">
+                <el-switch v-model="layers[nowLayerIndex].layout['icon-optional']"
+                          @change="handleLayoutChange(layers[nowLayerIndex]['id'],'icon-optional',layers[nowLayerIndex].layout['icon-optional'])">
+                </el-switch>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='icon-optional' @callback="callback"></ConditionRender>
+            </el-tab-pane>   
+            <el-tab-pane label="内边距">
+              <h3>内边距（px）</h3>&nbsp;
+              <span v-if="!menuButtonShowList['icon-padding']">Zoom Range</span>
+              <el-row v-if="menuButtonShowList['icon-padding']" style="display:flex;margin-top:10px">
+                <el-input-number v-model="layers[nowLayerIndex].layout['icon-padding']"
+                                @change="handleLayoutChange(layers[nowLayerIndex]['id'],'icon-padding',layers[nowLayerIndex].layout['icon-padding'])"
+                                :min="0" :max="99999"
+                                size="medium"
+                                label="描述文字">
+                </el-input-number>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='icon-padding' @callback="callback"></ConditionRender>
+            </el-tab-pane>                                    
             <el-tab-pane label="平移参考">
               <h3>平移参考</h3>
-              <el-select v-model="layers[nowLayerIndex].paint['icon-translate-anchor']" placeholder="请选择">
+              <el-select v-model="layers[nowLayerIndex].layout['icon-translate-anchor']" placeholder="请选择">
                 <el-option
                     v-for="item in ['map','viewport']"
                     :key="item"
@@ -973,42 +1007,92 @@
               <el-divider></el-divider>
               <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='text-field' @callback="callback"></ConditionRender>
             </el-tab-pane>
-            <el-tab-pane label="平移">
-              <h3>平移</h3>
-              <h4>x方向（px）：</h4>
-              <el-input-number v-model="layers[nowLayerIndex].paint['icon-translate'][0]"
-                              :step="1"
-                              @change="handlePaintChange(layers[nowLayerIndex]['id'],'icon-translate',layers[nowLayerIndex].paint['icon-translate'])">
-              </el-input-number>
-              <h4>y方向（px）：</h4>
-              <el-input-number v-model="layers[nowLayerIndex].paint['icon-translate'][1]"
-                              :step="1"
-                              @change="handlePaintChange(layers[nowLayerIndex]['id'],'icon-translate',layers[nowLayerIndex].paint['icon-translate'])">
-              </el-input-number>
+            <el-tab-pane label="颜色">
+              <h3>颜色</h3>&nbsp;
+              <span v-if="!menuButtonShowList['text-color']">Zoom Range</span>
+              <el-row v-if="menuButtonShowList['text-color']" style="display:flex;margin-top:10px">
+                <el-color-picker
+                    v-model="layers[nowLayerIndex].paint['text-color']"
+                    @change="handlePaintChange(layers[nowLayerIndex]['id'],'text-color',layers[nowLayerIndex].paint['text-color'])"
+                    :predefine="predefineColors">
+                </el-color-picker>
+                <el-input v-model="layers[nowLayerIndex].paint['text-color']"
+                          @change="handlePaintChange(layers[nowLayerIndex]['id'],'text-color',layers[nowLayerIndex].paint['text-color'])"
+                          placeholder="something"></el-input>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='text-color' @callback="callback"></ConditionRender>
             </el-tab-pane>
-            <el-tab-pane label="平移参考">
-              <h3>平移参考</h3>
-              <el-select v-model="layers[nowLayerIndex].paint['icon-translate-anchor']" placeholder="请选择">
-                <el-option
-                    v-for="item in ['map','viewport']"
-                    :key="item"
-                    :label="item"
-                    :value="item"
-                    @change="handlePaintChange(layers[nowLayerIndex]['id'],'icon-translate-anchor',layers[nowLayerIndex].paint['icon-translate-anchor'])">
-                </el-option>
-              </el-select>
+            <el-tab-pane label="不透明度">
+              <h3>不透明度</h3>&nbsp;
+              <span v-if="!menuButtonShowList['text-opacity']">Zoom Range</span>
+              <el-row v-if="menuButtonShowList['text-opacity']" style="margin-top:10px">
+                <el-slider
+                    v-model="layers[nowLayerIndex].paint['text-opacity']"
+                    :min=0
+                    :max=1
+                    :marks="{0:'0',0.5:'0.5',1:'1'}"
+                    @change="handlePaintChange(layers[nowLayerIndex]['id'],'text-opacity',layers[nowLayerIndex].paint['text-opacity'])"
+                    :step=0.1>
+                </el-slider>
+                <br>
+                <el-input-number v-model="layers[nowLayerIndex].paint['text-opacity']"
+                                @change="handlePaintChange(layers[nowLayerIndex]['id'],'text-opacity',layers[nowLayerIndex].paint['text-opacity'])"
+                                :min="0"
+                                :max="1"
+                                :step="0.1"
+                                size="medium"
+                                label="描述文字">
+                </el-input-number>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='text-opacity' @callback="callback"></ConditionRender>
             </el-tab-pane>
-            <el-tab-pane label="倾斜对齐">
-              <h3>倾斜对齐</h3>
-              <el-select v-model="layers[nowLayerIndex].paint['icon-pitch-alignment']" placeholder="请选择">
-                <el-option
-                    v-for="item in ['auto','map','viewport']"
-                    :key="item"
-                    :label="item"
-                    :value="item"
-                    @change="handlePaintChange(layers[nowLayerIndex]['id'],'icon-pitch-alignment',layers[nowLayerIndex].paint['icon-pitch-alignment'])">
-                </el-option>
-              </el-select>
+            <el-tab-pane label="字体">
+              <h3>字体</h3>&nbsp;
+              <span v-if="!menuButtonShowList['text-font']">Zoom Range</span>
+              <el-row v-if="menuButtonShowList['text-font']" style="display:flex;margin-top:10px">
+                <el-input v-model="layers[nowLayerIndex].layout['text-font']"
+                          @change="handleLayoutChange(layers[nowLayerIndex]['id'],'text-font',layers[nowLayerIndex].paint['text-font'])"
+                          placeholder="something"></el-input>
+                <el-popover
+                  ref="fieldPopover"
+                  placement="right"
+                  width="400"
+                  trigger="click">
+                  <el-table :data="filterOptions.filter(data => !search || data['column_name'].toLowerCase().includes(search.toLowerCase()))"
+                            :cell-style="{textAlign:'left'}" height="400" @row-click="fieldSelect">
+                    <el-table-column
+                      prop="column_name"
+                      align="right">
+                      <template slot="header" >
+                        <el-input
+                          v-model="search"
+                          size="mini"
+                          placeholder="搜索"
+                          prefix-icon="el-icon-search" />
+                      </template>
+                    </el-table-column>
+                  </el-table>
+                  <el-button type="text" icon="el-icon-s-unfold" slot="reference"></el-button>
+                </el-popover> 
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='text-font' @callback="callback"></ConditionRender>
+            </el-tab-pane>            
+            <el-tab-pane label="字体大小">
+              <h3>字体大小（px）</h3>&nbsp;
+              <span v-if="!menuButtonShowList['text-size']">Zoom Range</span>
+              <el-row v-if="menuButtonShowList['text-size']" style="display:flex;margin-top:10px">
+                <el-input-number v-model="layers[nowLayerIndex].paint['text-size']"
+                                @change="handlePaintChange(layers[nowLayerIndex]['id'],'text-size',layers[nowLayerIndex].paint['text-size'])"
+                                :min="0" :max="99999"
+                                size="medium"
+                                label="描述文字">
+                </el-input-number>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='text-size' @callback="callback"></ConditionRender>
             </el-tab-pane>
           </el-tabs>          
         </el-tab-pane>
@@ -1520,7 +1604,6 @@ export default {
     createEmptyMap() {
       mapboxgl.accessToken =
           "pk.eyJ1Ijoid3lqcSIsImEiOiJjbDBnZDdwajUxMXRzM2htdWxubDh1MzJrIn0.2e2_rdU2nOUvtwltBIZtZg";
-// "629e10a448d891481927522f":{type: "vector",url: "http://172.21.212.63:8991/getTileJson/629e10a448d891481927522f.json"}
       map = new mapboxgl.Map({
         container: "map",
         // style: {
@@ -1531,8 +1614,8 @@ export default {
         //   glyphs: "mapbox://fonts/{username}/{fontstack}/{range}.pbf",
 
         // }
-        sprite: "http://172.21.212.63:8991/store/sprites/mpx_sprite/sprite",
-        glyphs: "http://172.21.212.63:8991/store/fonts/{fontstack}/{range}.pbf"
+        // sprite: "http://172.21.212.63:8991/store/sprites/mpx_sprite/sprite",
+        // glyphs: "http://172.21.212.63:8991/store/fonts/{fontstack}/{range}.pbf"
         // style: 'mapbox://styles/mapbox/satellite-v9', // style URL
         // center: this.center,
         // zoom: this.zoom,
