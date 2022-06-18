@@ -614,11 +614,12 @@ export default {
                 'line-color':'颜色','line-width':'线宽','line-opacity':'不透明度','line-dasharray':'虚线','line-gap-width':'线间隙','line-blur':'模糊','line-translate':'平移','line-translate-anchor':'平移参考','line-offset':'偏移','line-cap':'线帽','line-join':'线连接',
                 'fill-color':'颜色','fill-opacity':'不透明度','fill-outline-color':'边线颜色','fill-translate':'平移','fill-translate-anchor':'平移参考','fill-antialias':'抗锯齿',
                 'fill-extrusion-color':'颜色','fill-extrusion-height':'高度','fill-extrusion-base':'底部高度','fill-extrusion-opacity':'不透明度','fill-extrusion-translate':'平移','fill-extrusion-translate-anchor':'平移参考','fill-extrusion-vertical-gradient':'渐变填充',
-                'icon-image':'图标','icon-size':'图标大小','text-field':'标注字段','text-color':'颜色','text-opacity':'不透明度','text-font':'字体','text-size':'字体大小','icon-allow-overlap':'允许压盖','icon-ignore-placement':'忽略放置','icon-optional':'图标可选','icon-padding':'内边距'},
+                'icon-image':'图标','icon-size':'图标大小','icon-opacity':'不透明度','icon-allow-overlap':'允许压盖','icon-ignore-placement':'忽略放置','icon-optional':'图标可选','icon-padding':'内边距','icon-offset':'偏移',
+                'text-field':'标注字段','text-color':'颜色','text-opacity':'不透明度','text-font':'字体','text-size':'字体大小','icon-translate':'平移','icon-translate-anchor':'平移参考','icon-anchor':'图标锚点','icon-rotate':'旋转角度','icon-pitch-alignment':'倾斜对齐','icon-rotation-alignment':'旋转对齐','icon-height':'图标高度',},
       numAttribute: ['circle-radius','circle-opacity','circle-stroke-opacity','circle-stroke-width','circle-stroke-opacity','circle-blur',
                      'line-width','line-opacity','line-gap-width','line-blur','line-offset','fill-opacity','fill-extrusion-height','fill-extrusion-base','fill-extrusion-opacity',
-                     'icon-size','text-opacity','icon-padding'],
-      arrayAttribute: ['circle-translate','line-translate','fill-translate','fill-extrusion-translate'],     //'line-dasharray'另外提出
+                     'icon-size','icon-opacity','text-opacity','icon-padding'],
+      arrayAttribute: ['circle-translate','line-translate','fill-translate','fill-extrusion-translate','icon-offset','icon-translate',],     //'line-dasharray'另外提出
 
       isNum: false,
       isArray: false,
@@ -772,7 +773,7 @@ export default {
       //初次传递整个导航条的显示情况，依据param2判断是否单个tab显示切换
       this.$bus.$emit("show",{param1:this.menuButtonShowList,param2:0});
 
-      console.log('a',this.menuButtonShowList)
+      // console.log('a',this.menuButtonShowList)
 
 
     },    
