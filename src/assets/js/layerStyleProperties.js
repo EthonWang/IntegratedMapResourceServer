@@ -61,55 +61,57 @@ export default {
             "icon-allow-overlap":false,
             "icon-anchor":"center", //One of "center", "left", "right", "top", "bottom", "top-left", "top-right", "bottom-left", "bottom-right".
             "icon-ignore-placement":false,
-            "icon-image":"",
+            "icon-image":"cat",
+            "icon-keep-upright":false,
             "icon-offset":[0,0],
             "icon-optional":false,
             "icon-padding":0,
             "icon-pitch-alignment":"auto", //One of "map", "viewport", "auto"
             "icon-rotate":0,
             "icon-rotation-alignment":"auto", //"map", "viewport", "auto"
-            "icon-size":1,
+            "icon-size":0.25,
 
-            "symbol-placement":"point",  //One of "point", "line", "line-center"
-            "symbol-sort-key":0,
-            "text-anchor":"center", //One of "center", "left", "right", "top", "bottom", "top-left", "top-right", "bottom-left", "bottom-right". Defaults to "center"
-            "text-field":"",
-            "text-font":["Open Sans Regular","Arial Unicode MS Regular"],
-            "text-ignore-placement":false,
-            "text-justify":"center", // One of "auto", "left", "center", "right".
-            "text-keep-upright":true,
-            "text-letter-spacing":0,
-            "text-line-height":1.2,
-            "text-max-angle":45,
-            "text-max-width":0,
-            "text-offset":[0,0],
-            "text-optional":false,
-            "text-padding":2,
-            "text-pitch-alignment":"auto", //One of "map", "viewport", "auto"
-            "text-radial-offset":0,
-            "text-rotate":0,
-            "text-rotation-alignment":"auto", //One of "map", "viewport", "auto"
-            "text-size":16,
-            "text-transform":"none", //One of "none", "uppercase", "lowercase"
-            "text-variable-anchor":["center"], //One of "center", "left", "right", "top", "bottom", "top-left", "top-right", "bottom-left", "bottom-right".
-            "text-writing-mode":["horizontal"], //One of "horizontal", "vertical"
-            "visibility":"none",
+            // "symbol-placement":"point",  //One of "point", "line", "line-center"
+            // "symbol-sort-key":0,
+            // "symbol-spacing":1,
+            // "text-anchor":"center", //One of "center", "left", "right", "top", "bottom", "top-left", "top-right", "bottom-left", "bottom-right". Defaults to "center"
+            // "text-field":"",
+            // "text-font":["Open Sans Regular","Arial Unicode MS Regular"],
+            // "text-ignore-placement":false,
+            // "text-justify":"center", // One of "auto", "left", "center", "right".
+            // "text-keep-upright":true,
+            // "text-letter-spacing":0,
+            // "text-line-height":1.2,
+            // "text-max-angle":45,
+            // "text-max-width":0,
+            // "text-offset":[0,0],
+            // "text-optional":false,
+            // "text-padding":2,
+            // "text-pitch-alignment":"auto", //One of "map", "viewport", "auto"
+            // "text-radial-offset":0,
+            // "text-rotate":0,
+            // "text-rotation-alignment":"auto", //One of "map", "viewport", "auto"
+            // "text-size":16,
+            // "text-transform":"none", //One of "none", "uppercase", "lowercase"
+            // "text-variable-anchor":["center"], //One of "center", "left", "right", "top", "bottom", "top-left", "top-right", "bottom-left", "bottom-right".
+            // "text-writing-mode":["horizontal"], //One of "horizontal", "vertical"
+            // "visibility":"none",
         },
         "paint":{
-            "icon-color":"#000000",
-            "icon-halo-blur":0,
-            "icon-halo-color":"rgba(0, 0, 0, 0)",
-            "icon-halo-width":0,
-            "icon-opacity":1,
-            "icon-translate":[0,0],
-            "icon-translate-anchor":"map", //One of "map", "viewport"
-            "text-color":"#000000",
-            "text-halo-blur":0,
-            "text-halo-color":"rgba(0, 0, 0, 0)",
-            "text-halo-width":0,
-            "text-opacity":1,
-            "text-translate":[0,0],
-            "text-translate-anchor":"map", //One of "map", "viewport".
+            // "icon-color":"#000000",
+            // // "icon-halo-blur":0,
+            // // "icon-halo-color":"rgba(0, 0, 0, 0)",
+            // // "icon-halo-width":0,
+            // "icon-opacity":1,
+            // "icon-translate":[0,0],
+            // "icon-translate-anchor":"map", //One of "map", "viewport"
+            // "text-color":"#000000",
+            // "text-halo-blur":0,
+            // "text-halo-color":"rgba(0, 0, 0, 0)",
+            // "text-halo-width":0,
+            // "text-opacity":1,
+            // "text-translate":[0,0],
+            // "text-translate-anchor":"map", //One of "map", "viewport".
         }
 
     },
