@@ -104,19 +104,59 @@
       <el-button @click="nowLayerIndex = 3">3</el-button>
     </div>
 
-    <ConditionRender :layerSelect="layers[nowLayerIndex]" :tab="tab" @callback="callback"></ConditionRender>
+    <!-- <ConditionRender :layerSelect="layers[nowLayerIndex]" :tab="tab" @callback="callback"></ConditionRender> -->
     <!-- <MapboxView :shpShowList="shpList"></MapboxView> -->
+
+    <div style="position:absolute;width:350px;top:400px;left:600px;display:flex">
+      <el-input
+        v-model="textField"
+        placeholder="something"
+      ></el-input>
+      <el-popover
+        ref="fieldPopover"
+        placement="right"
+        width="400"
+        trigger="click"
+      >
+        <el-tabs>
+          <el-tab-pane label="精灵图" style="overflow-y:scroll">
+            <el-row type="flex" justify="start" style="flex-wrap:wrap;width:100%">
+              <el-card class="spriteImage" v-for="(item,index) in sprite" :key="index">                
+                <el-image
+                  style="width: 100px; height: 100px"
+                  :src = "reqUrl + item.webAddress"
+                  fit="cover"
+                  @click="handleSprite(item)"
+                  >
+                </el-image>
+              </el-card>
+            </el-row>
+          </el-tab-pane>
+          <el-tab-pane label="自定义">
+
+          </el-tab-pane>          
+        </el-tabs>
+
+        <el-button
+          type="text"
+          icon="el-icon-s-unfold"
+          slot="reference"
+        ></el-button>
+      </el-popover> 
+    </div>
+
+   
   </div>
 
 </template>
 
 <script>
 // import MapboxView from "../components/MapboxView";
-import ConditionRender from "../components/ConditionRender"
+// import ConditionRender from "../components/ConditionRender"
 
 export default {
   name: "TestPage",
-  components: {ConditionRender},
+  // components: {ConditionRender},
   // components: {MapboxView},
   data() {
     return {
@@ -200,7 +240,45 @@ export default {
 
       tab: 'line-color',
 
-
+      textField: '',
+      sprite:
+      [
+            {
+              "id": "62ad321a48d8f9d460e94ae5",
+              "originName": "cat",
+              "storeName": "cat_62ad321a48d8f9d460e94ae4.png",
+              "createTime": "2022-06-18 10:02:02 ",
+              "webAddress": "/store/symbols/cat_62ad321a48d8f9d460e94ae4.png"
+            },
+            {
+              "id": "62ab329048d8acac7319a4cd",
+              "originName": "前方施工",
+              "storeName": "前方施工_62ab327348d8acac7319a4cb.png",
+              "createTime": "2022-06-16 21:39:28 ",
+              "webAddress": "/store/symbols/前方施工_62ab327348d8acac7319a4cb.png"
+            },
+            {
+              "id": "62ab329048d8acac7319a4ce",
+              "originName": "右道封闭",
+              "storeName": "右道封闭_62ab327448d8acac7319a4cc.png",
+              "createTime": "2022-06-16 21:39:28 ",
+              "webAddress": "/store/symbols/右道封闭_62ab327448d8acac7319a4cc.png"
+            },
+            {
+              "id": "62a8aa7348d890da216e97f0",
+              "originName": "锥形交通标志",
+              "storeName": "锥形交通标志_62a8aa6748d890da216e97ef.png",
+              "createTime": "2022-06-14 23:34:11 ",
+              "webAddress": "/store/symbols/锥形交通标志_62a8aa6748d890da216e97ef.png"
+            },
+            {
+              "id": "62a8aa7348d890da216e97f1",
+              "originName": "左道封闭",
+              "storeName": "左道封闭_62a8aa6548d890da216e97ee.png",
+              "createTime": "2022-06-14 23:34:11 ",
+              "webAddress": "/store/symbols/左道封闭_62a8aa6548d890da216e97ee.png"
+            }
+          ],
     }
   },
   created(){
@@ -284,6 +362,10 @@ export default {
       //     break;
       //   }
       // }
+    handleSprite(item){
+      this.textField = item.originName;
+      this.$refs.fieldPopover.doClose();
+    },
 
 
 
@@ -309,6 +391,18 @@ export default {
   display:flex;
   justify-content:space-between;
   align-items:center;
+}
+.spriteImage{
+    flex: 1;
+    height: 120px;
+    margin: 0 5px 5px 0; 
+    background-color: #999;
+    width: calc((100% - 20px) / 3);  
+    min-width: calc((100% - 20px) / 3); 
+    max-width: calc((100% - 20px) / 3); 
+}
+.spriteImage:nth-child(3n){
+  margin-right: 0;
 }
 
 </style>

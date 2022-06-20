@@ -1730,17 +1730,14 @@
               &nbsp;
               <span v-if="!menuButtonShowList['icon-image']">Zoom Range</span>
               <br />
-              <span style="font-size: 10px; color: #909399"
-                >（该属性需要抗锯齿属性为true）</span
-              >
               <el-row
                 v-if="menuButtonShowList['icon-image']"
                 style="display: flex; margin-top: 10px"
               >
                 <el-input
-                  v-model="layers[nowLayerIndex].layout['icon-image']"
+                  v-model="this.layers[this.nowLayerIndex].layout['icon-image']"
                   @change="
-                    handeLayoutChange(
+                    handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'icon-image',
                       layers[nowLayerIndex].layout['icon-image']
@@ -1748,70 +1745,65 @@
                   "
                   placeholder="something"
                 ></el-input>
-                <el-popover placement="right" width="400" trigger="click">
-                  <el-row type="flex" justify="space-between">
-                    <el-col :span="18">
-                      <el-tag
-                        v-for="tag in filterValueSelect"
-                        :key="tag.value"
-                        :closable="true"
-                        @close="handleTagClose(tag)"
+                <el-popover
+                  ref="iconPopover"
+                  placement="right"
+                  width="400"
+                  trigger="click"
+                >
+                  <el-tabs>
+                    <el-tab-pane
+                      label="精灵图"
+                      style="height: 200px; overflow-y: scroll"
+                    >
+                      <el-col
+                        class="cursor"
+                        v-for="(item, index) in spriteList"
+                        :key="index"
+                        @click.native="spriteSelect(item)"
                       >
-                        {{ tag.value }}
-                      </el-tag>
-                    </el-col>
-                    <el-col :span="4">
-                      <el-button
-                        size="mini"
-                        type="primary"
-                        @click="filterSearch"
-                        >确定</el-button
+                        {{ item }}
+                      </el-col>
+                    </el-tab-pane>
+                    <el-tab-pane label="自定义">
+                      <el-row
+                        type="flex"
+                        justify="start"
+                        style="flex-wrap: wrap; width: 100%"
                       >
-                    </el-col>
-                  </el-row>
+                        <el-card
+                          class="spriteImage"
+                          v-for="(item, index) in symbolTableData"
+                          :key="index"
+                        >
+                          <el-image
+                            style="width: 100px; height: 100px"
+                            :src="reqUrl + item.webAddress"
+                            fit="cover"
+                            class="cursor"
+                            @click="iconSelect(item)"
+                          >
+                          </el-image>
+                        </el-card>
+                      </el-row>
+                    </el-tab-pane>
+                  </el-tabs>
 
-                  <el-table
-                    :data="
-                      filterValue.filter(
-                        (data) =>
-                          !search ||
-                          data.value
-                            .toLowerCase()
-                            .includes(search.toLowerCase())
-                      )
-                    "
-                    @selection-change="handleSelectionChange"
-                    row-key="id"
-                    :cell-style="{ textAlign: 'left' }"
-                  >
-                    <el-table-column type="selection" width="50">
-                    </el-table-column>
-                    <el-table-column prop="value" align="right">
-                      <template slot="header">
-                        <el-input
-                          v-model="search"
-                          size="mini"
-                          placeholder="搜索"
-                          prefix-icon="el-icon-search"
-                        />
-                      </template>
-                    </el-table-column>
-                  </el-table>
                   <el-button
                     type="text"
-                    icon="el-icon-circle-plus"
+                    icon="el-icon-s-unfold"
                     slot="reference"
-                    @click="handleFilterValue(item, index)"
                   ></el-button>
                 </el-popover>
               </el-row>
+              <el-divider></el-divider>
               <ConditionRender
                 :layerSelect="layers[nowLayerIndex]"
                 tab="icon-image"
                 @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
-            <!-- <el-tab-pane label="图标大小">
+            <el-tab-pane label="图标大小">
               <h3>图标大小</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['icon-size']">Zoom Range</span>
@@ -1876,6 +1868,12 @@
                 label="描述文字"
               >
               </el-input-number>
+              <el-divider></el-divider>
+              <ConditionRender
+                :layerSelect="layers[nowLayerIndex]"
+                tab="icon-opacity"
+                @callback="callback"
+              ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="允许压盖">
               <h3>允许压盖</h3>
@@ -2095,15 +2093,17 @@
             </el-tab-pane>
             <el-tab-pane label="平移参考">
               <h3>平移参考</h3>
-              <el-select
-                v-model="layers[nowLayerIndex].layout['icon-translate-anchor']"
-                placeholder="请选择"
+              &nbsp;
+              <span v-if="!menuButtonShowList['icon-translate-anchor']"
+                >Zoom Range</span
               >
-                <el-option
-                  v-for="item in ['map', 'viewport']"
-                  :key="item"
-                  :label="item"
-                  :value="item"
+              <el-row
+                v-if="menuButtonShowList['icon-translate-anchor']"
+                style="margin-top: 10px; display: flex"
+              >
+                <el-select
+                  v-model="layers[nowLayerIndex].paint['icon-translate-anchor']"
+                  placeholder="请选择"
                   @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
@@ -2112,8 +2112,21 @@
                     )
                   "
                 >
-                </el-option>
-              </el-select>
+                  <el-option
+                    v-for="item in ['map', 'viewport']"
+                    :key="item"
+                    :label="item"
+                    :value="item"
+                  >
+                  </el-option>
+                </el-select>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender
+                :layerSelect="layers[nowLayerIndex]"
+                tab="icon-translate-anchor"
+                @callback="callback"
+              ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="图标锚点">
               <h3>图标锚点</h3>
@@ -2126,6 +2139,13 @@
                 <el-select
                   v-model="layers[nowLayerIndex].layout['icon-anchor']"
                   placeholder="请选择"
+                  @change="
+                    handleLayoutChange(
+                      layers[nowLayerIndex]['id'],
+                      'icon-anchor',
+                      layers[nowLayerIndex].layout['icon-anchor']
+                    )
+                  "
                 >
                   <el-option
                     v-for="item in [
@@ -2142,13 +2162,6 @@
                     :key="item"
                     :label="item"
                     :value="item"
-                    @change="
-                      handlePaintChange(
-                        layers[nowLayerIndex]['id'],
-                        'icon-anchor',
-                        layers[nowLayerIndex].paint['icon-translate-anchor']
-                      )
-                    "
                   >
                   </el-option>
                 </el-select>
@@ -2193,15 +2206,17 @@
             </el-tab-pane>
             <el-tab-pane label="倾斜对齐">
               <h3>倾斜对齐</h3>
-              <el-select
-                v-model="layers[nowLayerIndex].layout['icon-pitch-alignment']"
-                placeholder="请选择"
+              &nbsp;
+              <span v-if="!menuButtonShowList['icon-pitch-alignment']"
+                >Zoom Range</span
               >
-                <el-option
-                  v-for="item in ['auto', 'map', 'viewport']"
-                  :key="item"
-                  :label="item"
-                  :value="item"
+              <el-row
+                v-if="menuButtonShowList['icon-pitch-alignment']"
+                style="margin-top: 10px; display: flex"
+              >
+                <el-select
+                  v-model="layers[nowLayerIndex].layout['icon-pitch-alignment']"
+                  placeholder="请选择"
                   @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
@@ -2210,49 +2225,64 @@
                     )
                   "
                 >
-                </el-option>
-              </el-select>
+                  <el-option
+                    v-for="item in ['auto', 'map', 'viewport']"
+                    :key="item"
+                    :label="item"
+                    :value="item"
+                  >
+                  </el-option>
+                </el-select>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender
+                :layerSelect="layers[nowLayerIndex]"
+                tab="icon-pitch-alignment"
+                @callback="callback"
+              ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="旋转对齐">
               <h3>旋转对齐</h3>
-              <el-select
-                v-model="
-                  layers[nowLayerIndex].layout['icon-rotation-alignment']
-                "
-                placeholder="请选择"
+              &nbsp;
+              <span v-if="!menuButtonShowList['icon-rotation-alignment']"
+                >Zoom Range</span
               >
-                <el-option
-                  v-for="item in ['auto', 'map', 'viewport']"
-                  :key="item"
-                  :label="item"
-                  :value="item"
+              <el-row
+                v-if="menuButtonShowList['icon-rotation-alignment']"
+                style="margin-top: 10px; display: flex"
+              >
+                <el-select
+                  v-model="
+                    layers[nowLayerIndex].layout['icon-rotation-alignment']
+                  "
+                  placeholder="请选择"
                   @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'icon-rotation-alignment',
-                      layers[nowLayerIndex].layout['icon-pitch-alignment']
+                      layers[nowLayerIndex].layout['icon-rotation-alignment']
                     )
                   "
                 >
-                </el-option>
-              </el-select>
-            </el-tab-pane> -->
-            <!-- <el-tab-pane label="图标高度">
-              <h3>图标高度（px）</h3>&nbsp;
-              <span v-if="!menuButtonShowList['icon-height']">Zoom Range</span>
-              <el-row v-if="menuButtonShowList['icon-height']" style="display:flex;margin-top:10px">
-                <el-input-number v-model="layers[nowLayerIndex].layout['icon-height']"
-                                @change="handleLayoutChange(layers[nowLayerIndex]['id'],'icon-height',layers[nowLayerIndex].layout['icon-height'])"
-                                :min="0" :max="99999"
-                                size="medium"
-                                label="描述文字">
-                </el-input-number>
+                  <el-option
+                    v-for="item in ['auto', 'map', 'viewport']"
+                    :key="item"
+                    :label="item"
+                    :value="item"
+                  >
+                  </el-option>
+                </el-select>
               </el-row>
               <el-divider></el-divider>
-              <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='icon-height' @callback="callback"></ConditionRender>
-            </el-tab-pane>                          -->
+              <ConditionRender
+                :layerSelect="layers[nowLayerIndex]"
+                tab="icon-rotation-alignment"
+                @callback="callback"
+              ></ConditionRender>
+            </el-tab-pane>
           </el-tabs>
-          <!-- <el-tabs
+
+          <el-tabs
             class="symbolBox"
             :before-leave="leaveTab"
             v-if="editorShow == 'symbolEditorShow'"
@@ -2260,8 +2290,8 @@
             type="border-card"
             value="first"
             tab-position="left"
-          > -->
-          <!-- <el-tab-pane label="标注字段" name="first">
+          >
+            <el-tab-pane label="标注字段" name="first">
               <h3>标注字段</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-field']">Zoom Range</span>
@@ -2411,40 +2441,74 @@
                 tab="text-opacity"
                 @callback="callback"
               ></ConditionRender>
-            </el-tab-pane> -->
-          <!-- <el-tab-pane label="字体">
-              <h3>字体</h3>&nbsp;
+            </el-tab-pane>
+            <el-tab-pane label="字体">
+              <h3>字体</h3>
+              &nbsp;
               <span v-if="!menuButtonShowList['text-font']">Zoom Range</span>
-              <el-row v-if="menuButtonShowList['text-font']" style="display:flex;margin-top:10px">
-                <el-input v-model="layers[nowLayerIndex].layout['text-font']"
-                          @change="handleLayoutChange(layers[nowLayerIndex]['id'],'text-font',layers[nowLayerIndex].paint['text-font'])"
-                          placeholder="something"></el-input>
+              <el-row
+                v-if="menuButtonShowList['text-font']"
+                style="display: flex; margin-top: 10px"
+              >
+                <el-input
+                  v-model="layers[nowLayerIndex].layout['text-font'][0]"
+                  @change="
+                    handleLayoutChange(
+                      layers[nowLayerIndex]['id'],
+                      'text-font',
+                      layers[nowLayerIndex].layout['text-font']
+                    )
+                  "
+                  placeholder="something"
+                ></el-input>
                 <el-popover
-                  ref="fieldPopover"
+                  ref="fontPopover"
                   placement="right"
                   width="400"
-                  trigger="click">
-                  <el-table :data="filterOptions.filter(data => !search || data['column_name'].toLowerCase().includes(search.toLowerCase()))"
-                            :cell-style="{textAlign:'left'}" height="400" @row-click="fieldSelect">
-                    <el-table-column
-                      prop="column_name"
-                      align="right">
-                      <template slot="header" >
+                  trigger="click"
+                >
+                  <el-table
+                    :data="
+                      fontList.filter(
+                        (data) =>
+                          !fontSearch ||
+                          (data['name']
+                            .toLowerCase()
+                            .includes(fontSearch.toLowerCase()) &&
+                            data.type == 'offline')
+                      )
+                    "
+                    :cell-style="{ textAlign: 'left' }"
+                    height="400"
+                    @row-click="fontSelect"
+                  >
+                    <el-table-column prop="name">
+                      <template slot="header">
                         <el-input
-                          v-model="search"
+                          v-model="fontSearch"
                           size="mini"
                           placeholder="搜索"
-                          prefix-icon="el-icon-search" />
+                          prefix-icon="el-icon-search"
+                        >
+                        </el-input>
                       </template>
                     </el-table-column>
                   </el-table>
-                  <el-button type="text" icon="el-icon-s-unfold" slot="reference"></el-button>
-                </el-popover> 
+                  <el-button
+                    type="text"
+                    icon="el-icon-s-unfold"
+                    slot="reference"
+                  ></el-button>
+                </el-popover>
               </el-row>
               <el-divider></el-divider>
-              <ConditionRender :layerSelect="layers[nowLayerIndex]" tab='text-font' @callback="callback"></ConditionRender>
-            </el-tab-pane>             -->
-          <!-- <el-tab-pane label="字体大小">
+              <ConditionRender
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-font"
+                @callback="callback"
+              ></ConditionRender>
+            </el-tab-pane>
+            <el-tab-pane label="字体大小">
               <h3>字体大小（px）</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-size']">Zoom Range</span>
@@ -2475,7 +2539,692 @@
                 @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
-          </el-tabs> -->
+            <el-tab-pane label="放置位置">
+              <h3>放置位置</h3>
+              &nbsp;
+              <span v-if="!menuButtonShowList['symbol-placement']"
+                >Zoom Range</span
+              >
+              <el-row
+                v-if="menuButtonShowList['symbol-placement']"
+                style="margin-top: 10px; display: flex"
+              >
+                <el-select
+                  v-model="layers[nowLayerIndex].layout['symbol-placement']"
+                  placeholder="请选择"
+                  @change="
+                    handleLayoutChange(
+                      layers[nowLayerIndex]['id'],
+                      'symbol-placement',
+                      layers[nowLayerIndex].layout['symbol-placement']
+                    )
+                  "
+                >
+                  <el-option
+                    v-for="item in ['point', 'line', 'line-center']"
+                    :key="item"
+                    :label="item"
+                    :value="item"
+                  >
+                  </el-option>
+                </el-select>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender
+                :layerSelect="layers[nowLayerIndex]"
+                tab="symbol-placement"
+                @callback="callback"
+              ></ConditionRender>
+            </el-tab-pane>
+            <el-tab-pane label="图标锚点">
+              <h3>图标锚点</h3>
+              &nbsp;
+              <span v-if="!menuButtonShowList['text-anchor']">Zoom Range</span>
+              <el-row
+                v-if="menuButtonShowList['text-anchor']"
+                style="margin-top: 10px; display: flex"
+              >
+                <el-select
+                  v-model="layers[nowLayerIndex].layout['text-anchor']"
+                  placeholder="请选择"
+                  @change="
+                    handleLayoutChange(
+                      layers[nowLayerIndex]['id'],
+                      'text-anchor',
+                      layers[nowLayerIndex].layout['text-anchor']
+                    )
+                  "
+                >
+                  <el-option
+                    v-for="item in [
+                      'center',
+                      'left',
+                      'right',
+                      'top',
+                      'bottom',
+                      'top-left',
+                      'top-right',
+                      'bottom-left',
+                      'bottom-right',
+                    ]"
+                    :key="item"
+                    :label="item"
+                    :value="item"
+                  >
+                  </el-option>
+                </el-select>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-anchor"
+                @callback="callback"
+              ></ConditionRender>
+            </el-tab-pane>
+            <el-tab-pane label="文本对齐">
+              <h3>文本对齐</h3>
+              &nbsp;
+              <span v-if="!menuButtonShowList['text-letter-spacing']"
+                >Zoom Range</span
+              >
+              <el-row
+                v-if="menuButtonShowList['text-letter-spacing']"
+                style="margin-top: 10px; display: flex"
+              >
+                <el-select
+                  v-model="layers[nowLayerIndex].layout['text-letter-spacing']"
+                  placeholder="请选择"
+                  @change="
+                    handleLayoutChange(
+                      layers[nowLayerIndex]['id'],
+                      'text-letter-spacing',
+                      layers[nowLayerIndex].layout['text-letter-spacing']
+                    )
+                  "
+                >
+                  <el-option
+                    v-for="item in ['auto', 'center', 'right', 'left']"
+                    :key="item"
+                    :label="item"
+                    :value="item"
+                  >
+                  </el-option>
+                </el-select>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-letter-spacing"
+                @callback="callback"
+              ></ConditionRender>
+            </el-tab-pane>
+            <el-tab-pane label="字符边距">
+              <h3>字符边距（em）</h3>
+              &nbsp;
+              <span v-if="!menuButtonShowList['text-letter-spacing']"
+                >Zoom Range</span
+              >
+              <el-row
+                v-if="menuButtonShowList['text-letter-spacing']"
+                style="display: flex; margin-top: 10px"
+              >
+                <el-input-number
+                  v-model="layers[nowLayerIndex].layout['text-letter-spacing']"
+                  @change="
+                    handleLayoutChange(
+                      layers[nowLayerIndex]['id'],
+                      'text-letter-spacing',
+                      layers[nowLayerIndex].layout['text-letter-spacing']
+                    )
+                  "
+                  :min="0"
+                  :max="99999"
+                  size="medium"
+                  label="描述文字"
+                >
+                </el-input-number>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-letter-spacing"
+                @callback="callback"
+              ></ConditionRender>
+            </el-tab-pane>
+            <el-tab-pane label="行高">
+              <h3>行高（em）</h3>
+              &nbsp;
+              <span v-if="!menuButtonShowList['text-line-height']"
+                >Zoom Range</span
+              >
+              <el-row
+                v-if="menuButtonShowList['text-line-height']"
+                style="display: flex; margin-top: 10px"
+              >
+                <el-input-number
+                  v-model="layers[nowLayerIndex].layout['text-line-height']"
+                  @change="
+                    handleLayoutChange(
+                      layers[nowLayerIndex]['id'],
+                      'text-line-height',
+                      layers[nowLayerIndex].layout['text-line-height']
+                    )
+                  "
+                  :min="0"
+                  :max="99999"
+                  size="medium"
+                  label="描述文字"
+                >
+                </el-input-number>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-line-height"
+                @callback="callback"
+              ></ConditionRender>
+            </el-tab-pane>
+            <el-tab-pane label="最大宽度">
+              <h3>最大宽度（em）</h3>
+              &nbsp;
+              <span v-if="!menuButtonShowList['text-max-width']"
+                >Zoom Range</span
+              >
+              <el-row
+                v-if="menuButtonShowList['text-max-width']"
+                style="display: flex; margin-top: 10px"
+              >
+                <el-input-number
+                  v-model="layers[nowLayerIndex].layout['text-max-width']"
+                  @change="
+                    handleLayoutChange(
+                      layers[nowLayerIndex]['id'],
+                      'text-max-width',
+                      layers[nowLayerIndex].layout['text-max-width']
+                    )
+                  "
+                  :min="0"
+                  :max="99999"
+                  size="medium"
+                  label="描述文字"
+                >
+                </el-input-number>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-max-width"
+                @callback="callback"
+              ></ConditionRender>
+            </el-tab-pane>
+            <el-tab-pane label="允许压盖">
+              <h3>允许压盖</h3>
+              &nbsp;
+              <span v-if="!menuButtonShowList['text-allow-overlap']"
+                >Zoom Range</span
+              >
+              <el-row
+                v-if="menuButtonShowList['text-allow-overlap']"
+                style="margin-top: 10px; display: flex"
+              >
+                <el-switch
+                  v-model="layers[nowLayerIndex].layout['text-allow-overlap']"
+                  @change="
+                    handleLayoutChange(
+                      layers[nowLayerIndex]['id'],
+                      'text-allow-overlap',
+                      layers[nowLayerIndex].layout['text-allow-overlap']
+                    )
+                  "
+                >
+                </el-switch>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-allow-overlap"
+                @callback="callback"
+              ></ConditionRender>
+            </el-tab-pane>
+            <el-tab-pane label="忽略放置">
+              <h3>忽略放置</h3>
+              &nbsp;
+              <span v-if="!menuButtonShowList['text-ignore-placement']"
+                >Zoom Range</span
+              >
+              <el-row
+                v-if="menuButtonShowList['text-ignore-placement']"
+                style="margin-top: 10px; display: flex"
+              >
+                <el-switch
+                  v-model="
+                    layers[nowLayerIndex].layout['text-ignore-placement']
+                  "
+                  @change="
+                    handleLayoutChange(
+                      layers[nowLayerIndex]['id'],
+                      'text-ignore-placement',
+                      layers[nowLayerIndex].layout['text-ignore-placement']
+                    )
+                  "
+                >
+                </el-switch>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-ignore-placement"
+                @callback="callback"
+              ></ConditionRender>
+            </el-tab-pane>
+            <el-tab-pane label="标注可选">
+              <h3>标注可选</h3>
+              &nbsp;
+              <span v-if="!menuButtonShowList['text-optional']"
+                >Zoom Range</span
+              >
+              <el-row
+                v-if="menuButtonShowList['text-optional']"
+                style="margin-top: 10px; display: flex"
+              >
+                <el-switch
+                  v-model="layers[nowLayerIndex].layout['text-optional']"
+                  @change="
+                    handleLayoutChange(
+                      layers[nowLayerIndex]['id'],
+                      'text-optional',
+                      layers[nowLayerIndex].layout['text-optional']
+                    )
+                  "
+                >
+                </el-switch>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-optional"
+                @callback="callback"
+              ></ConditionRender>
+            </el-tab-pane>
+            <el-tab-pane label="大小写转换">
+              <h3>大小写转换</h3>
+              &nbsp;
+              <span v-if="!menuButtonShowList['text-transform']"
+                >Zoom Range</span
+              >
+              <el-row
+                v-if="menuButtonShowList['text-transform']"
+                style="margin-top: 10px; display: flex"
+              >
+                <el-select
+                  v-model="layers[nowLayerIndex].layout['text-transform']"
+                  placeholder="请选择"
+                  @change="
+                    handleLayoutChange(
+                      layers[nowLayerIndex]['id'],
+                      'text-transform',
+                      layers[nowLayerIndex].layout['text-transform']
+                    )
+                  "
+                >
+                  <el-option
+                    v-for="item in ['none', 'uppercase', 'lowercase']"
+                    :key="item"
+                    :label="item"
+                    :value="item"
+                  >
+                  </el-option>
+                </el-select>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-transform"
+                @callback="callback"
+              ></ConditionRender>
+            </el-tab-pane>
+            <el-tab-pane label="内边距">
+              <h3>内边距（px）</h3>
+              &nbsp;
+              <span v-if="!menuButtonShowList['text-padding']">Zoom Range</span>
+              <el-row
+                v-if="menuButtonShowList['text-padding']"
+                style="display: flex; margin-top: 10px"
+              >
+                <el-input-number
+                  v-model="layers[nowLayerIndex].layout['text-padding']"
+                  @change="
+                    handleLayoutChange(
+                      layers[nowLayerIndex]['id'],
+                      'text-padding',
+                      layers[nowLayerIndex].layout['text-padding']
+                    )
+                  "
+                  :min="0"
+                  :max="99999"
+                  size="medium"
+                  label="描述文字"
+                >
+                </el-input-number>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-padding"
+                @callback="callback"
+              ></ConditionRender>
+            </el-tab-pane>
+            <el-tab-pane label="偏移">
+              <h3>偏移</h3>
+              &nbsp;
+              <span v-if="!menuButtonShowList['text-offset']">Zoom Range</span>
+              <el-row
+                v-if="menuButtonShowList['text-offset']"
+                style="margin-top: 10px; display: flex"
+              >
+                <h4>x轴(em):&nbsp;</h4>
+                <el-input-number
+                  v-model="layers[nowLayerIndex].layout['text-offset'][0]"
+                  :step="1"
+                  @change="
+                    handleLayoutChange(
+                      layers[nowLayerIndex]['id'],
+                      'text-offset',
+                      layers[nowLayerIndex].layout['text-offset']
+                    )
+                  "
+                >
+                </el-input-number>
+              </el-row>
+              <el-row
+                v-if="menuButtonShowList['text-offset']"
+                style="display: flex"
+              >
+                <h4>y轴(em):&nbsp;</h4>
+                <el-input-number
+                  v-model="layers[nowLayerIndex].layout['text-offset'][1]"
+                  :step="1"
+                  @change="
+                    handleLayoutChange(
+                      layers[nowLayerIndex]['id'],
+                      'text-offset',
+                      layers[nowLayerIndex].layout['text-offset']
+                    )
+                  "
+                >
+                </el-input-number>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-offset"
+                @callback="callback"
+              ></ConditionRender>
+            </el-tab-pane>
+            <el-tab-pane label="平移">
+              <h3>平移(px)</h3>
+              &nbsp;
+              <span v-if="!menuButtonShowList['text-translate']"
+                >Zoom Range</span
+              >
+              <el-row
+                v-if="menuButtonShowList['text-translate']"
+                style="margin-top: 10px; display: flex"
+              >
+                <h4>x轴(px):&nbsp;</h4>
+                <el-input-number
+                  v-model="layers[nowLayerIndex].paint['text-translate'][0]"
+                  :step="1"
+                  @change="
+                    handlePaintChange(
+                      layers[nowLayerIndex]['id'],
+                      'text-translate',
+                      layers[nowLayerIndex].paint['text-translate']
+                    )
+                  "
+                >
+                </el-input-number>
+              </el-row>
+              <el-row
+                v-if="menuButtonShowList['text-translate']"
+                style="display: flex"
+              >
+                <h4>y轴(px):&nbsp;</h4>
+                <el-input-number
+                  v-model="layers[nowLayerIndex].paint['text-translate'][1]"
+                  :step="1"
+                  @change="
+                    handlePaintChange(
+                      layers[nowLayerIndex]['id'],
+                      'text-translate',
+                      layers[nowLayerIndex].paint['text-translate']
+                    )
+                  "
+                >
+                </el-input-number>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-translate"
+                @callback="callback"
+              ></ConditionRender>
+            </el-tab-pane>
+            <el-tab-pane label="旋转角度">
+              <h3>旋转角度（deg）</h3>
+              &nbsp;
+              <span v-if="!menuButtonShowList['text-rotate']">Zoom Range</span>
+              <el-row
+                v-if="menuButtonShowList['text-rotate']"
+                style="display: flex; margin-top: 10px"
+              >
+                <el-input-number
+                  v-model="layers[nowLayerIndex].layout['text-rotate']"
+                  @change="
+                    handleLayoutChange(
+                      layers[nowLayerIndex]['id'],
+                      'text-rotate',
+                      layers[nowLayerIndex].layout['text-rotate']
+                    )
+                  "
+                  :min="0"
+                  :max="99999"
+                  size="medium"
+                  label="描述文字"
+                >
+                </el-input-number>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-rotate"
+                @callback="callback"
+              ></ConditionRender>
+            </el-tab-pane>
+            <el-tab-pane label="倾斜对齐">
+              <h3>倾斜对齐</h3>
+              &nbsp;
+              <span v-if="!menuButtonShowList['text-pitch-alignment']"
+                >Zoom Range</span
+              >
+              <el-row
+                v-if="menuButtonShowList['text-pitch-alignment']"
+                style="margin-top: 10px; display: flex"
+              >
+                <el-select
+                  v-model="layers[nowLayerIndex].layout['text-pitch-alignment']"
+                  placeholder="请选择"
+                  @change="
+                    handleLayoutChange(
+                      layers[nowLayerIndex]['id'],
+                      'text-pitch-alignment',
+                      layers[nowLayerIndex].layout['text-pitch-alignment']
+                    )
+                  "
+                >
+                  <el-option
+                    v-for="item in ['auto', 'map', 'viewport']"
+                    :key="item"
+                    :label="item"
+                    :value="item"
+                  >
+                  </el-option>
+                </el-select>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-pitch-alignment"
+                @callback="callback"
+              ></ConditionRender>
+            </el-tab-pane>
+            <el-tab-pane label="旋转对齐">
+              <h3>旋转对齐</h3>
+              &nbsp;
+              <span v-if="!menuButtonShowList['text-rotation-alignment']"
+                >Zoom Range</span
+              >
+              <el-row
+                v-if="menuButtonShowList['text-rotation-alignment']"
+                style="margin-top: 10px; display: flex"
+              >
+                <el-select
+                  v-model="
+                    layers[nowLayerIndex].layout['text-rotation-alignment']
+                  "
+                  placeholder="请选择"
+                  @change="
+                    handleLayoutChange(
+                      layers[nowLayerIndex]['id'],
+                      'text-rotation-alignment',
+                      layers[nowLayerIndex].layout['text-rotation-alignment']
+                    )
+                  "
+                >
+                  <el-option
+                    v-for="item in ['auto', 'map', 'viewport']"
+                    :key="item"
+                    :label="item"
+                    :value="item"
+                  >
+                  </el-option>
+                </el-select>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-rotation-alignment"
+                @callback="callback"
+              ></ConditionRender>
+            </el-tab-pane>
+            <el-tab-pane label="掩膜颜色">
+              <h3>颜色</h3>
+              &nbsp;
+              <span v-if="!menuButtonShowList['text-halo-color']"
+                >Zoom Range</span
+              >
+              <el-row
+                v-if="menuButtonShowList['text-halo-color']"
+                style="display: flex; margin-top: 10px"
+              >
+                <el-color-picker
+                  v-model="layers[nowLayerIndex].paint['text-halo-color']"
+                  @change="
+                    handlePaintChange(
+                      layers[nowLayerIndex]['id'],
+                      'text-halo-color',
+                      layers[nowLayerIndex].paint['text-halo-color']
+                    )
+                  "
+                  :predefine="predefineColors"
+                >
+                </el-color-picker>
+                <el-input
+                  v-model="layers[nowLayerIndex].paint['text-halo-color']"
+                  @change="
+                    handlePaintChange(
+                      layers[nowLayerIndex]['id'],
+                      'text-halo-color',
+                      layers[nowLayerIndex].paint['text-halo-color']
+                    )
+                  "
+                  placeholder="something"
+                ></el-input>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-halo-color"
+                @callback="callback"
+              ></ConditionRender>
+            </el-tab-pane>
+            <el-tab-pane label="掩膜宽度">
+              <h3>掩膜宽度（px）</h3>
+              &nbsp;
+              <span v-if="!menuButtonShowList['text-halo-width']"
+                >Zoom Range</span
+              >
+              <el-row
+                v-if="menuButtonShowList['text-halo-width']"
+                style="display: flex; margin-top: 10px"
+              >
+                <el-input-number
+                  v-model="layers[nowLayerIndex].paint['text-halo-width']"
+                  @change="
+                    handlePaintChange(
+                      layers[nowLayerIndex]['id'],
+                      'text-halo-width',
+                      layers[nowLayerIndex].paint['text-halo-width']
+                    )
+                  "
+                  :min="0"
+                  :max="99999"
+                  size="medium"
+                  label="描述文字"
+                >
+                </el-input-number>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-halo-width"
+                @callback="callback"
+              ></ConditionRender>
+            </el-tab-pane>
+            <el-tab-pane label="掩膜模糊">
+              <h3>掩膜模糊（px）</h3>
+              &nbsp;
+              <span v-if="!menuButtonShowList['text-halo-blur']"
+                >Zoom Range</span
+              >
+              <el-row
+                v-if="menuButtonShowList['text-halo-blur']"
+                style="display: flex; margin-top: 10px"
+              >
+                <el-input-number
+                  v-model="layers[nowLayerIndex].paint['text-halo-blur']"
+                  @change="
+                    handlePaintChange(
+                      layers[nowLayerIndex]['id'],
+                      'text-halo-blur',
+                      layers[nowLayerIndex].paint['text-halo-blur']
+                    )
+                  "
+                  :min="0"
+                  :max="99999"
+                  size="medium"
+                  label="描述文字"
+                >
+                </el-input-number>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-halo-blur"
+                @callback="callback"
+              ></ConditionRender>
+            </el-tab-pane>
+          </el-tabs>
           <!-- 背景图层编辑面板 -->
           <el-tabs
             :before-leave="leaveTab"
@@ -3055,6 +3804,9 @@ export default {
           "贝塞尔曲线：使用由给定控制点定义的三次贝塞尔曲线进行插值。",
       },
 
+      //筛选
+      fontSearch: "",
+
       //过滤条件配置
       filterWay: "满足所有条件",
       filterCondition: [{ option: "", type: "==", value: [] }],
@@ -3104,81 +3856,8 @@ export default {
       pageSizeSymbol: 5,
       searchInputSymbol: "",
       totalDataCountSymbol: 0,
-
-      layerStyle: {
-        line: {
-          layout: {
-            "line-cap": "butt", //One of "butt", "round", "square"
-            "line-join": "miter", //One of "bevel", "round", "miter"
-            "line-miter-limit": 2,
-            "line-round-limit": 1.05,
-            visibility: "visible",
-            // "line-sort-key":999
-          },
-          paint: {
-            "line-blur": 0,
-            "line-color": "#000000",
-            "line-dasharray": [],
-            "line-gap-width": 0,
-            // "line-gradient":"",  //ignore  Requires source to be "geojson".
-            "line-offset": 0,
-            "line-opacity": 1,
-            // "line-pattern": "",  //ignore  Optional resolvedImage.
-            "line-translate": [0, 0],
-            "line-translate-anchor": "map", //One of "map", "viewport".
-            "line-width": 1,
-          },
-        },
-        circle: {
-          layout: {
-            visibility: "visible", //One of "visible", "none"
-            // "circle-sort-key":999,
-          },
-          paint: {
-            "circle-blur": 0,
-            "circle-color": "#000000",
-            "circle-opacity": 1,
-            "circle-pitch-alignment": "viewport", //One of "map", "viewport"
-            "circle-pitch-scale": "map", //One of "map", "viewport"
-            "circle-radius": 5,
-            "circle-stroke-color": "#000000",
-            "circle-stroke-opacity": 1,
-            "circle-stroke-width": 0,
-            "circle-translate": [0, 0],
-            "circle-translate-anchor": "map", // One of "map", "viewport"
-          },
-        },
-        fill: {
-          layout: {
-            visibility: "visible", //One of "visible", "none"
-            // "fill-sort-key":999
-          },
-          paint: {
-            "fill-antialias": true,
-            "fill-color": "#000000",
-            "fill-opacity": 1,
-            "fill-outline-color": "#000000",
-            //"fill-pattern":''  //ignore  Optional resolvedImage.
-            "fill-translate": [0, 0],
-            "fill-translate-anchor": "map", // One of "map", "viewport"
-          },
-        },
-        "fill-extrusion": {
-          layout: {
-            visibility: "visible", //One of "visible", "none"
-            // "fill-extrusion-sort-key":999
-          },
-          paint: {
-            "fill-extrusion-height": 0,
-            "fill-extrusion-base": 0,
-            "fill-extrusion-color": "#000000",
-            "fill-extrusion-opacity": 1,
-            "fill-extrusion-translate": [0, 0],
-            "fill-extrusion-translate-anchor": "map", // One of "map", "viewport"
-            "fill-extrusion-vertical-gradient": true,
-          },
-        },
-      },
+      fontList: [],
+      spriteList: [],
     };
   },
   mounted() {
@@ -3203,6 +3882,11 @@ export default {
     this.$bus.$off("show");
   },
   methods: {
+    change(e) {
+      this.fontSearch = "a";
+      // this.$forceUpdate()
+      console.log("e", e);
+    },
     async test() {
       let newTileJson = initTileJson;
       newTileJson.name = "aaa123";
@@ -3630,12 +4314,13 @@ export default {
         geoType = "circle";
       }
 
-      //前四个是自己用的属性
+      //前五个是自己用的属性
       let newLayer = {
         index: index,
         show: true,
         originName: row.originName,
         shpAttribute: row.attrInfo,
+        attrShow: [],
         id: row.originName,
         type: geoType,
         filter: ["all"],
@@ -3742,6 +4427,7 @@ export default {
         } else {
           this.editorShow = "symbolEditorShow";
           this.getSymbolList();
+          this.getFontList();
         }
         this.menuButtonShowList = [];
       });
@@ -3799,21 +4485,8 @@ export default {
       }
       this.handleLayerEdit(this.nowLayerIndex, aimLayer);
     },
-    // handleLayerStyleChange(index, row) {
-    //   index, row
-    //   console.log("row: ", row)
-    // map.removeLayer(row.id);
-    //
-    // let newLayer=row
-    //
-    //
-    // if (index === 0) {
-    //   map.addLayer(aimLayer)
-    // } else {
-    //   map.addLayer(aimLayer, this.layers[newIndex - 1].id)
-    // }
-    // },
 
+    //图标图层相关
     getSymbolList() {
       requestApi
         .getSymbolList({
@@ -3831,8 +4504,49 @@ export default {
         .catch((error) => {
           console.log(error);
         });
+      this.spriteList = map.listImages();
+      console.log("spriteList", this.spriteList);
     },
+    getFontList() {
+      requestApi
+        .getFontList()
+        .then((res) => {
+          for (let i in res.data.data) {
+            this.fontList.push({
+              name: res.data.data[i],
+              type: "offline",
+            });
+          }
+          console.log("fontList", this.fontList);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    iconSelect(item) {
+      this.layers[this.nowLayerIndex].layout["icon-image"] = item.originName;
+      this.$refs.iconPopover.doClose();
 
+      this.loadAndAddImg(
+        this.reqUrl + "/symbol/getSymbolById/" + item.id,
+        item.originName
+      );
+      this.handleLayoutChange(
+        this.layers[this.nowLayerIndex]["id"],
+        "icon-image",
+        this.layers[this.nowLayerIndex].layout["icon-image"]
+      );
+    },
+    spriteSelect(item) {
+      console.log("spriteclick");
+      this.layers[this.nowLayerIndex].layout["icon-image"] = item;
+      this.$refs.iconPopover.doClose();
+      this.handleLayoutChange(
+        this.layers[this.nowLayerIndex]["id"],
+        "icon-image",
+        this.layers[this.nowLayerIndex].layout["icon-image"]
+      );
+    },
     symbolChange(val) {
       if (val == "icon") {
         this.symbolColor = ["#43aaf5", "#838da8"];
@@ -3845,25 +4559,42 @@ export default {
     fieldSelect(row) {
       this.textField = row.column_name;
       this.$refs.fieldPopover.doClose();
-      const tem = [
-        "format",
-        ["get", "gid"],
-        {
-          "text-font": ["literal", ["Open Sans Regular"]],
-          "text-color": "#FF0000",
-          "font-scale": 0.8,
-        },
+      // const tem = [
+      //   "format",
+      //   ["get", "gid"],
+      //   {
+      //     "text-font": ["literal", ["Open Sans Regular"]],
+      //     "text-color": "#FF0000",
+      //     "font-scale": 0.8,
+      //   },
+      // // ];
+      // this.layers[this.nowLayerIndex].layout["text-field"] = tem;
+      // this.handleLayoutChange(
+      //   this.layers[this.nowLayerIndex]["id"],
+      //   "text-field",
+      //   tem
+      // );
+      this.layers[this.nowLayerIndex].layout["text-field"] = [
+        "get",
+        this.textField,
       ];
-      this.layers[this.nowLayerIndex].layout["text-field"] = tem;
       this.handleLayoutChange(
         this.layers[this.nowLayerIndex]["id"],
         "text-field",
-        tem
+        ["get", this.textField]
       );
-      // this.handleLayoutChange(this.layers[this.nowLayerIndex]['id'],'text-field',["get",textField]);
       console.log(
         "text-field",
         this.layers[this.nowLayerIndex].layout["text-field"]
+      );
+    },
+    fontSelect(row) {
+      this.layers[this.nowLayerIndex].layout["text-font"][0] = row.name;
+      this.$refs.fontPopover.doClose();
+      this.handleLayoutChange(
+        this.layers[this.nowLayerIndex]["id"],
+        "text-font",
+        this.layers[this.nowLayerIndex].layout["text-font"]
       );
     },
 
@@ -4192,6 +4923,20 @@ h4 {
   padding: 0px 10px;
   /*margin: 10px 0px;*/
 }
+/* 删除导航条前后箭头 */
+.editBoard
+  .el-tabs__header.is-left
+  .el-tabs__nav-wrap.is-scrollable.is-left
+  .el-tabs__nav-prev,
+.editBoard
+  .el-tabs__header.is-left
+  .el-tabs__nav-wrap.is-scrollable.is-left
+  .el-tabs__nav-next {
+  display: none;
+}
+.editBoard .el-tabs__header.is-left .el-tabs__nav-wrap.is-scrollable.is-left {
+  padding: 0px;
+}
 /* 样式设置tab内容框样式 */
 .editBoard .el-tabs--border-card > .el-tabs__content {
   /* margin: 5px 10px 0px 0px; */
@@ -4220,6 +4965,7 @@ h4 {
 .symbolBox .el-tabs__nav-scroll {
   margin-top: 40px;
   overflow: scroll;
+  height: calc(100vh - 42px - 40px);
 }
 /* 数据设置tabs内容框样式 */
 .editBoard
@@ -4340,5 +5086,25 @@ h4 {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+/* 图标图层 */
+/* 图标框 */
+.spriteImage {
+  flex: 1;
+  height: 120px;
+  margin: 0 5px 5px 0;
+  background-color: #999;
+  width: calc((100% - 20px) / 3);
+  min-width: calc((100% - 20px) / 3);
+  max-width: calc((100% - 20px) / 3);
+}
+.spriteImage:nth-child(3n) {
+  margin-right: 0;
+}
+
+/* 鼠标hover变为指状 */
+.cursor:hover {
+  cursor: pointer;
 }
 </style>
