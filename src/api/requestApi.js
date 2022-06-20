@@ -57,6 +57,9 @@ export default {
     deleteSymbol(symbolId){
         return instance.get(Vue.prototype.reqUrl+"/symbol/deleteSymbolById", {params:{symbolId}})
     },
+    getFontList(){
+        return instance.get(Vue.prototype.reqUrl+"/getFontList")
+    },    
 
 
     //Project  del
