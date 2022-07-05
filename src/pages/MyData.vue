@@ -131,7 +131,7 @@
               show-overflow-tooltip
               min-width="230px"
           ></el-table-column>
-          <el-table-column label="操作" show-overflow-tooltip min-width="230px">
+          <el-table-column label="操作" show-overflow-tooltip min-width="300px">
             <template slot-scope="scope">
               <el-button size="mini" @click="handlePreview(scope.row.id)"
               >预览
@@ -141,16 +141,49 @@
               >下载
               </el-button
               >
+              <el-button size="mini" @click="cacheItemPre = scope.row;cacheShow = true"
+              >预缓存     
+              </el-button
+              >                 
               <el-button
                   size="mini"
                   type="danger"
                   @click="handleDeleteShp(scope.row.id)"
               >删除
               </el-button
-              >
+              >                    
             </template>
           </el-table-column>
         </el-table>
+        <el-dialog
+          title="数据库源信息编辑"
+          :visible.sync="cacheShow"
+          width="30%"
+          center>
+          <el-form label-position="right" label-width="100px" :model="cacheItem">
+            <el-form-item 
+              label="name:"
+              :rules="{required: true, message: '请输入ip信息', trigger: 'blur'}">
+              <el-input v-model="cacheItem.ip"></el-input>
+            </el-form-item>
+            <el-form-item 
+              label="描述:">
+              <el-input v-model="cacheItem.description"></el-input>
+            </el-form-item>                                
+            <el-form-item 
+              label="层级范围:">
+            <el-slider
+              v-model="cacheItem.range"
+              range
+              :max="22">
+            </el-slider>
+            </el-form-item>             
+          </el-form>   
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="cacheShow = false">取 消</el-button>
+            <el-button type="primary" @click="handleCache">确 定</el-button>
+          </span>
+        </el-dialog>          
         <el-divider></el-divider>
 
         <el-pagination
@@ -265,6 +298,10 @@ export default {
       dataBaseInfo: {ip:'',dbname:'',userName:'',password:'',port:''},
       dataBaseShow: false,
       dataBaseList: [],
+      //缓存
+      cacheShow: false,
+      cacheItemPre: {},
+      cacheItem: {name:'',description:'',range:[0,22]},
       //shp页
       shpTableData: [],
       shpCurrentPage: 1,
@@ -331,7 +368,7 @@ export default {
         sortField: "uploadDate",
       })
           .then((res) => {
-            console.log(res.data);
+            console.log('shpDataList',res.data);
             this.shpTableData = res.data.data.content;
             this.shpTotalDataCount = res.data.data.totalElements;
           })
@@ -405,6 +442,34 @@ export default {
       window.location.href =
       // config.requestUrl + "/shp/downloadShp?shpId=" + shpId;
           this.reqUrl + "/shp/downloadShp?shpId=" + shpId;
+    },
+
+    handleCache(){
+      const fields = [];
+      for(let item of this.cacheItemPre.attrInfo){
+        fields.push(item.column)
+      }
+
+      let createTileCacheDTO = {
+        "description": this.cacheItem.description,
+        "name": this.cacheItemPre.id,
+        "vector_layers": [
+          {
+            "bounds": this.cacheItemPre.bounds,
+            "field": fields,
+            "id": this.cacheItemPre.id,
+            "maxzoom": this.cacheItem.range[1],
+            "minzoom": this.cacheItem.range[0]
+          }
+        ]        
+      };
+      requestApi.createTileCache(createTileCacheDTO)
+        .then((res)=>{
+            console.log(res)
+        })
+        .catch((error) => {
+          console.log(error);
+        }); 
     },
 
 

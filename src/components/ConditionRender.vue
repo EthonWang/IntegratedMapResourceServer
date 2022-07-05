@@ -6,7 +6,8 @@
           !attribute.includes('translate-anchor') &&
           !attribute.includes('pitch-alignment') &&
           !attribute.includes('pitch-scale') &&
-          !attribute.includes('gradient')
+          !attribute.includes('gradient') &&
+          !attribute.includes('rotation-alignment')
         "
         :disabled="
           attribute == 'fill-outline-color' &&
@@ -53,7 +54,15 @@
             !attribute.includes('dasharray') &&
             !attribute.includes('antialias') &&
             attribute.slice(-9) != 'translate' &&
-            !attribute.includes('gradient')
+            !attribute.includes('gradient') &&
+            !attribute.includes('allow-overlap') &&
+            !attribute.includes('placement') &&
+            !attribute.includes('optional') && 
+            !attribute.includes('padding') && 
+            !attribute.includes('icon-translate') && 
+            !attribute.includes('text-line-height') && 
+            !attribute.includes('text-translate') &&
+            !attribute.includes('rotation-alignment') 
           "
           :disabled="
             attribute == 'fill-outline-color' &&
@@ -103,7 +112,15 @@
             !attribute.includes('antialias') &&
             attribute.slice(-9) != 'translate' &&
             attribute.slice(-9) != 'translate' &&
-            !attribute.includes('gradient')
+            !attribute.includes('gradient') &&
+            !attribute.includes('allow-overlap') &&
+            !attribute.includes('placement') &&
+            !attribute.includes('optional') && 
+            !attribute.includes('padding') && 
+            !attribute.includes('icon-translate') && 
+            !attribute.includes('text-line-height') && 
+            !attribute.includes('text-translate') &&
+            !attribute.includes('rotation-alignment')
           "
           :disabled="
             attribute == 'fill-outline-color' &&
@@ -125,7 +142,15 @@
           !attribute.includes('antialias') &&
           attribute.slice(-9) != 'translate' &&
           !attribute.includes('join') &&
-          !attribute.includes('gradient')
+          !attribute.includes('gradient') &&
+          !attribute.includes('allow-overlap') &&
+          !attribute.includes('placement') &&
+          !attribute.includes('optional') && 
+          !attribute.includes('padding') && 
+          !attribute.includes('icon-translate') && 
+          !attribute.includes('text-line-height') && 
+          !attribute.includes('text-translate') &&
+          !attribute.includes('rotation-alignment')
         "
         class="menuButton"
         plain
@@ -216,10 +241,11 @@
             <el-row
               v-if="
                 attribute.includes('radius') ||
-                attribute.includes('width') ||
+                (attribute.includes('width')&&!attribute.includes('max')) ||
                 attribute.includes('blur') ||
                 attribute.includes('gap-width') ||
-                attribute.includes('offset')
+                attribute.includes('line-offset') ||
+                attribute.includes('padding') 
               "
             >
               <span style="margin-left: 10px"
@@ -234,16 +260,45 @@
                 attribute.includes('line-cap') ||
                 attribute.includes('join') ||
                 attribute.includes('fill-antialias') ||
-                attribute.includes('gradient')
+                attribute.includes('gradient') ||
+                attribute.includes('icon-image') ||
+                attribute.includes('size') ||
+                attribute.includes('optional') ||
+                attribute.includes('ignore-placement') ||
+                attribute.includes('allow-overlap') ||
+                attribute.includes('icon-anchor') ||
+                attribute.includes('icon-field') ||
+                attribute.includes('symbol-placement') ||
+                attribute.includes('text-justify') ||
+                attribute.includes('text-anchor') ||
+                attribute.includes('icon-offset') ||
+                attribute.includes('text-offset') ||
+                attribute.includes('text-transform') 
               "
             >
               <span style="margin-left: 10px">{{ scope.row.value }}</span>
             </el-row>
             <el-row
-              v-if="attribute.includes('height') || attribute.includes('base')"
+              v-if="attribute.includes('text-letter-spacing') || 
+                    attribute.includes('text-line-height') ||
+                    attribute.includes('text-max-width')"
+            >
+              <span style="margin-left: 10px"
+                >{{ scope.row.value }}&nbsp;em</span
+              >
+            </el-row>            
+            <el-row
+              v-if="attribute.includes('fill-extrusion-height') || attribute.includes('base')"
             >
               <span style="margin-left: 10px"
                 >{{ scope.row.value }}&nbsp;meters</span
+              >
+            </el-row>
+            <el-row
+              v-if="attribute.includes('rotate')"
+            >
+              <span style="margin-left: 10px"
+                >{{ scope.row.value }}&nbsp;deg</span
               >
             </el-row>
             <!-- <el-row v-else>
@@ -266,17 +321,17 @@
           <el-input
             v-model="zoomValue[zoomEditIndex].zoom"
             placeholder="something"
-            style="width: 80%"
+            style="width: 100%"
           >
             <template slot="prepend" body-style="padding:0">zoom:</template>
           </el-input>
         </el-row>
         <br />
-        <el-row v-if="attribute.includes('color')" style="display: flex">
+        <el-row v-if="attribute.includes('color')" type="flex">
           <el-input
             v-model="zoomValue[zoomEditIndex].value"
             placeholder="something"
-            style="width: 80%"
+            style="width: 100%"
           >
             <template slot="prepend">color:&nbsp;</template>
           </el-input>
@@ -286,11 +341,11 @@
           >
           </el-color-picker>
         </el-row>
-        <el-row v-if="attribute.includes('opacity')" style="display: flex">
+        <el-row v-if="attribute.includes('opacity')" type="flex">
           <el-input
             v-model="zoomValue[zoomEditIndex].value"
             placeholder="something"
-            style="width: 80%"
+            style="width: 100%"
           >
             <template slot="prepend" body-style="padding:0"
               >{{ tabName[attribute] }}:</template
@@ -300,16 +355,18 @@
         <el-row
           v-if="
             attribute.includes('radius') ||
-            attribute.includes('width') ||
+            (attribute.includes('width')&&!attribute.includes('max')) ||
             attribute.includes('blur') ||
             attribute.includes('gap-width') ||
-            attribute.includes('offset')
+            attribute.includes('line-offset') ||
+            attribute.includes('padding') || 
+            attribute.includes('size')
           "
         >
           <el-input
             v-model="zoomValue[zoomEditIndex].value"
             placeholder="something"
-            style="width: 80%"
+            style="width: 100%"
           >
             <template slot="prepend" body-style="padding:0"
               >{{ tabName[attribute] }}:</template
@@ -318,12 +375,12 @@
           </el-input>
         </el-row>
         <el-row
-          v-if="attribute.includes('height') || attribute.includes('base')"
+          v-if="attribute.includes('fill-extrusion-height') || attribute.includes('base')"
         >
           <el-input
             v-model="zoomValue[zoomEditIndex].value"
             placeholder="something"
-            style="width: 80%"
+            style="width: 100%"
           >
             <template slot="prepend" body-style="padding:0"
               >{{ tabName[attribute] }}:</template
@@ -331,28 +388,61 @@
             <template slot="append">meters</template>
           </el-input>
         </el-row>
-        <el-row v-if="attribute.includes('translate')">
+        <el-row
+          v-if="attribute.includes('rotate')"
+        >
+          <el-input
+            v-model="zoomValue[zoomEditIndex].value"
+            placeholder="something"
+            style="width: 100%"
+          >
+            <template slot="prepend" body-style="padding:0"
+              >{{ tabName[attribute] }}:</template
+            >
+            <template slot="append">deg</template>
+          </el-input>
+        </el-row>
+        <el-row
+          v-if="attribute.includes('text-letter-spacing') || attribute.includes('text-line-height') || attribute.includes('text-max-width')"
+        >
+          <el-input
+            v-model="zoomValue[zoomEditIndex].value"
+            placeholder="something"
+            style="width: 100%"
+          >
+            <template slot="prepend" body-style="padding:0"
+              >{{ tabName[attribute] }}:</template
+            >
+            <template slot="append">em</template>
+          </el-input>
+        </el-row>
+        <el-row v-if="attribute.includes('translate') || attribute.includes('icon-offset') || attribute.includes('text-offset')">
           <el-input
             v-model="zoomValue[zoomEditIndex].value[0]"
             placeholder="something"
-            style="width: 80%"
+            style="width: 100%"
           >
             <template slot="prepend" body-style="padding:0"
               >x轴方向平移:</template
             >
-            <template slot="append">px</template>
+            <template v-if="attribute.includes('translate')" slot="append">px</template>
+            <template v-if="attribute.includes('icon-offset')" slot="append">iconsize</template>
+            <template v-if="attribute.includes('text-offset')" slot="append">em</template>
           </el-input>
           <br /><br />
           <el-input
             v-model="zoomValue[zoomEditIndex].value[1]"
             placeholder="something"
-            style="width: 80%"
+            style="width: 100%"
           >
             <template slot="prepend" body-style="padding:0"
               >y轴方向平移:</template
             >
-            <template slot="append">px</template>
+            <template v-if="attribute.includes('translate')" slot="append">px</template>
+            <template v-if="attribute.includes('icon-offset')" slot="append">iconsize</template>
+            <template v-if="attribute.includes('text-offset')" slot="append">em</template>
           </el-input>
+
         </el-row>
         <el-row v-if="attribute.includes('dasharray')">
           <el-row class="zoomDasharray">
@@ -390,12 +480,19 @@
           </el-button>
         </el-row>
         <el-row
-          v-if="attribute.includes('line-cap') || attribute.includes('join')"
+          v-if="attribute.includes('line-cap') || 
+                attribute.includes('join') || 
+                attribute.includes('icon-anchor') || 
+                attribute.includes('symbol-placement') || 
+                attribute.includes('text-justify') || 
+                attribute.includes('text-anchor') ||
+                attribute.includes('text-transform')"
           type="flex"
           align="middle"
         >
           <h4>{{ tabName[attribute] }}:&nbsp;</h4>
           <el-select
+            v-if="attribute.includes('line-cap')"
             v-model="zoomValue[zoomEditIndex].value"
             placeholder="请选择"
           >
@@ -411,10 +508,8 @@
             >
             </el-option>
           </el-select>
-        </el-row>
-        <el-row v-if="attribute.includes('join')" type="flex" align="middle">
-          <h4>{{ tabName[attribute] }}:&nbsp;</h4>
           <el-select
+            v-if="attribute.includes('join')"
             v-model="zoomValue[zoomEditIndex].value"
             placeholder="请选择"
           >
@@ -429,17 +524,143 @@
               :value="item.value"
             >
             </el-option>
-          </el-select>
+          </el-select>          
+          <el-select
+            v-if="attribute.includes('icon-anchor') || attribute.includes('text-anchor')"
+            v-model="zoomValue[zoomEditIndex].value"
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="item in [
+                      'center',
+                      'left',
+                      'right',
+                      'top',
+                      'bottom',
+                      'top-left',
+                      'top-right',
+                      'bottom-left',
+                      'bottom-right',
+              ]"
+              :key="item"
+              :label="item"
+              :value="item"
+            >
+            </el-option>
+          </el-select>           
+          <el-select
+            v-if="attribute.includes('text-justify')"
+            v-model="zoomValue[zoomEditIndex].value"
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="item in ['auto', 'center', 'right', 'left']"
+              :key="item"
+              :label="item"
+              :value="item"
+            >
+            </el-option>
+          </el-select>           
+          <el-select
+            v-if="attribute.includes('symbol-placement')"
+            v-model="zoomValue[zoomEditIndex].value"
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="item in ['point', 'line', 'line-center']"
+              :key="item"
+              :label="item"
+              :value="item"
+            >
+            </el-option>
+          </el-select>           
+          <el-select
+            v-if="attribute.includes('text-transform')"
+            v-model="zoomValue[zoomEditIndex].value"
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="item in ['none', 'uppercase', 'lowercase']"
+              :key="item"
+              :label="item"
+              :value="item"
+            >
+            </el-option>
+          </el-select>           
         </el-row>
         <el-row
           v-if="
             attribute.includes('fill-antialias') ||
-            attribute.includes('gradient')
+            attribute.includes('gradient') ||
+            attribute.includes('optional') ||
+            attribute.includes('ignore-placement') ||
+            attribute.includes('allow-overlap')
           "
-          style="display: flex"
+          type="flex"
         >
+          <span>{{tabName[attribute]}} :</span> &nbsp;&nbsp;&nbsp;&nbsp;
           <el-switch v-model="zoomValue[zoomEditIndex].value"> </el-switch>
         </el-row>
+        <el-row v-if="attribute.includes('icon-image')" type="flex">
+          <el-input
+            v-model="zoomValue[zoomEditIndex].value"
+            placeholder="something"
+          >
+            <template slot="prepend" body-style="padding:0">
+              图标 :
+            </template>          
+          </el-input>
+          <el-popover
+            ref="iconPopover"
+            placement="right"
+            width="400"
+            trigger="click"
+          >
+            <el-tabs>
+              <el-tab-pane
+                label="精灵图"
+                style="height: 200px; overflow-y: scroll"
+              >
+                <el-col
+                  class="cursor"
+                  v-for="(item, index) in spriteList"
+                  :key="index"
+                  @click.native="spriteSelect(item,'zoom')"
+                >
+                  {{ item }}
+                </el-col>
+              </el-tab-pane>
+              <el-tab-pane label="自定义">
+                <el-row
+                  type="flex"
+                  justify="start"
+                  style="flex-wrap: wrap; width: 100%"
+                >
+                  <el-card
+                    class="spriteImage"
+                    v-for="(item, index) in symbolTableData"
+                    :key="index"
+                  >
+                    <el-image
+                      style="width: 100px; height: 100px"
+                      :src="reqUrl + item.webAddress"
+                      fit="cover"
+                      class="cursor"
+                      @click="iconSelect(item,'zoom')"
+                    >
+                    </el-image>
+                  </el-card>
+                </el-row>
+              </el-tab-pane>
+            </el-tabs>
+
+            <el-button
+              type="text"
+              icon="el-icon-s-unfold"
+              slot="reference"
+            ></el-button>
+          </el-popover>
+        </el-row>  
 
         <span slot="footer" class="dialog-footer">
           <el-button @click="zoomEditDelete">删除</el-button>
@@ -522,10 +743,10 @@
             <el-row
               v-if="
                 attribute.includes('radius') ||
-                attribute.includes('width') ||
+                (attribute.includes('width')&&!attribute.includes('max')) ||
                 attribute.includes('blur') ||
                 attribute.includes('gap-width') ||
-                attribute.includes('offset')
+                attribute.includes('line-offset')
               "
             >
               <span style="margin-left: 10px"
@@ -540,11 +761,29 @@
                 attribute.includes('line-cap') ||
                 attribute.includes('join') ||
                 attribute.includes('fill-antialias') ||
-                attribute.includes('height')
+                attribute.includes('height') ||
+                attribute.includes('icon-image') ||
+                attribute.includes('size') ||
+                attribute.includes('icon-anchor') ||
+                attribute.includes('text-transform') ||
+                attribute.includes('text-anchor') ||
+                attribute.includes('text-offset') ||
+                attribute.includes('icon-offset') ||
+                attribute.includes('text-justify') ||
+                attribute.includes('rotate')
               "
             >
               <span style="margin-left: 10px">{{ scope.row.value }}</span>
             </el-row>
+            <el-row
+              v-if="attribute.includes('text-letter-spacing') || 
+                    attribute.includes('text-line-height') ||
+                    attribute.includes('text-max-width')"
+            >
+              <span style="margin-left: 10px"
+                >{{ scope.row.value }}&nbsp;em</span
+              >
+            </el-row>             
             <el-row v-if="attribute.includes('height')">
               <span style="margin-left: 10px"
                 >{{ scope.row.value }}&nbsp;meters</span
@@ -556,7 +795,7 @@
           </template>
         </el-table-column>
       </el-table>
-      <el-button type="text" @click="dataInsert">+ 增加prop级别条件 </el-button>
+      <el-button type="text" @click="dataInsert">+ 增加data级别条件 </el-button>
       <el-dialog
         title="data范围编辑"
         :visible.sync="dataEditShow"
@@ -604,10 +843,11 @@
         <el-row
           v-if="
             attribute.includes('radius') ||
-            attribute.includes('width') ||
+            (attribute.includes('width')&&!attribute.includes('max')) ||
             attribute.includes('blur') ||
             attribute.includes('gap-width') ||
-            attribute.includes('offset')
+            attribute.includes('line-offset') || 
+            attribute.includes('size')
           "
         >
           <el-input
@@ -621,28 +861,61 @@
             <template slot="append">px</template>
           </el-input>
         </el-row>
-        <el-row v-if="attribute.includes('translate')">
+        <el-row
+          v-if="attribute.includes('rotate')"
+        >
+          <el-input
+            v-model="dataValue[dataEditIndex].value"
+            placeholder="something"
+            style="width: 100%"
+          >
+            <template slot="prepend" body-style="padding:0"
+              >{{ tabName[attribute] }}:</template
+            >
+            <template slot="append">deg</template>
+          </el-input>
+        </el-row>
+        <el-row
+          v-if="attribute.includes('text-letter-spacing') || attribute.includes('text-max-width')"
+        >
+          <el-input
+            v-model="dataValue[dataEditIndex].value"
+            placeholder="something"
+            style="width: 100%"
+          >
+            <template slot="prepend" body-style="padding:0"
+              >{{ tabName[attribute] }}:</template
+            >
+            <template slot="append">em</template>
+          </el-input>
+        </el-row>   
+        <el-row v-if="attribute.includes('translate') || attribute.includes('icon-offset') || attribute.includes('text-offset')">
           <el-input
             v-model="dataValue[dataEditIndex].value[0]"
             placeholder="something"
-            style="width: 80%"
+            style="width: 100%"
           >
             <template slot="prepend" body-style="padding:0"
               >x轴方向平移:</template
             >
-            <template slot="append">px</template>
+            <template v-if="attribute.includes('translate')" slot="append">px</template>
+            <template v-if="attribute.includes('icon-offset')" slot="append">iconsize</template>
+            <template v-if="attribute.includes('text-offset')" slot="append">em</template>
           </el-input>
           <br /><br />
           <el-input
             v-model="dataValue[dataEditIndex].value[1]"
             placeholder="something"
-            style="width: 80%"
+            style="width: 100%"
           >
             <template slot="prepend" body-style="padding:0"
               >y轴方向平移:</template
             >
-            <template slot="append">px</template>
+            <template v-if="attribute.includes('translate')" slot="append">px</template>
+            <template v-if="attribute.includes('icon-offset')" slot="append">iconsize</template>
+            <template v-if="attribute.includes('text-offset')" slot="append">em</template>
           </el-input>
+
         </el-row>
         <el-row v-if="attribute.includes('dasharray')">
           <el-row class="dataDasharray">
@@ -680,12 +953,18 @@
           </el-button>
         </el-row>
         <el-row
-          v-if="attribute.includes('line-cap') || attribute.includes('join')"
+          v-if="attribute.includes('line-cap') || 
+                attribute.includes('join') || 
+                attribute.includes('icon-anchor') || 
+                attribute.includes('text-anchor') || 
+                attribute.includes('text-transform') || 
+                attribute.includes('text-justify')"
           type="flex"
           align="middle"
         >
           <h4>{{ tabName[attribute] }}:&nbsp;</h4>
           <el-select
+            v-if="attribute.includes('line-cap')"
             v-model="dataValue[dataEditIndex].value"
             placeholder="请选择"
           >
@@ -701,6 +980,72 @@
             >
             </el-option>
           </el-select>
+          <el-select
+            v-if="attribute.includes('join')"
+            v-model="dataValue[dataEditIndex].value"
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="item in [
+                { label: '尖角 miter', value: 'miter' },
+                { label: '圆角 round', value: 'round' },
+                { label: '斜角 bevel', value: 'bevel' },
+              ]"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            >
+            </el-option>
+          </el-select>          
+          <el-select
+            v-if="attribute.includes('icon-anchor') || attribute.includes('text-anchor')"
+            v-model="dataValue[dataEditIndex].value"
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="item in [
+                      'center',
+                      'left',
+                      'right',
+                      'top',
+                      'bottom',
+                      'top-left',
+                      'top-right',
+                      'bottom-left',
+                      'bottom-right',
+              ]"
+              :key="item"
+              :label="item"
+              :value="item"
+            >
+            </el-option>
+          </el-select>           
+          <el-select
+            v-if="attribute.includes('text-justify')"
+            v-model="dataValue[dataEditIndex].value"
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="item in ['auto', 'center', 'right', 'left']"
+              :key="item"
+              :label="item"
+              :value="item"
+            >
+            </el-option>
+          </el-select>           
+          <el-select
+            v-if="attribute.includes('text-transform')"
+            v-model="dataValue[dataEditIndex].value"
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="item in ['none', 'uppercase', 'lowercase']"
+              :key="item"
+              :label="item"
+              :value="item"
+            >
+            </el-option>
+          </el-select>           
         </el-row>
         <el-row
           v-if="attribute.includes('fill-antialias')"
@@ -708,6 +1053,66 @@
         >
           <el-switch v-model="dataValue[dataEditIndex].value"> </el-switch>
         </el-row>
+        <el-row v-if="attribute.includes('icon-image')" type="flex">
+          <el-input
+            v-model="dataValue[dataEditIndex].value"
+            placeholder="something"
+          >
+            <template slot="prepend" body-style="padding:0">
+              图标 :
+            </template>          
+          </el-input>
+          <el-popover
+            ref="iconPopover"
+            placement="right"
+            width="400"
+            trigger="click"
+          >
+            <el-tabs>
+              <el-tab-pane
+                label="精灵图"
+                style="height: 200px; overflow-y: scroll"
+              >
+                <el-col
+                  class="cursor"
+                  v-for="(item, index) in spriteList"
+                  :key="index"
+                  @click.native="spriteSelect(item,'data')"
+                >
+                  {{ item }}
+                </el-col>
+              </el-tab-pane>
+              <el-tab-pane label="自定义">
+                <el-row
+                  type="flex"
+                  justify="start"
+                  style="flex-wrap: wrap; width: 100%"
+                >
+                  <el-card
+                    class="spriteImage"
+                    v-for="(item, index) in symbolTableData"
+                    :key="index"
+                  >
+                    <el-image
+                      style="width: 100px; height: 100px"
+                      :src="reqUrl + item.webAddress"
+                      fit="cover"
+                      class="cursor"
+                      @click="iconSelect(item,'data')"
+                    >
+                    </el-image>
+                  </el-card>
+                </el-row>
+              </el-tab-pane>
+            </el-tabs>
+
+            <el-button
+              type="text"
+              icon="el-icon-s-unfold"
+              slot="reference"
+            ></el-button>
+          </el-popover>
+        </el-row>         
 
         <span slot="footer" class="dialog-footer">
           <el-button @click="dataEditDelete">删除</el-button>
@@ -748,10 +1153,11 @@
             <el-row
               v-if="
                 attribute.includes('radius') ||
-                attribute.includes('width') ||
+                (attribute.includes('width')&&!attribute.includes('max')) ||
                 attribute.includes('blur') ||
                 attribute.includes('gap-width') ||
-                attribute.includes('offset')
+                attribute.includes('line-offset') ||
+                attribute.includes('size') 
               "
             >
               <span style="margin-left: 10px"
@@ -766,11 +1172,28 @@
                 attribute.includes('line-cap') ||
                 attribute.includes('join') ||
                 attribute.includes('fill-antialias') ||
-                attribute.includes('height')
+                attribute.includes('height') ||
+                attribute.includes('icon-image') ||
+                attribute.includes('rotate') ||
+                attribute.includes('icon-anchor') ||
+                attribute.includes('text-anchor') ||
+                attribute.includes('text-offset') ||
+                attribute.includes('icon-offset') ||                
+                attribute.includes('text-transform') ||
+                attribute.includes('text-justify')
               "
             >
               <span style="margin-left: 10px">{{ scope.row.value }}</span>
             </el-row>
+            <el-row
+              v-if="attribute.includes('text-letter-spacing') || 
+                    attribute.includes('text-line-height') ||
+                    attribute.includes('text-max-width')"
+            >
+              <span style="margin-left: 10px"
+                >{{ scope.row.value }}&nbsp;em</span
+              >
+            </el-row>             
             <el-row v-if="attribute.includes('height')">
               <span style="margin-left: 10px"
                 >{{ scope.row.value }}&nbsp;meters</span
@@ -779,7 +1202,7 @@
           </template>
         </el-table-column>
       </el-table>
-      <el-button type="text" @click="propInsert">+ 增加zoom级别条件 </el-button>
+      <el-button type="text" @click="propInsert">+ 增加prop级别条件 </el-button>
       <el-dialog
         title="属性条件编辑"
         :visible.sync="propEditShow"
@@ -798,14 +1221,14 @@
           >
             <el-row type="flex" justify="space-between">
               <el-col :span="18">
-                <el-tag
+                <!-- <el-tag
                   v-for="tag in propValueFilter[propEditIndex]"
                   :key="tag[propSelect]"
                   :closable="true"
                   @close="handleTagClose(tag)"
                 >
                   {{ tag[propSelect] }}
-                </el-tag>
+                </el-tag> -->
               </el-col>
               <el-col :span="4">
                 <el-button size="mini" type="primary" @click="propFilterConfirm"
@@ -826,11 +1249,11 @@
             <el-table
               :data="propValueList"
               @selection-change="propFilterChange"
-              row-key="id"
+              row-key="getRowKeys"
               :cell-style="{ textAlign: 'left' }"
               height="250"
             >
-              <el-table-column type="selection" width="50"> </el-table-column>
+              <el-table-column type="selection" width="50" :reserve-selection="true"> </el-table-column>
               <el-table-column :prop="propSelect" align="right">
               </el-table-column>
             </el-table>
@@ -871,7 +1294,7 @@
         </el-row>
         <el-row v-if="attribute.includes('opacity')" style="display: flex">
           <el-input
-            v-model="zoomValue[zoomEditIndex].value"
+            v-model="propValue[propEditIndex].value"
             placeholder="something"
             style="width: 80%"
           >
@@ -883,14 +1306,15 @@
         <el-row
           v-if="
             attribute.includes('radius') ||
-            attribute.includes('width') ||
+            (attribute.includes('width')&&!attribute.includes('max')) ||
             attribute.includes('blur') ||
             attribute.includes('gap-width') ||
-            attribute.includes('offset')
+            attribute.includes('line-offset') || 
+            attribute.includes('size')
           "
         >
           <el-input
-            v-model="zoomValue[zoomEditIndex].value"
+            v-model="propValue[propEditIndex].value"
             placeholder="something"
             style="width: 80%"
           >
@@ -900,41 +1324,74 @@
             <template slot="append">px</template>
           </el-input>
         </el-row>
-        <el-row v-if="attribute.includes('translate')">
+        <el-row
+          v-if="attribute.includes('rotate')"
+        >
           <el-input
-            v-model="zoomValue[zoomEditIndex].value[0]"
+            v-model="propValue[propEditIndex].value"
             placeholder="something"
-            style="width: 80%"
+            style="width: 100%"
+          >
+            <template slot="prepend" body-style="padding:0"
+              >{{ tabName[attribute] }}:</template
+            >
+            <template slot="append">deg</template>
+          </el-input>
+        </el-row>
+        <el-row
+          v-if="attribute.includes('text-letter-spacing') || attribute.includes('text-max-width')"
+        >
+          <el-input
+            v-model="propValue[propEditIndex].value"
+            placeholder="something"
+            style="width: 100%"
+          >
+            <template slot="prepend" body-style="padding:0"
+              >{{ tabName[attribute] }}:</template
+            >
+            <template slot="append">em</template>
+          </el-input>
+        </el-row>                
+        <el-row v-if="attribute.includes('translate') || attribute.includes('icon-offset') || attribute.includes('text-offset')">
+          <el-input
+            v-model="propValue[propEditIndex].value[0]"
+            placeholder="something"
+            style="width: 100%"
           >
             <template slot="prepend" body-style="padding:0"
               >x轴方向平移:</template
             >
-            <template slot="append">px</template>
+            <template v-if="attribute.includes('translate')" slot="append">px</template>
+            <template v-if="attribute.includes('icon-offset')" slot="append">iconsize</template>
+            <template v-if="attribute.includes('text-offset')" slot="append">em</template>
           </el-input>
           <br /><br />
           <el-input
-            v-model="zoomValue[zoomEditIndex].value[1]"
+            v-model="propValue[propEditIndex].value[1]"
             placeholder="something"
-            style="width: 80%"
+            style="width: 100%"
           >
             <template slot="prepend" body-style="padding:0"
               >y轴方向平移:</template
             >
-            <template slot="append">px</template>
+            <template v-if="attribute.includes('translate')" slot="append">px</template>
+            <template v-if="attribute.includes('icon-offset')" slot="append">iconsize</template>
+            <template v-if="attribute.includes('text-offset')" slot="append">em</template>
           </el-input>
+
         </el-row>
         <el-row v-if="attribute.includes('dasharray')">
           <el-row class="zoomDasharray">
             <div
               class="flexRowSpaceAround"
-              v-for="(item, index) in zoomValue[zoomEditIndex].value"
+              v-for="(item, index) in propValue[propEditIndex].value"
               :key="index"
               style="height: 40px"
             >
               <h4 v-if="index % 2 == 0">实部:</h4>
               <h4 v-else>虚部:</h4>
               <el-input-number
-                v-model="zoomValue[zoomEditIndex].value[index]"
+                v-model="propValue[propEditIndex].value[index]"
                 :min="0"
                 size="small"
                 label="描述文字"
@@ -946,7 +1403,7 @@
                 icon="el-icon-delete"
                 size="mini"
                 circle
-                @click="zoomValue[zoomEditIndex].value.splice(index, 1)"
+                @click="propValue[propEditIndex].value.splice(index, 1)"
               ></el-button>
             </div>
           </el-row>
@@ -959,13 +1416,19 @@
           </el-button>
         </el-row>
         <el-row
-          v-if="attribute.includes('line-cap') || attribute.includes('join')"
+          v-if="attribute.includes('line-cap') || 
+                attribute.includes('join') || 
+                attribute.includes('icon-anchor') || 
+                attribute.includes('text-anchor') || 
+                attribute.includes('text-transform') || 
+                attribute.includes('text-justify')"
           type="flex"
           align="middle"
         >
           <h4>{{ tabName[attribute] }}:&nbsp;</h4>
           <el-select
-            v-model="zoomValue[zoomEditIndex].value"
+            v-if="attribute.includes('line-cap')"
+            v-model="propValue[propEditIndex].value"
             placeholder="请选择"
           >
             <el-option
@@ -980,13 +1443,140 @@
             >
             </el-option>
           </el-select>
+          <el-select
+            v-if="attribute.includes('join')"
+            v-model="propValue[propEditIndex].value"
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="item in [
+                { label: '尖角 miter', value: 'miter' },
+                { label: '圆角 round', value: 'round' },
+                { label: '斜角 bevel', value: 'bevel' },
+              ]"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            >
+            </el-option>
+          </el-select>          
+          <el-select
+            v-if="attribute.includes('icon-anchor') || attribute.includes('text-anchor')"
+            v-model="propValue[propEditIndex].value"
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="item in [
+                      'center',
+                      'left',
+                      'right',
+                      'top',
+                      'bottom',
+                      'top-left',
+                      'top-right',
+                      'bottom-left',
+                      'bottom-right',
+              ]"
+              :key="item"
+              :label="item"
+              :value="item"
+            >
+            </el-option>
+          </el-select>  
+          <el-select
+            v-if="attribute.includes('text-justify')"
+            v-model="propValue[propEditIndex].value"
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="item in ['auto', 'center', 'right', 'left']"
+              :key="item"
+              :label="item"
+              :value="item"
+            >
+            </el-option>
+          </el-select>           
+          <el-select
+            v-if="attribute.includes('text-transform')"
+            v-model="propValue[propEditIndex].value"
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="item in ['none', 'uppercase', 'lowercase']"
+              :key="item"
+              :label="item"
+              :value="item"
+            >
+            </el-option>
+          </el-select>           
         </el-row>
         <el-row
           v-if="attribute.includes('fill-antialias')"
           style="display: flex"
         >
-          <el-switch v-model="zoomValue[zoomEditIndex].value"> </el-switch>
+          <el-switch v-model="propValue[propEditIndex].value"> </el-switch>
         </el-row>
+        <el-row 
+          v-if="attribute.includes('icon-image')" type="flex">
+          <el-input
+            v-model="propValue[propEditIndex].value"
+            placeholder="something"
+          >
+            <template slot="prepend" body-style="padding:0">
+              图标 :
+            </template>          
+          </el-input>
+          <el-popover
+            ref="iconPopover"
+            placement="right"
+            width="400"
+            trigger="click"
+          >
+            <el-tabs>
+              <el-tab-pane
+                label="精灵图"
+                style="height: 200px; overflow-y: scroll"
+              >
+                <el-col
+                  class="cursor"
+                  v-for="(item, index) in spriteList"
+                  :key="index"
+                  @click.native="spriteSelect(item,'prop')"
+                >
+                  {{ item }}
+                </el-col>
+              </el-tab-pane>
+              <el-tab-pane label="自定义">
+                <el-row
+                  type="flex"
+                  justify="start"
+                  style="flex-wrap: wrap; width: 100%"
+                >
+                  <el-card
+                    class="spriteImage"
+                    v-for="(item, index) in symbolTableData"
+                    :key="index"
+                  >
+                    <el-image
+                      style="width: 100px; height: 100px"
+                      :src="reqUrl + item.webAddress"
+                      fit="cover"
+                      class="cursor"
+                      @click="iconSelect(item,'prop')"
+                    >
+                    </el-image>
+                  </el-card>
+                </el-row>
+              </el-tab-pane>
+            </el-tabs>
+
+            <el-button
+              type="text"
+              icon="el-icon-s-unfold"
+              slot="reference"
+            ></el-button>
+          </el-popover>
+        </el-row>          
 
         <span slot="footer" class="dialog-footer">
           <el-button :disabled="propEditIndex == 0" @click="propEditDelete"
@@ -1008,6 +1598,7 @@
         </span>
       </el-dialog>
     </el-row>
+    <!-- 公式编辑框 -->
     <el-row v-if="formulaShow">
       <el-input
         type="textarea"
@@ -1054,6 +1645,13 @@ export default {
       dataValueOrigin: [],
       formValueOrigin: [],
       propertyList: [],
+
+      //全局参数
+      spriteList: [],
+      fontList: [],
+      symbolTableData: [],
+
+
       //添加新属性，要更新下列属性
       tabName: {
         "circle-color": "颜色",
@@ -1149,9 +1747,19 @@ export default {
         "fill-extrusion-base",
         "fill-extrusion-opacity",
         "icon-size",
+        "text-size",
         "icon-opacity",
+        "icon-rotate",
         "text-opacity",
         "icon-padding",
+        "text-letter-spacing",
+        "text-line-height",
+        "text-max-width",
+        "text-padding",
+        "text-rotate",
+        "text-halo-width",
+        "text-halo-blur",
+
       ],
       arrayAttribute: [
         "circle-translate",
@@ -1159,8 +1767,24 @@ export default {
         "fill-translate",
         "fill-extrusion-translate",
         "icon-offset",
+        "text-offset",
         "icon-translate",
+        "text-translate",
       ], //'line-dasharray'另外提出
+      onlyZoom: [
+        "icon-allow-overlap",
+        "icon-ignore-placement",
+        "icon-optional",
+        "icon-padding",
+        "icon-translate",
+        "symbol-placement",
+        "text-line-height",
+        "text-allow-overlap",
+        "text-ignore-placement",
+        "text-optional",
+        "text-padding",
+        "text-translate"
+      ],
 
       isNum: false,
       isArray: false,
@@ -1175,9 +1799,7 @@ export default {
       zoomRateShow: false,
 
       //data范围条件
-      dataOptions: [{ value: "z-index" }],
       dataValue: [{ data: 0 }, { data: 0 }],
-      dataList: [],
       dataRange: { min: 0, max: 0 },
       dataSearch: "",
       dataSelect: "",
@@ -1191,7 +1813,6 @@ export default {
 
       //property范围条件
       propValue: [{ prop: "default" }, { prop: "" }],
-      attributeOptions: [{ value: "z-index" }],
       allpropValueListLength: 0,
       propEditShow: false,
       propEditIndex: 1,
@@ -1286,9 +1907,14 @@ export default {
   },
   methods: {
     initInfo() {
+      // 初始化页面参数
+      this.spriteList = JSON.parse(localStorage.getItem('spriteList'));
+      this.symbolTableData = JSON.parse(localStorage.getItem('symbolTableData'));
+      this.fontList = JSON.parse(localStorage.getItem('fontList'));
+
       // 保留原样式用于重置,
       if (this.layerOrigin == "") {
-        this.layerOrigin = JSON.parse(JSON.stringify(this.layerSelect));
+        this.layerOrigin = JSON.parse(JSON.stringify(this.layer));
       }
       // 判断样式tab属于layout还是paint
       if (
@@ -1305,14 +1931,22 @@ export default {
       }
       // 初始化属性表
       this.propertyList = this.layer.shpAttribute;
-      // console.log('att',this.layoutOrpaint);
-      // console.log('att',this.propertyList);
       // 初始化tab显示列表
       for (let tab in this.layer["paint"]) {
-        this.menuButtonShowList[tab] = true;
+        if(this.layer.attrValueSet[tab] == 'primary' || !(this.attribute in this.layer.attrValueSet)){
+          this.menuButtonShowList[tab] = true;
+          this.layer.attrValueSet[tab] = 'primary';   //若之前未有存档，则初始化为primary
+        }else{
+          this.menuButtonShowList[tab] = false;
+        }
       }
       for (let tab in this.layer["layout"]) {
-        this.menuButtonShowList[tab] = true;
+        if(this.layer.attrValueSet[tab] == 'primary' || !(this.attribute in this.layer.attrValueSet)){
+          this.menuButtonShowList[tab] = true;
+          this.layer.attrValueSet[tab] = 'primary';
+        }else{
+          this.menuButtonShowList[tab] = false;
+        }
       }
       // 判断样式属性值为数字还是文本
       this.isNum =
@@ -1320,9 +1954,60 @@ export default {
       this.isArray =
         this.arrayAttribute.indexOf(this.attribute) == -1 ? false : true;
       //初次传递整个导航条的显示情况，依据param2判断是否单个tab显示切换
-      this.$bus.$emit("show", { param1: this.menuButtonShowList, param2: 0 });
+      this.$bus.$emit("show", { param1: this.menuButtonShowList, param2: 0 ,param3:this.layer.attrValueSet});
+      if(this.layer.attrValueSet[this.attribute] != 'primary'){
+        switch(this.layer.attrValueSet[this.attribute].type){
+          //赋初始值
+          case 'zoom':
+            console.log('zoom变换读取原数据:',this.layer.attrValueSet[this.attribute].value)
+            this.zoomValue = this.layer.attrValueSet[this.attribute].value.zoomValue;
+            this.zoomRate = this.layer.attrValueSet[this.attribute].value.zoomRate;
+            this.zoomValueOrigin = this.layer.attrValueSet[this.attribute].value.zoomValueOrigin;
 
-      // console.log('a',this.menuButtonShowList)
+            this.menuButtonShowList[this.attribute] = false;
+            this.$bus.$emit("show", { param1: this.attribute, param2: false, param4: 'zoom'});
+            this.zoomShow = true;          
+            break
+          case 'data':
+            console.log('data变换读取原数据:',this.layer.attrValueSet[this.attribute].value)
+            this.dataValue = this.layer.attrValueSet[this.attribute].value.dataValue;
+            this.dataRange = this.layer.attrValueSet[this.attribute].value.dataRange;
+            this.dataSelect = this.layer.attrValueSet[this.attribute].value.dataSelect;
+            this.datalength = this.layer.attrValueSet[this.attribute].value.datalength;
+            this.dataInsertIndex = this.layer.attrValueSet[this.attribute].value.dataInsertIndex;
+            this.dataRate = this.layer.attrValueSet[this.attribute].value.dataRate;
+            this.dataValueOrigin = this.layer.attrValueSet[this.attribute].value.dataValueOrigin;
+
+            this.menuButtonShowList[this.attribute] = false;
+            this.$bus.$emit("show", { param1: this.attribute, param2: false, param4: 'data'});
+            this.dataShow = true;              
+            break
+          case 'prop':
+            console.log('prop变换读取原数据:',this.layer.attrValueSet[this.attribute].value)
+            this.propValue = this.layer.attrValueSet[this.attribute].value.propValue;
+            this.propSelect = this.layer.attrValueSet[this.attribute].value.propSelect;
+            this.propValueFilter = this.layer.attrValueSet[this.attribute].value.propValueFilter;
+            this.propValueList = this.layer.attrValueSet[this.attribute].value.propValueList;
+            this.propValueOrigin = this.layer.attrValueSet[this.attribute].value.propValueOrigin;
+
+            this.menuButtonShowList[this.attribute] = false;
+            this.$bus.$emit("show", { param1: this.attribute, param2: false, param4: 'prop'});
+            this.propertyShow = true; 
+            break
+          case 'formula':
+            console.log('formula变换读取原数据:',this.layer.attrValueSet[this.attribute].value)
+            this.formulaValue = this.layer.attrValueSet[this.attribute].value.formulaValue;
+            this.formValueOrigin = this.layer.attrValueSet[this.attribute].value.formValueOrigin;
+
+            this.menuButtonShowList[this.attribute] = false;
+            this.$bus.$emit("show", { param1: this.attribute, param2: false, param4: 'formula'});
+            this.formulaShow = true;             
+            
+            break
+          default:
+            return null;
+        }
+      }
     },
     reset(val) {
       this.$confirm("是否重置当前设置?", "提示", {
@@ -1349,7 +2034,9 @@ export default {
       // 内部重置按钮功能
       if (val === "open") {
         console.log("attr", this.menuButtonShowList);
+        //在一个图层中，属性的显示情况和值同时存储
         this.menuButtonShowList[this.attribute] = true;
+        this.layer.attrValueSet[this.attribute] = 'primary';
         this.$bus.$emit("show", { param1: this.attribute, param2: true });
         // zoom相关
         if (this.zoomShow) {
@@ -1400,12 +2087,9 @@ export default {
         this.layer[this.layoutOrpaint][this.attribute] = value1;
       }
       //向父组件传递要修改的参数
-      this.handleValue();
-    },
-    handleValue() {
       const value = this.layer[this.layoutOrpaint][this.attribute];
-      console.log("value:", value);
-      this.$emit("callback", this.layoutOrpaint, this.attribute, value);
+      const parameters = 'primary';
+      this.$emit("callback", this.layoutOrpaint, this.attribute, value, parameters);
     },
 
     //条件渲染相同功能
@@ -1437,40 +2121,32 @@ export default {
     },
     //对zoom变化各行进行处理
     zoomOpen() {
-      //初始化zoom条件渲染的参数
-      const valueOrigin1 = JSON.parse(
-        JSON.stringify(this.layerSelect[this.layoutOrpaint][this.attribute])
-      );
-      const valueOrigin2 = JSON.parse(
-        JSON.stringify(this.layerSelect[this.layoutOrpaint][this.attribute])
-      );
-      this.zoomValue[0].value = valueOrigin1;
-      this.zoomValue[1].value = valueOrigin2;
+      //初始化zoom条件渲染的参数   转换赋值，避免赋值的对象间相互影响
+      const valueOrigin1 = this.layer[this.layoutOrpaint][this.attribute];
+      const valueOrigin2 = this.layer[this.layoutOrpaint][this.attribute];
+      this.zoomValue[0].value = JSON.parse(JSON.stringify(valueOrigin1));
+      this.zoomValue[1].value = JSON.parse(JSON.stringify(valueOrigin2));
       this.zoomValueOrigin = JSON.parse(JSON.stringify(this.zoomValue));
 
       //先初始化参数，再打开相关编辑面板
       this.menuButtonShowList[this.attribute] = false;
-      this.$bus.$emit("show", { param1: this.attribute, param2: false });
+      this.$bus.$emit("show", { param1: this.attribute, param2: false, param4:'zoom'});
       this.zoomShow = true;
       this.zoomEditShow = true;
     },
     dataOpen(row) {
       //初始化data范围渲染的参数
       console.log("datarow", row);
-      const valueOrigin1 = JSON.parse(
-        JSON.stringify(this.layerSelect[this.layoutOrpaint][this.attribute])
-      );
-      const valueOrigin2 = JSON.parse(
-        JSON.stringify(this.layerSelect[this.layoutOrpaint][this.attribute])
-      );
-      this.dataValue[0].value = valueOrigin1;
-      this.dataValue[1].value = valueOrigin2;
+      const valueOrigin1 = this.layer[this.layoutOrpaint][this.attribute];
+      const valueOrigin2 = this.layer[this.layoutOrpaint][this.attribute];
+      this.dataValue[0].value = JSON.parse(JSON.stringify(valueOrigin1));
+      this.dataValue[1].value = JSON.parse(JSON.stringify(valueOrigin2));
       this.dataValueOrigin = JSON.parse(JSON.stringify(this.dataValue));
       this.dataSelect = row.column_name;
       this.getDataRange();
       //先初始化参数，再打开相关编辑面板
       this.menuButtonShowList[this.attribute] = false;
-      this.$bus.$emit("show", { param1: this.attribute, param2: false });
+      this.$bus.$emit("show", { param1: this.attribute, param2: false, param4:'data'});
       this.dataShow = true;
       this.dataEditShow = true;
     },
@@ -1478,24 +2154,20 @@ export default {
       this.propSelect = row.column_name;
       this.propValueListInit();
       //初始化prop条件渲染的参数
-      const valueOrigin1 = JSON.parse(
-        JSON.stringify(this.layerSelect[this.layoutOrpaint][this.attribute])
-      );
-      const valueOrigin2 = JSON.parse(
-        JSON.stringify(this.layerSelect[this.layoutOrpaint][this.attribute])
-      );
-      this.propValue[0].value = valueOrigin1;
-      this.propValue[1].value = valueOrigin2;
+      const valueOrigin1 = this.layer[this.layoutOrpaint][this.attribute];
+      const valueOrigin2 = this.layer[this.layoutOrpaint][this.attribute];
+      this.propValue[0].value = JSON.parse(JSON.stringify(valueOrigin1));
+      this.propValue[1].value = JSON.parse(JSON.stringify(valueOrigin2));
       this.propValueOrigin = JSON.parse(JSON.stringify(this.propValue));
       //先初始化参数，再打开相关编辑面板
       this.menuButtonShowList[this.attribute] = false;
-      this.$bus.$emit("show", { param1: this.attribute, param2: false });
+      this.$bus.$emit("show", { param1: this.attribute, param2: false, param4:'prop'});
       this.propertyShow = true;
       this.propEditShow = true;
     },
     formulaOpen() {
       this.menuButtonShowList[this.attribute] = false;
-      this.$bus.$emit("show", { param1: this.attribute, param2: false });
+      this.$bus.$emit("show", { param1: this.attribute, param2: false, param4:'formula'});
       this.formulaShow = true;
     },
 
@@ -1513,14 +2185,14 @@ export default {
           1
         ) {
           let zoom = Number(this.zoomValue[i - 1]["zoom"]) + 1;
-          let value = this.zoomValue[i - 1]["value"];
+          const value = JSON.parse(JSON.stringify(this.zoomValue[i - 1]["value"]));
           const Object = { zoom: zoom, value: value };
           this.zoomValue.splice(i, 0, Object);
           this.zoomEditIndex = i;
           break;
         } else if (i == this.zoomValue.length - 1 && i - 23 < 0) {
           let zoom = Number(this.zoomValue[i]["zoom"]) + 1;
-          let value = this.zoomValue[i]["value"];
+          const value = JSON.parse(JSON.stringify(this.zoomValue[i]["value"]));
           const Object = { zoom: zoom, value: value };
           this.zoomEditIndex = Number(i) + 1;
           this.zoomValue.splice(Number(i) + 1, 0, Object);
@@ -1595,7 +2267,8 @@ export default {
           zoomCondition1.push(Number(this.zoomValue[i]["zoom"]));
           //js默认为string类型
           if (this.isNum) {
-            zoomCondition1.push(Number(this.zoomValue[i]["value"]));
+            this.zoomValue[i]["value"] = Number(this.zoomValue[i]["value"])
+            zoomCondition1.push(this.zoomValue[i]["value"]);
             value = zoomCondition1;
             console.log("num", this.isNum);
           } else if (this.attribute.includes("color")) {
@@ -1603,10 +2276,10 @@ export default {
             value = zoomCondition1;
             console.log("color");
           } else if (this.isArray) {
-            let value1 = parseInt(this.zoomValue[i]["value"][0]);
-            let value2 = parseInt(this.zoomValue[i]["value"][1]);
-            this.zoomValue[i]["value"][0] = JSON.parse(JSON.stringify(value1));
-            this.zoomValue[i]["value"][1] = JSON.parse(JSON.stringify(value2));
+            this.zoomValue[i]["value"][0] = Number(this.zoomValue[i]["value"][0]);
+            this.zoomValue[i]["value"][1] = Number(this.zoomValue[i]["value"][1]);
+            let value1 = this.zoomValue[i]["value"][0];
+            let value2 = this.zoomValue[i]["value"][1];
             zoomCondition1.push(["literal", [value1, value2]]);
             value = zoomCondition1;
             console.log("array", value1, value2);
@@ -1635,14 +2308,17 @@ export default {
         }
       }
       console.log("zoomCondition:", value);
-      this.$emit("callback", this.layoutOrpaint, this.attribute, value);
+      const parameters = {
+        value:{zoomValue:this.zoomValue,zoomRate:this.zoomRate,zoomValueOrigin:this.zoomValueOrigin},
+        type:'zoom'};
+      this.$emit("callback", this.layoutOrpaint, this.attribute, value, parameters);
     },
 
     //data变化处理
     dataInsert() {
       //按顺序插入中值
       const index = 2 * Number(this.dataInsertIndex) - 1;
-      const value = this.dataValue[index - 1].value;
+      const value = JSON.parse(JSON.stringify(this.dataValue[index - 1].value));
       const data =
         (Number(this.dataValue[index - 1].data) +
           Number(this.dataValue[index].data)) /
@@ -1656,6 +2332,22 @@ export default {
     },
     dataEditFirm() {
       this.dataEditShow = false;
+      //根据data值，进行数据的排序
+      let Object = this.dataValue[this.dataEditIndex];
+      let num = Object.data;
+      this.dataValue.splice(this.dataEditIndex, 1);      
+      for (let i in this.dataValue) {
+        //js的var是弱类型，默认是string类型，10>2不成立
+        if (num - this.dataValue[i].data < 0) {
+          this.dataValue.splice(i, 0, Object);
+          break;
+        }
+        if (i == this.dataValue.length - 1) {
+          console.log("i:", i);
+          this.dataValue.push(Object);
+          break;
+        }
+      }      
       // 设置多级显示
       let dataCondition1 = [
         "interpolate",
@@ -1677,8 +2369,8 @@ export default {
             value = dataCondition1;
             console.log("color");
           } else if (this.isArray) {
-            let value1 = parseInt(this.dataValue[i]["value"][0]);
-            let value2 = parseInt(this.dataValue[i]["value"][1]);
+            let value1 = Number(this.dataValue[i]["value"][0]);
+            let value2 = Number(this.dataValue[i]["value"][1]);
             this.dataValue[i]["value"][0] = JSON.parse(JSON.stringify(value1));
             this.dataValue[i]["value"][1] = JSON.parse(JSON.stringify(value2));
             dataCondition1.push(["literal", [value1, value2]]);
@@ -1692,23 +2384,40 @@ export default {
         (!this.isNum && !this.isArray && !this.attribute.includes("color"))
       ) {
         for (let i in this.dataValue) {
-          i == 0 || dataCondition2.push(Number(this.dataValue[i]["data"])); //step的data=0时，只加载value
+          if(this.isNum){
+            this.dataValue[i]["data"] = Number(this.dataValue[i]["data"]);
+          }
+          i == 0 || dataCondition2.push(this.dataValue[i]["data"]); //step的data=0时，只加载value
           if (this.attribute.includes("dasharray")) {
-            const value1 = parseInt(this.dataValue[i]["value"][0]);
-            const value2 = parseInt(this.dataValue[i]["value"][1]);
+            if(this.isNum){
+              this.dataValue[i]["value"][0] = Number(this.dataValue[i]["value"][0]);
+              this.dataValue[i]["value"][1] = Number(this.dataValue[i]["value"][1]);
+            }            
+            const value1 = this.dataValue[i]["value"][0];
+            const value2 = this.dataValue[i]["value"][1];
             this.dataValue[i]["value"][0] = value1;
             this.dataValue[i]["value"][1] = value2;
             dataCondition2.push(["literal", [value1, value2]]);
             value = dataCondition2;
             console.log("dasharray");
-          } else {
+          } else if(this.attribute.includes("image")){
             dataCondition2.push(this.dataValue[i]["value"]);
             value = dataCondition2;
             console.log("text");
+          }else {
+            if(this.isNum){
+              this.dataValue[i]["value"] = Number(this.dataValue[i]["value"]);
+            }            
+            dataCondition2.push(this.dataValue[i]["value"]);
+            value = dataCondition2;
+            console.log("num");
           }
         }
       }
-      this.$emit("callback", this.layoutOrpaint, this.attribute, value);
+      const parameters = 
+        {value:{dataValue:this.dataValue,dataRange:this.dataRange,dataSelect:this.dataSelect,dataValueOrigin:this.dataValueOrigin,
+         datalength:this.datalength,dataInsertIndex:this.dataInsertIndex,dataRate:this.dataRate},type:'data'};
+      this.$emit("callback", this.layoutOrpaint, this.attribute, value, parameters);
     },
     getDataRange() {
       requestApi
@@ -1774,17 +2483,11 @@ export default {
           pageSize: 10,
           searchText: this.propSearch,
           sort: "asc",
-          // aimAttrName: row.column_name,
-          // aimShpTableName: this.layer.id,
-          // page: 1,
-          // pageSize: 10,
-          // searchText: '',
-          // sort: "asc"
         })
         .then((res) => {
           console.log("res", res);
           this.propValueList = res.data.data.attrValue;
-          this.allpropValueListLength = this.propValueList.length;
+          this.allpropValueListLength = res.data.data.featureCount;
           console.log("propValueList", this.propValueList);
         })
         .catch((error) => {
@@ -1833,23 +2536,58 @@ export default {
           const value1 = this.propValueFilter[i][j][this.propSelect];
           template[2].push(value1);
         }
+        // 第一步 添加条件
         value.push(template);
-        value.push(this.propValue[num].value);
+        // 第二步 添加参数值
+        if(this.isNum){
+          this.propValue[num].value = Number(this.propValue[num].value);
+        }
+        //数组和其他类型不同形式
+        let results = this.propValue[num].value;
+        if(this.isArray){
+          let value1 = Number(this.propValue[i]["value"][0]);
+          let value2 = Number(this.propValue[i]["value"][1]);
+          this.propValue[i]["value"][0] = JSON.parse(JSON.stringify(value1));
+          this.propValue[i]["value"][1] = JSON.parse(JSON.stringify(value2));
+          results = ["literal", [value1, value2]];
+        }          
+        value.push(results);
         num++;
       }
-      value.push(this.propValue[0].value);
-      console.log("propcondition", value);
-      this.$emit("callback", this.layoutOrpaint, this.attribute, value);
-
-      console.log("propEditIndex", this.propEditIndex);
-      console.log("propValue", this.propValue);
+      //数字类型
+      if(this.isNum){
+        this.propValue[0].value = Number(this.propValue[0].value);
+      }
+      let resultDefault = this.propValue[0].value;
+      //数组类型
+      if(this.isArray){
+        let value1 = Number(this.propValue[0]["value"][0]);
+        let value2 = Number(this.propValue[0]["value"][1]);
+        this.propValue[0]["value"][0] = JSON.parse(JSON.stringify(value1));
+        this.propValue[0]["value"][1] = JSON.parse(JSON.stringify(value2));
+        resultDefault = ["literal", [value1, value2]];
+        this.propValue[0]["value"] = Number(this.propValue[0].value);
+      }      
+      value.push(resultDefault);
+      const parameters = {
+        value:{propValue:this.propValue,propSelect:this.propSelect,propValueFilter:this.propValueFilter,
+        propValueList:this.propValueList,propValueOrigin:this.propValueOrigin},
+        type:'prop'}
+      this.$emit("callback", this.layoutOrpaint, this.attribute, value, parameters);
     },
     propFilterChange(val) {
       this.propValueFilter[this.propEditIndex] = val;
       console.log("select", val);
     },
+    selectall(selection){
+      console.log("selection:",selection)
+    },
+    getRowKeys(row){
+      return row.id
+    },
     //将选中的filter值更新到propValue中
     propFilterConfirm() {
+      this.$refs.propValuePopover.doClose();
       let string = "";
       for (let i in this.propValueFilter[this.propEditIndex]) {
         const value =
@@ -1898,19 +2636,40 @@ export default {
       while (e.indexOf("。", start) != -1) {
         start = end + 1;
         end = e.indexOf("。", start);
-        var value = e.slice(start, end);
-        if (!value.includes("'") && !value.includes('"')) {
-          value = Number(value);
+        let f = e.slice(start, end);
+        if (!f.includes("'") && !f.includes('"')) {
+          f = Number(f);
         }
-        value = value.replaceAll('"', "'");
-        array.push(value);
+        f = f.replaceAll('"', "'");
+        array.push(f);
       }
       console.log("array", array);
 
-      // const value = e.split('。');
-      // console.log('formulaValue2',value);
-      // this.$emit("callback",this.layoutOrpaint,this.attribute,value);
+      const value = e.split('。');
+      const parameters = {value:{formulaValue:this.formulaValue,formValueOrigin:this.formValueOrigin},type:'formula'}
+      console.log('formulaValue2',value);
+      this.$emit("callback",this.layoutOrpaint,this.attribute,value, parameters);
     },
+
+    //图标层
+    spriteSelect(item,type) {
+      switch(type){
+        case 'zoom':
+          this.zoomValue[this.zoomEditIndex].value = item;
+          break
+        case 'data':
+          this.dataValue[this.dataEditIndex].value = item;
+          break
+        case 'prop':
+          this.propValue[this.propEditIndex].value = item;
+          break
+      }
+      this.$refs.iconPopover.doClose();
+    },
+    iconSelect(item) {
+      this.zoomValue[this.zoomEditIndex].value = item.originName;
+      this.$refs.iconPopover.doClose();     
+    },    
 
     test() {
       // console.log(tab, event);

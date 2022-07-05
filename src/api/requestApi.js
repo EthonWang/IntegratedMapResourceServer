@@ -113,7 +113,12 @@ export default {
     },
     deleteTileJson(tileJsonId){
         return instance.get(Vue.prototype.reqUrl+"/deleteTileJson/"+tileJsonId+".json")
-    }
+    },
+
+    //瓦片缓存
+    createTileCache(data){
+        return instance.post(Vue.prototype.reqUrl+"/createTileCache",data)
+    },
 
 
 }

@@ -16,53 +16,77 @@
         <!--        打开shp选择框，添加shplayer数据-->
         <div>
           <el-popover placement="right" width="250" trigger="click">
-            <el-row type="flex" align="middle">
-              <h4>数据库源:&nbsp;</h4>
-              <el-select
-                v-model="dataBaseSelect"
-                placeholder="请选择"
-                style="width: 73%"
-                @change="dataBaseSearch"
-              >
-                <el-option
-                  v-for="item in dataBaseList"
-                  :key="item.dbname"
-                  :label="item.dbname"
-                  :value="item.id"
+            <el-tabs value="PG" @tab-click="dataBaseClick">
+              <el-tab-pane label="PG" name="PG">
+                <el-row type="flex" align="middle">
+                  <h4>数据库源:&nbsp;</h4>
+                  <el-select
+                    v-model="PgBaseSelect"
+                    placeholder="请选择"
+                    style="width: 73%"
+                    @change="PgBaseChange"
+                  >
+                    <el-option
+                      v-for="item in dataBaseList"
+                      :key="item.dbname"
+                      :label="item.dbname"
+                      :value="item.id"
+                    >
+                    </el-option>
+                  </el-select>
+                </el-row>
+                <el-table :data="shpTableData" height="313">
+                  <el-table-column
+                    property="originName"
+                    width="170"
+                    show-overflow-tooltip
+                    label="名称"
+                  ></el-table-column>
+                  <el-table-column width="80" label="操作">
+                    <template slot-scope="scope">
+                      <el-button
+                        size="mini"
+                        type="primary"
+                        @click="handleAddShpLayer(scope.$index, scope.row)"
+                        >添加
+                      </el-button>
+                    </template>
+                  </el-table-column>
+                </el-table>
+                <el-pagination
+                  v-if="PgBaseSelect == 'default'"
+                  small
+                  @current-change="handleCurrentChangeShp"
+                  :current-page="currentPageShp"
+                  :page-size="pageSizeShp"
+                  layout="total, prev, pager, next"
+                  :total="totalDataCountShp"
+                  class="flexRowCenter"
                 >
-                </el-option>
-              </el-select>
-            </el-row>
+                </el-pagination>
+              </el-tab-pane>
+              <el-tab-pane label="OSM" name="OSM">
+                <el-table :data="dataLayers" height="313">
+                  <el-table-column
+                    property="id"
+                    width="170"
+                    show-overflow-tooltip
+                    label="名称"
+                  ></el-table-column>
+                  <el-table-column width="80" label="操作">
+                    <template slot-scope="scope">
+                      <el-button
+                        size="mini"
+                        type="primary"
+                        @click="handleAddShpLayer(scope.$index, scope.row)"
+                        >添加
+                      </el-button>
+                    </template>
+                  </el-table-column>
+                </el-table>
+              </el-tab-pane>              
+            </el-tabs>
 
-            <el-table :data="shpTableData" height="313">
-              <el-table-column
-                property="originName"
-                width="170"
-                show-overflow-tooltip
-                label="名称"
-              ></el-table-column>
-              <el-table-column width="80" label="操作">
-                <template slot-scope="scope">
-                  <el-button
-                    size="mini"
-                    type="primary"
-                    @click="handleAddShpLayer(scope.$index, scope.row)"
-                    >添加
-                  </el-button>
-                </template>
-              </el-table-column>
-            </el-table>
-            <el-pagination
-              v-if="dataBaseSelect == 'default'"
-              small
-              @current-change="handleCurrentChangeShp"
-              :current-page="currentPageShp"
-              :page-size="pageSizeShp"
-              layout="total, prev, pager, next"
-              :total="totalDataCountShp"
-              class="flexRowCenter"
-            >
-            </el-pagination>
             <el-button type="primary" slot="reference" @click="addShpData"
               >添加数据</el-button
             >
@@ -88,6 +112,7 @@
             >发布</el-button
           >
         </el-popover>
+        <el-button type="sucess" @click="addBackground"></el-button>
       </div>
 
       <!--      图层列表-->
@@ -191,12 +216,12 @@
         class="editBoardTitle"
         @click="nameEdit = true"
       >
-        <div>{{ layers[nowLayerIndex]["id"] }}</div>
+        <div>{{ layers[nowLayerIndex]["originName"] }}</div>
         <i class="el-icon-edit"></i>
       </div>
       <div v-show="nameEdit === true" class="editBoardTitle">
         <el-input
-          v-model="layers[nowLayerIndex]['id']"
+          v-model="layers[nowLayerIndex]['originName']"
           size="mini"
           @change="nameEdit = false"
         ></el-input>
@@ -215,7 +240,7 @@
             <el-tab-pane label="颜色" name="first">
               <h3>颜色</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['circle-color']">Zoom Range</span>
+              <span v-if="!menuButtonShowList['circle-color']">{{menuShowList['circle-color']}}</span>
               <el-row
                 v-if="menuButtonShowList['circle-color']"
                 style="display: flex; margin-top: 10px"
@@ -255,7 +280,7 @@
               <h3>半径（px）</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['circle-radius']"
-                >Zoom Range</span
+                >{{menuShowList['circle-radius']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['circle-radius']"
@@ -288,7 +313,7 @@
               <h3>不透明度</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['circle-opacity']"
-                >Zoom Range</span
+                >{{menuShowList['circle-opacity']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['circle-opacity']"
@@ -338,7 +363,7 @@
               <h3>边线颜色</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['circle-stroke-color']"
-                >Zoom Range</span
+                >{{menuShowList['circle-stroke-color']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['circle-stroke-color']"
@@ -379,7 +404,7 @@
               <h3>边线宽度</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['circle-stroke-width']"
-                >Zoom Range</span
+                >{{menuShowList['circle-stroke-width']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['circle-stroke-width']"
@@ -412,7 +437,7 @@
               <h3>边线不透明度</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['circle-stroke-opacity']"
-                >Zoom Range</span
+                >{{menuShowList['circle-stroke-opacity']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['circle-stroke-opacity']"
@@ -461,7 +486,7 @@
             <el-tab-pane label="模糊" name="seventh">
               <h3>模糊度</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['circle-blur']">Zoom Range</span>
+              <span v-if="!menuButtonShowList['circle-blur']">{{menuShowList['circle-blur']}}</span>
               <el-row v-if="menuButtonShowList['circle-blur']">
                 <el-slider
                   v-model="layers[nowLayerIndex].paint['circle-blur']"
@@ -507,7 +532,7 @@
               <h3>平移</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['circle-translate']"
-                >Zoom Range</span
+                >{{menuShowList['circle-translate']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['circle-translate']"
@@ -556,7 +581,7 @@
               <h3>平移参考</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['circle-translate-anchor']"
-                >Zoom Range</span
+                >{{menuShowList['circle-translate-anchor']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['circle-translate-anchor']"
@@ -595,7 +620,7 @@
               <h3>倾斜对齐</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['circle-pitch-alignment']"
-                >Zoom Range</span
+                >{{menuShowList['circle-pitch-alignment']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['circle-pitch-alignment']"
@@ -634,7 +659,7 @@
               <h3>倾斜缩放</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['circle-pitch-scale']"
-                >Zoom Range</span
+                >{{menuShowList['circle-pitch-scale']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['circle-pitch-scale']"
@@ -679,7 +704,7 @@
             <el-tab-pane label="颜色" name="first">
               <h3>线颜色</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['line-color']">Zoom Range</span>
+              <span v-if="!menuButtonShowList['line-color']">{{menuShowList['line-color']}}</span>
               <el-row
                 v-if="menuButtonShowList['line-color']"
                 style="display: flex; margin-top: 10px"
@@ -718,7 +743,7 @@
             <el-tab-pane label="线宽" name="second">
               <h3>线宽（px）</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['line-width']">Zoom Range</span>
+              <span v-if="!menuButtonShowList['line-width']">{{menuShowList['line-width']}}</span>
               <el-row
                 v-if="menuButtonShowList['line-width']"
                 style="display: flex; margin-top: 10px"
@@ -749,7 +774,7 @@
             <el-tab-pane label="不透明度" name="third">
               <h3>不透明度</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['line-opacity']">Zoom Range</span>
+              <span v-if="!menuButtonShowList['line-opacity']">{{menuShowList['line-opacity']}}</span>
               <el-row
                 v-if="menuButtonShowList['line-opacity']"
                 style="margin-top: 10px"
@@ -798,7 +823,7 @@
               <h3>虚线</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['line-dasharray']"
-                >Zoom Range</span
+                >{{menuShowList['line-dasharray']}}</span
               >
               <el-row
                 v-if="layers[nowLayerIndex].paint['line-dasharray'].length == 0"
@@ -868,7 +893,7 @@
               <h3>线间隙宽度</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['line-gap-width']"
-                >Zoom Range</span
+                >{{menuShowList['line-gap-width']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['line-gap-width']"
@@ -900,7 +925,7 @@
             <el-tab-pane label="模糊" name="sixth">
               <h3>模糊度</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['line-blur']">Zoom Range</span>
+              <span v-if="!menuButtonShowList['line-blur']">{{menuShowList['line-blur']}}</span>
               <el-row v-if="menuButtonShowList['line-blur']">
                 <el-slider
                   v-model="layers[nowLayerIndex].paint['line-blur']"
@@ -946,7 +971,7 @@
               <h3>平移</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['line-translate']"
-                >Zoom Range</span
+                >{{menuShowList['line-translate']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['line-translate']"
@@ -995,7 +1020,7 @@
               <h3>平移参考</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['line-translate-anchor']"
-                >Zoom Range</span
+                >{{menuShowList['line-translate-anchor']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['line-translate-anchor']"
@@ -1031,7 +1056,7 @@
             <el-tab-pane label="偏移" name="ninth">
               <h3>偏移</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['line-offset']">Zoom Range</span>
+              <span v-if="!menuButtonShowList['line-offset']">{{menuShowList['line-offset']}}</span>
               <el-row
                 v-if="menuButtonShowList['line-offset']"
                 style="display: flex; margin-top: 10px"
@@ -1062,7 +1087,7 @@
             <el-tab-pane label="线帽" name="tentn">
               <h3>线帽</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['line-cap']">Zoom Range</span>
+              <span v-if="!menuButtonShowList['line-cap']">{{menuShowList['line-cap']}}</span>
               <el-row
                 v-if="menuButtonShowList['line-cap']"
                 style="display: flex; margin-top: 10px"
@@ -1101,7 +1126,7 @@
             <el-tab-pane label="线连接" name="eleven">
               <h3>线连接</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['line-join']">Zoom Range</span>
+              <span v-if="!menuButtonShowList['line-join']">{{menuShowList['line-join']}}</span>
               <el-row
                 v-if="menuButtonShowList['line-join']"
                 style="display: flex; margin-top: 10px"
@@ -1149,7 +1174,7 @@
             <el-tab-pane label="颜色" name="first">
               <h3>填充颜色</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['fill-color']">Zoom Range</span>
+              <span v-if="!menuButtonShowList['fill-color']">{{menuShowList['fill-color']}}</span>
               <el-row
                 v-if="menuButtonShowList['fill-color']"
                 style="display: flex; margin-top: 10px"
@@ -1188,7 +1213,7 @@
             <el-tab-pane label="不透明度" name="second">
               <h3>不透明度</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['fill-opacity']">Zoom Range</span>
+              <span v-if="!menuButtonShowList['fill-opacity']">{{menuShowList['fill-opacity']}}</span>
               <el-row
                 v-if="menuButtonShowList['fill-opacity']"
                 style="margin-top: 10px"
@@ -1237,7 +1262,7 @@
               <h3>边线颜色</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['fill-outline-color']"
-                >Zoom Range</span
+                >{{menuShowList['fill-outline-color']}}</span
               >
               <br />
               <span style="font-size: 10px; color: #909399"
@@ -1285,7 +1310,7 @@
               <h3>平移</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['fill-translate']"
-                >Zoom Range</span
+                >{{menuShowList['fill-translate']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['fill-translate']"
@@ -1334,7 +1359,7 @@
               <h3>平移参考</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['fill-translate-anchor']"
-                >Zoom Range</span
+                >{{menuShowList['fill-translate-anchor']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['fill-translate-anchor']"
@@ -1371,7 +1396,7 @@
               <h3>抗锯齿</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['fill-antialias']"
-                >Zoom Range</span
+                >{{menuShowList['fill-antialias']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['fill-antialias']"
@@ -1409,7 +1434,7 @@
               <h3>填充颜色</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['fill-extrusion-color']"
-                >Zoom Range</span
+                >{{menuShowList['fill-extrusion-color']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['fill-extrusion-color']"
@@ -1450,7 +1475,7 @@
               <h3>不透明度</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['fill-extrusion-opacity']"
-                >Zoom Range</span
+                >{{menuShowList['fill-extrusion-opacity']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['fill-extrusion-opacity']"
@@ -1504,7 +1529,7 @@
               <h3>高度</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['fill-extrusion-height']"
-                >Zoom Range</span
+                >{{menuShowList['fill-extrusion-height']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['fill-extrusion-height']"
@@ -1538,7 +1563,7 @@
               &nbsp;
               <br />
               <span v-if="!menuButtonShowList['fill-extrusion-base']"
-                >Zoom Range</span
+                >{{menuShowList['fill-extrusion-base']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['fill-extrusion-base']"
@@ -1571,7 +1596,7 @@
               <h3>平移</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['fill-extrusion-translate']"
-                >Zoom Range</span
+                >{{menuShowList['fill-extrusion-translate']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['fill-extrusion-translate']"
@@ -1625,7 +1650,7 @@
               &nbsp;
               <span
                 v-if="!menuButtonShowList['fill-extrusion-translate-anchor']"
-                >Zoom Range</span
+                >{{menuShowList['fill-extrusion-translate-anchor']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['fill-extrusion-translate-anchor']"
@@ -1669,7 +1694,7 @@
               &nbsp;
               <span
                 v-if="!menuButtonShowList['fill-extrusion-vertical-gradient']"
-                >Zoom Range</span
+                >{{menuShowList['fill-extrusion-vertical-gradient']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['fill-extrusion-vertical-gradient']"
@@ -1728,14 +1753,14 @@
             <el-tab-pane label="图标" name="first">
               <h3>图标选择</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['icon-image']">Zoom Range</span>
+              <span v-if="!menuButtonShowList['icon-image']">{{menuShowList['icon-image']}}</span>
               <br />
               <el-row
                 v-if="menuButtonShowList['icon-image']"
                 style="display: flex; margin-top: 10px"
               >
                 <el-input
-                  v-model="this.layers[this.nowLayerIndex].layout['icon-image']"
+                  v-model="layers[nowLayerIndex].layout['icon-image']"
                   @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
@@ -1806,7 +1831,7 @@
             <el-tab-pane label="图标大小">
               <h3>图标大小</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['icon-size']">Zoom Range</span>
+              <span v-if="!menuButtonShowList['icon-size']">{{menuShowList['icon-size']}}</span>
               <el-row
                 v-if="menuButtonShowList['icon-size']"
                 style="display: flex; margin-top: 10px"
@@ -1836,38 +1861,47 @@
             </el-tab-pane>
             <el-tab-pane label="不透明度">
               <h3>不透明度</h3>
-              <el-slider
-                v-model="layers[nowLayerIndex].paint['icon-opacity']"
-                :min="0"
-                :max="1"
-                :marks="{ 0: '0', 0.5: '0.5', 1: '1' }"
-                @change="
-                  handlePaintChange(
-                    layers[nowLayerIndex]['id'],
-                    'icon-opacity',
-                    layers[nowLayerIndex].paint['icon-opacity']
-                  )
-                "
-                :step="0.1"
+              &nbsp;
+              <span v-if="!menuButtonShowList['icon-opacity']"
+                >{{menuShowList['icon-opacity']}}</span
               >
-              </el-slider>
-              <br />
-              <el-input-number
-                v-model="layers[nowLayerIndex].paint['icon-opacity']"
-                @change="
-                  handlePaintChange(
-                    layers[nowLayerIndex]['id'],
-                    'icon-opacity',
-                    layers[nowLayerIndex].paint['icon-opacity']
-                  )
-                "
-                :min="0"
-                :max="1"
-                :step="0.1"
-                size="medium"
-                label="描述文字"
-              >
-              </el-input-number>
+              <el-row
+                v-if="menuButtonShowList['icon-opacity']"
+                style="margin-top: 10px"
+              >              
+                <el-slider
+                  v-model="layers[nowLayerIndex].paint['icon-opacity']"
+                  :min="0"
+                  :max="1"
+                  :marks="{ 0: '0', 0.5: '0.5', 1: '1' }"
+                  @change="
+                    handlePaintChange(
+                      layers[nowLayerIndex]['id'],
+                      'icon-opacity',
+                      layers[nowLayerIndex].paint['icon-opacity']
+                    )
+                  "
+                  :step="0.1"
+                >
+                </el-slider>
+                <br />
+                <el-input-number
+                  v-model="layers[nowLayerIndex].paint['icon-opacity']"
+                  @change="
+                    handlePaintChange(
+                      layers[nowLayerIndex]['id'],
+                      'icon-opacity',
+                      layers[nowLayerIndex].paint['icon-opacity']
+                    )
+                  "
+                  :min="0"
+                  :max="1"
+                  :step="0.1"
+                  size="medium"
+                  label="描述文字"
+                >
+                </el-input-number>
+              </el-row>
               <el-divider></el-divider>
               <ConditionRender
                 :layerSelect="layers[nowLayerIndex]"
@@ -1879,7 +1913,7 @@
               <h3>允许压盖</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['icon-allow-overlap']"
-                >Zoom Range</span
+                >{{menuShowList['icon-allow-overlap']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['icon-allow-overlap']"
@@ -1908,7 +1942,7 @@
               <h3>忽略放置</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['icon-ignore-placement']"
-                >Zoom Range</span
+                >{{menuShowList['icon-ignore-placement']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['icon-ignore-placement']"
@@ -1939,7 +1973,7 @@
               <h3>图标可选</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['icon-optional']"
-                >Zoom Range</span
+                >{{menuShowList['icon-optional']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['icon-optional']"
@@ -1967,7 +2001,7 @@
             <el-tab-pane label="内边距">
               <h3>内边距（px）</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['icon-padding']">Zoom Range</span>
+              <span v-if="!menuButtonShowList['icon-padding']">{{menuShowList['icon-padding']}}</span>
               <el-row
                 v-if="menuButtonShowList['icon-padding']"
                 style="display: flex; margin-top: 10px"
@@ -1998,12 +2032,12 @@
             <el-tab-pane label="偏移">
               <h3>偏移（iconsize）</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['icon-offset']">Zoom Range</span>
+              <span v-if="!menuButtonShowList['icon-offset']">{{menuShowList['icon-offset']}}</span>
               <el-row
                 v-if="menuButtonShowList['icon-offset']"
                 style="margin-top: 10px; display: flex"
               >
-                <h4>x轴(px):&nbsp;</h4>
+                <h4>x轴:&nbsp;</h4>
                 <el-input-number
                   v-model="layers[nowLayerIndex].layout['icon-offset'][0]"
                   :step="1"
@@ -2021,7 +2055,7 @@
                 v-if="menuButtonShowList['icon-offset']"
                 style="display: flex"
               >
-                <h4>y轴(px):&nbsp;</h4>
+                <h4>y轴:&nbsp;</h4>
                 <el-input-number
                   v-model="layers[nowLayerIndex].layout['icon-offset'][1]"
                   :step="1"
@@ -2046,7 +2080,7 @@
               <h3>平移</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['icon-translate']"
-                >Zoom Range</span
+                >{{menuShowList['icon-translate']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['icon-translate']"
@@ -2095,7 +2129,7 @@
               <h3>平移参考</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['icon-translate-anchor']"
-                >Zoom Range</span
+                >{{menuShowList['icon-translate-anchor']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['icon-translate-anchor']"
@@ -2131,7 +2165,7 @@
             <el-tab-pane label="图标锚点">
               <h3>图标锚点</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['icon-anchor']">Zoom Range</span>
+              <span v-if="!menuButtonShowList['icon-anchor']">{{menuShowList['icon-anchor']}}</span>
               <el-row
                 v-if="menuButtonShowList['icon-anchor']"
                 style="margin-top: 10px; display: flex"
@@ -2176,7 +2210,7 @@
             <el-tab-pane label="旋转角度">
               <h3>旋转角度（deg）</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['icon-rotate']">Zoom Range</span>
+              <span v-if="!menuButtonShowList['icon-rotate']">{{menuShowList['icon-rotate']}}</span>
               <el-row
                 v-if="menuButtonShowList['icon-rotate']"
                 style="display: flex; margin-top: 10px"
@@ -2208,7 +2242,7 @@
               <h3>倾斜对齐</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['icon-pitch-alignment']"
-                >Zoom Range</span
+                >{{menuShowList['icon-pitch-alignment']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['icon-pitch-alignment']"
@@ -2245,7 +2279,7 @@
               <h3>旋转对齐</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['icon-rotation-alignment']"
-                >Zoom Range</span
+                >{{menuShowList['icon-rotation-alignment']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['icon-rotation-alignment']"
@@ -2294,7 +2328,7 @@
             <el-tab-pane label="标注字段" name="first">
               <h3>标注字段</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['text-field']">Zoom Range</span>
+              <span v-if="!menuButtonShowList['text-field']">{{menuShowList['text-field']}}</span>
               <el-row
                 v-if="menuButtonShowList['text-field']"
                 style="display: flex; margin-top: 10px"
@@ -2320,10 +2354,10 @@
                     :data="
                       filterOptions.filter(
                         (data) =>
-                          !search ||
+                          !textFieldSearch ||
                           data['column_name']
                             .toLowerCase()
-                            .includes(search.toLowerCase())
+                            .includes(textFieldSearch.toLowerCase())
                       )
                     "
                     :cell-style="{ textAlign: 'left' }"
@@ -2333,7 +2367,7 @@
                     <el-table-column prop="column_name" align="right">
                       <template slot="header">
                         <el-input
-                          v-model="search"
+                          v-model="textFieldSearch"
                           size="mini"
                           placeholder="搜索"
                           prefix-icon="el-icon-search"
@@ -2358,7 +2392,7 @@
             <el-tab-pane label="颜色">
               <h3>颜色</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['text-color']">Zoom Range</span>
+              <span v-if="!menuButtonShowList['text-color']">{{menuShowList['text-color']}}</span>
               <el-row
                 v-if="menuButtonShowList['text-color']"
                 style="display: flex; margin-top: 10px"
@@ -2397,7 +2431,7 @@
             <el-tab-pane label="不透明度">
               <h3>不透明度</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['text-opacity']">Zoom Range</span>
+              <span v-if="!menuButtonShowList['text-opacity']">{{menuShowList['text-opacity']}}</span>
               <el-row
                 v-if="menuButtonShowList['text-opacity']"
                 style="margin-top: 10px"
@@ -2445,7 +2479,7 @@
             <el-tab-pane label="字体">
               <h3>字体</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['text-font']">Zoom Range</span>
+              <span v-if="!menuButtonShowList['text-font']">{{menuShowList['text-font']}}</span>
               <el-row
                 v-if="menuButtonShowList['text-font']"
                 style="display: flex; margin-top: 10px"
@@ -2511,7 +2545,7 @@
             <el-tab-pane label="字体大小">
               <h3>字体大小（px）</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['text-size']">Zoom Range</span>
+              <span v-if="!menuButtonShowList['text-size']">{{menuShowList['text-size']}}</span>
               <el-row
                 v-if="menuButtonShowList['text-size']"
                 style="display: flex; margin-top: 10px"
@@ -2543,7 +2577,7 @@
               <h3>放置位置</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['symbol-placement']"
-                >Zoom Range</span
+                >{{menuShowList['symbol-placement']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['symbol-placement']"
@@ -2579,7 +2613,7 @@
             <el-tab-pane label="图标锚点">
               <h3>图标锚点</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['text-anchor']">Zoom Range</span>
+              <span v-if="!menuButtonShowList['text-anchor']">{{menuShowList['text-anchor']}}</span>
               <el-row
                 v-if="menuButtonShowList['text-anchor']"
                 style="margin-top: 10px; display: flex"
@@ -2624,21 +2658,21 @@
             <el-tab-pane label="文本对齐">
               <h3>文本对齐</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['text-letter-spacing']"
-                >Zoom Range</span
+              <span v-if="!menuButtonShowList['text-justify']"
+                >{{menuShowList['text-justify']}}</span
               >
               <el-row
-                v-if="menuButtonShowList['text-letter-spacing']"
+                v-if="menuButtonShowList['text-justify']"
                 style="margin-top: 10px; display: flex"
               >
                 <el-select
-                  v-model="layers[nowLayerIndex].layout['text-letter-spacing']"
+                  v-model="layers[nowLayerIndex].layout['text-justify']"
                   placeholder="请选择"
                   @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
-                      'text-letter-spacing',
-                      layers[nowLayerIndex].layout['text-letter-spacing']
+                      'text-justify',
+                      layers[nowLayerIndex].layout['text-justify']
                     )
                   "
                 >
@@ -2654,7 +2688,7 @@
               <el-divider></el-divider>
               <ConditionRender
                 :layerSelect="layers[nowLayerIndex]"
-                tab="text-letter-spacing"
+                tab="text-justify"
                 @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
@@ -2662,8 +2696,8 @@
               <h3>字符边距（em）</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-letter-spacing']"
-                >Zoom Range</span
-              >
+                >{{menuShowList['text-letter-spacing']}}</span
+              >             
               <el-row
                 v-if="menuButtonShowList['text-letter-spacing']"
                 style="display: flex; margin-top: 10px"
@@ -2695,7 +2729,7 @@
               <h3>行高（em）</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-line-height']"
-                >Zoom Range</span
+                >{{menuShowList['text-line-height']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['text-line-height']"
@@ -2728,7 +2762,7 @@
               <h3>最大宽度（em）</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-max-width']"
-                >Zoom Range</span
+                >{{menuShowList['text-max-width']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['text-max-width']"
@@ -2761,7 +2795,7 @@
               <h3>允许压盖</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-allow-overlap']"
-                >Zoom Range</span
+                >{{menuShowList['text-allow-overlap']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['text-allow-overlap']"
@@ -2790,7 +2824,7 @@
               <h3>忽略放置</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-ignore-placement']"
-                >Zoom Range</span
+                >{{menuShowList['text-ignore-placement']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['text-ignore-placement']"
@@ -2821,7 +2855,7 @@
               <h3>标注可选</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-optional']"
-                >Zoom Range</span
+                >{{menuShowList['text-optional']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['text-optional']"
@@ -2850,7 +2884,7 @@
               <h3>大小写转换</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-transform']"
-                >Zoom Range</span
+                >{{menuShowList['text-transform']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['text-transform']"
@@ -2886,7 +2920,7 @@
             <el-tab-pane label="内边距">
               <h3>内边距（px）</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['text-padding']">Zoom Range</span>
+              <span v-if="!menuButtonShowList['text-padding']">{{menuShowList['text-padding']}}</span>
               <el-row
                 v-if="menuButtonShowList['text-padding']"
                 style="display: flex; margin-top: 10px"
@@ -2915,14 +2949,14 @@
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="偏移">
-              <h3>偏移</h3>
+              <h3>偏移(em)</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['text-offset']">Zoom Range</span>
+              <span v-if="!menuButtonShowList['text-offset']">{{menuShowList['text-offset']}}</span>
               <el-row
                 v-if="menuButtonShowList['text-offset']"
                 style="margin-top: 10px; display: flex"
               >
-                <h4>x轴(em):&nbsp;</h4>
+                <h4>x轴:&nbsp;</h4>
                 <el-input-number
                   v-model="layers[nowLayerIndex].layout['text-offset'][0]"
                   :step="1"
@@ -2940,7 +2974,7 @@
                 v-if="menuButtonShowList['text-offset']"
                 style="display: flex"
               >
-                <h4>y轴(em):&nbsp;</h4>
+                <h4>y轴:&nbsp;</h4>
                 <el-input-number
                   v-model="layers[nowLayerIndex].layout['text-offset'][1]"
                   :step="1"
@@ -2965,7 +2999,7 @@
               <h3>平移(px)</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-translate']"
-                >Zoom Range</span
+                >{{menuShowList['text-translate']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['text-translate']"
@@ -3013,7 +3047,7 @@
             <el-tab-pane label="旋转角度">
               <h3>旋转角度（deg）</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['text-rotate']">Zoom Range</span>
+              <span v-if="!menuButtonShowList['text-rotate']">{{menuShowList['text-rotate']}}</span>
               <el-row
                 v-if="menuButtonShowList['text-rotate']"
                 style="display: flex; margin-top: 10px"
@@ -3045,7 +3079,7 @@
               <h3>倾斜对齐</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-pitch-alignment']"
-                >Zoom Range</span
+                >{{menuShowList['text-pitch-alignment']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['text-pitch-alignment']"
@@ -3082,7 +3116,7 @@
               <h3>旋转对齐</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-rotation-alignment']"
-                >Zoom Range</span
+                >{{menuShowList['text-rotation-alignment']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['text-rotation-alignment']"
@@ -3121,7 +3155,7 @@
               <h3>颜色</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-halo-color']"
-                >Zoom Range</span
+                >{{menuShowList['text-halo-color']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['text-halo-color']"
@@ -3162,7 +3196,7 @@
               <h3>掩膜宽度（px）</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-halo-width']"
-                >Zoom Range</span
+                >{{menuShowList['text-halo-width']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['text-halo-width']"
@@ -3195,7 +3229,7 @@
               <h3>掩膜模糊（px）</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-halo-blur']"
-                >Zoom Range</span
+                >{{menuShowList['text-halo-blur']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['text-halo-blur']"
@@ -3237,7 +3271,7 @@
               <h3>填充颜色</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['fill-extrusion-color']"
-                >Zoom Range</span
+                >{{menuShowList['fill-extrusion-color']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['fill-extrusion-color']"
@@ -3278,7 +3312,7 @@
               <h3>不透明度</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['fill-extrusion-opacity']"
-                >Zoom Range</span
+                >{{menuShowList['fill-extrusion-opacity']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['fill-extrusion-opacity']"
@@ -3332,7 +3366,7 @@
               <h3>高度</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['fill-extrusion-height']"
-                >Zoom Range</span
+                >{{menuShowList['fill-extrusion-height']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['fill-extrusion-height']"
@@ -3366,7 +3400,7 @@
               &nbsp;
               <br />
               <span v-if="!menuButtonShowList['fill-extrusion-base']"
-                >Zoom Range</span
+                >{{menuShowList['fill-extrusion-base']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['fill-extrusion-base']"
@@ -3399,7 +3433,7 @@
               <h3>平移</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['fill-extrusion-translate']"
-                >Zoom Range</span
+                >{{menuShowList['fill-extrusion-translate']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['fill-extrusion-translate']"
@@ -3453,7 +3487,7 @@
               &nbsp;
               <span
                 v-if="!menuButtonShowList['fill-extrusion-translate-anchor']"
-                >Zoom Range</span
+                >{{menuShowList['fill-extrusion-translate-anchor']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['fill-extrusion-translate-anchor']"
@@ -3497,7 +3531,7 @@
               &nbsp;
               <span
                 v-if="!menuButtonShowList['fill-extrusion-vertical-gradient']"
-                >Zoom Range</span
+                >{{menuShowList['fill-extrusion-vertical-gradient']}}</span
               >
               <el-row
                 v-if="menuButtonShowList['fill-extrusion-vertical-gradient']"
@@ -3575,9 +3609,9 @@
             <el-select v-model="filterWay" placeholder="请选择" size="small">
               <el-option
                 v-for="item in [
-                  { value: 'and', label: '满足所有条件' },
-                  { value: 'or', label: '满足任意条件' },
-                  { value: '!', label: '不满足任意条件' },
+                  { value: 'all', label: '满足所有条件' },
+                  { value: 'any', label: '满足任意条件' },
+                  { value: 'none', label: '不满足任意条件' },
                 ]"
                 :key="item.value"
                 :label="item.label"
@@ -3595,7 +3629,7 @@
             <el-button
               type="text"
               icon="el-icon-remove-outline"
-              @click="filterCondition.splice(index, 1)"
+              @click="filterRemove(index)"
             ></el-button>
             <el-col :span="6">
               <el-select
@@ -3603,6 +3637,7 @@
                 v-model="filterCondition[index]['option']"
                 placeholder="请选择"
                 size="small"
+                @change="filterValueInit(index)"
               >
                 <el-option
                   v-for="item in filterOptions"
@@ -3631,7 +3666,7 @@
             <el-col :span="10">
               <el-input
                 placeholder=""
-                v-model="filterValueInput[0]"
+                v-model="filterCondition[index]['value']"
                 size="small"
                 clearable
               >
@@ -3642,7 +3677,7 @@
             </el-col>
             <el-popover placement="right" width="400" trigger="click">
               <el-row type="flex" justify="space-between">
-                <el-col :span="18">
+                <!-- <el-col :span="18">
                   <el-tag
                     v-for="tag in filterValueSelect"
                     :key="tag.value"
@@ -3651,31 +3686,37 @@
                   >
                     {{ tag.value }}
                   </el-tag>
-                </el-col>
-                <el-col :span="4">
-                  <el-button size="mini" type="primary" @click="filterSearch"
-                    >确定</el-button
+                </el-col> -->
+                <el-col :offset="20" :span="4">
+                  <el-button size="mini" type="primary" @click="filterConfirm"
+                    >筛选</el-button
                   >
                 </el-col>
               </el-row>
 
               <el-table
                 :data="
-                  filterValue.filter(
+                  filterValueSelect.filter(
                     (data) =>
-                      !search ||
-                      data.value.toLowerCase().includes(search.toLowerCase())
+                      !filterSearch ||
+                      data[filterOptionSelectList[index]]
+                        .toLowerCase()
+                        .includes(filterSearch.toLowerCase())
                   )
                 "
-                @selection-change="handleSelectionChange"
+                @row-click="handleFilter"
                 row-key="id"
+                :highlight-current-row="true"
                 :cell-style="{ textAlign: 'left' }"
+                height="250"
               >
-                <el-table-column type="selection" width="50"> </el-table-column>
-                <el-table-column prop="value" align="right">
+                <el-table-column
+                  :prop="filterOptionSelectList[index]"
+                  align="right"
+                >
                   <template slot="header">
                     <el-input
-                      v-model="search"
+                      v-model="filterSearch"
                       size="mini"
                       placeholder="搜索"
                       prefix-icon="el-icon-search"
@@ -3691,7 +3732,7 @@
               ></el-button>
             </el-popover>
           </el-row>
-          <el-col v-if="filterCondition == []" class="displayBox"
+          <el-col v-if="filterCondition.length < 1" class="displayBox"
             >未设置过滤条件</el-col
           >
           <el-button
@@ -3745,6 +3786,8 @@ import layerStyle from "../assets/js/layerStyleProperties";
 
 import Sortable from "sortablejs";
 import ConditionRender from "../components/ConditionRender";
+// import Datajson from "../assets/js/liberty";
+import osmSource from "../assets/js/osmSource";
 // import Vue from "vue";
 
 var map = null;
@@ -3757,13 +3800,15 @@ export default {
       shpTableData: [],
       multiShpTable: [],
       dataBaseList: [],
-      dataBaseSelect: "default",
+      PgBaseSelect: "default",
+      dataBaseSelect: "PG",
       currentPageShp: 1,
       pageSizeShp: 5,
       searchInputShp: "",
       totalDataCountShp: 0,
       addSourceShow: true,
       publishLink: "",
+      dataLayers:osmSource.vector_layers,
 
       //左侧shp图层树
       layersNameObject: {}, //检测重复  后端字段为layerTree
@@ -3787,6 +3832,7 @@ export default {
 
       //编辑框
       menuButtonShowList: [], //由列表来记录图层编辑框下每个tab的显示情况
+      menuShowList: [], //由列表来记录图层编辑框下那个渲染按钮打开
       editorShow: "",
       isSymbol: true,
       nameEdit: false,
@@ -3806,11 +3852,13 @@ export default {
 
       //筛选
       fontSearch: "",
+      textFieldSearch: "",
 
       //过滤条件配置
-      filterWay: "满足所有条件",
-      filterCondition: [{ option: "", type: "==", value: [] }],
+      filterWay: "all",
+      filterCondition: [{ option: "", type: "==", value: 0 }],
       filterOptions: [],
+      filterOptionSelectList: [],
       filterTypes: [
         { value: "==", label: "==" },
         { value: "!=", label: "!=" },
@@ -3823,22 +3871,14 @@ export default {
         { value: "has", label: "has" },
         { value: "!has", label: "!has" },
       ],
-      filterValue: [
-        { value: "a", id: "a" },
-        { value: "2", id: "2" },
-        { value: "3", id: "3" },
-        { value: "4", id: "4" },
-        { value: "5", id: "5" },
-        { value: "6" },
-        { value: "7", id: "7" },
-        { value: "8", id: "8" },
-        { value: "9", id: "9" },
-      ],
-      filterValueInput: [""],
+      filterValue: [],
       filterValueSelect: [],
-      multipleSelection: [],
+      // filterValueInput: [""],
+      // multipleSelection: [],
       nowFilterIndex: 0,
-      search: "",
+      filterSearch: "",
+      filterSearchPage: 1,
+      allfilterValueListLength: 0,
 
       predefineColors: [
         "#ff4500",
@@ -3862,13 +3902,36 @@ export default {
   },
   mounted() {
     this.$bus.$on("show", (data) => {
-      //编辑框初始化先获取所有tab的显示情况，单个tab修改时子组件给父组件传递单个tab变化值
+      //多级渲染显示
+      if(data.param4){
+        switch(data.param4){
+          case 'zoom':
+            this.menuShowList[data.param1] = 'Zoom Range';
+            break
+          case 'data':
+            this.menuShowList[data.param1] = 'Data Range';
+            break
+          case 'prop':
+            this.menuShowList[data.param1] = 'Data Condition';
+            break
+          case 'formula':
+            this.menuShowList[data.param1] = 'Expression';
+            break
+        }
+      }
+      //编辑框初始化先获取所有tab的显示情况，单个tab修改时子组件给父组件传递单个tab变化值,params3用于保存attrValueSet
       if (data.param2 === 0) {
         this.menuButtonShowList = data.param1;
+        this.layers[this.nowLayerIndex].attrShowList = data.param1;
+        this.attrValueSet = data.param3;
       } else {
         const value1 = data.param1;
         const value2 = data.param2;
         this.menuButtonShowList[value1] = value2;
+        this.layers[this.nowLayerIndex].attrShowList[value1] = value2;
+        if (value2) {
+          this.attrValueSet[value1] = "primary";
+        }
       }
     });
     this.mapProjectId = this.$route.params.mapProjectId;
@@ -3979,7 +4042,9 @@ export default {
       });
 
       //center
-      map.on("mousemove", (e) => {
+      map.on("mousemove", this.layersName ,(e) => {
+        map.getCanvas().style.cursor = 'pointer';
+
         this.center = String(e.lngLat.lng) + "," + String(e.lngLat.lat);
         this.showCenter =
           String(e.lngLat.lng.toFixed(5)) +
@@ -4032,7 +4097,7 @@ export default {
           item.appendChild(item_name).className = "item_name";
           item_name.innerHTML = feature.layer.id;
 
-          var index = this.layersName.indexOf(feature.layer.id);
+          var index = this.layersName.indexOf(feature.layer['originName']);
 
           //根据index获取相关图层信息
           const color_name = feature.layer.type + "-" + "color";
@@ -4146,11 +4211,42 @@ export default {
       // this.publishLink = myConfig.requestUrl+'/mapServer/'+this.mapProjectId;
       this.publishLink = this.reqUrl + "/mapServer/" + this.mapProjectId;
     },
+    addBackground(){
+      const backLayer = {
+        "id": "背景",
+        "type": "background",
+        "paint": {
+          "background-color": "rgba(255,255,255,0)"
+        },
+        "layout": {
+          "visibility": "visible"
+        },
+        "metadata": {
+          "mapbox:group": "92ca48f13df25"
+        }
+      }      
+      if(
+        !Object.prototype.hasOwnProperty.call(
+          this.layersNameObject,
+          'background'
+        )
+      ){
+        this.layersNameObject = 1
+      }else{
+        this.layersNameObject += 1
+        backLayer.id = "背景" + this.layersNameObject;
+      }
+      this.layers.push(backLayer);
+      this.layersName.push(backLayer.id);
+      this.addLayerToMap(backLayer);
+
+
+    },
 
     //打开shp选择框
     addShpData() {
-      console.log("dataBaseSelect1", this.dataBaseSelect);
-      if (this.dataBaseSelect == "default") {
+      console.log("PgBaseSelect1", this.PgBaseSelect);
+      if (this.PgBaseSelect == "default") {
         requestApi
           .getShpList({
             asc: false,
@@ -4169,12 +4265,12 @@ export default {
           });
       }
     },
-    dataBaseSearch() {
-      console.log("dataBaseSelect2", this.dataBaseSelect);
-      if (this.dataBaseSelect != "default") {
+    PgBaseChange() {
+      console.log("PgBaseSelect2", this.PgBaseSelect);
+      if (this.PgBaseSelect != "default") {
         this.shpTableData = [];
         requestApi
-          .getShpListById(this.dataBaseSelect)
+          .getShpListById(this.PgBaseSelect)
           .then((res) => {
             console.log("database", res);
             for (let i in res.data.data) {
@@ -4189,11 +4285,15 @@ export default {
         this.addShpData();
       }
     },
+    dataBaseClick(tab){
+      this.dataBaseSelect = tab.name;
+      console.log('dataBaseSelect',this.dataBaseSelect);
+    },
 
     handleCurrentChangeShp(val) {
       this.currentPageShp = val;
-      if (this.dataBaseSelect != "default") {
-        this.dataBaseSearch();
+      if (this.PgBaseSelect != "default") {
+        this.PgBaseChange();
       } else {
         this.addShpData();
       }
@@ -4258,12 +4358,17 @@ export default {
       ) {
         let newTileJson = initTileJson;
         newTileJson.name = row.tableName;
-        // if(this.dataBaseSelect == 'default'){
+        // if(this.PgBaseSelect == 'default'){
         //   newTileJson.tiles = [myConfig.requestUrl + "/mvt/" + row.tableName + "/{z}/{x}/{y}.pbf"]
         // }else{
         //   newTileJson.tiles = ["/MultiSource/" + myConfig.requestUrl + "//" + row.tableName + "/{z}/{x}/{y}.pbf"]
         // }
-        if (this.dataBaseSelect == "default") {
+        if(this.dataBaseSelect == "OSM"){
+         newTileJson.tiles = [
+            "https://api.maptiler.com/tiles/v3/{z}/{x}/{y}.pbf?key=XAapkmkXQpx839NCfnxD",
+          ];
+        }
+        else if (this.PgBaseSelect == "default") {
           newTileJson.tiles = [
             this.reqUrl + "/mvt/" + row.tableName + "/{z}/{x}/{y}.pbf",
           ];
@@ -4276,12 +4381,16 @@ export default {
               "/{z}/{x}/{y}.pbf",
           ];
         }
-        let vector_layer = {
-          description: "",
-          fields: row.attrInfo,
-          id: row.tableName,
-        };
-        newTileJson.vector_layers = [vector_layer];
+        if(this.dataBaseSelect == "OSM"){
+          newTileJson.vector_layers = this.dataLayers;
+        }else{
+          let vector_layer = {
+            description: "",
+            fields: row.attrInfo,
+            id: row.tableName,
+          };
+          newTileJson.vector_layers = [vector_layer];
+        }
 
         let res = await this.createTileJson(newTileJson);
         if (res.data.code !== 0) {
@@ -4302,7 +4411,11 @@ export default {
           type: newSourceJson.sourceType,
           url: newSourceJson.sourceUrl,
         };
-        this.sourceNameObject[row.tableName] = sourceId;
+        if(this.dataBaseSelect == "OSM"){
+          this.sourceNameObject[this.dataLayers.id] = sourceId;  
+        }else{        
+          this.sourceNameObject[row.tableName] = sourceId;  
+        }
       }
 
       let geoType = row.geoType;
@@ -4314,13 +4427,15 @@ export default {
         geoType = "circle";
       }
 
-      //前五个是自己用的属性
+      //前七个是自己用的属性
       let newLayer = {
         index: index,
         show: true,
         originName: row.originName,
         shpAttribute: row.attrInfo,
-        attrShow: [],
+        attrValueSet: {},
+        attrShowList: {},
+        filterValueSet: {},
         id: row.originName,
         type: geoType,
         filter: ["all"],
@@ -4404,6 +4519,12 @@ export default {
       });
     },
 
+    //设置对地图进行筛选
+    setFilterToMap(id, filter) {
+      console.log("set filters：", id, filter);
+      map.setFilter(id, filter);
+    },
+
     handleLayerEdit(index, row) {
       console.log("now edit layer: index, row", index, row);
       this.nowLayerIndex = index;
@@ -4413,6 +4534,9 @@ export default {
       ];
       //先关闭，否则组件不会初始化
       this.editorShow = "";
+      //设置属性编辑界面的展示情况
+      this.menuButtonShowList = this.layers[this.nowLayerIndex].attrShowList;
+      this.menuShowList = JSON.parse(JSON.stringify(this.menuButtonShowList));
       //短时间vue会集中处理，因此要等编辑框关闭，dom渲染完再处理
       this.$nextTick(() => {
         if (row.type === "line") {
@@ -4505,7 +4629,9 @@ export default {
           console.log(error);
         });
       this.spriteList = map.listImages();
-      console.log("spriteList", this.spriteList);
+      // 将固定的数据用于组件访问
+      localStorage.setItem('spriteList',JSON.stringify(this.spriteList));
+      localStorage.setItem('symbolTableData',JSON.stringify(this.symbolTableData));
     },
     getFontList() {
       requestApi
@@ -4518,6 +4644,7 @@ export default {
             });
           }
           console.log("fontList", this.fontList);
+          localStorage.setItem('fontList',JSON.stringify(this.fontList));
         })
         .catch((error) => {
           console.log(error);
@@ -4684,53 +4811,119 @@ export default {
       };
     },
 
+    filterValueInit(index) {
+      this.filterOptionSelectList.splice(
+        index,
+        0,
+        this.filterCondition[index].option
+      );
+      requestApi
+        .getAttrValue({
+          aimAttrName: this.filterCondition[this.nowFilterIndex].option,
+          aimShpTableName: this.layers[this.nowLayerIndex]["source-layer"],
+          page: this.filterSearchPage,
+          pageSize: 10,
+          searchText: this.filterSearch,
+          sort: "asc",
+        })
+        .then((res) => {
+          console.log("res", res);
+          this.filterValue.splice(
+            [this.nowFilterIndex],
+            0,
+            res.data.data.attrValue
+          );
+          this.filterValueSelect = this.filterValue[this.nowFilterIndex];
+          this.allfilterValueListLength = res.data.data.featureCount;
+          console.log("filterValue", this.filterValue);
+          console.log("filterValueSelect", this.filterValueSelect);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
     //添加筛选框用户输入的value
     handleFilterValue(item, index) {
+      console.log("filter", index, item);
       this.nowFilterIndex = index;
       //filterValueInput第一个绑定input内容，后面依次记录每次内容
-      this.filterValueInput[0] != "" &&
-        this.filterValueInput.push(this.filterValueInput[0]);
-      this.filterValueInput[0] != "" &&
-        this.filterValueSelect.push({ value: this.filterValueInput[0] });
-      console.log("item", item, index);
+      // this.filterValueInput[0] != "" &&
+      //   this.filterValueInput.push(this.filterValueInput[0]);
+      // this.filterValueInput[0] != "" &&
+      //   this.filterValueSelect.push({ value: this.filterValueInput[0] });
+      // console.log("item", item, index);
     },
     //更新用户选中的筛选信息
-    handleSelectionChange(val) {
-      console.log(val);
-      this.multipleSelection = val;
-      console.log("this.filterValueSelect:", this.filterValueSelect);
-      this.update();
-      // console.log('this.multipleSelection:',this.multipleSelection);
-    },
-    update() {
-      // this.filterValueSelect = [];
-      for (const i in this.filterValueInput) {
-        i != 0 &&
-          this.filterValueSelect.push({ value: this.filterValueInput[i] });
+    // handleSelectionChange(val) {
+    //   console.log(val);
+    //   this.multipleSelection = val;
+    //   console.log("this.filterValueSelect:", this.filterValueSelect);
+    //   this.update();
+    //   console.log('this.multipleSelection:',this.multipleSelection);
+    // },
+    // update() {
+    ////   this.filterValueSelect = [];
+    //   for (const i in this.filterValueInput) {
+    //     i != 0 &&
+    //       this.filterValueSelect.push({ value: this.filterValueInput[i] });
+    //   }
+    //   for (const i in this.multipleSelection) {
+    //     this.filterValueSelect.push(this.multipleSelection[i]);
+    //   }
+    // },
+    // handleTagClose(tag) {
+    //   this.filterValueSelect.splice(this.filterValueSelect.indexOf(tag), 1);
+    //   this.filterValueInput = "";"get","gid"
+    //   console.log("tag", tag);
+    // },
+    filterRemove(index) {
+      this.filterCondition.splice(index, 1);
+      if (this.filterCondition.length < 1) {
+        const id = this.layers[this.nowLayerIndex].id;
+        this.setFilterToMap(id, null);
       }
-      for (const i in this.multipleSelection) {
-        this.filterValueSelect.push(this.multipleSelection[i]);
+    },
+    handleFilter(row) {
+      this.filterCondition[this.nowFilterIndex].value =
+        row[this.filterOptionSelectList[this.nowFilterIndex]];
+    },
+    filterConfirm() {
+      console.log("筛选条件：", this.filterCondition);
+      console.log("筛选条件1：", this.filterWay);
+      let judge = this.filterWay;
+      const filters = [judge];
+      for(let i = 0;i < this.filterCondition.length;i++){
+        const filter = [];
+        filter.push(this.filterCondition[i].type);
+        filter.push(["get", this.filterCondition[i].option]);
+        filter.push(this.filterCondition[i].value);        
+        if(judge == 'none'){
+          filters.push(!filter)
+        }else{
+          filters.push(filter)
+        }
       }
+      const id = this.layers[this.nowLayerIndex].id;
+      console.log("condition", id, filters);
+      this.setFilterToMap(id, filters);
+      this.layers[this.nowLayerIndex].filterValueSet = {
+        filterCondition: this.filterCondition,
+        filterValue: this.filterValue,
+        filterOptionSelectList: this.filterOptionSelectList,
+        filterValueSelect: this.filterValueSelect,
+      };
     },
-    handleTagClose(tag) {
-      this.filterValueSelect.splice(this.filterValueSelect.indexOf(tag), 1);
-      this.filterValueInput = "";
-      console.log("tag", tag);
-    },
-    filterSearch() {
-      this.filterCondition[this.nowFilterIndex].value = this.filterValueSelect;
-      console.log("filterCondition:", this.filterCondition);
-    },
-    callback(layoutOrpaint, attribute, value) {
+    callback(layoutOrpaint, attribute, value, parameters) {
       console.log("layoutOrpaint1:", layoutOrpaint);
       console.log("attribute1:", attribute);
       console.log("value1:", value);
       this.layers[this.nowLayerIndex][layoutOrpaint][attribute] = value;
-      console.log("layers:", this.layers[this.nowLayerIndex]);
       const id = this.layers[this.nowLayerIndex]["id"];
       layoutOrpaint == "layout" &&
         this.handleLayoutChange(id, attribute, value);
       layoutOrpaint == "paint" && this.handlePaintChange(id, attribute, value);
+      this.attrValueSet[attribute] = parameters;
+      console.log("parameters1:", this.attrValueSet[attribute]);
     },
     leaveTab(activeName, oldActiveName) {
       console.log("activeName", activeName, this.menuButtonShowList);
