@@ -153,7 +153,7 @@ export default {
         // style: 'mapbox://styles/mapbox/streets-v11',
         // style:"http://127.0.0.1/api/v1/styles/3eada7e0ae4411ec8cb88b1eae413f21/draft?access_token=tk.fb799200ae8311ec8cb88b1eae413f21",
         // style:"https://api.mapbox.com/styles/v1/mapbox/streets-v11?access_token=pk.eyJ1Ijoid3lqcSIsImEiOiJjbDBnZDdwajUxMXRzM2htdWxubDh1MzJrIn0.2e2_rdU2nOUvtwltBIZtZg",
-        style:"http://172.21.212.63:8991/mapServer/626a592bc27f00a2b6b029f1",
+        style:this.reqUrl + "/mapServer/626a592bc27f00a2b6b029f1",
         // center: [-122.486052, 37.830348], // starting position [lng, lat]
         // zoom: 7, // starting zoom
       });
@@ -199,16 +199,16 @@ export default {
             // });
             map.addSource("testMapLine", {
               type: "vector",
-              tiles: ["http://172.21.212.63:8995/mvt/map_lines_625984a8c27fe412a844025c/{z}/{x}/{y}.pbf?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxMTEifQ.Ne6qdHY2XgpBNQ74MeO-23ZyF0OahH-AHMbrXqhKlwU"]
+              tiles: [this.reqUrl + "/mvt/map_lines_625984a8c27fe412a844025c/{z}/{x}/{y}.pbf?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxMTEifQ.Ne6qdHY2XgpBNQ74MeO-23ZyF0OahH-AHMbrXqhKlwU"]
             });
             map.addSource("testMapPoint", {
               type: "vector",
-              tiles: ["http://172.21.212.63:8995/mvt/outlet_955a104f_e489_4f38_a449_a750d8d052e3/{z}/{x}/{y}.pbf?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxMTEifQ.Ne6qdHY2XgpBNQ74MeO-23ZyF0OahH-AHMbrXqhKlwU"]
+              tiles: [this.reqUrl + "/mvt/outlet_955a104f_e489_4f38_a449_a750d8d052e3/{z}/{x}/{y}.pbf?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxMTEifQ.Ne6qdHY2XgpBNQ74MeO-23ZyF0OahH-AHMbrXqhKlwU"]
             });
 
             map.addSource("testMapPolygon", {
               type: "vector",
-              tiles: ["http://172.21.212.63:8995/mvt/mask_e40dd61b_ed2e_4cb6_b9df_9d30eed9bcb7/{z}/{x}/{y}.pbf?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxMTEifQ.Ne6qdHY2XgpBNQ74MeO-23ZyF0OahH-AHMbrXqhKlwU"]
+              tiles: [this.reqUrl + "/mvt/mask_e40dd61b_ed2e_4cb6_b9df_9d30eed9bcb7/{z}/{x}/{y}.pbf?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxMTEifQ.Ne6qdHY2XgpBNQ74MeO-23ZyF0OahH-AHMbrXqhKlwU"]
             });
 
             map.addSource("testPointJson", {

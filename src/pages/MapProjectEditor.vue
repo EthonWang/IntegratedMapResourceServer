@@ -24,7 +24,7 @@
                     v-model="PgBaseSelect"
                     placeholder="请选择"
                     style="width: 73%"
-                    @change="PgBaseChange"
+                    @change="PgBaseChange($event)"
                   >
                     <el-option
                       v-for="item in dataBaseList"
@@ -54,7 +54,7 @@
                   </el-table-column>
                 </el-table>
                 <el-pagination
-                  v-if="PgBaseSelect == 'default'"
+                  v-if="PgBaseSelect == 'defaultPG'"
                   small
                   @current-change="handleCurrentChangeShp"
                   :current-page="currentPageShp"
@@ -65,7 +65,48 @@
                 >
                 </el-pagination>
               </el-tab-pane>
-              <el-tab-pane label="OSM" name="OSM">
+              <el-tab-pane label="mbTile" name="mbTile">
+                <el-row type="flex" align="middle">
+                  <h4>数据库源:&nbsp;</h4>
+                  <el-select
+                    v-model="mbTileSelect"
+                    placeholder="请选择"
+                    style="width: 73%"
+                    @change="mbTileChange($event)"
+                  >
+                    <el-option
+                      v-for="item in mbTileJsonList"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    >
+                    </el-option>
+                  </el-select>&nbsp;
+                  <el-button type="success" size="mini" circle icon="el-icon-plus" @click="mbTileEditShow=true"></el-button>
+                  <el-dialog
+                    title="mbTile信息编辑"
+                    :visible.sync="mbTileEditShow"
+                    width="30%" :modal="false"
+                    center>
+                    <el-form label-position="left" label-width="100px" :model="mbTileEditInfo" id="myForm" enctype="multipart/form-data" name="fileinfo" action="" target="uploadFrame">
+                      <el-form-item 
+                        label="文件:"
+                        :rules="{required: true, message: '请选择文件', trigger: 'blur'}">                       
+                        <input type="file" ref="mbFile">
+                      </el-form-item>
+                      <el-form-item 
+                        label="文件名:"
+                        :rules="{required: true, message: '请输入文件名', trigger: 'blur'}">
+                        <el-input v-model="mbTileEditInfo.mbTilesJsonName"></el-input>
+                      </el-form-item>                                  
+                    </el-form>   
+                    <iframe id="uploadFrame" name="uploadFrame" style="display:none;"></iframe>
+                    <span slot="footer" class="dialog-footer">
+                      <el-button @click="mbTileEditShow = false">取 消</el-button>
+                      <el-button type="primary" @click="addMbTileData">确 定</el-button>
+                    </span>
+                  </el-dialog>                   
+                </el-row>                
                 <el-table :data="dataLayers" height="313">
                   <el-table-column
                     property="id"
@@ -84,7 +125,7 @@
                     </template>
                   </el-table-column>
                 </el-table>
-              </el-tab-pane>              
+              </el-tab-pane>
             </el-tabs>
 
             <el-button type="primary" slot="reference" @click="addShpData"
@@ -112,7 +153,7 @@
             >发布</el-button
           >
         </el-popover>
-        <el-button type="sucess" @click="addBackground"></el-button>
+        <el-button type="success" @click="addBackground">添加背景</el-button>
       </div>
 
       <!--      图层列表-->
@@ -123,7 +164,7 @@
           ref="shpLayerTable"
           row-key="id"
           size="mini"
-          @cell-click="handleLayerClick()"
+          @row-click="handleLayerClick()"
           style="width: 100%"
         >
           <el-table-column width="40">
@@ -170,30 +211,6 @@
                 style="margin-left: 5px"
               >
               </el-button>
-              <!-- <el-popover
-                  placement="right"
-                  width="200"
-                  trigger="click">
-                <el-select v-model="scope.row.type" placeholder="请选择"
-                           @change="handleLayerStyleChange(scope.$index, scope.row)">
-                  <el-option
-                      v-for="item in [{value:'symbol',label:'图标(symbol)'},{value:'circle',label:'圆(circle)'}]"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
-                  </el-option>
-                </el-select>
-
-                <el-button
-                    v-if="scope.row.type==='circle'||scope.row.type==='symbol'"
-                    size="mini"
-                    type="primary"
-                    icon="el-icon-setting"
-                    circle
-                    style="  margin-left: 5px;"
-                    slot="reference">
-                </el-button>
-              </el-popover> -->
             </template>
           </el-table-column>
         </el-table>
@@ -240,7 +257,9 @@
             <el-tab-pane label="颜色" name="first">
               <h3>颜色</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['circle-color']">{{menuShowList['circle-color']}}</span>
+              <span v-if="!menuButtonShowList['circle-color']">{{
+                menuShowList["circle-color"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['circle-color']"
                 style="display: flex; margin-top: 10px"
@@ -279,9 +298,9 @@
             <el-tab-pane label="半径" name="second">
               <h3>半径（px）</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['circle-radius']"
-                >{{menuShowList['circle-radius']}}</span
-              >
+              <span v-if="!menuButtonShowList['circle-radius']">{{
+                menuShowList["circle-radius"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['circle-radius']"
                 style="display: flex; margin-top: 10px"
@@ -312,9 +331,9 @@
             <el-tab-pane label="不透明度" name="third">
               <h3>不透明度</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['circle-opacity']"
-                >{{menuShowList['circle-opacity']}}</span
-              >
+              <span v-if="!menuButtonShowList['circle-opacity']">{{
+                menuShowList["circle-opacity"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['circle-opacity']"
                 style="margin-top: 10px"
@@ -362,9 +381,9 @@
             <el-tab-pane label="边线颜色" name="forth">
               <h3>边线颜色</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['circle-stroke-color']"
-                >{{menuShowList['circle-stroke-color']}}</span
-              >
+              <span v-if="!menuButtonShowList['circle-stroke-color']">{{
+                menuShowList["circle-stroke-color"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['circle-stroke-color']"
                 style="display: flex; margin-top: 10px"
@@ -403,9 +422,9 @@
             <el-tab-pane label="边线宽度" name="fifth">
               <h3>边线宽度</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['circle-stroke-width']"
-                >{{menuShowList['circle-stroke-width']}}</span
-              >
+              <span v-if="!menuButtonShowList['circle-stroke-width']">{{
+                menuShowList["circle-stroke-width"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['circle-stroke-width']"
                 style="display: flex; margin-top: 10px"
@@ -436,9 +455,9 @@
             <el-tab-pane label="边线不透明度" name="sixth">
               <h3>边线不透明度</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['circle-stroke-opacity']"
-                >{{menuShowList['circle-stroke-opacity']}}</span
-              >
+              <span v-if="!menuButtonShowList['circle-stroke-opacity']">{{
+                menuShowList["circle-stroke-opacity"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['circle-stroke-opacity']"
                 style="margin-top: 10px"
@@ -486,7 +505,9 @@
             <el-tab-pane label="模糊" name="seventh">
               <h3>模糊度</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['circle-blur']">{{menuShowList['circle-blur']}}</span>
+              <span v-if="!menuButtonShowList['circle-blur']">{{
+                menuShowList["circle-blur"]
+              }}</span>
               <el-row v-if="menuButtonShowList['circle-blur']">
                 <el-slider
                   v-model="layers[nowLayerIndex].paint['circle-blur']"
@@ -531,9 +552,9 @@
             <el-tab-pane label="平移" name="eighth">
               <h3>平移</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['circle-translate']"
-                >{{menuShowList['circle-translate']}}</span
-              >
+              <span v-if="!menuButtonShowList['circle-translate']">{{
+                menuShowList["circle-translate"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['circle-translate']"
                 style="margin-top: 10px; display: flex"
@@ -580,9 +601,9 @@
             <el-tab-pane label="平移参考" name="ninth">
               <h3>平移参考</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['circle-translate-anchor']"
-                >{{menuShowList['circle-translate-anchor']}}</span
-              >
+              <span v-if="!menuButtonShowList['circle-translate-anchor']">{{
+                menuShowList["circle-translate-anchor"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['circle-translate-anchor']"
                 style="display: flex; margin-top: 10px"
@@ -619,9 +640,9 @@
             <el-tab-pane label="倾斜对齐" name="tentn">
               <h3>倾斜对齐</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['circle-pitch-alignment']"
-                >{{menuShowList['circle-pitch-alignment']}}</span
-              >
+              <span v-if="!menuButtonShowList['circle-pitch-alignment']">{{
+                menuShowList["circle-pitch-alignment"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['circle-pitch-alignment']"
                 style="display: flex; margin-top: 10px"
@@ -658,9 +679,9 @@
             <el-tab-pane label="倾斜缩放" name="eleven">
               <h3>倾斜缩放</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['circle-pitch-scale']"
-                >{{menuShowList['circle-pitch-scale']}}</span
-              >
+              <span v-if="!menuButtonShowList['circle-pitch-scale']">{{
+                menuShowList["circle-pitch-scale"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['circle-pitch-scale']"
                 style="display: flex; margin-top: 10px"
@@ -704,7 +725,9 @@
             <el-tab-pane label="颜色" name="first">
               <h3>线颜色</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['line-color']">{{menuShowList['line-color']}}</span>
+              <span v-if="!menuButtonShowList['line-color']">{{
+                menuShowList["line-color"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['line-color']"
                 style="display: flex; margin-top: 10px"
@@ -743,7 +766,9 @@
             <el-tab-pane label="线宽" name="second">
               <h3>线宽（px）</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['line-width']">{{menuShowList['line-width']}}</span>
+              <span v-if="!menuButtonShowList['line-width']">{{
+                menuShowList["line-width"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['line-width']"
                 style="display: flex; margin-top: 10px"
@@ -774,7 +799,9 @@
             <el-tab-pane label="不透明度" name="third">
               <h3>不透明度</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['line-opacity']">{{menuShowList['line-opacity']}}</span>
+              <span v-if="!menuButtonShowList['line-opacity']">{{
+                menuShowList["line-opacity"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['line-opacity']"
                 style="margin-top: 10px"
@@ -822,9 +849,9 @@
             <el-tab-pane label="虚线" name="forth">
               <h3>虚线</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['line-dasharray']"
-                >{{menuShowList['line-dasharray']}}</span
-              >
+              <span v-if="!menuButtonShowList['line-dasharray']">{{
+                menuShowList["line-dasharray"]
+              }}</span>
               <el-row
                 v-if="layers[nowLayerIndex].paint['line-dasharray'].length == 0"
                 style="margin-top: 10px"
@@ -892,9 +919,9 @@
             <el-tab-pane label="线间隙" name="fifth">
               <h3>线间隙宽度</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['line-gap-width']"
-                >{{menuShowList['line-gap-width']}}</span
-              >
+              <span v-if="!menuButtonShowList['line-gap-width']">{{
+                menuShowList["line-gap-width"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['line-gap-width']"
                 style="display: flex; margin-top: 10px"
@@ -925,7 +952,9 @@
             <el-tab-pane label="模糊" name="sixth">
               <h3>模糊度</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['line-blur']">{{menuShowList['line-blur']}}</span>
+              <span v-if="!menuButtonShowList['line-blur']">{{
+                menuShowList["line-blur"]
+              }}</span>
               <el-row v-if="menuButtonShowList['line-blur']">
                 <el-slider
                   v-model="layers[nowLayerIndex].paint['line-blur']"
@@ -970,9 +999,9 @@
             <el-tab-pane label="平移" name="seventh">
               <h3>平移</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['line-translate']"
-                >{{menuShowList['line-translate']}}</span
-              >
+              <span v-if="!menuButtonShowList['line-translate']">{{
+                menuShowList["line-translate"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['line-translate']"
                 style="margin-top: 10px; display: flex"
@@ -1019,9 +1048,9 @@
             <el-tab-pane label="平移参考" name="eighth">
               <h3>平移参考</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['line-translate-anchor']"
-                >{{menuShowList['line-translate-anchor']}}</span
-              >
+              <span v-if="!menuButtonShowList['line-translate-anchor']">{{
+                menuShowList["line-translate-anchor"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['line-translate-anchor']"
                 style="display: flex; margin-top: 10px"
@@ -1056,7 +1085,9 @@
             <el-tab-pane label="偏移" name="ninth">
               <h3>偏移</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['line-offset']">{{menuShowList['line-offset']}}</span>
+              <span v-if="!menuButtonShowList['line-offset']">{{
+                menuShowList["line-offset"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['line-offset']"
                 style="display: flex; margin-top: 10px"
@@ -1087,7 +1118,9 @@
             <el-tab-pane label="线帽" name="tentn">
               <h3>线帽</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['line-cap']">{{menuShowList['line-cap']}}</span>
+              <span v-if="!menuButtonShowList['line-cap']">{{
+                menuShowList["line-cap"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['line-cap']"
                 style="display: flex; margin-top: 10px"
@@ -1126,7 +1159,9 @@
             <el-tab-pane label="线连接" name="eleven">
               <h3>线连接</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['line-join']">{{menuShowList['line-join']}}</span>
+              <span v-if="!menuButtonShowList['line-join']">{{
+                menuShowList["line-join"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['line-join']"
                 style="display: flex; margin-top: 10px"
@@ -1174,7 +1209,9 @@
             <el-tab-pane label="颜色" name="first">
               <h3>填充颜色</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['fill-color']">{{menuShowList['fill-color']}}</span>
+              <span v-if="!menuButtonShowList['fill-color']">{{
+                menuShowList["fill-color"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['fill-color']"
                 style="display: flex; margin-top: 10px"
@@ -1213,7 +1250,9 @@
             <el-tab-pane label="不透明度" name="second">
               <h3>不透明度</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['fill-opacity']">{{menuShowList['fill-opacity']}}</span>
+              <span v-if="!menuButtonShowList['fill-opacity']">{{
+                menuShowList["fill-opacity"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['fill-opacity']"
                 style="margin-top: 10px"
@@ -1261,9 +1300,9 @@
             <el-tab-pane label="边线颜色" name="third">
               <h3>边线颜色</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['fill-outline-color']"
-                >{{menuShowList['fill-outline-color']}}</span
-              >
+              <span v-if="!menuButtonShowList['fill-outline-color']">{{
+                menuShowList["fill-outline-color"]
+              }}</span>
               <br />
               <span style="font-size: 10px; color: #909399"
                 >（该属性需要抗锯齿属性为true）</span
@@ -1309,9 +1348,9 @@
             <el-tab-pane label="平移" name="forth">
               <h3>平移</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['fill-translate']"
-                >{{menuShowList['fill-translate']}}</span
-              >
+              <span v-if="!menuButtonShowList['fill-translate']">{{
+                menuShowList["fill-translate"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['fill-translate']"
                 style="margin-top: 10px; display: flex"
@@ -1358,9 +1397,9 @@
             <el-tab-pane label="平移参考" name="fifth">
               <h3>平移参考</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['fill-translate-anchor']"
-                >{{menuShowList['fill-translate-anchor']}}</span
-              >
+              <span v-if="!menuButtonShowList['fill-translate-anchor']">{{
+                menuShowList["fill-translate-anchor"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['fill-translate-anchor']"
                 style="display: flex; margin-top: 10px"
@@ -1395,9 +1434,9 @@
             <el-tab-pane label="抗锯齿" name="sixth">
               <h3>抗锯齿</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['fill-antialias']"
-                >{{menuShowList['fill-antialias']}}</span
-              >
+              <span v-if="!menuButtonShowList['fill-antialias']">{{
+                menuShowList["fill-antialias"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['fill-antialias']"
                 style="margin-top: 10px; display: flex"
@@ -1433,9 +1472,9 @@
             <el-tab-pane label="颜色" name="first">
               <h3>填充颜色</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['fill-extrusion-color']"
-                >{{menuShowList['fill-extrusion-color']}}</span
-              >
+              <span v-if="!menuButtonShowList['fill-extrusion-color']">{{
+                menuShowList["fill-extrusion-color"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['fill-extrusion-color']"
                 style="display: flex; margin-top: 10px"
@@ -1474,9 +1513,9 @@
             <el-tab-pane label="不透明度" name="second">
               <h3>不透明度</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['fill-extrusion-opacity']"
-                >{{menuShowList['fill-extrusion-opacity']}}</span
-              >
+              <span v-if="!menuButtonShowList['fill-extrusion-opacity']">{{
+                menuShowList["fill-extrusion-opacity"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['fill-extrusion-opacity']"
                 style="margin-top: 10px"
@@ -1528,9 +1567,9 @@
             <el-tab-pane label="高度" name="third">
               <h3>高度</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['fill-extrusion-height']"
-                >{{menuShowList['fill-extrusion-height']}}</span
-              >
+              <span v-if="!menuButtonShowList['fill-extrusion-height']">{{
+                menuShowList["fill-extrusion-height"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['fill-extrusion-height']"
                 style="display: flex; margin-top: 10px"
@@ -1562,9 +1601,9 @@
               <h3>底部高度</h3>
               &nbsp;
               <br />
-              <span v-if="!menuButtonShowList['fill-extrusion-base']"
-                >{{menuShowList['fill-extrusion-base']}}</span
-              >
+              <span v-if="!menuButtonShowList['fill-extrusion-base']">{{
+                menuShowList["fill-extrusion-base"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['fill-extrusion-base']"
                 style="display: flex; margin-top: 10px"
@@ -1595,9 +1634,9 @@
             <el-tab-pane label="平移" name="fifth">
               <h3>平移</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['fill-extrusion-translate']"
-                >{{menuShowList['fill-extrusion-translate']}}</span
-              >
+              <span v-if="!menuButtonShowList['fill-extrusion-translate']">{{
+                menuShowList["fill-extrusion-translate"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['fill-extrusion-translate']"
                 style="margin-top: 10px; display: flex"
@@ -1650,7 +1689,7 @@
               &nbsp;
               <span
                 v-if="!menuButtonShowList['fill-extrusion-translate-anchor']"
-                >{{menuShowList['fill-extrusion-translate-anchor']}}</span
+                >{{ menuShowList["fill-extrusion-translate-anchor"] }}</span
               >
               <el-row
                 v-if="menuButtonShowList['fill-extrusion-translate-anchor']"
@@ -1694,7 +1733,7 @@
               &nbsp;
               <span
                 v-if="!menuButtonShowList['fill-extrusion-vertical-gradient']"
-                >{{menuShowList['fill-extrusion-vertical-gradient']}}</span
+                >{{ menuShowList["fill-extrusion-vertical-gradient"] }}</span
               >
               <el-row
                 v-if="menuButtonShowList['fill-extrusion-vertical-gradient']"
@@ -1753,7 +1792,9 @@
             <el-tab-pane label="图标" name="first">
               <h3>图标选择</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['icon-image']">{{menuShowList['icon-image']}}</span>
+              <span v-if="!menuButtonShowList['icon-image']">{{
+                menuShowList["icon-image"]
+              }}</span>
               <br />
               <el-row
                 v-if="menuButtonShowList['icon-image']"
@@ -1831,7 +1872,9 @@
             <el-tab-pane label="图标大小">
               <h3>图标大小</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['icon-size']">{{menuShowList['icon-size']}}</span>
+              <span v-if="!menuButtonShowList['icon-size']">{{
+                menuShowList["icon-size"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['icon-size']"
                 style="display: flex; margin-top: 10px"
@@ -1862,13 +1905,13 @@
             <el-tab-pane label="不透明度">
               <h3>不透明度</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['icon-opacity']"
-                >{{menuShowList['icon-opacity']}}</span
-              >
+              <span v-if="!menuButtonShowList['icon-opacity']">{{
+                menuShowList["icon-opacity"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['icon-opacity']"
                 style="margin-top: 10px"
-              >              
+              >
                 <el-slider
                   v-model="layers[nowLayerIndex].paint['icon-opacity']"
                   :min="0"
@@ -1912,9 +1955,9 @@
             <el-tab-pane label="允许压盖">
               <h3>允许压盖</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['icon-allow-overlap']"
-                >{{menuShowList['icon-allow-overlap']}}</span
-              >
+              <span v-if="!menuButtonShowList['icon-allow-overlap']">{{
+                menuShowList["icon-allow-overlap"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['icon-allow-overlap']"
                 style="margin-top: 10px; display: flex"
@@ -1941,9 +1984,9 @@
             <el-tab-pane label="忽略放置">
               <h3>忽略放置</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['icon-ignore-placement']"
-                >{{menuShowList['icon-ignore-placement']}}</span
-              >
+              <span v-if="!menuButtonShowList['icon-ignore-placement']">{{
+                menuShowList["icon-ignore-placement"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['icon-ignore-placement']"
                 style="margin-top: 10px; display: flex"
@@ -1972,9 +2015,9 @@
             <el-tab-pane label="图标可选">
               <h3>图标可选</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['icon-optional']"
-                >{{menuShowList['icon-optional']}}</span
-              >
+              <span v-if="!menuButtonShowList['icon-optional']">{{
+                menuShowList["icon-optional"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['icon-optional']"
                 style="margin-top: 10px; display: flex"
@@ -2001,7 +2044,9 @@
             <el-tab-pane label="内边距">
               <h3>内边距（px）</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['icon-padding']">{{menuShowList['icon-padding']}}</span>
+              <span v-if="!menuButtonShowList['icon-padding']">{{
+                menuShowList["icon-padding"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['icon-padding']"
                 style="display: flex; margin-top: 10px"
@@ -2032,7 +2077,9 @@
             <el-tab-pane label="偏移">
               <h3>偏移（iconsize）</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['icon-offset']">{{menuShowList['icon-offset']}}</span>
+              <span v-if="!menuButtonShowList['icon-offset']">{{
+                menuShowList["icon-offset"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['icon-offset']"
                 style="margin-top: 10px; display: flex"
@@ -2079,9 +2126,9 @@
             <el-tab-pane label="平移">
               <h3>平移</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['icon-translate']"
-                >{{menuShowList['icon-translate']}}</span
-              >
+              <span v-if="!menuButtonShowList['icon-translate']">{{
+                menuShowList["icon-translate"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['icon-translate']"
                 style="margin-top: 10px; display: flex"
@@ -2128,9 +2175,9 @@
             <el-tab-pane label="平移参考">
               <h3>平移参考</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['icon-translate-anchor']"
-                >{{menuShowList['icon-translate-anchor']}}</span
-              >
+              <span v-if="!menuButtonShowList['icon-translate-anchor']">{{
+                menuShowList["icon-translate-anchor"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['icon-translate-anchor']"
                 style="margin-top: 10px; display: flex"
@@ -2165,7 +2212,9 @@
             <el-tab-pane label="图标锚点">
               <h3>图标锚点</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['icon-anchor']">{{menuShowList['icon-anchor']}}</span>
+              <span v-if="!menuButtonShowList['icon-anchor']">{{
+                menuShowList["icon-anchor"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['icon-anchor']"
                 style="margin-top: 10px; display: flex"
@@ -2210,7 +2259,9 @@
             <el-tab-pane label="旋转角度">
               <h3>旋转角度（deg）</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['icon-rotate']">{{menuShowList['icon-rotate']}}</span>
+              <span v-if="!menuButtonShowList['icon-rotate']">{{
+                menuShowList["icon-rotate"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['icon-rotate']"
                 style="display: flex; margin-top: 10px"
@@ -2241,9 +2292,9 @@
             <el-tab-pane label="倾斜对齐">
               <h3>倾斜对齐</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['icon-pitch-alignment']"
-                >{{menuShowList['icon-pitch-alignment']}}</span
-              >
+              <span v-if="!menuButtonShowList['icon-pitch-alignment']">{{
+                menuShowList["icon-pitch-alignment"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['icon-pitch-alignment']"
                 style="margin-top: 10px; display: flex"
@@ -2278,9 +2329,9 @@
             <el-tab-pane label="旋转对齐">
               <h3>旋转对齐</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['icon-rotation-alignment']"
-                >{{menuShowList['icon-rotation-alignment']}}</span
-              >
+              <span v-if="!menuButtonShowList['icon-rotation-alignment']">{{
+                menuShowList["icon-rotation-alignment"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['icon-rotation-alignment']"
                 style="margin-top: 10px; display: flex"
@@ -2328,7 +2379,9 @@
             <el-tab-pane label="标注字段" name="first">
               <h3>标注字段</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['text-field']">{{menuShowList['text-field']}}</span>
+              <span v-if="!menuButtonShowList['text-field']">{{
+                menuShowList["text-field"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['text-field']"
                 style="display: flex; margin-top: 10px"
@@ -2392,7 +2445,9 @@
             <el-tab-pane label="颜色">
               <h3>颜色</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['text-color']">{{menuShowList['text-color']}}</span>
+              <span v-if="!menuButtonShowList['text-color']">{{
+                menuShowList["text-color"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['text-color']"
                 style="display: flex; margin-top: 10px"
@@ -2431,7 +2486,9 @@
             <el-tab-pane label="不透明度">
               <h3>不透明度</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['text-opacity']">{{menuShowList['text-opacity']}}</span>
+              <span v-if="!menuButtonShowList['text-opacity']">{{
+                menuShowList["text-opacity"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['text-opacity']"
                 style="margin-top: 10px"
@@ -2479,7 +2536,9 @@
             <el-tab-pane label="字体">
               <h3>字体</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['text-font']">{{menuShowList['text-font']}}</span>
+              <span v-if="!menuButtonShowList['text-font']">{{
+                menuShowList["text-font"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['text-font']"
                 style="display: flex; margin-top: 10px"
@@ -2545,7 +2604,9 @@
             <el-tab-pane label="字体大小">
               <h3>字体大小（px）</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['text-size']">{{menuShowList['text-size']}}</span>
+              <span v-if="!menuButtonShowList['text-size']">{{
+                menuShowList["text-size"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['text-size']"
                 style="display: flex; margin-top: 10px"
@@ -2576,9 +2637,9 @@
             <el-tab-pane label="放置位置">
               <h3>放置位置</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['symbol-placement']"
-                >{{menuShowList['symbol-placement']}}</span
-              >
+              <span v-if="!menuButtonShowList['symbol-placement']">{{
+                menuShowList["symbol-placement"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['symbol-placement']"
                 style="margin-top: 10px; display: flex"
@@ -2613,7 +2674,9 @@
             <el-tab-pane label="图标锚点">
               <h3>图标锚点</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['text-anchor']">{{menuShowList['text-anchor']}}</span>
+              <span v-if="!menuButtonShowList['text-anchor']">{{
+                menuShowList["text-anchor"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['text-anchor']"
                 style="margin-top: 10px; display: flex"
@@ -2658,9 +2721,9 @@
             <el-tab-pane label="文本对齐">
               <h3>文本对齐</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['text-justify']"
-                >{{menuShowList['text-justify']}}</span
-              >
+              <span v-if="!menuButtonShowList['text-justify']">{{
+                menuShowList["text-justify"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['text-justify']"
                 style="margin-top: 10px; display: flex"
@@ -2695,9 +2758,9 @@
             <el-tab-pane label="字符边距">
               <h3>字符边距（em）</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['text-letter-spacing']"
-                >{{menuShowList['text-letter-spacing']}}</span
-              >             
+              <span v-if="!menuButtonShowList['text-letter-spacing']">{{
+                menuShowList["text-letter-spacing"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['text-letter-spacing']"
                 style="display: flex; margin-top: 10px"
@@ -2728,9 +2791,9 @@
             <el-tab-pane label="行高">
               <h3>行高（em）</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['text-line-height']"
-                >{{menuShowList['text-line-height']}}</span
-              >
+              <span v-if="!menuButtonShowList['text-line-height']">{{
+                menuShowList["text-line-height"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['text-line-height']"
                 style="display: flex; margin-top: 10px"
@@ -2761,9 +2824,9 @@
             <el-tab-pane label="最大宽度">
               <h3>最大宽度（em）</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['text-max-width']"
-                >{{menuShowList['text-max-width']}}</span
-              >
+              <span v-if="!menuButtonShowList['text-max-width']">{{
+                menuShowList["text-max-width"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['text-max-width']"
                 style="display: flex; margin-top: 10px"
@@ -2794,9 +2857,9 @@
             <el-tab-pane label="允许压盖">
               <h3>允许压盖</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['text-allow-overlap']"
-                >{{menuShowList['text-allow-overlap']}}</span
-              >
+              <span v-if="!menuButtonShowList['text-allow-overlap']">{{
+                menuShowList["text-allow-overlap"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['text-allow-overlap']"
                 style="margin-top: 10px; display: flex"
@@ -2823,9 +2886,9 @@
             <el-tab-pane label="忽略放置">
               <h3>忽略放置</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['text-ignore-placement']"
-                >{{menuShowList['text-ignore-placement']}}</span
-              >
+              <span v-if="!menuButtonShowList['text-ignore-placement']">{{
+                menuShowList["text-ignore-placement"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['text-ignore-placement']"
                 style="margin-top: 10px; display: flex"
@@ -2854,9 +2917,9 @@
             <el-tab-pane label="标注可选">
               <h3>标注可选</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['text-optional']"
-                >{{menuShowList['text-optional']}}</span
-              >
+              <span v-if="!menuButtonShowList['text-optional']">{{
+                menuShowList["text-optional"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['text-optional']"
                 style="margin-top: 10px; display: flex"
@@ -2883,9 +2946,9 @@
             <el-tab-pane label="大小写转换">
               <h3>大小写转换</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['text-transform']"
-                >{{menuShowList['text-transform']}}</span
-              >
+              <span v-if="!menuButtonShowList['text-transform']">{{
+                menuShowList["text-transform"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['text-transform']"
                 style="margin-top: 10px; display: flex"
@@ -2920,7 +2983,9 @@
             <el-tab-pane label="内边距">
               <h3>内边距（px）</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['text-padding']">{{menuShowList['text-padding']}}</span>
+              <span v-if="!menuButtonShowList['text-padding']">{{
+                menuShowList["text-padding"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['text-padding']"
                 style="display: flex; margin-top: 10px"
@@ -2951,7 +3016,9 @@
             <el-tab-pane label="偏移">
               <h3>偏移(em)</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['text-offset']">{{menuShowList['text-offset']}}</span>
+              <span v-if="!menuButtonShowList['text-offset']">{{
+                menuShowList["text-offset"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['text-offset']"
                 style="margin-top: 10px; display: flex"
@@ -2998,9 +3065,9 @@
             <el-tab-pane label="平移">
               <h3>平移(px)</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['text-translate']"
-                >{{menuShowList['text-translate']}}</span
-              >
+              <span v-if="!menuButtonShowList['text-translate']">{{
+                menuShowList["text-translate"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['text-translate']"
                 style="margin-top: 10px; display: flex"
@@ -3047,7 +3114,9 @@
             <el-tab-pane label="旋转角度">
               <h3>旋转角度（deg）</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['text-rotate']">{{menuShowList['text-rotate']}}</span>
+              <span v-if="!menuButtonShowList['text-rotate']">{{
+                menuShowList["text-rotate"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['text-rotate']"
                 style="display: flex; margin-top: 10px"
@@ -3078,9 +3147,9 @@
             <el-tab-pane label="倾斜对齐">
               <h3>倾斜对齐</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['text-pitch-alignment']"
-                >{{menuShowList['text-pitch-alignment']}}</span
-              >
+              <span v-if="!menuButtonShowList['text-pitch-alignment']">{{
+                menuShowList["text-pitch-alignment"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['text-pitch-alignment']"
                 style="margin-top: 10px; display: flex"
@@ -3115,9 +3184,9 @@
             <el-tab-pane label="旋转对齐">
               <h3>旋转对齐</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['text-rotation-alignment']"
-                >{{menuShowList['text-rotation-alignment']}}</span
-              >
+              <span v-if="!menuButtonShowList['text-rotation-alignment']">{{
+                menuShowList["text-rotation-alignment"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['text-rotation-alignment']"
                 style="margin-top: 10px; display: flex"
@@ -3154,9 +3223,9 @@
             <el-tab-pane label="掩膜颜色">
               <h3>颜色</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['text-halo-color']"
-                >{{menuShowList['text-halo-color']}}</span
-              >
+              <span v-if="!menuButtonShowList['text-halo-color']">{{
+                menuShowList["text-halo-color"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['text-halo-color']"
                 style="display: flex; margin-top: 10px"
@@ -3195,9 +3264,9 @@
             <el-tab-pane label="掩膜宽度">
               <h3>掩膜宽度（px）</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['text-halo-width']"
-                >{{menuShowList['text-halo-width']}}</span
-              >
+              <span v-if="!menuButtonShowList['text-halo-width']">{{
+                menuShowList["text-halo-width"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['text-halo-width']"
                 style="display: flex; margin-top: 10px"
@@ -3228,9 +3297,9 @@
             <el-tab-pane label="掩膜模糊">
               <h3>掩膜模糊（px）</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['text-halo-blur']"
-                >{{menuShowList['text-halo-blur']}}</span
-              >
+              <span v-if="!menuButtonShowList['text-halo-blur']">{{
+                menuShowList["text-halo-blur"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['text-halo-blur']"
                 style="display: flex; margin-top: 10px"
@@ -3270,9 +3339,9 @@
             <el-tab-pane label="颜色" name="first">
               <h3>填充颜色</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['fill-extrusion-color']"
-                >{{menuShowList['fill-extrusion-color']}}</span
-              >
+              <span v-if="!menuButtonShowList['fill-extrusion-color']">{{
+                menuShowList["fill-extrusion-color"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['fill-extrusion-color']"
                 style="display: flex; margin-top: 10px"
@@ -3311,9 +3380,9 @@
             <el-tab-pane label="不透明度" name="second">
               <h3>不透明度</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['fill-extrusion-opacity']"
-                >{{menuShowList['fill-extrusion-opacity']}}</span
-              >
+              <span v-if="!menuButtonShowList['fill-extrusion-opacity']">{{
+                menuShowList["fill-extrusion-opacity"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['fill-extrusion-opacity']"
                 style="margin-top: 10px"
@@ -3365,9 +3434,9 @@
             <el-tab-pane label="高度" name="third">
               <h3>高度</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['fill-extrusion-height']"
-                >{{menuShowList['fill-extrusion-height']}}</span
-              >
+              <span v-if="!menuButtonShowList['fill-extrusion-height']">{{
+                menuShowList["fill-extrusion-height"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['fill-extrusion-height']"
                 style="display: flex; margin-top: 10px"
@@ -3399,9 +3468,9 @@
               <h3>底部高度</h3>
               &nbsp;
               <br />
-              <span v-if="!menuButtonShowList['fill-extrusion-base']"
-                >{{menuShowList['fill-extrusion-base']}}</span
-              >
+              <span v-if="!menuButtonShowList['fill-extrusion-base']">{{
+                menuShowList["fill-extrusion-base"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['fill-extrusion-base']"
                 style="display: flex; margin-top: 10px"
@@ -3432,9 +3501,9 @@
             <el-tab-pane label="平移" name="fifth">
               <h3>平移</h3>
               &nbsp;
-              <span v-if="!menuButtonShowList['fill-extrusion-translate']"
-                >{{menuShowList['fill-extrusion-translate']}}</span
-              >
+              <span v-if="!menuButtonShowList['fill-extrusion-translate']">{{
+                menuShowList["fill-extrusion-translate"]
+              }}</span>
               <el-row
                 v-if="menuButtonShowList['fill-extrusion-translate']"
                 style="margin-top: 10px; display: flex"
@@ -3487,7 +3556,7 @@
               &nbsp;
               <span
                 v-if="!menuButtonShowList['fill-extrusion-translate-anchor']"
-                >{{menuShowList['fill-extrusion-translate-anchor']}}</span
+                >{{ menuShowList["fill-extrusion-translate-anchor"] }}</span
               >
               <el-row
                 v-if="menuButtonShowList['fill-extrusion-translate-anchor']"
@@ -3531,7 +3600,7 @@
               &nbsp;
               <span
                 v-if="!menuButtonShowList['fill-extrusion-vertical-gradient']"
-                >{{menuShowList['fill-extrusion-vertical-gradient']}}</span
+                >{{ menuShowList["fill-extrusion-vertical-gradient"] }}</span
               >
               <el-row
                 v-if="menuButtonShowList['fill-extrusion-vertical-gradient']"
@@ -3676,24 +3745,13 @@
               </el-input>
             </el-col>
             <el-popover placement="right" width="400" trigger="click">
-              <el-row type="flex" justify="space-between">
-                <!-- <el-col :span="18">
-                  <el-tag
-                    v-for="tag in filterValueSelect"
-                    :key="tag.value"
-                    :closable="true"
-                    @close="handleTagClose(tag)"
-                  >
-                    {{ tag.value }}
-                  </el-tag>
-                </el-col> -->
-                <el-col :offset="20" :span="4">
-                  <el-button size="mini" type="primary" @click="filterConfirm"
-                    >筛选</el-button
-                  >
-                </el-col>
-              </el-row>
-
+              <el-button
+                size="mini"
+                type="primary"
+                @click="filterConfirm"
+                style="position: absolute; top: 24px; z-index: 100"
+                >筛选
+              </el-button>
               <el-table
                 :data="
                   filterValueSelect.filter(
@@ -3708,12 +3766,14 @@
                 row-key="id"
                 :highlight-current-row="true"
                 :cell-style="{ textAlign: 'left' }"
-                height="250"
+                height="300"
               >
                 <el-table-column
                   :prop="filterOptionSelectList[index]"
                   align="right"
                 >
+                </el-table-column>
+                <el-table-column align="right">
                   <template slot="header">
                     <el-input
                       v-model="filterSearch"
@@ -3724,6 +3784,16 @@
                   </template>
                 </el-table-column>
               </el-table>
+              <el-pagination
+                small
+                @current-change="handleCurrentChangeFilter"
+                :current-page="filterSearchPage"
+                :page-size="pageSizeFilter"
+                layout="total, prev, pager, next"
+                :total="totalDataCountFilter"
+                class="flexRowCenter"
+              >
+              </el-pagination>
               <el-button
                 type="text"
                 icon="el-icon-circle-plus"
@@ -3779,6 +3849,7 @@
 <script>
 import mapboxgl from "mapbox-gl";
 import requestApi from "../api/requestApi";
+import fileApi from "../api/fileApi";
 import layerStyleProperties from "../assets/js/layerStyleProperties";
 import initTileJson from "../assets/js/initTileJson";
 import layerStyle from "../assets/js/layerStyleProperties";
@@ -3787,7 +3858,6 @@ import layerStyle from "../assets/js/layerStyleProperties";
 import Sortable from "sortablejs";
 import ConditionRender from "../components/ConditionRender";
 // import Datajson from "../assets/js/liberty";
-import osmSource from "../assets/js/osmSource";
 // import Vue from "vue";
 
 var map = null;
@@ -3800,15 +3870,21 @@ export default {
       shpTableData: [],
       multiShpTable: [],
       dataBaseList: [],
-      PgBaseSelect: "default",
-      dataBaseSelect: "PG",
+      mbTileJsonList: [],
+      mbTileSelect: "",     //储存所选mbTile的id数据
+      mbTileJson: {},
+      PgBaseSelect: "defaultPG",
+      dataBaseSelect: "defaultPG", //用于数据库类型判断(四种)
       currentPageShp: 1,
       pageSizeShp: 5,
       searchInputShp: "",
       totalDataCountShp: 0,
       addSourceShow: true,
       publishLink: "",
-      dataLayers:osmSource.vector_layers,
+      dataLayers: [],
+      mutiPgInfo: "",
+      mbTileEditShow: false,
+      mbTileEditInfo: {mbTilesJsonFile:null,mbTilesJsonName:""},
 
       //左侧shp图层树
       layersNameObject: {}, //检测重复  后端字段为layerTree
@@ -3850,7 +3926,7 @@ export default {
           "贝塞尔曲线：使用由给定控制点定义的三次贝塞尔曲线进行插值。",
       },
 
-      //筛选
+      //文字
       fontSearch: "",
       textFieldSearch: "",
 
@@ -3872,13 +3948,14 @@ export default {
         { value: "!has", label: "!has" },
       ],
       filterValue: [],
-      filterValueSelect: [],
+      filterValueSelect: [],      //分页信息显示
       // filterValueInput: [""],
       // multipleSelection: [],
       nowFilterIndex: 0,
       filterSearch: "",
       filterSearchPage: 1,
-      allfilterValueListLength: 0,
+      pageSizeFilter: 10,
+      totalDataCountFilter: 0,
 
       predefineColors: [
         "#ff4500",
@@ -3903,20 +3980,20 @@ export default {
   mounted() {
     this.$bus.$on("show", (data) => {
       //多级渲染显示
-      if(data.param4){
-        switch(data.param4){
-          case 'zoom':
-            this.menuShowList[data.param1] = 'Zoom Range';
-            break
-          case 'data':
-            this.menuShowList[data.param1] = 'Data Range';
-            break
-          case 'prop':
-            this.menuShowList[data.param1] = 'Data Condition';
-            break
-          case 'formula':
-            this.menuShowList[data.param1] = 'Expression';
-            break
+      if (data.param4) {
+        switch (data.param4) {
+          case "zoom":
+            this.menuShowList[data.param1] = "Zoom Range";
+            break;
+          case "data":
+            this.menuShowList[data.param1] = "Data Range";
+            break;
+          case "prop":
+            this.menuShowList[data.param1] = "Data Condition";
+            break;
+          case "formula":
+            this.menuShowList[data.param1] = "Expression";
+            break;
         }
       }
       //编辑框初始化先获取所有tab的显示情况，单个tab修改时子组件给父组件传递单个tab变化值,params3用于保存attrValueSet
@@ -3997,7 +4074,7 @@ export default {
         .getDataSourceList()
         .then((res) => {
           this.dataBaseList = res.data.data;
-          this.dataBaseList.unshift({ dbname: "default", id: "default" });
+          this.dataBaseList.unshift({ dbname: "defaultPG", id: "defaultPG" });
         })
         .catch((error) => {
           console.log(error);
@@ -4042,8 +4119,8 @@ export default {
       });
 
       //center
-      map.on("mousemove", this.layersName ,(e) => {
-        map.getCanvas().style.cursor = 'pointer';
+      map.on("mousemove", this.layersName, (e) => {
+        map.getCanvas().style.cursor = "pointer";
 
         this.center = String(e.lngLat.lng) + "," + String(e.lngLat.lat);
         this.showCenter =
@@ -4097,7 +4174,7 @@ export default {
           item.appendChild(item_name).className = "item_name";
           item_name.innerHTML = feature.layer.id;
 
-          var index = this.layersName.indexOf(feature.layer['originName']);
+          var index = this.layersName.indexOf(feature.layer["originName"]);
 
           //根据index获取相关图层信息
           const color_name = feature.layer.type + "-" + "color";
@@ -4115,14 +4192,6 @@ export default {
           .setLngLat(e.lngLat)
           .setDOMContent(container)
           .addTo(map);
-      });
-
-      map.on("load", () => {
-        const stylejson1 = map.getStyle();
-        console.log("stylejson3", stylejson1);
-
-        const styleLoadStatus = map.isStyleLoaded();
-        console.log("styleLoadStatus", styleLoadStatus);
       });
 
       map.on("load", function () {
@@ -4192,7 +4261,7 @@ export default {
           this.mapProjectInfo.layers = this.layers;
           this.mapProjectInfo.layerTree = this.layersNameObject;
           // this.mapProjectInfo.glyphs = this.reqUrl+"/store/fonts/{fontstack}/{range}.pbf";
-          // this.mapProjectInfo.sprite = "http://172.21.212.63:8991/store/sprites/mpx_sprite/sprite";
+          // this.mapProjectInfo.sprite = this.reqUrl+"/store/sprites/mpx_sprite/sprite";
 
           requestApi
             .updateMapProject(JSON.stringify(this.mapProjectInfo))
@@ -4211,49 +4280,59 @@ export default {
       // this.publishLink = myConfig.requestUrl+'/mapServer/'+this.mapProjectId;
       this.publishLink = this.reqUrl + "/mapServer/" + this.mapProjectId;
     },
-    addBackground(){
+    addBackground() {
       const backLayer = {
-        "id": "背景",
-        "type": "background",
-        "paint": {
-          "background-color": "rgba(255,255,255,0)"
+        id: "背景",
+        type: "background",
+        paint: {
+          "background-color": "rgba(255,255,255,0)",
         },
-        "layout": {
-          "visibility": "visible"
+        layout: {
+          visibility: "visible",
         },
-        "metadata": {
-          "mapbox:group": "92ca48f13df25"
-        }
-      }      
-      if(
+        metadata: {
+          "mapbox:group": "92ca48f13df25",
+        },
+      };
+      if (
         !Object.prototype.hasOwnProperty.call(
           this.layersNameObject,
-          'background'
+          "background"
         )
-      ){
-        this.layersNameObject = 1
-      }else{
-        this.layersNameObject += 1
+      ) {
+        this.layersNameObject = 1;
+      } else {
+        this.layersNameObject += 1;
         backLayer.id = "背景" + this.layersNameObject;
       }
       this.layers.push(backLayer);
       this.layersName.push(backLayer.id);
       this.addLayerToMap(backLayer);
-
-
     },
 
+    //添加数据库相关
     //打开shp选择框
     addShpData() {
-      console.log("PgBaseSelect1", this.PgBaseSelect);
-      if (this.PgBaseSelect == "default") {
+      requestApi.getTileJsonList('mbTile')
+        .then((res)=>{
+          this.mbTileJsonList = res.data.data;
+          console.log("mbTileJsonList",this.mbTileJsonList);
+          //mbTiles先默认为第一个osm数据
+          this.mbTileSelect = this.mbTileJsonList[0].id;
+          this.dataLayers = this.mbTileJsonList[0].vector_layers
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+      
+      if (this.PgBaseSelect == "defaultPG") {
         requestApi
           .getShpList({
             asc: false,
             page: this.currentPageShp,
             pageSize: this.pageSizeShp,
             searchText: this.searchInputShp,
-            sortField: "uploadDate",
+            sortField: "createTime",
           })
           .then((res) => {
             console.log("shpbase", res.data);
@@ -4265,34 +4344,64 @@ export default {
           });
       }
     },
-    PgBaseChange() {
+    addMbTileData(){
+      // 阻止发生默认行为
+      let formData = new FormData()
+      //input的type为file,输入的文件在files属性里
+      let file = this.$refs.mbFile.files[0]
+      this.mbTileEditInfo.mbTilesJsonFile = file;
+      formData.append('mbTilesJsonFile',file)
+      formData.append('mbTilesJsonName',this.mbTileEditInfo.mbTilesJsonName)     
+      console.log("表单信息：",this.mbTileEditInfo)
+      this.onUpload(formData)    
+    },
+    // 上传文件
+    onUpload (formData) {
+        fileApi.postUpload(formData).then(() => {
+            this.$message.success(this.$t('UPLOAD_SUCCESS'))
+        }).catch((e) => {
+            this.$message.error(e.message)
+        })
+    }, 
+    PgBaseChange(val) {
+      //val表示选择的value值
+      let index = 0;
+      //获取select选择内容的下标
+      this.dataBaseList.forEach((e,ind)=>{
+        if(e.id == val){
+          index = ind;
+        }
+      })
+      //更改pg数据库源，同时修改dataBaseSelect类型
+      this.dataBaseSelect = this.PgBaseSelect == 'defaultPG' ? 'defaultPG' : 'multiPG';
       console.log("PgBaseSelect2", this.PgBaseSelect);
-      if (this.PgBaseSelect != "default") {
-        this.shpTableData = [];
-        requestApi
-          .getShpListById(this.PgBaseSelect)
-          .then((res) => {
-            console.log("database", res);
-            for (let i in res.data.data) {
-              this.shpTableData.push({ originName: res.data.data[i] });
-            }
-            console.log("muti", this.shpTableData);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+      if (this.PgBaseSelect != "defaultPG") {
+        this.shpTableData = this.dataBaseList[index].dataInfo;
+        this.mutiPgInfo = this.dataBaseList[index]  //用于展示IP、端口信息
       } else {
         this.addShpData();
       }
     },
-    dataBaseClick(tab){
-      this.dataBaseSelect = tab.name;
-      console.log('dataBaseSelect',this.dataBaseSelect);
+    mbTileChange(val) {
+      let index = 0;
+      this.mbTileJsonList.forEach((e,ind)=>{
+        if(e.id == val){
+          index = ind;
+        }
+      })
+      //更改pg数据库源，同时修改dataBaseSelect类型
+      this.mbTileJson = this.mbTileJsonList[index]
+      this.dataLayers = this.mbTileJson.vector_layers
+
+    },    
+    dataBaseClick(tab) {
+      this.dataBaseSelect = tab.name == 'PG' ? 'defaultPG' : tab.name;
+      console.log("dataBaseSelect", this.dataBaseSelect);
     },
 
     handleCurrentChangeShp(val) {
       this.currentPageShp = val;
-      if (this.PgBaseSelect != "default") {
+      if (this.PgBaseSelect != "defaultPG") {
         this.PgBaseChange();
       } else {
         this.addShpData();
@@ -4333,103 +4442,221 @@ export default {
     },
 
     //向shp树添加shp,即source,同时添加shplayer
+    // async handleAddShpLayer(index, row) {
+    //   console.log("add shp row: ", row);
+    //   //旧source写法
+    //   // let newSource = {
+    //   //   sourceName: row.tableName,
+    //   //   sourceType: "vector",
+    //   //   sourceTiles: [this.reqUrl+"/mvt/" + row.tableName + "/{z}/{x}/{y}.pbf"],
+    //   // }
+    //   // if (!Object.prototype.hasOwnProperty.call(this.sources, newSource.sourceName)) {
+    //   //   this.sources[newSource.sourceName] = {
+    //   //     type: newSource.sourceType,
+    //   //     tiles: newSource.sourceTiles,
+    //   //   }
+    //   //   this.addSourceToMap(newSource)
+    //   // }
+
+    //   //如果没有添加过source则添加
+    //   if (
+    //     !Object.prototype.hasOwnProperty.call(
+    //       this.sourceNameObject,
+    //       row.tableName
+    //     )
+    //   ) {
+    //     let newTileJson = initTileJson;
+    //     newTileJson.name = row.tableName;
+    //     // if(this.PgBaseSelect == 'defaultPG'){
+    //     //   newTileJson.tiles = [myConfig.requestUrl + "/mvt/" + row.tableName + "/{z}/{x}/{y}.pbf"]
+    //     // }else{
+    //     //   newTileJson.tiles = ["/MultiSource/" + myConfig.requestUrl + "//" + row.tableName + "/{z}/{x}/{y}.pbf"]
+    //     // }
+    //     if (this.dataBaseSelect == "mbTile") {
+    //       newTileJson.tiles = [
+    //         "https://api.maptiler.com/tiles/v3/{z}/{x}/{y}.pbf?key=XAapkmkXQpx839NCfnxD",
+    //       ];
+    //     } else if (this.PgBaseSelect == "defaultPG") {
+    //       newTileJson.tiles = [
+    //         this.reqUrl + "/mvt/" + row.tableName + "/{z}/{x}/{y}.pbf",
+    //       ];
+    //     } else {
+    //       newTileJson.tiles = [
+    //         "/MultiSource/" +
+    //           this.reqUrl +
+    //           "//" +
+    //           row.tableName +
+    //           "/{z}/{x}/{y}.pbf",
+    //       ];
+    //     }
+    //     if (this.dataBaseSelect == "mbTile") {
+    //       newTileJson.vector_layers = this.dataLayers;
+    //     } else {
+    //       let vector_layer = {
+    //         description: "",
+    //         fields: row.attrInfo,
+    //         id: row.tableName,
+    //       };
+    //       newTileJson.vector_layers = [vector_layer];
+    //     }
+
+    //     let res = await this.createTileJson(newTileJson);
+    //     if (res.data.code !== 0) {
+    //       console.log("添加source失败");
+    //       return;
+    //     }
+    //     let sourceId = res.data.data.tileJsonId;
+
+    //     // let tileJsonUrl = myConfig.requestUrl + "/getTileJson/" + sourceId + ".json"
+    //     let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceId + ".json";
+    //     let newSourceJson = {
+    //       sourceName: sourceId,
+    //       sourceType: "vector",
+    //       sourceUrl: tileJsonUrl,
+    //     };
+    //     this.addSourceToMap(newSourceJson);
+    //     this.sources[newSourceJson.sourceName] = {
+    //       type: newSourceJson.sourceType,
+    //       url: newSourceJson.sourceUrl,
+    //     };
+    //     if (this.dataBaseSelect == "mbTile") {
+    //       this.sourceNameObject[this.dataLayers.id] = sourceId;
+    //     } else {
+    //       this.sourceNameObject[row.tableName] = sourceId;
+    //     }
+    //   }
+
+    //   let geoType = row.geoType;
+    //   if (row.geoType.indexOf("LINE") !== -1) {
+    //     geoType = "line";
+    //   } else if (row.geoType.indexOf("POLYGON") !== -1) {
+    //     geoType = "fill";
+    //   } else {
+    //     geoType = "circle";
+    //   }
+
+    //   //前八个是自己用的属性
+    //   let newLayer = {
+    //     index: index,
+    //     sourceType: "mbTile",     //记录数据来源类型，用于区别mbTlie的添加和删除
+    //     show: true,
+    //     originName: row.originName,
+    //     shpAttribute: row.attrInfo,
+    //     attrValueSet: {},
+    //     attrShowList: {},
+    //     filterValueSet: {},
+    //     id: row.originName,
+    //     type: geoType,
+    //     filter: ["all"],
+    //     layout: layerStyleProperties[geoType].layout,
+    //     maxzoom: 22,
+    //     metadata: "",
+    //     minzoom: 0,
+    //     paint: layerStyleProperties[geoType].paint,
+    //     source: this.sourceNameObject[row.tableName], //通过记录的source名字与id对应，拿到sourceId
+    //     // "source-layer": "default"
+    //     "source-layer": row.tableName,
+    //     // "source-layer":"my22"
+    //   };
+
+    //   if (geoType !== "symbol") {
+    //     newLayer.paint[geoType + "-color"] =
+    //       "#" + Math.random().toString(16).substr(2, 6);
+    //   }
+
+    //   if (
+    //     !Object.prototype.hasOwnProperty.call(
+    //       this.layersNameObject,
+    //       newLayer.originName
+    //     )
+    //   ) {
+    //     this.layersNameObject[newLayer.originName] = 1;
+    //   } else {
+    //     this.layersNameObject[newLayer.originName] += 1;
+    //     newLayer.id =
+    //       row.originName + this.layersNameObject[newLayer.originName];
+    //   }
+    //   this.layers.unshift(newLayer);
+    //   this.layersName.unshift(newLayer.id);
+    //   this.addLayerToMap(newLayer);
+    // },
     async handleAddShpLayer(index, row) {
       console.log("add shp row: ", row);
-      //旧source写法
-      // let newSource = {
-      //   sourceName: row.tableName,
-      //   sourceType: "vector",
-      //   sourceTiles: ["http://172.21.212.63:8991/mvt/" + row.tableName + "/{z}/{x}/{y}.pbf"],
-      // }
-      // if (!Object.prototype.hasOwnProperty.call(this.sources, newSource.sourceName)) {
-      //   this.sources[newSource.sourceName] = {
-      //     type: newSource.sourceType,
-      //     tiles: newSource.sourceTiles,
-      //   }
-      //   this.addSourceToMap(newSource)
-      // }
-
-      //如果没有添加过source则添加
+      //判断该shp是否已添加
       if (
         !Object.prototype.hasOwnProperty.call(
           this.sourceNameObject,
           row.tableName
         )
       ) {
-        let newTileJson = initTileJson;
-        newTileJson.name = row.tableName;
-        // if(this.PgBaseSelect == 'default'){
-        //   newTileJson.tiles = [myConfig.requestUrl + "/mvt/" + row.tableName + "/{z}/{x}/{y}.pbf"]
-        // }else{
-        //   newTileJson.tiles = ["/MultiSource/" + myConfig.requestUrl + "//" + row.tableName + "/{z}/{x}/{y}.pbf"]
-        // }
-        if(this.dataBaseSelect == "OSM"){
-         newTileJson.tiles = [
-            "https://api.maptiler.com/tiles/v3/{z}/{x}/{y}.pbf?key=XAapkmkXQpx839NCfnxD",
-          ];
-        }
-        else if (this.PgBaseSelect == "default") {
-          newTileJson.tiles = [
-            this.reqUrl + "/mvt/" + row.tableName + "/{z}/{x}/{y}.pbf",
-          ];
-        } else {
-          newTileJson.tiles = [
-            "/MultiSource/" +
-              this.reqUrl +
-              "//" +
-              row.tableName +
-              "/{z}/{x}/{y}.pbf",
-          ];
-        }
-        if(this.dataBaseSelect == "OSM"){
-          newTileJson.vector_layers = this.dataLayers;
-        }else{
-          let vector_layer = {
-            description: "",
-            fields: row.attrInfo,
-            id: row.tableName,
-          };
-          newTileJson.vector_layers = [vector_layer];
-        }
-
-        let res = await this.createTileJson(newTileJson);
-        if (res.data.code !== 0) {
-          console.log("添加source失败");
-          return;
-        }
-        let sourceId = res.data.data.tileJsonId;
-
-        // let tileJsonUrl = myConfig.requestUrl + "/getTileJson/" + sourceId + ".json"
-        let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceId + ".json";
-        let newSourceJson = {
-          sourceName: sourceId,
-          sourceType: "vector",
-          sourceUrl: tileJsonUrl,
-        };
-        this.addSourceToMap(newSourceJson);
-        this.sources[newSourceJson.sourceName] = {
-          type: newSourceJson.sourceType,
-          url: newSourceJson.sourceUrl,
-        };
-        if(this.dataBaseSelect == "OSM"){
-          this.sourceNameObject[this.dataLayers.id] = sourceId;  
-        }else{        
-          this.sourceNameObject[row.tableName] = sourceId;  
+        //分类型进行创建shp的json入库并返回对应id
+        switch (this.dataBaseSelect) {
+          case "defaultPG":
+            this.addPgDefaultShp(index, row);
+            break;
+          case "multiPG":
+            this.addPgMultiShp(index, row);
+            break;
+          case "cacheTile":
+            this.addCacheShp(index, row);
+            break;
+          case "mbTile":
+            this.addMbTileShp(index, row);
+            break;
         }
       }
 
+
+    },
+    async addPgDefaultShp(index, row) {
+      let newTileJson = initTileJson;
+      newTileJson.name = row.tableName;
+      newTileJson.tiles = [
+        this.reqUrl + "/mvt/" + row.tableName + "/{z}/{x}/{y}.pbf",
+      ];
+      let vector_layer = {
+        description: "",
+        fields: row.attrInfo,
+        id: row.tableName,
+      };
+      newTileJson.vector_layers = [vector_layer];
+      newTileJson.tileJsonType = this.dataBaseSelect;
+      let res = await this.createTileJson(newTileJson);
+      if (res.data.code !== 0) {
+        console.log("添加source失败");
+        return;
+      }
+      //添加source
+      let sourceId = res.data.data.tileJsonId;
+      let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceId + ".json";
+      let newSourceJson = {
+        sourceName: sourceId,
+        sourceType: "vector",
+        sourceUrl: tileJsonUrl,
+      };
+      this.addSourceToMap(newSourceJson);
+      this.sources[newSourceJson.sourceName] = {
+        type: newSourceJson.sourceType,
+        url: newSourceJson.sourceUrl,
+      };
+      //记录shp图层和对应的id
+      this.sourceNameObject[row.tableName] = sourceId;        
+      //添加layer
       let geoType = row.geoType;
       if (row.geoType.indexOf("LINE") !== -1) {
         geoType = "line";
       } else if (row.geoType.indexOf("POLYGON") !== -1) {
         geoType = "fill";
-      } else {
+      } else if (row.geoType.indexOf("POINT") !== -1) {
         geoType = "circle";
+      } else {
+        geoType = "symbol";
       }
 
-      //前七个是自己用的属性
+      //前八个是自己用的属性
       let newLayer = {
         index: index,
+        sourceType: "mbTile",     //记录数据来源类型，用于区别mbTlie的添加和删除
         show: true,
         originName: row.originName,
         shpAttribute: row.attrInfo,
@@ -4469,12 +4696,190 @@ export default {
       }
       this.layers.unshift(newLayer);
       this.layersName.unshift(newLayer.id);
-      this.addLayerToMap(newLayer);
+      this.addLayerToMap(newLayer);      
+    },
+    async addPgMultiShp(index, row) {
+      let newTileJson = initTileJson;
+      newTileJson.name = row.originName;
+      newTileJson.tiles = [
+        this.reqUrl +
+          "/multiPgSource/" +
+          this.mutiPgInfo.ip +
+          "/" +
+          this.mutiPgInfo.port +
+          "/" +
+          row.originName +
+          "/{z}/{x}/{y}.pbf",
+      ];
+      let vector_layer = {
+        description: "",
+        fields: row.attrInfo,
+        id: row.originName,
+      };
+      newTileJson.vector_layers = [vector_layer];
+      newTileJson.tileJsonType = this.dataBaseSelect;
+      let res = await this.createTileJson(newTileJson);
+      if (res.data.code !== 0) {
+        console.log("添加source失败");
+        return;
+      }
+      //添加source
+      let sourceId = res.data.data.tileJsonId;
+      let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceId + ".json";
+      let newSourceJson = {
+        sourceName: sourceId,
+        sourceType: "vector",
+        sourceUrl: tileJsonUrl,
+      };
+      this.addSourceToMap(newSourceJson);
+      this.sources[newSourceJson.sourceName] = {
+        type: newSourceJson.sourceType,
+        url: newSourceJson.sourceUrl,
+      };
+      //记录shp图层和对应的id
+      this.sourceNameObject[row.id] = sourceId;        
+      //添加layer
+      let geoType = row.geoType;
+      if (row.geoType.indexOf("LINE") !== -1) {
+        geoType = "line";
+      } else if (row.geoType.indexOf("POLYGON") !== -1) {
+        geoType = "fill";
+      } else if (row.geoType.indexOf("POINT") !== -1) {
+        geoType = "circle";
+      } else {
+        geoType = "symbol";
+      }
+      console.log("originname:",row.originName)
+      //前八个是自己用的属性
+      let newLayer = {
+        index: index,
+        sourceType: "mbTile",     //记录数据来源类型，用于区别mbTlie的添加和删除
+        show: true,
+        originName: row.originName,
+        shpAttribute: row.attrInfo,
+        attrValueSet: {},
+        attrShowList: {},
+        filterValueSet: {},
+        id: row.originName,
+        type: geoType,
+        filter: ["all"],
+        layout: layerStyleProperties[geoType].layout,
+        maxzoom: 22,
+        metadata: "",
+        minzoom: 0,
+        paint: layerStyleProperties[geoType].paint,
+        source: this.sourceNameObject[row.id],      //添加的sourceId
+        // "source-layer": "default"
+        "source-layer": row.originName,
+        // "source-layer":"my22"
+      };
+
+      if (geoType !== "symbol") {
+        newLayer.paint[geoType + "-color"] =
+          "#" + Math.random().toString(16).substr(2, 6);
+      }
+
+      if (
+        !Object.prototype.hasOwnProperty.call(
+          this.layersNameObject,
+          newLayer.originName
+        )
+      ) {
+        this.layersNameObject[newLayer.originName] = 1;
+      } else {
+        this.layersNameObject[newLayer.originName] += 1;
+        newLayer.id =
+          row.originName + this.layersNameObject[newLayer.originName];
+      }
+      this.layers.unshift(newLayer);
+      this.layersName.unshift(newLayer.id);
+      this.addLayerToMap(newLayer);      
+    },    
+    async addMbTileShp(index,row){
+      //添加mbTile的shp图层时，相关json已经入库
+      let sourceId = this.mbTileSelect;
+      let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceId + ".json";
+      let newSourceJson = {
+        sourceName: sourceId,
+        sourceType: "vector",
+        sourceUrl: tileJsonUrl,
+      };
+      this.addSourceToMap(newSourceJson);
+      this.sources[newSourceJson.sourceName] = {
+        type: newSourceJson.sourceType,
+        url: newSourceJson.sourceUrl,
+      };
+      //记录shp图层和对应的id
+      this.sourceNameObject[row.id] = sourceId;      
+      //添加layer
+      // let newLayerout = layerStyleProperties[row.type].layout;
+      // if('layout' in row){
+      //   for(let key in row.layout){
+      //     newLayerout[key] = row.layout[key]
+      //   }
+      // }
+      // let newPaint = layerStyleProperties[row.type].paint;
+      // if('paint' in row){
+      //   for(let key in row.paint){
+      //     newPaint[key] = row.paint[key]
+      //   }
+      // }
+
+      //前八个是自己用的属性
+      let geoType = "circle"
+      let newLayer = {
+        index: index,
+        sourceType: "mbTile",     //记录数据来源类型，用于区别mbTlie的添加和删除
+        show: true,
+        originName: row.id,
+        shpAttribute: row.attrInfo,
+        attrValueSet: {},
+        attrShowList: {},
+        filterValueSet: {},
+        id: row.id,
+        type: geoType,
+        filter: ["all"],
+        layout: layerStyleProperties[geoType].layout,
+        maxzoom: 22,
+        metadata: "",
+        minzoom: 0,
+        paint: layerStyleProperties[geoType].paint,
+        source: this.sourceNameObject[row.id], //通过记录的source名字与id对应，拿到sourceId
+        // "source-layer": "default"
+        "source-layer": row.id,
+        // "source-layer":"my22"
+      };
+
+      if (geoType !== "symbol") {
+        newLayer.paint[geoType + "-color"] =
+          "#" + Math.random().toString(16).substr(2, 6);
+      }
+
+      if (
+        !Object.prototype.hasOwnProperty.call(
+          this.layersNameObject,
+          newLayer.originName
+        )
+      ) {
+        this.layersNameObject[newLayer.originName] = 1;
+      } else {
+        this.layersNameObject[newLayer.originName] += 1;
+        newLayer.id =
+          row.originName + this.layersNameObject[newLayer.originName];
+      }
+      this.layers.unshift(newLayer);
+      this.layersName.unshift(newLayer.id);
+      this.addLayerToMap(newLayer);          
     },
 
-    //生成tilejson
+    //生成tilejson和mbTileJson
     async createTileJson(initTileJson) {
-      let data = await requestApi.createTileJson(initTileJson);
+      let data = "";
+      if(this.dataBaseSelect != "mbTile"){
+        data = await requestApi.createTileJson(initTileJson);
+      }else{
+        data = await requestApi.createMbTilesJson(initTileJson);
+      }
       return data;
     },
 
@@ -4573,19 +4978,22 @@ export default {
       this.layersNameObject[layerOriginName] -= 1;
       this.handleRemoveLayer(layerid);
 
-      //如果没有layer使用source，则删除source
-      if (this.layersNameObject[layerOriginName] === 0) {
-        delete this.layersNameObject[layerOriginName];
-        this.handleRemoveSource(aimSource);
-        delete this.sources[aimSource];
-        for (let key in this.sourceNameObject) {
-          if (this.sourceNameObject[key] === aimSource) {
-            delete this.sourceNameObject[key];
-            break;
+      //mbTile不删除source
+      if(row.sourceType != "mbTile"){
+        //如果没有layer使用source，则删除source
+        if (this.layersNameObject[layerOriginName] === 0) {
+          delete this.layersNameObject[layerOriginName];
+          this.handleRemoveSource(aimSource);
+          delete this.sources[aimSource];
+          for (let key in this.sourceNameObject) {
+            if (this.sourceNameObject[key] === aimSource) {
+              delete this.sourceNameObject[key];
+              break;
+            }
           }
+          //source没有再使用时,删除后台的tileJson
+          this.deleteTileJson(row.source);
         }
-        //source没有再使用时,删除后台的tileJson
-        this.deleteTileJson(row.source);
       }
     },
 
@@ -4630,8 +5038,11 @@ export default {
         });
       this.spriteList = map.listImages();
       // 将固定的数据用于组件访问
-      localStorage.setItem('spriteList',JSON.stringify(this.spriteList));
-      localStorage.setItem('symbolTableData',JSON.stringify(this.symbolTableData));
+      localStorage.setItem("spriteList", JSON.stringify(this.spriteList));
+      localStorage.setItem(
+        "symbolTableData",
+        JSON.stringify(this.symbolTableData)
+      );
     },
     getFontList() {
       requestApi
@@ -4644,7 +5055,7 @@ export default {
             });
           }
           console.log("fontList", this.fontList);
-          localStorage.setItem('fontList',JSON.stringify(this.fontList));
+          localStorage.setItem("fontList", JSON.stringify(this.fontList));
         })
         .catch((error) => {
           console.log(error);
@@ -4740,21 +5151,6 @@ export default {
       map.flyTo({
         center: [113.32948058466824, 23.19862318628209],
       });
-      // var render =
-      //   [
-      //   "interpolate",
-      //   ["exponential", 0.5],
-      //   ["zoom"],
-      //   2,
-      //   "#e2714b",
-      //   5,
-      //   "#eee695"
-      //   ];
-      // this.handlePaintChange('ChinaProvince','fill-color',render)
-      // this.layers[3].paint['fill-color'] = 0
-      // if (row.type === "circle") {
-      //   this.pointEditorShow = !this.pointEditorShow;
-      // }
     },
 
     handleLayerShowSwitchChange(val, row) {
@@ -4812,6 +5208,7 @@ export default {
     },
 
     filterValueInit(index) {
+      //更新筛选条件的列表
       this.filterOptionSelectList.splice(
         index,
         0,
@@ -4827,16 +5224,38 @@ export default {
           sort: "asc",
         })
         .then((res) => {
-          console.log("res", res);
+          console.log("filterlist", res);
           this.filterValue.splice(
             [this.nowFilterIndex],
             0,
             res.data.data.attrValue
           );
           this.filterValueSelect = this.filterValue[this.nowFilterIndex];
-          this.allfilterValueListLength = res.data.data.featureCount;
+          this.totalDataCountFilter = res.data.data.featureCount;
           console.log("filterValue", this.filterValue);
+          console.log("filtertotal", this.totalDataCountFilter);
           console.log("filterValueSelect", this.filterValueSelect);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+
+    handleCurrentChangeFilter(val) {
+      this.filterSearchPage = val;
+      requestApi
+        .getAttrValue({
+          aimAttrName: this.filterCondition[this.nowFilterIndex].option,
+          aimShpTableName: this.layers[this.nowLayerIndex]["source-layer"],
+          page: this.filterSearchPage,
+          pageSize: 10,
+          searchText: this.filterSearch,
+          sort: "asc",
+        })
+        .then((res) => {
+          console.log("res", res);
+          this.filterValueSelect = res.data.data.attrValue;
+          this.totalDataCountFilter = res.data.data.featureCount;
         })
         .catch((error) => {
           console.log(error);
@@ -4892,15 +5311,15 @@ export default {
       console.log("筛选条件1：", this.filterWay);
       let judge = this.filterWay;
       const filters = [judge];
-      for(let i = 0;i < this.filterCondition.length;i++){
+      for (let i = 0; i < this.filterCondition.length; i++) {
         const filter = [];
         filter.push(this.filterCondition[i].type);
         filter.push(["get", this.filterCondition[i].option]);
-        filter.push(this.filterCondition[i].value);        
-        if(judge == 'none'){
-          filters.push(!filter)
-        }else{
-          filters.push(filter)
+        filter.push(this.filterCondition[i].value);
+        if (judge == "none") {
+          filters.push(!filter);
+        } else {
+          filters.push(filter);
         }
       }
       const id = this.layers[this.nowLayerIndex].id;

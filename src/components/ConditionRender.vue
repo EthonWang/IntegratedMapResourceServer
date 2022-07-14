@@ -1247,13 +1247,14 @@
             </el-input>
             <br />
             <el-table
+              ref="multiplePropTable"
               :data="propValueList"
               @selection-change="propFilterChange"
-              row-key="getRowKeys"
+              :row-key="getRowKey"
               :cell-style="{ textAlign: 'left' }"
               height="250"
             >
-              <el-table-column type="selection" width="50" :reserve-selection="true"> </el-table-column>
+              <el-table-column type="selection" width="50" > </el-table-column>
               <el-table-column :prop="propSelect" align="right">
               </el-table-column>
             </el-table>
@@ -1822,6 +1823,10 @@ export default {
       propSearch: "区",
       propNowPage: 1,
       propdisable: false,
+      //prop多选
+      propTableChecked : [], // 选中数据
+      multipleSelectionAll: new Map(), //所有选中的数据包含跨页数据      
+
 
       //表达式渲染
       formulaValue: "",
@@ -2118,6 +2123,23 @@ export default {
     handleCurrentChange(currentPage) {
       this.propNowPage = currentPage;
       this.propValueListInit();
+      this.$nextTick(() => {
+        // this.component.chartBind.alDeviceManage 是上次选中的数据
+        // 对当前页进行数据回显
+        console.log("multipleSelectionAll",this.multipleSelectionAll)
+          for(let [,value] of this.multipleSelectionAll) {
+            value.forEach(row=>{
+              this.propValueList.forEach(item => {
+                if( row.id == item.id ) 
+                  this.$refs.multiplePropTable.toggleRowSelection(item, true);
+              });
+            })
+          }
+          // 当前页选中数据存储在Map中
+          // this.multipleSelectionAll.set(this.propNowPage, this.tableChecked);
+          // 将其他页面选中数据存储在Map中
+          // if ( type == 'init') this.findOthertarget();
+      });    
     },
     //对zoom变化各行进行处理
     zoomOpen() {
@@ -2577,12 +2599,13 @@ export default {
     },
     propFilterChange(val) {
       this.propValueFilter[this.propEditIndex] = val;
+      this.multipleSelectionAll.set(this.propNowPage,val);
       console.log("select", val);
     },
     selectall(selection){
       console.log("selection:",selection)
     },
-    getRowKeys(row){
+    getRowKey(row){
       return row.id
     },
     //将选中的filter值更新到propValue中

@@ -365,7 +365,7 @@ export default {
         page: this.shpCurrentPage,
         shpPageSize: this.shpPageSize,
         searchText: this.shpSearchInput,
-        sortField: "uploadDate",
+        sortField: "createTime",
       })
           .then((res) => {
             console.log('shpDataList',res.data);
@@ -373,13 +373,13 @@ export default {
             this.shpTotalDataCount = res.data.data.totalElements;
           })
           .catch((error) => {
-            console.log(error);
+            console.log('shp失败',error);
           });
     },
     getDataSourceList(){
       requestApi.getDataSourceList()
           .then((res) => {
-            console.log('res:',res)
+            console.log('数据库源:',res)
             this.dataBaseList = res.data.data;
           })
           .catch((error) => {

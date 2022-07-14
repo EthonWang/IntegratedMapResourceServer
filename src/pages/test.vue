@@ -1215,7 +1215,7 @@ export default {
       let newSource = {
         sourceName: row.tableName,
         sourceType: "vector",
-        sourceTiles: ["http://172.21.212.63:8991/mvt/" + row.tableName + "/{z}/{x}/{y}.pbf"],
+        sourceTiles: [this.reqUrl +"/mvt/" + row.tableName + "/{z}/{x}/{y}.pbf"],
       }
       if (!Object.prototype.hasOwnProperty.call(this.sources, newSource.sourceName)) {
         this.sources[newSource.sourceName] = {

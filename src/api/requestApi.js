@@ -111,8 +111,14 @@ export default {
     createTileJson(data){
         return instance.post(Vue.prototype.reqUrl+"/createTileJson",data)
     },
+    createMbTilesJson(data){
+        return instance.post(Vue.prototype.reqUrl+"/createMbTilesJson",data)
+    },
     deleteTileJson(tileJsonId){
         return instance.get(Vue.prototype.reqUrl+"/deleteTileJson/"+tileJsonId+".json")
+    },
+    getTileJsonList(tileJsonType){
+        return instance.post(Vue.prototype.reqUrl+"/getTileJsonList/"+tileJsonType)
     },
 
     //瓦片缓存

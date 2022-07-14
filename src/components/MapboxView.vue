@@ -430,7 +430,7 @@ export default {
       //添加数据源
       map.addSource(newShpInfo.nameId, {
         type: "vector",
-        tiles: ["http://172.21.212.63:8991/mvt/" + newShpInfo.nameId + "/{z}/{x}/{y}.pbf"],
+        tiles: [this.reqUrl+"/mvt/" + newShpInfo.nameId + "/{z}/{x}/{y}.pbf"],
       })
 
       //添加layer
