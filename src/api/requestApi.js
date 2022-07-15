@@ -41,7 +41,13 @@ export default {
     },  
     getMaxMinAttrValue(data){
         return instance.post(Vue.prototype.reqUrl+"/shp/getMaxMinAttrValue", data)
-    },      
+    },  
+    getAttrValueMultiPg(ip,port,data){
+        return instance.post(Vue.prototype.reqUrl+"/shp/getAttrValueMultiPg/"+ip+"/"+port, data)
+    },  
+    getMaxMinAttrMultiPg(ip,port,data){
+        return instance.post(Vue.prototype.reqUrl+"/shp/getMaxMinAttrMultiPg/"+ip+"/"+port, data)
+    },          
     getShpListById(dataSourceId){
         return instance.get(Vue.prototype.reqUrl+"/getShpListById/"+dataSourceId)
     },  
@@ -111,9 +117,20 @@ export default {
     createTileJson(data){
         return instance.post(Vue.prototype.reqUrl+"/createTileJson",data)
     },
+    createMbTilesJson(data){
+        return instance.post(Vue.prototype.reqUrl+"/createMbTilesJson",data)
+    },
     deleteTileJson(tileJsonId){
         return instance.get(Vue.prototype.reqUrl+"/deleteTileJson/"+tileJsonId+".json")
-    }
+    },
+    getTileJsonList(tileJsonType){
+        return instance.post(Vue.prototype.reqUrl+"/getTileJsonList/"+tileJsonType)
+    },
+
+    //瓦片缓存
+    createTileCache(data){
+        return instance.post(Vue.prototype.reqUrl+"/createTileCache",data)
+    },
 
 
 }

@@ -9,6 +9,7 @@ export default{
     "scheme": "xyz", //OPTIONAL. Default: "xyz". Either "xyz" or "tms".
     "tilejson": "2.1.0", // REQUIRED 固定值
     "version": "1.0.0", //OPTIONAL 自定版本
+    "tileJsonType": "",
 
     "tiles": [], // REQUIRED
 
