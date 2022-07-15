@@ -17,7 +17,7 @@
         </el-upload>
         <br>
         <el-button size="mini" @click="helloTest()">测试</el-button>
-        <el-button slot="reference" size="mini" type="success" @click="dataBaseShow= true" >添加数据库源</el-button>
+        <!-- <el-button slot="reference" size="mini" type="success" @click="dataBaseShow= true" >添加数据库源</el-button>
         <el-dialog
           title="数据库源信息编辑"
           :visible.sync="dataBaseShow"
@@ -54,7 +54,7 @@
             <el-button @click="dataBaseShow = false">取 消</el-button>
             <el-button type="primary" @click="addDataSource">确 定</el-button>
           </span>
-        </el-dialog>  
+        </el-dialog>   -->
         <el-table
           :data="dataBaseList"
           stripe :row-style="{height:'10px',padding:'0'}"

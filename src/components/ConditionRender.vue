@@ -2442,24 +2442,46 @@ export default {
       this.$emit("callback", this.layoutOrpaint, this.attribute, value, parameters);
     },
     getDataRange() {
-      requestApi
-        .getMaxMinAttrValue({
-          attrName: this.dataSelect,
-          shpTableName: this.layer["source-layer"],
-        })
-        .then((res) => {
-          const value = res.data.data;
-          this.dataRange = {
-            min: parseFloat(value.min.toFixed(2)),
-            max: parseFloat(value.max.toFixed(2)),
-          };
-          this.dataValue[0].data = parseFloat(value.min);
-          this.dataValue[1].data = parseFloat(value.max);
-          console.log("datarange", this.dataRange);
-        })
-        .catch((err) => {
-          console.log("err", err);
-        });
+      if(this.layer.sourceType == "pgDefault"){
+        requestApi
+          .getMaxMinAttrValue({
+            attrName: this.dataSelect,
+            shpTableName: this.layer["source-layer"],
+          })
+          .then((res) => {
+            const value = res.data.data;
+            this.dataRange = {
+              min: parseFloat(value.min.toFixed(2)),
+              max: parseFloat(value.max.toFixed(2)),
+            };
+            this.dataValue[0].data = parseFloat(value.min);
+            this.dataValue[1].data = parseFloat(value.max);
+            console.log("datarange", this.dataRange);
+          })
+          .catch((err) => {
+            console.log("err", err);
+          });
+      }else if(this.layer.sourceType == "pgMulti"){
+        requestApi
+          .getMaxMinAttrMultiPg(this.layer.mutiPgInfo.ip,this.layer.mutiPgInfo.port,{
+            attrName: this.dataSelect,
+            shpTableName: this.layer["source-layer"],
+          })
+          .then((res) => {
+            const value = res.data.data;
+            this.dataRange = {
+              min: parseFloat(value.min.toFixed(2)),
+              max: parseFloat(value.max.toFixed(2)),
+            };
+            this.dataValue[0].data = parseFloat(value.min);
+            this.dataValue[1].data = parseFloat(value.max);
+            console.log("datarange", this.dataRange);
+          })
+          .catch((err) => {
+            console.log("err", err);
+          });        
+      }
+
     },
     dataEditDelete() {
       this.dataEditShow = false;
@@ -2497,24 +2519,46 @@ export default {
       console.log("propValue:", this.propValueFilter);
     },
     propValueListInit() {
-      requestApi
-        .getAttrValue({
-          aimAttrName: this.propSelect,
-          aimShpTableName: this.layer["source-layer"],
-          page: this.propNowPage,
-          pageSize: 10,
-          searchText: this.propSearch,
-          sort: "asc",
-        })
-        .then((res) => {
-          console.log("res", res);
-          this.propValueList = res.data.data.attrValue;
-          this.allpropValueListLength = res.data.data.featureCount;
-          console.log("propValueList", this.propValueList);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      if(this.layer.sourceType == "pgDefault"){
+        requestApi
+          .getAttrValue({
+            aimAttrName: this.propSelect,
+            aimShpTableName: this.layer["source-layer"],
+            page: this.propNowPage,
+            pageSize: 10,
+            searchText: this.propSearch,
+            sort: "asc",
+          })
+          .then((res) => {
+            console.log("res", res);
+            this.propValueList = res.data.data.attrValue;
+            this.allpropValueListLength = res.data.data.featureCount;
+            console.log("propValueList", this.propValueList);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }else if(this.layer.sourceType == "pgMulti"){
+        requestApi
+          .getAttrValueMultiPg(this.layer.mutiPgInfo.ip,this.layer.mutiPgInfo.port,{
+            aimAttrName: this.propSelect,
+            aimShpTableName: this.layer["source-layer"],
+            page: this.propNowPage,
+            pageSize: 10,
+            searchText: this.propSearch,
+            sort: "asc",
+          })
+          .then((res) => {
+            console.log("res", res);
+            this.propValueList = res.data.data.attrValue;
+            this.allpropValueListLength = res.data.data.featureCount;
+            console.log("propValueList", this.propValueList);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }        
+
     },
     propInsert() {
       this.propValue.push({ prop: "" });

@@ -41,7 +41,13 @@ export default {
     },  
     getMaxMinAttrValue(data){
         return instance.post(Vue.prototype.reqUrl+"/shp/getMaxMinAttrValue", data)
-    },      
+    },  
+    getAttrValueMultiPg(ip,port,data){
+        return instance.post(Vue.prototype.reqUrl+"/shp/getAttrValueMultiPg/"+ip+"/"+port, data)
+    },  
+    getMaxMinAttrMultiPg(ip,port,data){
+        return instance.post(Vue.prototype.reqUrl+"/shp/getMaxMinAttrMultiPg/"+ip+"/"+port, data)
+    },          
     getShpListById(dataSourceId){
         return instance.get(Vue.prototype.reqUrl+"/getShpListById/"+dataSourceId)
     },  
