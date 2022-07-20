@@ -1729,6 +1729,9 @@ export default {
         "text-halo-color": "掩膜颜色",
         "text-halo-width": "掩膜宽度",
         "text-halo-blur": "掩膜模糊",
+        "background-color": "背景色",
+        "background-opacity": "不透明度",
+        
         
       },
       numAttribute: [
@@ -1760,6 +1763,7 @@ export default {
         "text-rotate",
         "text-halo-width",
         "text-halo-blur",
+        "background-opacity"
 
       ],
       arrayAttribute: [
