@@ -91,7 +91,7 @@ export default {
       })
           .then((res) => {
             let data = res.data.data
-            console.log(res)
+            console.log("mapProjectData",res)
             this.mapProjectData = data.content
             this.mapProjectTotal = data.totalElements
           })
@@ -211,13 +211,16 @@ export default {
 
 .projectsBox {
   width: 80%;
+  height: calc(100vh - 340px);
   display: flex;
   justify-content: space-around;
   flex-wrap: wrap;
-  margin: 0px auto;
+  margin: 20px auto;
+  overflow-y: scroll;
 }
 
 .project-item {
+  max-height: 380px;
   width: 20%;
   min-width: 200px;
   max-width: 250px;

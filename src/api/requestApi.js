@@ -106,6 +106,9 @@ export default {
     copyMapProject(data){
         return instance.post(Vue.prototype.reqUrl+"/mapProject/copyMapProject",data)
     },
+    createMapImg(data){
+        return instance.post(Vue.prototype.reqUrl+"/mapProject/createMapImg",data)
+    },    
     addDataSource(data){
         return instance.post(Vue.prototype.reqUrl+"/addDataSource",data)
     },
@@ -126,6 +129,10 @@ export default {
     getTileJsonList(tileJsonType){
         return instance.post(Vue.prototype.reqUrl+"/getTileJsonList/"+tileJsonType)
     },
+    getStyleList(tileJsonId){
+        return instance.post(Vue.prototype.reqUrl+"/mapServer/getStyleList/"+tileJsonId)
+    },    
+    
 
     //瓦片缓存
     createTileCache(data){
