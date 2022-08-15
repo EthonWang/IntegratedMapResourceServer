@@ -63,10 +63,17 @@ export default {
     deleteSymbol(symbolId){
         return instance.get(Vue.prototype.reqUrl+"/symbol/deleteSymbolById", {params:{symbolId}})
     },
+
+
+    //字体
     getFontList(){
         return instance.get(Vue.prototype.reqUrl+"/getFontList")
     },    
 
+    //mbtiles
+    getMbtilesSourceList(){
+      return  instance.get(Vue.prototype.reqUrl+"/getMbtilesList")
+    },
 
     //Project  del
     // getProjectList(data){
