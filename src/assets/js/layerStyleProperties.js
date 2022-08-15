@@ -141,6 +141,18 @@ export default {
             "visibility": "visible",
         }
 
+    },
+    heatmap:{
+        "paint":{
+            "heatmap-color": ["interpolate",["linear"],["heatmap-density"],0,"rgba(0, 0, 255, 0)",0.1,"royalblue",0.3,"cyan",0.5,"lime",0.7,"yellow",1,"red"],
+            "heatmap-intensity": 1,
+            "heatmap-opacity": 1,
+            "heatmap-radius": 1,
+            "heatmap-weight": 1
+        },
+        "layout":{
+            "visibility": "visible", //One of "visible", "none"
+        }
     }          
 
 }

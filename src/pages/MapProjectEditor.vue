@@ -80,8 +80,8 @@
                       :label="item.name"
                       :value="item.id"
                     >
-                    </el-option> 
-                  </el-select>&nbsp;
+                    </el-option> </el-select
+                  >&nbsp;
                   <el-button
                     type="success"
                     size="mini"
@@ -144,13 +144,12 @@
                     </span>
                   </el-dialog>
                 </el-row>
-                <br>
+                <br />
                 <el-row type="flex" align="middle">
                   <h4>特定样式:&nbsp;</h4>
                   <el-select
                     v-model="mbTileStyleSelect"
                     placeholder="请选择"
-                    :disabled="!isSource"
                     style="width: 73%"
                     @change="mbTileStyleChange($event)"
                   >
@@ -160,12 +159,62 @@
                       :label="item.name"
                       :value="item.id"
                     >
-                    </el-option> 
-                  </el-select>&nbsp;
-                  <el-switch
+                    </el-option> </el-select
+                  >&nbsp;
+                  <el-button
+                    type="success"
+                    size="mini"
+                    circle
+                    icon="el-icon-plus"
+                    @click="mbTileStyleEditShow = true"
+                  ></el-button>
+                  <el-dialog
+                    title="mbTile地图样式信息添加"
+                    :visible.sync="mbTileStyleEditShow"
+                    width="30%"
+                    :modal="false"
+                    center
+                  >
+                    <el-form
+                      label-position="left"
+                      label-width="100px"
+                      :model="mbTileStyleInfo"
+                      id="myForm"
+                      enctype="multipart/form-data"
+                      name="fileinfo"
+                      action=""
+                      target="uploadFrame"
+                    >
+                      <el-form-item
+                        label="文件:"
+                        :rules="{
+                          required: true,
+                          message: '请选择文件',
+                          trigger: 'blur',
+                        }"
+                      >
+                        <input type="file" ref="mbStyleFile" />
+                      </el-form-item>
+                    </el-form>
+                    <iframe
+                      id="uploadFrame"
+                      name="uploadFrame"
+                      style="display: none"
+                    ></iframe>
+                    <span slot="footer" class="dialog-footer">
+                      <el-button @click="mbTileStyleEditShow = false"
+                        >取 消</el-button
+                      >
+                      <el-button type="primary" @click="addMbStyleData"
+                        >确 定</el-button
+                      >
+                    </span>
+                  </el-dialog>                  
+                  <!-- <el-switch
                     v-model="isSource"
-                    @change="useMbtileStyle($event)">
-                  </el-switch>
+                    @change="useMbtileStyle($event)"
+                  >
+                  </el-switch> -->
                 </el-row>
                 <el-table v-if="!isSource" :data="dataLayers" height="313">
                   <el-table-column
@@ -184,8 +233,8 @@
                       </el-button>
                     </template>
                   </el-table-column>
-                </el-table>     
-                <el-table v-if="isSource" :data="styleLayers" height="313">
+                </el-table>
+                <!-- <el-table v-if="isSource" :data="styleLayers" height="313">
                   <el-table-column
                     property="id"
                     width="170"
@@ -202,7 +251,7 @@
                       </el-button>
                     </template>
                   </el-table-column>
-                </el-table>                                
+                </el-table> -->
               </el-tab-pane>
             </el-tabs>
 
@@ -215,9 +264,13 @@
             >
           </el-popover>
         </div>
-        <el-button type="success" size="mini" slot="reference" @click="saveMap"
-          >保存地图</el-button
-        >
+        <!-- <el-button-group size="mini"> -->
+          <el-button type="success" size="mini" @click="saveMap"
+            >保存</el-button
+          >
+          <!-- <el-button type="success" size="mini">暂存</el-button>
+        </el-button-group> -->
+
         <el-popover
           placement="right"
           title="链接地址"
@@ -286,7 +339,7 @@
                 type="success"
                 @click="handleLayerEdit(scope.$index, scope.row)"
                 icon="el-icon-edit"
-                circle
+                circle title="编辑图层"
                 style="margin-left: 5px"
               >
               </el-button>
@@ -295,15 +348,86 @@
                 type="danger"
                 @click="handleLayerDelete(scope.$index, scope.row)"
                 icon="el-icon-delete"
-                circle
+                circle title="删除图层"
                 style="margin-left: 5px"
               >
               </el-button>
+              <!-- <el-popover placement="right" width="250" trigger="click">
+                <el-row type="flex" justify="end">
+                  <el-button type="primary" size="mini" @click="returnOriginStyle">返回原样式</el-button>
+                </el-row>
+                <el-table :data="typeStyleList[scope.row.type]" height="313">
+                  <el-table-column
+                    property="description"
+                    width="170"
+                    show-overflow-tooltip
+                    :label="scope.row.type + '样式'"
+                  ></el-table-column>
+                  <el-table-column width="80" label="操作">
+                    <template slot-scope="scope">
+                      <el-button
+                        size="mini"
+                        type="primary"
+                        @click="addTypeStyle(scope.row)"
+                        >应用
+                      </el-button>
+                    </template>
+                  </el-table-column>
+                </el-table>                -->
+                <el-button
+                  v-if="scope.row.type != 'background'"
+                  size="mini"
+                  slot="reference"
+                  type="primary"
+                  @click="getTypeStyleList(scope.$index, scope.row)"
+                  icon="el-icon-s-grid"
+                  circle
+                  :title="'应用' + scope.row['type'] + '样式'"
+                  style="margin-left: 5px"
+                >
+                </el-button>
+              <!-- </el-popover> -->
             </template>
           </el-table-column>
         </el-table>
       </div>
       <el-button @click="test1">test</el-button>
+    </div>
+    <div v-if="stylesBoxShow" class="stylesBox">
+      <el-row type="flex" align="middle" class="stylesBoxTitle">
+        <h4 style="margin-left:10px">可视化模板</h4>&nbsp;
+      <el-popconfirm
+        title="确认返回原样式吗？"
+        @confirm="returnOriginStyle"
+      >
+        <i slot="reference" class="el-icon-refresh-left iconBtn" title="返回原样式"></i>
+      </el-popconfirm>        
+        <i class="el-icon-close close-button" @click="stylesBoxShow = false"></i>
+      </el-row>
+      <el-collapse accordion value="first">
+        <el-collapse-item name="first">
+          <template slot="title">
+            <h4 style="margin-left:10px">散点图</h4>&nbsp;
+            <i class="el-icon-circle-plus iconBtn"></i>
+          </template>
+          <el-row type="flex" justify="start" style="flex-wrap:wrap">
+            <el-card v-for="(item,index) in typeStyleList[styleTypeSelect]" :key="index" 
+                     class="templeCard cursor" shadow="hover" @click.native="addTypeStyle(item)">
+              <el-image
+                style="width: 100%; height: 110px; border-bottom:1px solid #dcdfe6"
+                :src="imgDefault"
+                fit="contain"></el-image>
+                <el-row type="flex" align="middle" justify="center">
+                  <span>{{item.description}}</span>
+                </el-row>
+            </el-card>
+          </el-row>
+        </el-collapse-item>
+        <el-collapse-item title="反馈 Feedback">
+          <div>控制反馈：通过界面样式和交互动效让用户可以清晰的感知自己的操作；</div>
+          <div>页面反馈：操作后，通过页面元素的变化清晰地展现当前状态。</div>
+        </el-collapse-item>
+      </el-collapse>      
     </div>
 
     <div
@@ -314,7 +438,8 @@
         editorShow == 'fillEditorShow' ||
         editorShow == 'symbolEditorShow' ||
         editorShow == 'fillExtrusionEditorShow' ||
-        editorShow == 'backgroundEditorShow'
+        editorShow == 'backgroundEditorShow' ||
+        editorShow == 'heatMapEditorShow'
       "
     >
       <div
@@ -2454,8 +2579,7 @@
                 @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
-          </el-tabs>
-
+          </el-tabs>       
           <el-tabs
             class="symbolBox"
             :before-leave="leaveTab"
@@ -3495,6 +3619,211 @@
               <el-divider></el-divider>
             </el-tab-pane>
           </el-tabs>
+          <!-- 热力图 -->
+          <el-tabs
+            :before-leave="leaveTab"
+            v-if="editorShow == 'heatMapEditorShow'"
+            type="border-card"
+            value="first"
+            tab-position="left"
+          >
+            <!-- <el-tab-pane label="颜色" name="first">
+              <h3>热力图颜色渲染</h3>
+              &nbsp;
+              <span v-if="!menuButtonShowList['fill-extrusion-color']">{{
+                menuShowList["fill-extrusion-color"]
+              }}</span>
+              <el-row
+                v-if="menuButtonShowList['fill-extrusion-color']"
+                style="display: flex; margin-top: 10px"
+              >
+                <el-color-picker
+                  v-model="layers[nowLayerIndex].paint['fill-extrusion-color']"
+                  @change="
+                    handlePaintChange(
+                      layers[nowLayerIndex]['id'],
+                      'fill-extrusion-color',
+                      layers[nowLayerIndex].paint['fill-extrusion-color']
+                    )
+                  "
+                  :predefine="predefineColors"
+                >
+                </el-color-picker>
+                <el-input
+                  v-model="layers[nowLayerIndex].paint['fill-extrusion-color']"
+                  @change="
+                    handlePaintChange(
+                      layers[nowLayerIndex]['id'],
+                      'fill-extrusion-color',
+                      layers[nowLayerIndex].paint['fill-extrusion-color']
+                    )
+                  "
+                  placeholder="something"
+                ></el-input>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender
+                :layerSelect="layers[nowLayerIndex]"
+                tab="fill-extrusion-color"
+                @callback="callback"
+              ></ConditionRender>
+            </el-tab-pane> -->
+            <el-tab-pane label="不透明度" name="second">
+              <h3>不透明度</h3>
+              &nbsp;
+              <span v-if="!menuButtonShowList['heatmap-opacity']">{{
+                menuShowList["heatmap-opacity"]
+              }}</span>
+              <el-row
+                v-if="menuButtonShowList['heatmap-opacity']"
+                style="margin-top: 10px"
+              >
+                <el-slider
+                  v-model="
+                    layers[nowLayerIndex].paint['heatmap-opacity']
+                  "
+                  :min="0"
+                  :max="1"
+                  :marks="{ 0: '0', 0.5: '0.5', 1: '1' }"
+                  @change="
+                    handlePaintChange(
+                      layers[nowLayerIndex]['id'],
+                      'heatmap-opacity',
+                      layers[nowLayerIndex].paint['heatmap-opacity']
+                    )
+                  "
+                  :step="0.1"
+                >
+                </el-slider>
+                <br />
+                <el-input-number
+                  v-model="
+                    layers[nowLayerIndex].paint['heatmap-opacity']
+                  "
+                  @change="
+                    handlePaintChange(
+                      layers[nowLayerIndex]['id'],
+                      'heatmap-opacity',
+                      layers[nowLayerIndex].paint['heatmap-opacity']
+                    )
+                  "
+                  :min="0"
+                  :max="1"
+                  :step="0.1"
+                  size="medium"
+                  label="描述文字"
+                >
+                </el-input-number>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender
+                :layerSelect="layers[nowLayerIndex]"
+                tab="heatmap-opacity"
+                @callback="callback"
+              ></ConditionRender>
+            </el-tab-pane>
+            <el-tab-pane label="半径" name="third">
+              <h3>半径</h3>
+              &nbsp;
+              <span v-if="!menuButtonShowList['heatmap-radius']">{{
+                menuShowList["heatmap-radius"]
+              }}</span>
+              <el-row
+                v-if="menuButtonShowList['heatmap-radius']"
+                style="display: flex; margin-top: 10px"
+              >
+                <el-input-number
+                  v-model="layers[nowLayerIndex].paint['heatmap-radius']"
+                  @change="
+                    handlePaintChange(
+                      layers[nowLayerIndex]['id'],
+                      'heatmap-radius',
+                      layers[nowLayerIndex].paint['heatmap-radius']
+                    )
+                  "
+                  :min="0"
+                  :max="99999"
+                  size="medium"
+                  label="描述文字"
+                >
+                </el-input-number>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender
+                :layerSelect="layers[nowLayerIndex]"
+                tab="heatmap-radius"
+                @callback="callback"
+              ></ConditionRender>
+            </el-tab-pane>
+            <el-tab-pane label="权重" name="forth">
+              <h3>权重</h3>
+              &nbsp;
+              <br />
+              <span v-if="!menuButtonShowList['heatmap-weight']">{{
+                menuShowList["heatmap-weight"]
+              }}</span>
+              <el-row
+                v-if="menuButtonShowList['heatmap-weight']"
+                style="display: flex; margin-top: 10px"
+              >
+                <el-input-number
+                  v-model="layers[nowLayerIndex].paint['heatmap-weight']"
+                  @change="
+                    handlePaintChange(
+                      layers[nowLayerIndex]['id'],
+                      'heatmap-weight',
+                      layers[nowLayerIndex].paint['heatmap-weight']
+                    )
+                  "
+                  :min="0"
+                  :max="99999"
+                  size="medium"
+                  label="描述文字"
+                >
+                </el-input-number>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender
+                :layerSelect="layers[nowLayerIndex]"
+                tab="heatmap-weight"
+                @callback="callback"
+              ></ConditionRender>
+            </el-tab-pane>
+            <el-tab-pane label="密度" name="fifth">
+              <h3>密度</h3>
+              &nbsp;
+              <br />
+              <span v-if="!menuButtonShowList['heatmap-intensity']">{{
+                menuShowList["heatmap-intensity"]
+              }}</span>
+              <el-row
+                v-if="menuButtonShowList['heatmap-intensity']"
+                style="display: flex; margin-top: 10px"
+              >
+                <el-input-number
+                  v-model="layers[nowLayerIndex].paint['heatmap-intensity']"
+                  @change="
+                    handlePaintChange(
+                      layers[nowLayerIndex]['id'],
+                      'heatmap-intensity',
+                      layers[nowLayerIndex].paint['heatmap-intensity']
+                    )
+                  "
+                  :min="0"
+                  :max="99999"
+                  size="medium"
+                  label="描述文字"
+                >
+                </el-input-number>
+              </el-row>
+              <el-divider></el-divider>
+              <ConditionRender
+                :layerSelect="layers[nowLayerIndex]"
+                tab="heatmap-intensity"
+                @callback="callback"
+              ></ConditionRender>
+            </el-tab-pane>            
+          </el-tabs>   
         </el-tab-pane>
 
         <el-tab-pane
@@ -3530,6 +3859,7 @@
                       label: '三维填充(fill-extrusion)',
                     },
                     { value: 'background', label: '背景(background)' },
+                    { value: 'heatmap', label: '热力图(heatmap)' },
                   ]"
                   :key="item.value"
                   :label="item.label"
@@ -3541,7 +3871,7 @@
           </el-form>
           <el-divider></el-divider>
           <el-row type="flex" justify="space-between" align="middle">
-            <h4>过滤条件配置</h4>
+            <h4>过滤条件配置</h4>&nbsp;
             <el-select v-model="filterWay" placeholder="请选择" size="small">
               <el-option
                 v-for="item in [
@@ -3710,7 +4040,7 @@
     <div class="rightMap">
       <div id="map" class="mapStyle"></div>
     </div>
-    <div
+    <!-- <div
       style="
         position: absolute;
         top: 300px;
@@ -3721,7 +4051,7 @@
       "
     >
       <el-image :src="canvasSrc"></el-image>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -3732,6 +4062,7 @@ import fileApi from "../api/fileApi";
 import layerStyleProperties from "../assets/js/layerStyleProperties";
 import initTileJson from "../assets/js/initTileJson";
 import layerStyle from "../assets/js/layerStyleProperties";
+// import colorFormat from "../assets/js/colorFormat.js";
 // import myConfig from "../config";
 
 import Sortable from "sortablejs";
@@ -3745,6 +4076,8 @@ export default {
   components: { ConditionRender },
   data() {
     return {
+      imgDefault: require("../assets/imgs/map-icon.png"),
+
       //添加shp数据时列表
       shpTableData: [],
       multiShpTable: [],
@@ -3759,25 +4092,35 @@ export default {
       publishLink: "",
       dataLayers: [],
       mutiPgInfo: "",
+
       //mbtile
       mbTileJsonList: [],
       mbTileSelect: "", //储存所选mbTile的id数据
       mbTileSelectIndex: 0, //  记录选择的数据下标
-      mbTileJson: {},      
+      mbTileJson: {},
       mbTileEditShow: false,
-      mbTileEditInfo: { mbTilesJsonFile: null },  //作为对象，为之后上传文件加其余字段做准备
+      mbTileEditInfo: { mbTilesJsonFile: null }, //作为对象，为之后上传文件加其余字段做准备
       //mbTile样式功能
-      isSource: false,   //初始mbtile默认添加的是vector_layer数据,false表示为添加style样式
-      mbTileStyleSelect: "",  //储存所选的mbtile的样式id
+      isSource: false, //初始mbtile默认添加的是vector_layer数据,false表示为添加style样式
+      mbTileStyleSelect: "", //储存所选的mbtile的样式id
       mbTileStyleList: [],
       mbTileStyleJson: {},
       mbTileStyleSelectIndex: 0, //  记录选择的数据下标
       styleLayers: [],
+      mbTileStyleEditShow: false,
+      mbTileStyleInfo:{mapStyleFile : null,tileJsonId:''},
 
       //左侧shp图层树
       layersNameObject: {}, //检测重复  后端字段为layerTree
       layersName: [], //加载的图层id集合，用于展示图层按index的排列
       sourceNameObject: {}, //检测source重复
+
+      //类型样式框
+      stylesBoxShow: false,
+      styleTypeSelect: "",
+      //类型样式列表
+      typeStyleList: {'circle':[],'line':[],'fill':[],'fill-extrusion':[]},
+      originStyle: [],  //图层初始样式，用于应用类型样式后还原样式，注意图层顺序改变时及时更改
 
       //mapbox地图
       mapProjectInfo: {},
@@ -3790,7 +4133,7 @@ export default {
       sources: {},
       layers: [],
       nowLayerIndex: 0,
-      canvasSrc: "",  //画布转换为图片的地址
+      canvasSrc: "", //画布转换为图片的地址
 
       //图标图层样式
       textField: "",
@@ -3821,7 +4164,8 @@ export default {
 
       //过滤条件配置
       filterWay: "all",
-      filterCondition: [{ option: "", type: "==", value: 0 }],
+      // filterCondition: [{ option: "", type: "==", value: 0 }],
+      filterCondition: [],
       filterOptions: [],
       filterOptionSelectList: [],
       filterTypes: [
@@ -3902,7 +4246,7 @@ export default {
     });
     this.mapProjectId = this.$route.params.mapProjectId;
     this.getMapProjectInfo();
-    this.getDataSourceList();
+    this.getDataSourceList();  
 
     //layer拖动排序
     this.initSort();
@@ -3950,13 +4294,19 @@ export default {
           this.layersNameObject = this.mapProjectInfo.layerTree;
           this.createEmptyMap();
           this.initMapWithData();
-          for (const i in this.layers) {
-            this.layersName.push(this.layers[i].id);
+          for (const item of this.layers) {
+            this.layersName.push(item.id);
+            if(item.type != "background"){
+              this.originStyle.push({
+                "paint":item['paint'],
+                "layout":item['layout']
+              })
+            }          
           }
         })
         .catch((error) => {
           console.log(error);
-        });
+        });    
     },
     getDataSourceList() {
       requestApi
@@ -3975,7 +4325,7 @@ export default {
         "pk.eyJ1Ijoid3lqcSIsImEiOiJjbDBnZDdwajUxMXRzM2htdWxubDh1MzJrIn0.2e2_rdU2nOUvtwltBIZtZg";
       map = new mapboxgl.Map({
         container: "map",
-        preserveDrawingBuffer: true,    //为true，则可以使用map.getCanvas().toDataURL()转为PNG
+        preserveDrawingBuffer: true, //为true，则可以使用map.getCanvas().toDataURL()转为PNG
       });
 
       // 添加比例尺
@@ -4063,8 +4413,7 @@ export default {
           container.appendChild(item).className = "item";
           item.appendChild(colorBox).className = "colorBox";
           item.appendChild(item_name).className = "item_name";
-          item_name.innerHTML = this.layers[index].showName;    //显示的是showName
-
+          item_name.innerHTML = this.layers[index].showName; //显示的是showName
 
           //根据index获取相关图层信息
           const color_name = feature.layer.type + "-" + "color";
@@ -4132,7 +4481,6 @@ export default {
     saveMap() {
       //现将画布内容转为png图片当做工程封面
       this.canvasSrc = map.getCanvas().toDataURL("image/png");
-      console.log("canvasSrc", this.canvasSrc);      
       this.$confirm("是否保存地图?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -4153,17 +4501,15 @@ export default {
           // this.mapProjectInfo.layers = {layers: this.layers}
           this.mapProjectInfo.layers = this.layers;
           this.mapProjectInfo.layerTree = this.layersNameObject;
-          this.mapProjectInfo.canvasSrc = this.canvasSrc;
           // this.mapProjectInfo.glyphs = this.reqUrl+"/store/fonts/{fontstack}/{range}.pbf";
           // this.mapProjectInfo.sprite = this.reqUrl+"/store/sprites/mpx_sprite/sprite";
           //保存截图到工程字段
           requestApi
             .createMapImg({
-              imgUrl:this.canvasSrc,
-              mapProjectId:this.mapProjectId
+              imgUrl: this.canvasSrc,
+              mapProjectId: this.mapProjectId,
             })
-            .then(() => {
-            })
+            .then(() => {})
             .catch((error) => {
               console.log(error);
             });
@@ -4192,6 +4538,7 @@ export default {
         sourceType: "pgMulti", //记录数据来源类型，用于区别mbTlie的添加和删除
         show: true,
         originName: "background",
+        showName: "背景", //用于展示图层名字
         shpAttribute: "",
         attrValueSet: {},
         attrShowList: {},
@@ -4221,13 +4568,14 @@ export default {
       } else {
         this.layersNameObject["background"] += 1;
         backLayer.id = "背景" + this.layersNameObject["background"];
+        backLayer.showName = "背景" + this.layersNameObject["background"];
       }
       this.layers.push(backLayer);
       this.layersName.push(backLayer.id);
-      if(!index){
-        this.addLayerToMap(backLayer)   //没有图层直接按默认添加
-      }else{
-        map.addLayer(backLayer, this.layers[index - 1].id);   //有图层则背景添加在最底层
+      if (!index) {
+        this.addLayerToMap(backLayer); //没有图层直接按默认添加
+      } else {
+        map.addLayer(backLayer, this.layers[index - 1].id); //有图层则背景添加在最底层
       }
     },
 
@@ -4247,7 +4595,7 @@ export default {
           console.log(error);
         });
       requestApi
-        .getStyleList(this.mbTileSelect)
+        .getStyleListById(this.mbTileSelect)
         .then((res) => {
           this.mbTileStyleList = res.data.data;
           console.log("mbTileStyleList", this.mbTileStyleList);
@@ -4286,19 +4634,44 @@ export default {
       formData.append("mbTilesJsonFile", file);
       // formData.append("mbTilesJsonName", this.mbTileEditInfo.mbTilesJsonName); //暂时不用上传name
       console.log("表单信息：", this.mbTileEditInfo);
-      this.onUpload(formData);
+      this.onUpload(true,formData);
       this.mbTileEditShow = false;
     },
+    addMbStyleData() {
+      // 阻止发生默认行为
+      let formData = new FormData();
+      //input的type为file,输入的文件在files属性里
+      let file = this.$refs.mbStyleFile.files[0];
+      this.mbTileStyleInfo.mapStyleFile = file;
+      formData.append("mapStyleFile", file);
+      formData.append("tileJsonId", this.mbTileSelect); 
+      console.log("表单信息：", this.mbTileStyleInfo);
+      this.onUpload(false,formData);
+      this.mbTileStyleEditShow = false;
+    },
+
     // 上传文件
-    onUpload(formData) {
-      fileApi
-        .postUpload(formData)
-        .then(() => {
-          this.$message.success("mbTile数据上传成功！");
-        })
-        .catch((e) => {
-          this.$message.error(e.message);
-        });
+    onUpload(status,formData) {
+      if(status){
+        fileApi
+          .mbTileUpload(formData)
+          .then(() => {
+            this.$message.success("Mbtile数据上传成功！");
+          })
+          .catch((e) => {
+            this.$message.error(e.message);
+          });
+      }else{
+        fileApi
+          .mbStyleUpload(formData)
+          .then(() => {
+            this.$message.success("style数据上传成功！");
+          })
+          .catch((e) => {
+            this.$message.error(e.message);
+          });
+      }
+
     },
     PgBaseChange(val) {
       //val表示选择的value值
@@ -4331,7 +4704,8 @@ export default {
       this.mbTileJson = this.mbTileJsonList[index];
       this.dataLayers = this.mbTileJson.vector_layers;
     },
-    mbTileStyleChange(val){
+    //获取选定的styleJson和对应layers
+    mbTileStyleChange(val) {
       let index = 0;
       this.mbTileStyleList.forEach((e, ind) => {
         if (e.id == val) {
@@ -4341,13 +4715,14 @@ export default {
       });
       this.mbTileStyleJson = this.mbTileStyleList[index];
       this.styleLayers = this.mbTileStyleJson.layers;
-    },   
-    useMbtileStyle(val){
-      if(val){
-        this.styleLayers = this.mbTileStyleJson[0].layers;
-        console.log("stylel了")
-      }
-    }, 
+    },
+    //用于Mbtile的source和layer的json切换
+    // useMbtileStyle(val) {
+    //   if (val) {
+    //     this.styleLayers = this.mbTileStyleJson[0].layers;
+    //     console.log("stylel了");
+    //   }
+    // },
     dataBaseClick(tab) {
       this.dataBaseSelect = tab.name == "PG" ? "defaultPG" : tab.name;
       console.log("dataBaseSelect", this.dataBaseSelect);
@@ -4373,7 +4748,9 @@ export default {
         onEnd({ newIndex, oldIndex }) {
           _this.handleCloseEditBoard();
           const currRow = _this.layers.splice(oldIndex, 1)[0];
+          const currRow2 = _this.originStyle.splice(oldIndex, 1)[0];
           _this.layers.splice(newIndex, 0, currRow);
+          _this.originStyle.splice(newIndex, 0, currRow2);  //在保持原来样式的同时更改顺序
           _this.handleShowSortChange(newIndex);
         },
       });
@@ -4390,8 +4767,9 @@ export default {
       const stylejson2 = map.getStyle();
       console.log("stylejson2", stylejson2);
       //更改顺序后更新
-      for (const i in this.layers) {
-        this.layersName[i] = this.layers[i].id;
+      this.layersName = [];
+      for (const item of this.layers) {
+        this.layersName.push(item.id);       
       }
     },
 
@@ -4551,6 +4929,8 @@ export default {
           this.addMbTileShp(index, row);
           break;
       }
+      this.editorShow = "";
+
     },
     async addPgDefaultShp(index, row) {
       //判断该shp是否已添加
@@ -4610,8 +4990,8 @@ export default {
         index: index,
         sourceType: "pgDefault", //记录数据来源类型，用于区别mbTlie的添加和删除
         show: true,
-        originName: row.originName,   
-        showName: row.originName,   //用于展示图层名字
+        originName: row.originName,
+        showName: row.originName, //用于展示图层名字
         shpAttribute: row.attrInfo,
         attrValueSet: {},
         attrShowList: {},
@@ -4644,11 +5024,15 @@ export default {
         this.layersNameObject[newLayer.originName] = 1;
       } else {
         this.layersNameObject[newLayer.originName] += 1;
-        newLayer.id =
-          row.originName + this.layersNameObject[newLayer.originName];
+        newLayer.id = row.originName + this.layersNameObject[newLayer.originName];
+        newLayer.showName = row.originName + this.layersNameObject[newLayer.originName];
       }
       this.layers.unshift(newLayer);
       this.layersName.unshift(newLayer.id);
+      this.originStyle.unshift({
+        "paint":newLayer.paint,
+        "layout":newLayer.layout
+      });
       this.addLayerToMap(newLayer);
     },
     async addPgMultiShp(index, row) {
@@ -4714,7 +5098,7 @@ export default {
         sourceType: "pgMulti", //记录数据来源类型，用于区别mbTlie的添加和删除
         show: true,
         originName: row.originName,
-        showName: row.originName,   //用于展示图层名字
+        showName: row.originName, //用于展示图层名字
         shpAttribute: row.attrInfo,
         mutiPgInfo: this.mutiPgInfo, //用来记录多源pg信息
         attrValueSet: {},
@@ -4750,9 +5134,15 @@ export default {
         this.layersNameObject[newLayer.originName] += 1;
         newLayer.id =
           row.originName + this.layersNameObject[newLayer.originName];
+        newLayer.showName =
+          row.originName + this.layersNameObject[newLayer.originName];
       }
       this.layers.unshift(newLayer);
       this.layersName.unshift(newLayer.id);
+      this.originStyle.unshift({
+        "paint":newLayer.paint,
+        "layout":newLayer.layout
+      });      
       this.addLayerToMap(newLayer);
     },
     async addMbTileShp(index, row) {
@@ -4801,7 +5191,7 @@ export default {
         sourceType: "mbTile", //记录数据来源类型，用于区别mbTlie的添加和删除
         show: true,
         originName: row.id,
-        showName: row.originName,   //用于展示图层名字
+        showName: row.id, //用于展示图层名字
         shpAttribute: row.attrInfo,
         attrValueSet: {},
         attrShowList: {},
@@ -4835,9 +5225,14 @@ export default {
       } else {
         this.layersNameObject[newLayer.originName] += 1;
         newLayer.id = row.id + this.layersNameObject[newLayer.originName];
+        newLayer.showName = row.id + this.layersNameObject[newLayer.originName];
       }
       this.layers.unshift(newLayer);
       this.layersName.unshift(newLayer.id);
+      this.originStyle.unshift({
+        "paint":newLayer.paint,
+        "layout":newLayer.layout
+      });      
       this.addLayerToMap(newLayer);
     },
 
@@ -4921,16 +5316,73 @@ export default {
           this.editorShow = "circleEditorShow";
         } else if (row.type === "fill-extrusion") {
           this.editorShow = "fillExtrusionEditorShow";
-        } else if (row.type === "symbolEditorShow") {
+        } else if (row.type === "symbol") {
           this.editorShow = "symbolEditorShow";
           this.getSymbolList();
           this.getFontList();
+        } else if(row.type === "heatmap"){
+          this.editorShow = "heatMapEditorShow";
         } else {
           this.editorShow = "backgroundEditorShow";
         }
         this.menuButtonShowList = [];
       });
-      this.filterOptions = this.layers[this.nowLayerIndex]["shpAttribute"];
+      this.filterOptions = this.layers[this.nowLayerIndex]["shpAttribute"] != "undefined" ? this.layers[this.nowLayerIndex]["shpAttribute"] : [];
+      //filter赋值
+      if(JSON.stringify(this.layers[this.nowLayerIndex].filterValueSet) != '{}'){
+        this.filterCondition = this.layers[this.nowLayerIndex].filterValueSet["filterCondition"]; 
+        this.filterValue = this.layers[this.nowLayerIndex].filterValueSet["filterValue"]; 
+        this.filterOptionSelectList = this.layers[this.nowLayerIndex].filterValueSet["filterOptionSelectList"]; 
+        this.filterValueSelect = this.layers[this.nowLayerIndex].filterValueSet["filterValueSelect"];       
+      }
+    },
+
+    //回撤到原来样式
+    returnOriginStyle(){
+      const style = this.originStyle[this.nowLayerIndex];
+      this.addTypeStyle(style);
+    },
+    //获取地图的类型样式列表
+    getTypeStyleList(index,row){
+      this.nowLayerIndex = index;
+      this.styleTypeSelect = row.type;
+      this.stylesBoxShow = !this.stylesBoxShow;
+      const type = row.type;
+      requestApi.getTypeStyleList(type)
+        .then((res)=>{
+          if(res.data.code == 0){
+            this.typeStyleList[type] = res.data.data;
+            console.log('typeStyleList',this.typeStyleList); 
+          }else{
+            console.log(res.data.msg)
+          }
+        })
+        .catch((err)=>{
+          console.log(err);
+        })
+      
+    },
+    //添加对应的类型样式
+    addTypeStyle(row){
+      //先改参数再更新图层，打开图层编辑框
+      console.log("apply",row, "style to", this.layers[this.nowLayerIndex].originName);
+      let aimLayer = this.layers[this.nowLayerIndex];
+      aimLayer.paint = row.paint;
+      // aimLayer.paint = {};
+      aimLayer.layout = row.layout;
+      // aimLayer.layout = {
+      //   "icon-image": "cat",
+      //   "icon-size": 0.25,
+      // };
+      console.log("应用完图层样式", aimLayer);
+      this.handleRemoveLayer(aimLayer.id);
+      if (this.nowLayerIndex === 0) {
+        this.addLayerToMap(aimLayer);
+      } else {
+        map.addLayer(aimLayer, this.layers[this.nowLayerIndex - 1].id);
+      }
+      //更新图层编辑框样式
+      this.handleLayerEdit(this.nowLayerIndex, aimLayer);
     },
 
     handleCloseEditBoard() {
@@ -4945,6 +5397,7 @@ export default {
       let layerid = row.id;
       this.layers.splice(index, 1);
       this.layersName.splice(index, 1);
+      this.originStyle.splice(index, 1);
       this.layersNameObject[layerOriginName] -= 1;
       this.handleRemoveLayer(layerid);
 
@@ -5113,6 +5566,7 @@ export default {
 
     handleLayerClick() {
       console.log("layers:", this.layers);
+      console.log("layersName",this.layersName);
       // const source = map.getSource(this.layers[this.nowLayerIndex]["source"]);
       // console.log("source:", source);
       const style = map.getStyle();
@@ -5172,6 +5626,8 @@ export default {
             _this.editorShow = "symbolEditorShow";
             _this.getSymbolList();
             _this.getFontList();
+          } else if(feature.layer.type === "heatmap"){
+            _this.editorShow = "heatMapEditorShow";
           } else {
             _this.editorShow = "backgroundEditorShow";
           }
@@ -5273,6 +5729,7 @@ export default {
       if (this.filterCondition.length < 1) {
         const id = this.layers[this.nowLayerIndex].id;
         this.setFilterToMap(id, null);
+        this.layers[this.nowLayerIndex]['filter'] = ['all'];
       }
     },
     handleFilter(row) {
@@ -5280,8 +5737,6 @@ export default {
         row[this.filterOptionSelectList[this.nowFilterIndex]];
     },
     filterConfirm() {
-      console.log("筛选条件：", this.filterCondition);
-      console.log("筛选条件1：", this.filterWay);
       let judge = this.filterWay;
       const filters = [judge];
       for (let i = 0; i < this.filterCondition.length; i++) {
@@ -5296,8 +5751,11 @@ export default {
         }
       }
       const id = this.layers[this.nowLayerIndex].id;
-      console.log("condition", id, filters);
+      console.log("筛选结果", id, filters);
+      //更改添加上的filter样式
       this.setFilterToMap(id, filters);
+      //更改自定义的layers中filter样式
+      this.layers[this.nowLayerIndex]['filter'] = filters;
       this.layers[this.nowLayerIndex].filterValueSet = {
         filterCondition: this.filterCondition,
         filterValue: this.filterValue,
@@ -5322,7 +5780,6 @@ export default {
       console.log("oldActiveName", oldActiveName, this.menuButtonShowList);
     },
     test1() {
-
       var imgDataSrc = map.getCanvas().toDataURL("image/png");
       this.canvasSrc = imgDataSrc;
       console.log("canvasSrc", this.canvasSrc);
@@ -5425,10 +5882,39 @@ h4 {
   height: calc(100vh - 170px);
   overflow-y: scroll;
 }
-.layerTable::-webkit-scrollbar{
+.layerTable::-webkit-scrollbar {
   width: 0;
   height: 0;
   color: transparent;
+}
+/* 样式框样式 */
+.stylesBox{
+  /* display: flex; */
+  background-color: white;
+  border-left: 1px solid #dcdfe6; 
+  height: 100%;
+  width: 350px;
+  position: absolute;
+  margin-left: 330px;
+  z-index: 99;  
+}
+/* 样式框标题 */
+.stylesBoxTitle{
+  height: 40px;
+  border-bottom:1px #dcdfe6
+}
+/* 模板展示框样式 */
+.templeCard{
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  height: 150px;
+  width: 150px;
+  margin: 5px 10px;
+  padding: 0;
+}
+.templeCard .el-card__body{
+  padding: 0;
 }
 
 /* 编辑框样式 */
@@ -5703,5 +6189,10 @@ h4 {
 /* 鼠标hover变为指状 */
 .cursor:hover {
   cursor: pointer;
+}
+/* 图标按钮样式 */
+.iconBtn:hover{
+  cursor: pointer;
+  color: #409eff;
 }
 </style>

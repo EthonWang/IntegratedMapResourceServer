@@ -116,6 +116,25 @@ export default {
         return instance.get(Vue.prototype.reqUrl+"/getDataSourceList")
     },
 
+    //地图发布相关
+    //获取发布的地图样式
+    getPublishedMap(mapProjectId){
+        return instance.post(Vue.prototype.reqUrl+"/mapProject/getPublishedMap/"+mapProjectId)
+    },    
+    //发布地图项目
+    publicMap(mapProjectId){
+        return instance.get(Vue.prototype.reqUrl+"/mapProject/publicMap/"+mapProjectId)
+    },    
+    //取消发布地图项目
+    cancelPublicMap(mapProjectId){
+        return instance.get(Vue.prototype.reqUrl+"/mapProject/cancelPublicMap/"+mapProjectId)
+    },        
+    //更换发布地图项目的链接
+    changeMapLink(mapProjectId){
+        return instance.get(Vue.prototype.reqUrl+"/mapProject/changeMapLink/"+mapProjectId)
+    },       
+
+    //地图数据与样式
     //tilejson
     createTileJson(data){
         return instance.post(Vue.prototype.reqUrl+"/createTileJson",data)
@@ -129,9 +148,33 @@ export default {
     getTileJsonList(tileJsonType){
         return instance.post(Vue.prototype.reqUrl+"/getTileJsonList/"+tileJsonType)
     },
-    getStyleList(tileJsonId){
-        return instance.post(Vue.prototype.reqUrl+"/mapServer/getStyleList/"+tileJsonId)
-    },    
+    //获取style样式列表
+    getStyleListById(tileJsonId){
+        return instance.get(Vue.prototype.reqUrl+"/mapServer/getStyleList/"+tileJsonId)
+    },   
+    //保存其他来源的地图样式
+    saveOtherMapStyle(data){
+        return instance.post(Vue.prototype.reqUrl+"/mapServer/saveOtherMapStyle",data)
+    },
+
+    //地图类型样式
+    //创建类型样式
+    createTypeStyle(data){
+        return instance.post(Vue.prototype.reqUrl+"/style/createStyle",data)
+    },
+    //删除类型样式
+    deleteTypeStyle(styleId){
+        return instance.get(Vue.prototype.reqUrl+"/style/deleteStyleById/"+styleId)
+    },
+    //获取类型样式
+    getTypeStyleById(styleId){
+        return instance.get(Vue.prototype.reqUrl+"/style/getStyleById/"+styleId)
+    },
+    //获取类型样式列表
+    getTypeStyleList(styleType){
+        return instance.get(Vue.prototype.reqUrl+"/style/getStyleList/"+styleType)
+    },
+
     
 
     //瓦片缓存

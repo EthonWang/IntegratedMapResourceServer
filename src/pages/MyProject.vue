@@ -17,19 +17,27 @@
 
     <div class="projectsBox">
       <el-card class="project-item" v-for="(item) in mapProjectData" :key="item.date" shadow="hover">
-        <img class="project-item-image" src="../assets/imgs/map-icon.png">
+        <el-image class="project-item-image" style="" fit="contain" :src="item.mapImgUrl.mapImgUrl ? item.mapImgUrl.mapImgUrl : imgDefault"></el-image>
         <div>
 
-          <h3 class="project-name" :title="item.name">{{ item.name }}</h3>
+          <el-row type="flex" align="middle" >
+            <h3 class="project-name" :title="item.name">{{ item.name }}</h3>                                 
+            <el-tag :type="item.publicBoolean ? 'success':'info'">{{item.publicBoolean ? '已发布':'未发布'}}</el-tag>
+          </el-row>
+
 
           <div class="time">{{ item.created }}</div>
           <div class="bts">
-
             <el-button size="mini" type="success" icon="el-icon-edit-outline" circle title="编辑"
                        @click="editMapProject(item)"></el-button>
-
-            <el-button size="mini" type="primary" icon="el-icon-document-copy" circle title="复制"
+            <el-button size="mini" type="info" icon="el-icon-document-copy" circle title="复制"
                        @click="copyMapProject(item)"></el-button>
+            <el-button v-if="item.publicBoolean" size="mini" type="primary" plain icon="el-icon-close" circle title="取消发布"
+                       @click="cancelPublicMap(item)"></el-button>  
+            <el-button v-if="!item.publicBoolean" size="mini" type="primary" plain icon="el-icon-s-promotion" circle title="发布"
+                       @click="publicMap(item)"></el-button> 
+            <el-button size="mini" type="warning" icon="el-icon-refresh" circle title="更换发布链接"
+                       @click="changeMapLink(item)"></el-button>                       
             <el-button size="mini" type="danger" icon="el-icon-delete" circle title="删除"
                        @click="deleteMapProjectById(item)"></el-button>
           </div>
@@ -69,6 +77,7 @@ export default {
       mapProjectData: [],
       mapProjectTotal: 0,
       mapProjectNames: {},
+      imgDefault: require("../assets/imgs/map-icon.png"),
 
       currentPage: 1,
       pageSize: 8,
@@ -158,6 +167,81 @@ export default {
       });
     },
 
+    publicMap(item) {
+      this.$confirm('确认发布地图, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        requestApi.publicMap(item.id)
+            .then((res) => {
+              if (res.data.code === 0) {
+                this.getMapProjectList()
+                this.$message.success("地图发布成功:" + item.name);
+              } else {
+                this.$message.info("地图发布失败");
+              }
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+      }).catch(() => {
+        this.$message.info("地图发布失败");
+      });
+
+
+    },
+
+    cancelPublicMap(item) {
+      this.$confirm('取消地图发布, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        requestApi.cancelPublicMap(item.id)
+            .then((res) => {
+              if (res.data.code === 0) {
+                this.getMapProjectList()
+                this.$message.success("取消地图发布成功:" + item.name);
+              } else {
+                this.$message.info("取消发布失败");
+              }
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+      }).catch(() => {
+        this.$message.info("取消发布失败");
+      });
+
+
+    },
+
+    changeMapLink(item) {
+      this.$confirm('确认更新发布链接, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        requestApi.changeMapLink(item.id)
+            .then((res) => {
+              if (res.data.code === 0) {
+                this.getMapProjectList()
+                this.$message.success("发布链接更新成功:" + item.name);
+              } else {
+                this.$message.info("发布链接更新失败");
+              }
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+      }).catch(() => {
+        this.$message.info("发布链接更新失败");
+      });
+
+
+    },
+
     deleteMapProjectById(item) {
       this.$confirm('确认删除该文件, 是否继续?', '提示', {
         confirmButtonText: '确定',
@@ -210,16 +294,19 @@ export default {
 }
 
 .projectsBox {
+  padding-top:10px;
   width: 80%;
   height: calc(100vh - 340px);
   display: flex;
   justify-content: space-around;
+  /* align-content:center ; */
   flex-wrap: wrap;
   margin: 20px auto;
   overflow-y: scroll;
 }
 
 .project-item {
+  height: calc(15vh + 150px);
   max-height: 380px;
   width: 20%;
   min-width: 200px;
@@ -229,6 +316,7 @@ export default {
 
 .project-item-image {
   width: 100%;
+  height: 15vh;
 }
 
 .project-name {
@@ -243,7 +331,7 @@ export default {
 .bts {
   display: flex;
   justify-content: flex-end;
-  margin-top: 6px;
+  margin-top: 10px;
 }
 
 </style>

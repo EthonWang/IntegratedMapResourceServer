@@ -11,7 +11,7 @@ import "./assets/css/common.css"
 Vue.use(ElementUI);
 Vue.use(VueRouter)
 
-Vue.prototype.reqUrl="http://"+window.IPConfig.baseIP+":8991";
+Vue.prototype.reqUrl="http://"+window.IPConfig.baseIP+":8899";
 Vue.prototype.reqBaseIp="http://"+window.IPConfig.baseIP;
 
 

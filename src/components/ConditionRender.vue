@@ -1,6 +1,6 @@
 <template>
   <div class="box">
-    <el-row v-if="menuButtonShowList[attribute]">
+    <el-row v-if="menuButtonShowList[attribute] && conditionShow">
       <el-button
         v-if="
           !attribute.includes('translate-anchor') &&
@@ -62,7 +62,8 @@
             !attribute.includes('icon-translate') && 
             !attribute.includes('text-line-height') && 
             !attribute.includes('text-translate') &&
-            !attribute.includes('rotation-alignment') 
+            !attribute.includes('rotation-alignment') &&
+            !attribute.includes('heatmap-opacity') 
           "
           :disabled="
             attribute == 'fill-outline-color' &&
@@ -120,7 +121,8 @@
             !attribute.includes('icon-translate') && 
             !attribute.includes('text-line-height') && 
             !attribute.includes('text-translate') &&
-            !attribute.includes('rotation-alignment')
+            !attribute.includes('rotation-alignment') &&
+            !attribute.includes('heatmap-opacity') 
           "
           :disabled="
             attribute == 'fill-outline-color' &&
@@ -273,7 +275,10 @@
                 attribute.includes('text-anchor') ||
                 attribute.includes('icon-offset') ||
                 attribute.includes('text-offset') ||
-                attribute.includes('text-transform') 
+                attribute.includes('text-transform') ||
+                attribute.includes('weight') ||
+                attribute.includes('intensity') 
+
               "
             >
               <span style="margin-left: 10px">{{ scope.row.value }}</span>
@@ -341,7 +346,7 @@
           >
           </el-color-picker>
         </el-row>
-        <el-row v-if="attribute.includes('opacity')" type="flex">
+        <el-row v-if="attribute.includes('opacity')||attribute.includes('weight')||attribute.includes('intensity')" type="flex">
           <el-input
             v-model="zoomValue[zoomEditIndex].value"
             placeholder="something"
@@ -770,7 +775,9 @@
                 attribute.includes('text-offset') ||
                 attribute.includes('icon-offset') ||
                 attribute.includes('text-justify') ||
-                attribute.includes('rotate')
+                attribute.includes('rotate') ||
+                attribute.includes('weight') ||
+                attribute.includes('intensity')
               "
             >
               <span style="margin-left: 10px">{{ scope.row.value }}</span>
@@ -829,7 +836,7 @@
           >
           </el-color-picker>
         </el-row>
-        <el-row v-if="attribute.includes('opacity')" style="display: flex">
+        <el-row v-if="attribute.includes('opacity')||attribute.includes('weight')||attribute.includes('intensity')" style="display: flex">
           <el-input
             v-model="dataValue[dataEditIndex].value"
             placeholder="something"
@@ -1180,7 +1187,9 @@
                 attribute.includes('text-offset') ||
                 attribute.includes('icon-offset') ||                
                 attribute.includes('text-transform') ||
-                attribute.includes('text-justify')
+                attribute.includes('text-justify') ||
+                attribute.includes('weight') ||
+                attribute.includes('intensity')
               "
             >
               <span style="margin-left: 10px">{{ scope.row.value }}</span>
@@ -1293,7 +1302,7 @@
           >
           </el-color-picker>
         </el-row>
-        <el-row v-if="attribute.includes('opacity')" style="display: flex">
+        <el-row v-if="attribute.includes('opacity')||attribute.includes('weight')||attribute.includes('intensity')" style="display: flex">
           <el-input
             v-model="propValue[propEditIndex].value"
             placeholder="something"
@@ -1646,6 +1655,7 @@ export default {
       dataValueOrigin: [],
       formValueOrigin: [],
       propertyList: [],
+      conditionShow: true,
 
       //全局参数
       spriteList: [],
@@ -1731,6 +1741,10 @@ export default {
         "text-halo-blur": "掩膜模糊",
         "background-color": "背景色",
         "background-opacity": "不透明度",
+        "heatmap-opacity": "不透明度",
+        "heatmap-radius": "半径",
+        "heatmap-weight": "权重",
+        "heatmap-intensity": "密度"
         
         
       },
@@ -1763,9 +1777,13 @@ export default {
         "text-rotate",
         "text-halo-width",
         "text-halo-blur",
-        "background-opacity"
+        "background-opacity",
+        "heatmap-opacity",
+        "heatmap-radius",
+        "heatmap-weight",
+        "heatmap-intensity",
 
-      ],
+      ],  //该列表用于渲染时候进行属性判断
       arrayAttribute: [
         "circle-translate",
         "line-translate",
@@ -2016,6 +2034,10 @@ export default {
           default:
             return null;
         }
+      }
+      //判断编辑图层是否为mbTile
+      if(this.layer["shpAttribute"] == 'undefined' || this.layer["shpAttribute"] == null){
+        this.conditionShow = false;
       }
     },
     reset(val) {
