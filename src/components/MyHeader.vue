@@ -1,6 +1,6 @@
 <template>
   <header>
-    <a href="#" class="logo"><h2>Mapbox</h2></a>
+    <a href="#" class="logo"><h2>Mapbox管理台</h2></a>
     <ul class="navigation">
       <li>
         <router-link to="/Map/MyData"><h3>我的数据</h3></router-link>
@@ -15,7 +15,9 @@
         <router-link to="/Map/MyTest"><h3>测试</h3></router-link>
       </li>
     </ul>
-    <div>wyjq</div>
+
+    <a href="#" style="visibility:hidden;" class="logo"><h2>Mapbox管理台</h2></a>
+
   </header>
 </template> 
 
