@@ -298,7 +298,7 @@ export default {
   width: 80%;
   height: calc(100vh - 340px);
   display: flex;
-  justify-content: space-around;
+  justify-content: flex-start;
   /* align-content:center ; */
   flex-wrap: wrap;
   margin: 20px auto;
@@ -308,10 +308,10 @@ export default {
 .project-item {
   height: calc(15vh + 150px);
   max-height: 380px;
-  width: 20%;
+  width: 18%;
   min-width: 200px;
   max-width: 250px;
-  margin: 25px;
+  margin: 20px;
 }
 
 .project-item-image {

@@ -2035,9 +2035,10 @@ export default {
             return null;
         }
       }
-      //判断编辑图层是否为mbTile
-      if(this.layer["shpAttribute"] == 'undefined' || this.layer["shpAttribute"] == null){
+      //判断编辑图层是否为mbTile和背景图层
+      if(typeof(this.layer["shpAttribute"]) == 'undefined' || this.layer["shpAttribute"].length == 0){
         this.conditionShow = false;
+        console.log("conditionShow",this.conditionShow);
       }
     },
     reset(val) {

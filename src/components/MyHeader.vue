@@ -50,6 +50,7 @@ header .logo {
   position: relative;
   color: rgb(0, 0, 0);
   text-decoration: none;
+  align-items: baseline; 
 }
 header .navigation {
   display: flex;
