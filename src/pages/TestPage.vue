@@ -92,7 +92,7 @@
         </el-popover>                  
       </el-row>
       
-      <el-col v-if="filterCondition == []" class="displayBox">未设置过滤条件</el-col>
+      <el-col v-if="filterCondition.length == 0" class="displayBox">未设置过滤条件</el-col>
       <el-button type="text" icon="el-icon-circle-plus-outline"
       @click="filterCondition.push({options:'',type:'==',value:''})">添加过滤条件</el-button> 
     </div>
