@@ -283,29 +283,37 @@
           >
           <!-- <el-button type="success" size="mini">暂存</el-button>
         </el-button-group> -->
+        <el-button
+            v-if="!publicBoolean"
+            type="warning"
+            size="mini"
+            @click="publicMap"
+        >发布</el-button>
 
         <el-popover
-          placement="right"
-          title="链接地址"
-          width="200"
-          trigger="click"
+            v-else
+            placement="right"
+            title="链接地址"
+            width="200"
+            trigger="hover"
         >
           <el-link
             type="primary"
-            :href="publishLink"
             target="_blank"
             :underline="false"
-            >{{ publishLink }}</el-link
+            :href="reqUrl + '/mapProject/getPublishedMap/' + mapProjectId"
+            >
+            {{reqUrl + "/mapProject/getPublishedMap/" + mapProjectId}}
+          </el-link>
+          <el-tag
+              type="warning"
+              slot="reference"
           >
-          <el-button
-            type="warning"
-            size="mini"
-            slot="reference"
-            @click="publish"
-            >发布</el-button
-          >
+            已发布
+          </el-tag>
+
         </el-popover>
-        <el-button type="success" size="mini" @click="addBackground('multiPG',{})"
+        <el-button type="danger" size="mini" @click="addBackground('multiPG',{})"
           >添加背景</el-button
         >
       </div>
@@ -4200,6 +4208,7 @@ export default {
       layers: [],
       nowLayerIndex: 0,
       canvasSrc: "", //画布转换为图片的地址
+      publicBoolean:false,
 
       //图标图层样式
       textField: "",
@@ -4274,6 +4283,8 @@ export default {
       totalDataCountSymbol: 0,
       fontList: [],
       spriteList: [],
+
+
     };
   },
   mounted() {
@@ -4358,6 +4369,7 @@ export default {
           this.sources = this.mapProjectInfo.sources;
           this.layers = this.mapProjectInfo.layers;
           this.layersNameObject = this.mapProjectInfo.layerTree;
+          this.publicBoolean=this.mapProjectInfo.publicBoolean;
           this.createEmptyMap();
           this.initMapWithData();
           for (const item of this.layers) {
@@ -4594,7 +4606,32 @@ export default {
     },
     publish() {
       // this.publishLink = myConfig.requestUrl+'/mapServer/'+this.mapProjectId;
-      this.publishLink = this.reqUrl + "/mapServer/" + this.mapProjectId;
+      // this.publishLink = this.reqUrl + "/mapProject/getPublishedMap/" + this.mapProjectId;
+      this.publishLink = this.reqUrl + "/mapProject/getPublishedMap/" + this.mapProjectId;
+    },
+
+    publicMap() {
+      this.$confirm('确认发布地图, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        requestApi.publicMap(this.mapProjectId)
+            .then((res) => {
+              if (res.data.code === 0) {
+
+                this.publicBoolean=true
+                this.$message.success("地图发布成功");
+              } else {
+                this.$message.info("地图发布失败");
+              }
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+      }).catch(() => {
+        this.$message.info("地图发布失败");
+      });
     },
     addBackground(sourceType,row) {
       const index = this.layers.length;

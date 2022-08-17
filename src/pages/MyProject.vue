@@ -21,8 +21,32 @@
         <div>
 
           <el-row type="flex" align="middle" >
-            <h3 class="project-name" :title="item.name">{{ item.name }}</h3>                                 
-            <el-tag :type="item.publicBoolean ? 'success':'info'">{{item.publicBoolean ? '已发布':'未发布'}}</el-tag>
+            <h3 class="project-name" :title="item.name">{{ item.name }}</h3>
+<!--            <el-tag :type="item.publicBoolean ? 'success':'info'">{{item.publicBoolean ? '已发布':'未发布'}}</el-tag>-->
+            <el-tag v-if="!item.publicBoolean" type="info">未发布</el-tag>
+
+            <el-popover
+                placement="right"
+                title="链接地址"
+                width="200"
+                trigger="hover"
+            >
+              <el-link
+                  type="primary"
+                  :href="publishLink+item.id"
+                  target="_blank"
+                  :underline="false"
+              >
+                {{ publishLink+item.id }}
+              </el-link>
+              <el-tag
+                  slot="reference"
+                  v-if="item.publicBoolean"
+              >
+                已发布
+              </el-tag>
+            </el-popover>
+
           </el-row>
 
 
@@ -81,7 +105,8 @@ export default {
 
       currentPage: 1,
       pageSize: 8,
-      searchInput: ""
+      searchInput: "",
+      publishLink:this.reqUrl + "/mapProject/getPublishedMap/"
     }
   },
 
