@@ -8,12 +8,12 @@
       <li>
         <router-link to="/Map/MyProject"><h3>我的项目</h3></router-link>
       </li>
-      <li>
-        <router-link target="_blank" to="/MapEditor"><h3>临时地图编辑</h3></router-link>
-      </li>
-      <li>
-        <router-link to="/Map/MyTest"><h3>测试</h3></router-link>
-      </li>
+<!--      <li>-->
+<!--        <router-link target="_blank" to="/MapEditor"><h3>样式库</h3></router-link>-->
+<!--      </li>-->
+<!--      <li>-->
+<!--        <router-link to="/Map/MyTest"><h3>测试</h3></router-link>-->
+<!--      </li>-->
     </ul>
 
     <a href="#" style="visibility:hidden;" class="logo"><h2>Mapbox管理台</h2></a>
