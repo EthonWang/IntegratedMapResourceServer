@@ -237,7 +237,7 @@
                   </el-table-column>
                 </el-table>
                 <!-- styleLayer -->
-                <el-table v-if="isStyle" :data="styleLayers" height="313">
+                <el-table v-if="isStyle" :data="styleLayers.filter(data => (data['source'] != 'natural_earth_shaded_relief') && (data['type'] != 'raster'))" height="313">
                   <el-table-column
                     property="id"
                     width="200"
@@ -248,8 +248,10 @@
                     <template slot="header">
                       <el-popconfirm
                         title="确定添加全部样式图层吗？"
-                        @confirm="addAllStyles"
+                        @confirm="addAllStyles(styleLayers)"
                       >
+                        <!-- <i slot="reference" class="el-icon-refresh-left iconBtn" title="返回原样式"></i> -->
+
                         <el-button slot="reference" type="warning" size="mini">全部添加</el-button>
                       </el-popconfirm>                      
                     </template>                   
@@ -303,7 +305,7 @@
             >发布</el-button
           >
         </el-popover>
-        <el-button type="success" size="mini" @click="addBackground"
+        <el-button type="success" size="mini" @click="addBackground('multiPG',{})"
           >添加背景</el-button
         >
       </div>
@@ -390,7 +392,7 @@
                   size="mini"
                   slot="reference"
                   type="primary"
-                  @click="getTypeStyleList(scope.$index, scope.row)"
+                  @click="openTemplateEdit(scope.$index, scope.row)"
                   icon="el-icon-s-grid"
                   circle
                   :title="'应用' + scope.row['type'] + '样式'"
@@ -406,13 +408,14 @@
     </div>
     <div v-if="stylesBoxShow" class="stylesBox">
       <el-row type="flex" align="middle" class="stylesBoxTitle">
-        <h4 style="margin:10px">可视化模板</h4>&nbsp;
+        <h4 style="margin:10px;color:#409eff">可视化模板</h4>&nbsp;
         <el-popconfirm
           title="确认返回原样式吗？"
           @confirm="returnOriginStyle"
         >
           <i slot="reference" class="el-icon-refresh-left iconBtn" title="返回原样式"></i>
         </el-popconfirm>        
+        <i class="el-icon-close " @click="stylesBoxShow = false"></i>
         <i class="el-icon-close close-button" @click="stylesBoxShow = false"></i>
       </el-row>
       <el-collapse accordion class="templateCol" value="first">
@@ -439,17 +442,49 @@
             <h4 style="margin-left:10px">mbTile样式库</h4>&nbsp;
             <!-- <i class="el-icon-circle-plus iconBtn"></i> -->
           </template>          
-          <el-collapse >
-            <el-collapse-item>
+          <el-collapse accordion value="first">
+            <el-collapse-item v-for="(item,index) in mbTileJsonList" :key="index">
               <template slot="title">
-                <h4 style="margin-left:20px">mbTile样式库</h4>&nbsp;
+                <h4 style="margin-left:20px;color:#9e9399">{{item.name}}</h4>&nbsp;
               </template>
-              <div>与现实生活一致：与现实生活的流程、逻辑保持一致，遵循用户习惯的语言和概念；</div>
-              <div>在界面中一致：所有的元素和结构需保持一致，比如：设计样式、图标和文本、元素的位置等。</div>
-            </el-collapse-item>
-            <el-collapse-item title="反馈 Feedback">
-              <div>控制反馈：通过界面样式和交互动效让用户可以清晰的感知自己的操作；</div>
-              <div>页面反馈：操作后，通过页面元素的变化清晰地展现当前状态。</div>
+              <el-row class="mbTileCollapse">
+                <el-row type="flex" align="middle">
+                  <h4>特定样式:</h4>&nbsp;
+                  <el-select
+                    v-model="templateStyleSelect"
+                    placeholder="请选择"
+                    style="width: 73%"
+                    @change="templateStyleChange($event)"
+                  >
+                    <el-option
+                      v-for="item in mbTileStyleList"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    >
+                    </el-option> </el-select
+                  >               
+                </el-row>   
+                <el-table :data="tempStyleLayers.filter(data => (data.type == styleTypeSelect))" height="600">
+                  <el-table-column
+                    property="id"
+                    width="210"
+                    show-overflow-tooltip
+                    label="style"
+                  ></el-table-column>
+                  <el-table-column width="100">                  
+                    <template slot-scope="scope">
+                      <el-button
+                        size="mini"
+                        type="primary"
+                        @click="addMbTileToSelf(scope.row)"
+                        >应用样式
+                      </el-button>
+                    </template>                    
+                  </el-table-column>
+                </el-table>                  
+              </el-row>
+                       
             </el-collapse-item>
           </el-collapse>
         </el-collapse-item>
@@ -4148,7 +4183,10 @@ export default {
       typeStyleList: {'circle':[],'line':[],'fill':[],'fill-extrusion':[]},
       originStyle: [],  //图层初始样式，用于应用类型样式后还原样式，注意图层顺序改变时及时更改
       //mbTile模板样式
-
+      templateStyleSelect: "",  //mbTile模板的styleJson选择
+      templateStyleJson: {},
+      templateStyleSelectIndex: 0, //  记录选择的数据下标
+      tempStyleLayers: [],
 
       //mapbox地图
       mapProjectInfo: {},
@@ -4531,25 +4569,24 @@ export default {
           this.mapProjectInfo.layerTree = this.layersNameObject;
           // this.mapProjectInfo.glyphs = this.reqUrl+"/store/fonts/{fontstack}/{range}.pbf";
           // this.mapProjectInfo.sprite = this.reqUrl+"/store/sprites/mpx_sprite/sprite";
-          //保存截图到工程字段
-          requestApi
-            .createMapImg({
-              imgUrl: this.canvasSrc,
-              mapProjectId: this.mapProjectId,
-            })
-            .then(() => {})
-            .catch((error) => {
-              console.log(error);
-            });
-
           requestApi
             .updateMapProject(JSON.stringify(this.mapProjectInfo))
             .then(() => {
               this.$message.success("保存成功!");
-            })
-            .catch((error) => {
-              console.log(error);
-            });
+              //保存截图到工程字段
+              requestApi
+                .createMapImg({
+                  imgUrl: this.canvasSrc,
+                  mapProjectId: this.mapProjectId,
+                })
+                .then(() => {})
+                .catch((error) => {
+                  console.log(error);
+                });              
+                })
+                .catch((error) => {
+                  console.log(error);
+                });
         })
         .catch(() => {
           this.$message.info("取消保存");
@@ -4559,11 +4596,26 @@ export default {
       // this.publishLink = myConfig.requestUrl+'/mapServer/'+this.mapProjectId;
       this.publishLink = this.reqUrl + "/mapServer/" + this.mapProjectId;
     },
-    addBackground() {
+    addBackground(sourceType,row) {
       const index = this.layers.length;
+      const newLayout = layerStyleProperties['background'].layout;
+      const newPaint = layerStyleProperties['background'].paint;
+      if(sourceType == "mbTile"){
+        if('layout' in row){
+          for(let key in row.layout){
+            newLayout[key] = row.layout[key]
+          }
+        }
+        if('paint' in row){
+          for(let key in row.paint){
+            newPaint[key] = row.paint[key]
+          }
+        } 
+      }
+     
       const backLayer = {
         index: index,
-        sourceType: "pgMulti", //记录数据来源类型，用于区别mbTlie的添加和删除
+        sourceType: sourceType, //记录数据来源类型，用于区别mbTlie的添加和删除
         show: true,
         originName: "background",
         showName: "背景", //用于展示图层名字
@@ -4573,13 +4625,8 @@ export default {
         filterValueSet: {},
         id: "背景",
         type: "background",
-        paint: {
-          "background-color": "rgba(228, 123, 219,0.3)",
-          "background-opacity": 1,
-        },
-        layout: {
-          visibility: "visible",
-        },
+        paint: newPaint,
+        layout: newLayout,
         metadata: {
           "mapbox:group": "92ca48f13df25",
         },
@@ -4988,7 +5035,11 @@ export default {
           if(!this.isStyle){
             this.addDataMbTileShp(index, row);
           }else{
-            this.addStyleMbTileShp(index, row);
+            if(row.type != "background"){
+              this.addStyleMbTileShp(index, row);
+            }else{
+              this.addBackground("mbTile",row);
+            }            
           }
           break;
       }
@@ -5287,10 +5338,6 @@ export default {
     },
     async addStyleMbTileShp(index, row) {
       let name = this.mbTileJsonList[this.mbTileSelectIndex].name;
-      console.log("判断：",!Object.prototype.hasOwnProperty.call(
-          this.sourceNameObject,
-          name
-        ));
       //判断该shp是否已添加
       if (
         !Object.prototype.hasOwnProperty.call(
@@ -5327,7 +5374,6 @@ export default {
           newPaint[key] = row.paint[key]
         }
       }
-      console.log("newPaint",newPaint);
 
       //前八个是自己用的属性
       let geoType = row.type;
@@ -5376,7 +5422,15 @@ export default {
       this.addLayerToMap(newLayer);
     },
     //添加所有styleJson图层
-    addAllStyles(){
+    addAllStyles(List){
+      for(let i in List){
+        let item = List[i];
+        console.log('item',item);
+        if((item['source'] != 'natural_earth_shaded_relief') && (item['type'] != 'raster')){
+          this.addStyleMbTileShp(i,item)
+        }
+
+      }
       console.log('添加所有styleJson图层');
     },
 
@@ -5486,11 +5540,23 @@ export default {
       const style = this.originStyle[this.nowLayerIndex];
       this.addTypeStyle(style);
     },
-    //获取地图的类型样式列表
-    getTypeStyleList(index,row){
+    async openTemplateEdit(index,row){
       this.nowLayerIndex = index;
       this.styleTypeSelect = row.type;
-      const type = row.type;
+      const type = row.type;      
+      this.getTypeStyleList(type);
+      this.getTileJsonList("mbTile");
+      if(this.templateStyleSelect == ""){
+        this.templateStyleSelect = this.mbTileStyleList[0].id;  //先默认为第一个
+        this.templateStyleJson = this.mbTileStyleList[0];  //先默认为第一个
+        this.tempStyleLayers = this.templateStyleJson.layers;
+        console.log('aaa',this.tempStyleLayers);
+      }
+      this.stylesBoxShow = !this.stylesBoxShow;
+
+    },
+    //获取地图的类型样式列表
+    getTypeStyleList(type){
       requestApi.getTypeStyleList(type)
         .then((res)=>{
           if(res.data.code == 0){
@@ -5502,13 +5568,19 @@ export default {
         })
         .catch((err)=>{
           console.log(err);
-        })
-      // this.getTileJsonList("mbTile")
-      //     .then(()=>{
-            
-      //     });
-      this.stylesBoxShow = !this.stylesBoxShow;
+        })      
       
+    },
+    templateStyleChange(val){
+      let index = 0;
+      this.mbTileStyleList.forEach((e, ind) => {
+        if (e.id == val) {
+          index = ind;
+          this.templateStyleSelectIndex = ind;
+        }
+      });
+      this.templateStyleJson = this.mbTileStyleList[index];
+      this.tempStyleLayers = this.templateStyleJson.layers;
     },
     //添加对应的类型样式
     addTypeStyle(row){
@@ -5523,6 +5595,33 @@ export default {
       //   "icon-size": 0.25,
       // };
       console.log("应用完图层样式", aimLayer);
+      this.handleRemoveLayer(aimLayer.id);
+      if (this.nowLayerIndex === 0) {
+        this.addLayerToMap(aimLayer);
+      } else {
+        map.addLayer(aimLayer, this.layers[this.nowLayerIndex - 1].id);
+      }
+      //更新图层编辑框样式
+      this.handleLayerEdit(this.nowLayerIndex, aimLayer);
+    },
+    //给自己数据添加mbTile样式，不需要filter属性
+    addMbTileToSelf(row){
+      //只替换paint和layout的相关属性
+      console.log("row",row)
+      let aimLayer = this.layers[this.nowLayerIndex];
+      if('layout' in row){
+        for(let key in row.layout){
+          aimLayer.layout[key] = row.layout[key]
+        }
+      }
+      if('paint' in row){
+        for(let key in row.paint){
+          aimLayer.paint[key] = row.paint[key]
+        }
+      }      
+      //先改参数再更新图层，打开图层编辑框
+      console.log("apply",row, "style to", this.layers[this.nowLayerIndex].originName);
+      console.log("应用完Mbtile图层样式", aimLayer);
       this.handleRemoveLayer(aimLayer.id);
       if (this.nowLayerIndex === 0) {
         this.addLayerToMap(aimLayer);
@@ -6041,6 +6140,7 @@ h4 {
   /* display: flex; */
   background-color: white;
   border-left: 1px solid #dcdfe6; 
+  border-right: 1px solid #dcdfe6; 
   height: 100%;
   width: 350px;
   position: absolute;
@@ -6050,12 +6150,17 @@ h4 {
 /* 样式框标题 */
 .stylesBoxTitle{
   height: 40px;
-  border-bottom:1px #dcdfe6
+  border-bottom:1px #dcdfe6;
+  background-color: ;
 }
 /* 模板折叠框样式 */
-.templateCol .el-collapse-item__wrap{
-  max-height: 480px;
+.templateCol .el-collapse-item__wrap:nth-child(1){
+  max-height: 550px;
   overflow-y: scroll;
+}
+.templateCol .el-collapse-item__wrap:nth-child(2){
+  max-height: calc(100vh - 200px);
+  overflow-y: hidden;
 }
 .templateCol .el-collapse-item__wrap::-webkit-scrollbar{
   width:0px
@@ -6071,6 +6176,12 @@ h4 {
 }
 .templateCard .el-card__body{
   padding: 0;
+}
+/* mbTile折叠框内容样式 */
+.mbTileCollapse{
+  width: 100%;
+  padding: 10px 0px 00px 20px;
+  border-top: 1px solid #dcdfe6;
 }
 
 /* 编辑框样式 */
