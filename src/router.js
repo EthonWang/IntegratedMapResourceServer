@@ -5,7 +5,8 @@ import MapEditor from "./pages/MapEditor"
 import MyData from "./pages/MyData"
 import MyProject from "./pages/MyProject"
 import MapProjectEditor from "./pages/MapProjectEditor"
-import TestPage from "./pages/TestPage"
+import StyleDB from "./pages/StyleDB"
+// import TestPage from "./pages/TestPage"
 import MapboxView from "./components/MapboxView.vue"
 import ConditionRender from "./components/ConditionRender.vue"
 
@@ -30,8 +31,8 @@ const route = new VueRouter({
 					component:MyProject
 				},
 				{
-					path:mapBaseRoute+"/MyTest",
-					component:TestPage
+					path:mapBaseRoute+"/StyleDB",
+					component:StyleDB
 				}
 			]
 		},{
@@ -46,10 +47,10 @@ const route = new VueRouter({
             path: "/MapboxView",
 			component: MapboxView
         },
-				{
-					path: "/ConditionRender",
-		component: ConditionRender
-			},	
+		{
+			path: "/ConditionRender",
+			component: ConditionRender
+		},
 	
 						
 	]
