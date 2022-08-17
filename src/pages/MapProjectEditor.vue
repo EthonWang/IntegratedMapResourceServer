@@ -225,7 +225,17 @@
                     show-overflow-tooltip
                     label="source"
                   ></el-table-column>
-                  <el-table-column width="100" label="操作">
+                  <el-table-column width="100">
+                    <template slot="header">
+                      <el-popconfirm
+                        title="确定添加全部样式图层吗？"
+                        @confirm="addAllSources(dataLayers)"
+                      >
+                        <!-- <i slot="reference" class="el-icon-refresh-left iconBtn" title="返回原样式"></i> -->
+
+                        <el-button slot="reference" type="warning" size="mini">全部添加</el-button>
+                      </el-popconfirm>                      
+                    </template>                    
                     <template slot-scope="scope">
                       <el-button
                         size="mini"
@@ -415,23 +425,24 @@
         >
           <i slot="reference" class="el-icon-refresh-left iconBtn" title="返回原样式"></i>
         </el-popconfirm>        
-        <i class="el-icon-close " @click="stylesBoxShow = false"></i>
+        <i class="el-icon-upload iconBtn" style="margin:0 5px" title="将该图层模板上传到样式库" @click="createTypeStyle(layers[nowLayerIndex])"></i>
         <i class="el-icon-close close-button" @click="stylesBoxShow = false"></i>
       </el-row>
       <el-collapse accordion class="templateCol" value="first">
         <el-collapse-item name="first">
           <template slot="title">
-            <h4 style="margin-left:10px">散点图</h4>&nbsp;
-            <i class="el-icon-circle-plus iconBtn"></i>
+            <h4 style="margin-left:10px">自定义样式库</h4>&nbsp;
+            <!-- <i class="el-icon-circle-plus iconBtn"></i> -->
           </template>
-          <el-row type="flex" justify="start" style="flex-wrap:wrap">
+          <el-row type="flex" justify="start" style="flex-wrap:wrap;border-top:1px solid #ebeef5">
             <el-card v-for="(item,index) in typeStyleList[styleTypeSelect]" :key="index" 
                      class="templateCard cursor" shadow="hover" @click.native="addTypeStyle(item)">
+              <i class="el-icon-remove-outline tempDeleBtn" @click="tempCardDelete(item.id)"></i>
               <el-image
                 style="width: 100%; height: 110px; border-bottom:1px solid #dcdfe6"
-                :src="imgDefault"
-                fit="contain"></el-image>
-                <el-row type="flex" align="middle" justify="center">
+                :src="item.styleImgUrl.ImgUrl"
+                fit="fill"></el-image>
+                <el-row type="flex" align="middle" justify="center" class="tempCardName">
                   <span>{{item.description}}</span>
                 </el-row>
             </el-card>
@@ -5433,6 +5444,14 @@ export default {
       }
       console.log('添加所有styleJson图层');
     },
+    addAllSources(List){
+      for(let i in List){
+        let item = List[i];
+        this.addDataMbTileShp(i,item)
+
+      }
+      console.log('添加所有styleJson图层');
+    },
 
     //生成tilejson和mbTileJson
     async createTileJson(initTileJson) {
@@ -5494,6 +5513,8 @@ export default {
 
     handleLayerEdit(index, row) {
       console.log("now edit layer: index, row", index, row);
+      // 先关闭模板样式编辑框避免冲突
+      this.stylesBoxShow = false;
       this.nowLayerIndex = index;
       this.zoomRange = [
         this.layers[this.nowLayerIndex].minzoom,
@@ -5541,6 +5562,8 @@ export default {
       this.addTypeStyle(style);
     },
     async openTemplateEdit(index,row){
+      // 先关闭图层编辑框避免冲突
+      this.editorShow = false;
       this.nowLayerIndex = index;
       this.styleTypeSelect = row.type;
       const type = row.type;      
@@ -5550,11 +5573,49 @@ export default {
         this.templateStyleSelect = this.mbTileStyleList[0].id;  //先默认为第一个
         this.templateStyleJson = this.mbTileStyleList[0];  //先默认为第一个
         this.tempStyleLayers = this.templateStyleJson.layers;
-        console.log('aaa',this.tempStyleLayers);
       }
       this.stylesBoxShow = !this.stylesBoxShow;
 
     },
+    //添加选中图层至样式库
+    createTypeStyle(layer){
+      console.log("layer",layer);
+      const canvasSrc = map.getCanvas().toDataURL("image/png");
+      const body = {
+        "layout": layer.layout,
+        "paint": layer.paint,
+        "type": this.styleTypeSelect,
+        "styleImgUrl": {"ImgUrl":canvasSrc},
+        "description": "",
+      }
+      this.$prompt('请输入样式名称', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+      }).then(({ value }) => {
+        body.description = value;
+        requestApi.createTypeStyle(body)
+          .then((res)=>{
+            this.$message.success(res.data.data);
+            this.getTypeStyleList(this.styleTypeSelect);
+          })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '取消样式上传'
+        });       
+      });
+    },
+    // 删除自定义模板样式
+    tempCardDelete(id){
+      requestApi.deleteTypeStyle(id)
+        .then((res)=>{
+          this.$message.success(res.data.data);
+          this.getTypeStyleList(this.styleTypeSelect);
+        })
+        .catch(()=>{
+          this.$message.info('删除失败');
+        })
+    },    
     //获取地图的类型样式列表
     getTypeStyleList(type){
       requestApi.getTypeStyleList(type)
@@ -6151,7 +6212,7 @@ h4 {
 .stylesBoxTitle{
   height: 40px;
   border-bottom:1px #dcdfe6;
-  background-color: ;
+  /* background-color: ; */
 }
 /* 模板折叠框样式 */
 .templateCol .el-collapse-item__wrap:nth-child(1){
@@ -6167,6 +6228,7 @@ h4 {
 }
 /* 模板展示框样式 */
 .templateCard{
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   flex-direction: column;
@@ -6176,6 +6238,28 @@ h4 {
 }
 .templateCard .el-card__body{
   padding: 0;
+}
+/* 模板名称样式 */
+.tempCardName{
+  padding: 0 25px;
+}
+.tempCardName span{
+  width: 100px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;  
+}
+/* 样式删除按钮 */
+.tempDeleBtn{
+  position: absolute;
+  color: #dcdfe6;
+  font-size: 20px;
+  right: 2px;
+  top: 120px;
+  z-index: 1;
+}
+.tempDeleBtn:hover{
+  color: red;
 }
 /* mbTile折叠框内容样式 */
 .mbTileCollapse{
