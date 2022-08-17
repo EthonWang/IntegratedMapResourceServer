@@ -135,7 +135,7 @@ export default {
         "paint":{
             "background-color": "#000000",
             "background-opacity": 1,
-            "background-pattern": "",
+            // "background-pattern": "",
         },
         "layout":{
             "visibility": "visible",
