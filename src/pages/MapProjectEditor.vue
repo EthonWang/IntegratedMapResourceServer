@@ -422,7 +422,7 @@
           </el-table-column>
         </el-table>
       </div>
-      <el-button @click="test1">test</el-button>
+      <!-- <el-button @click="test1">test</el-button> -->
     </div>
     <div v-if="stylesBoxShow" class="stylesBox">
       <el-row type="flex" align="middle" class="stylesBoxTitle">
@@ -527,7 +527,7 @@
         class="editBoardTitle"
         @click="nameEdit = true"
       >
-        <div>{{ layers[nowLayerIndex]["showName"] }}</div>
+        <div :title="layers[nowLayerIndex]['showName']">{{ layers[nowLayerIndex]["showName"] }}</div>
         <i class="el-icon-edit"></i>
       </div>
       <div v-show="nameEdit === true" class="editBoardTitle">
@@ -3950,147 +3950,149 @@
             </el-form-item>
           </el-form>
           <el-divider></el-divider>
-          <el-row type="flex" justify="space-between" align="middle">
-            <h4>过滤条件配置</h4>&nbsp;
-            <el-select v-model="filterWay" placeholder="请选择" size="small">
-              <el-option
-                v-for="item in [
-                  { value: 'all', label: '满足所有条件' },
-                  { value: 'any', label: '满足任意条件' },
-                  { value: 'none', label: '不满足任意条件' },
-                ]"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              >
-              </el-option>
-            </el-select>
-          </el-row>
-          <br />
-          <el-row
-            v-for="(item, index) in filterCondition"
-            :key="index"
-            class="filterBox"
-          >
-            <el-button
-              type="text"
-              icon="el-icon-remove-outline"
-              @click="filterRemove(index)"
-            ></el-button>
-            <el-col :span="6">
-              <el-select
-                :span="2"
-                v-model="filterCondition[index]['option']"
-                placeholder="请选择"
-                size="small"
-                @change="filterValueInit(index)"
-              >
+          <el-row v-if="layers[nowLayerIndex].sourceType != 'mbTile'">
+            <el-row type="flex" justify="space-between" align="middle">
+              <h4>过滤条件配置</h4>&nbsp;
+              <el-select v-model="filterWay" placeholder="请选择" size="small">
                 <el-option
-                  v-for="item in filterOptions"
-                  :key="item['column_name']"
-                  :label="item['column_name']"
-                  :value="item['column_name']"
-                >
-                </el-option>
-              </el-select>
-            </el-col>
-            <el-col :span="5">
-              <el-select
-                v-model="filterCondition[index]['type']"
-                placeholder="=="
-                size="small"
-              >
-                <el-option
-                  v-for="item in filterTypes"
+                  v-for="item in [
+                    { value: 'all', label: '满足所有条件' },
+                    { value: 'any', label: '满足任意条件' },
+                    { value: 'none', label: '不满足任意条件' },
+                  ]"
                   :key="item.value"
                   :label="item.label"
                   :value="item.value"
                 >
                 </el-option>
               </el-select>
-            </el-col>
-            <el-col :span="10">
-              <el-input
-                placeholder=""
-                v-model="filterCondition[index]['value']"
-                size="small"
-                clearable
-              >
-                <template>
-                  <i class="el-icon-circle-plus"></i>
-                </template>
-              </el-input>
-            </el-col>
-            <el-popover placement="right" width="400" trigger="click">
-              <el-button
-                size="mini"
-                type="primary"
-                @click="filterConfirm"
-                style="position: absolute; top: 24px; z-index: 100"
-                >筛选
-              </el-button>
-              <el-table
-                :data="
-                  filterValueSelect.filter(
-                    (data) =>
-                      !filterSearch ||
-                      data[filterOptionSelectList[index]]
-                        .toLowerCase()
-                        .includes(filterSearch.toLowerCase())
-                  )
-                "
-                @row-click="handleFilter"
-                row-key="id"
-                :highlight-current-row="true"
-                :cell-style="{ textAlign: 'left' }"
-                height="300"
-              >
-                <el-table-column
-                  :prop="filterOptionSelectList[index]"
-                  align="right"
-                >
-                </el-table-column>
-                <el-table-column align="right">
-                  <template slot="header">
-                    <el-input
-                      v-model="filterSearch"
-                      size="mini"
-                      placeholder="搜索"
-                      prefix-icon="el-icon-search"
-                    />
-                  </template>
-                </el-table-column>
-              </el-table>
-              <el-pagination
-                small
-                @current-change="handleCurrentChangeFilter"
-                :current-page="filterSearchPage"
-                :page-size="pageSizeFilter"
-                layout="total, prev, pager, next"
-                :total="totalDataCountFilter"
-                class="flexRowCenter"
-              >
-              </el-pagination>
+            </el-row>
+            <br />
+            <el-row
+              v-for="(item, index) in filterCondition"
+              :key="index"
+              class="filterBox"
+            >
               <el-button
                 type="text"
-                icon="el-icon-circle-plus"
-                slot="reference"
-                @click="handleFilterValue(item, index)"
+                icon="el-icon-remove-outline"
+                @click="filterRemove(index)"
               ></el-button>
-            </el-popover>
+              <el-col :span="6">
+                <el-select
+                  :span="2"
+                  v-model="filterCondition[index]['option']"
+                  placeholder="请选择"
+                  size="small"
+                  @change="filterValueInit(index)"
+                >
+                  <el-option
+                    v-for="item in filterOptions"
+                    :key="item['column_name']"
+                    :label="item['column_name']"
+                    :value="item['column_name']"
+                  >
+                  </el-option>
+                </el-select>
+              </el-col>
+              <el-col :span="5">
+                <el-select
+                  v-model="filterCondition[index]['type']"
+                  placeholder="=="
+                  size="small"
+                >
+                  <el-option
+                    v-for="item in filterTypes"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  >
+                  </el-option>
+                </el-select>
+              </el-col>
+              <el-col :span="10">
+                <el-input
+                  placeholder=""
+                  v-model="filterCondition[index]['value']"
+                  size="small"
+                  clearable
+                >
+                  <template>
+                    <i class="el-icon-circle-plus"></i>
+                  </template>
+                </el-input>
+              </el-col>
+              <el-popover placement="right" width="400" trigger="click">
+                <el-button
+                  size="mini"
+                  type="primary"
+                  @click="filterConfirm"
+                  style="position: absolute; top: 24px; z-index: 100"
+                  >筛选
+                </el-button>
+                <el-table
+                  :data="
+                    filterValueSelect.filter(
+                      (data) =>
+                        !filterSearch ||
+                        data[filterOptionSelectList[index]]
+                          .toLowerCase()
+                          .includes(filterSearch.toLowerCase())
+                    )
+                  "
+                  @row-click="handleFilter"
+                  row-key="id"
+                  :highlight-current-row="true"
+                  :cell-style="{ textAlign: 'left' }"
+                  height="300"
+                >
+                  <el-table-column
+                    :prop="filterOptionSelectList[index]"
+                    align="right"
+                  >
+                  </el-table-column>
+                  <el-table-column align="right">
+                    <template slot="header">
+                      <el-input
+                        v-model="filterSearch"
+                        size="mini"
+                        placeholder="搜索"
+                        prefix-icon="el-icon-search"
+                      />
+                    </template>
+                  </el-table-column>
+                </el-table>
+                <el-pagination
+                  small
+                  @current-change="handleCurrentChangeFilter"
+                  :current-page="filterSearchPage"
+                  :page-size="pageSizeFilter"
+                  layout="total, prev, pager, next"
+                  :total="totalDataCountFilter"
+                  class="flexRowCenter"
+                >
+                </el-pagination>
+                <el-button
+                  type="text"
+                  icon="el-icon-circle-plus"
+                  slot="reference"
+                  @click="handleFilterValue(item, index)"
+                ></el-button>
+              </el-popover>
+            </el-row>
+            <el-col v-if="filterCondition.length < 1" class="displayBox"
+              >未设置过滤条件</el-col
+            >
+            <el-button
+              type="text"
+              icon="el-icon-circle-plus-outline"
+              @click="
+                filterCondition.push({ options: '', type: '==', value: '' })
+              "
+              >添加过滤条件</el-button
+            >
+            <el-divider></el-divider>
           </el-row>
-          <el-col v-if="filterCondition.length < 1" class="displayBox"
-            >未设置过滤条件</el-col
-          >
-          <el-button
-            type="text"
-            icon="el-icon-circle-plus-outline"
-            @click="
-              filterCondition.push({ options: '', type: '==', value: '' })
-            "
-            >添加过滤条件</el-button
-          >
-          <el-divider></el-divider>
           <h4>显示级别配置</h4>
           <el-form label-position="top">
             <el-form-item label="最小级别">
@@ -4223,6 +4225,7 @@ export default {
 
       //图标图层样式
       textField: "",
+      layerIcon: {'circle':'fa fa-circle','line':'fa fa-window-minimize','fill':'fa fa-square','symbol':'fa fa-font','fill-extrusion':'fa fa-cube','heatmap':'fa fa-fire','raster':'fa fa-photo','hillshade':'	fa fa-area-chart'},
 
       //编辑框
       menuButtonShowList: [], //由列表来记录图层编辑框下每个tab的显示情况
@@ -4497,9 +4500,14 @@ export default {
           let item = window.document.createElement("div");
           var item_name = window.document.createElement("div");
           let colorBox = window.document.createElement("div");
+          let iconBox = window.document.createElement("div");
+          if(feature.layer.type != 'background'){
+            iconBox.className = this.layerIcon[feature.layer.type];
+          }
 
           var index = this.layersName.indexOf(feature.layer["id"]);
           container.appendChild(item).className = "item";
+          item.appendChild(iconBox);
           item.appendChild(colorBox).className = "colorBox";
           item.appendChild(item_name).className = "item_name";
           item_name.innerHTML = this.layers[index].showName; //显示的是showName
@@ -4508,10 +4516,9 @@ export default {
           const color_name = feature.layer.type + "-" + "color";
           colorBox.style.setProperty(
             "background-color",
-            this.layers[index].paint[color_name]
+            feature.layer.paint[color_name]
           );
-
-          this.addItemEvent(item, feature, index);
+          this.addItemEvent(item, this.layers[index], index);
         }
 
         console.log("selectedFeatures", selectedFeatures);
@@ -4679,8 +4686,10 @@ export default {
           "mapbox:group": "92ca48f13df25",
         },
       };
-      backLayer.paint["background-color"] =
-        "#" + Math.random().toString(16).substr(2, 6);
+      if(sourceType != "mbTile"){
+        backLayer.paint["background-color"] =
+          "#" + Math.random().toString(16).substr(2, 6);
+      }
       if (
         !Object.prototype.hasOwnProperty.call(
           this.layersNameObject,
@@ -4759,7 +4768,7 @@ export default {
       await this.getStyleListById(this.mbTileSelect); //加载数据后更新styleList，注：但现在没触发
     },
     // 获取不同类型来源的tileJson列表
-    getTileJsonList(type){
+    async getTileJsonList(type){
       requestApi
         .getTileJsonList(type)
         .then((res) => {
@@ -5161,11 +5170,11 @@ export default {
         id: row.originName,
         type: geoType,
         filter: ["all"],
-        layout: layerStyleProperties[geoType].layout,
+        layout: JSON.parse(JSON.stringify(layerStyleProperties[geoType].layout)),   //防止同类型图层样式改变间影响
         maxzoom: 22,
         metadata: "",
         minzoom: 0,
-        paint: layerStyleProperties[geoType].paint,
+        paint: JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint)),
         source: this.sourceNameObject[row.tableName], //通过记录的source名字与id对应，拿到sourceId
         // "source-layer": "default"
         "source-layer": row.tableName,
@@ -5269,11 +5278,11 @@ export default {
         id: row.originName,
         type: geoType,
         filter: ["all"],
-        layout: layerStyleProperties[geoType].layout,
+        layout: JSON.parse(JSON.stringify(layerStyleProperties[geoType].layout)),
         maxzoom: 22,
         metadata: "",
         minzoom: 0,
-        paint: layerStyleProperties[geoType].paint,
+        paint: JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint)),
         source: this.sourceNameObject[row.id], //添加的sourceId
         // "source-layer": "default"
         "source-layer": row.originName,
@@ -5348,11 +5357,11 @@ export default {
         id: row.id,
         type: geoType,
         filter: ["all"],
-        layout: layerStyleProperties[geoType].layout,
+        layout: JSON.parse(JSON.stringify(layerStyleProperties[geoType].layout)),
         maxzoom: typeof(row['maxzoom']) != 'undefined' ? row['maxzoom'] : 22,
         metadata: "",
         minzoom: typeof(row['minzoom']) != 'undefined' ? row['minzoom'] : 0,
-        paint: layerStyleProperties[geoType].paint,
+        paint: JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint)),
         source: this.sourceNameObject[name], //通过记录的source名字与id对应，拿到sourceId
         // "source-layer": "default"
         "source-layer": row.id,
@@ -5438,11 +5447,11 @@ export default {
         id: row.id,
         type: geoType,
         filter: typeof(row['filter']) != "undefined" ? row['filter'] : ['all'],
-        layout: newLayout,
+        layout: JSON.parse(JSON.stringify(newLayout)),
         maxzoom: typeof(row['maxzoom']) != 'undefined' ? row['maxzoom'] : 22,
         metadata: "",
         minzoom: typeof(row['minzoom']) != 'undefined' ? row['minzoom'] : 0,
-        paint: newPaint,
+        paint: JSON.parse(JSON.stringify(newPaint)),
         source: this.sourceNameObject[name], //通过记录的source名字与id对应，拿到sourceId
         // "source-layer": "default"
         "source-layer": row['source-layer'],
@@ -5596,7 +5605,16 @@ export default {
     //回撤到原来样式
     returnOriginStyle(){
       const style = this.originStyle[this.nowLayerIndex];
-      this.addTypeStyle(style);
+      const aimLayer = this.layers[this.nowLayerIndex];
+      aimLayer.paint = JSON.parse(JSON.stringify(style.paint));
+      aimLayer.layout = JSON.parse(JSON.stringify(style.layout));
+      console.log("应用完图层样式", aimLayer);
+      this.handleRemoveLayer(aimLayer.id);
+      if (this.nowLayerIndex === 0) {
+        this.addLayerToMap(aimLayer);
+      } else {
+        map.addLayer(aimLayer, this.layers[this.nowLayerIndex - 1].id);
+      }    
     },
     async openTemplateEdit(index,row){
       // 先关闭图层编辑框避免冲突
@@ -5605,7 +5623,7 @@ export default {
       this.styleTypeSelect = row.type;
       const type = row.type;      
       this.getTypeStyleList(type);
-      this.getTileJsonList("mbTile");
+      await this.getTileJsonList("mbTile");
       if(this.templateStyleSelect == ""){
         this.templateStyleSelect = this.mbTileStyleList[0].id;  //先默认为第一个
         this.templateStyleJson = this.mbTileStyleList[0];  //先默认为第一个
@@ -5682,16 +5700,12 @@ export default {
     },
     //添加对应的类型样式
     addTypeStyle(row){
-      //先改参数再更新图层，打开图层编辑框
-      console.log("apply",row, "style to", this.layers[this.nowLayerIndex].originName);
+      //先更新原样式
       let aimLayer = this.layers[this.nowLayerIndex];
-      aimLayer.paint = row.paint;
-      // aimLayer.paint = {};
-      aimLayer.layout = row.layout;
-      // aimLayer.layout = {
-      //   "icon-image": "cat",
-      //   "icon-size": 0.25,
-      // };
+      this.originStyle[this.nowLayerIndex].paint = JSON.parse(JSON.stringify(aimLayer.paint));
+      this.originStyle[this.nowLayerIndex].layout = JSON.parse(JSON.stringify(aimLayer.layout));
+      aimLayer.paint = JSON.parse(JSON.stringify(row.paint));
+      aimLayer.layout = JSON.parse(JSON.stringify(row.layout));
       console.log("应用完图层样式", aimLayer);
       this.handleRemoveLayer(aimLayer.id);
       if (this.nowLayerIndex === 0) {
@@ -5699,22 +5713,23 @@ export default {
       } else {
         map.addLayer(aimLayer, this.layers[this.nowLayerIndex - 1].id);
       }
-      //更新图层编辑框样式
-      this.handleLayerEdit(this.nowLayerIndex, aimLayer);
     },
     //给自己数据添加mbTile样式，不需要filter属性
     addMbTileToSelf(row){
       //只替换paint和layout的相关属性
       console.log("row",row)
+      //先更新原样式
       let aimLayer = this.layers[this.nowLayerIndex];
+      this.originStyle[this.nowLayerIndex].paint = JSON.parse(JSON.stringify(aimLayer.paint));
+      this.originStyle[this.nowLayerIndex].layout = JSON.parse(JSON.stringify(aimLayer.layout));      
       if('layout' in row){
         for(let key in row.layout){
-          aimLayer.layout[key] = row.layout[key]
+          aimLayer.layout[key] = JSON.parse(JSON.stringify(row.layout[key]));
         }
       }
       if('paint' in row){
         for(let key in row.paint){
-          aimLayer.paint[key] = row.paint[key]
+          aimLayer.paint[key] = JSON.parse(JSON.stringify(row.paint[key]));
         }
       }      
       //先改参数再更新图层，打开图层编辑框
@@ -5770,14 +5785,8 @@ export default {
       //先改参数再更新图层，打开图层编辑框
       console.log("change layer type to", val);
       let aimLayer = this.layers[this.nowLayerIndex];
-      aimLayer.paint = layerStyle[val].paint;
-      // aimLayer.paint = {};
-      aimLayer.layout = layerStyle[val].layout;
-      // aimLayer.layout = {
-      //   "icon-image": "cat",
-      //   "icon-size": 0.25,
-      // };
-      console.log("layer", aimLayer);
+      aimLayer.paint = JSON.parse(JSON.stringify(layerStyle[val].paint));
+      aimLayer.layout = JSON.parse(JSON.stringify(layerStyle[val].layout));
       this.handleRemoveLayer(aimLayer.id);
       if (this.nowLayerIndex === 0) {
         this.addLayerToMap(aimLayer);
@@ -5913,8 +5922,10 @@ export default {
     handleLayerClick() {
       console.log("layers:", this.layers);
       console.log("layersName",this.layersName);
-      // const source = map.getSource(this.layers[this.nowLayerIndex]["source"]);
-      // console.log("source:", source);
+      if(this.nowLayerIndex > 0){
+        const source = map.getSource(this.layers[this.nowLayerIndex]["source"]);
+        console.log("source:", source);
+      }
       const style = map.getStyle();
       console.log("style:", style);
 
@@ -5953,32 +5964,7 @@ export default {
       //因为item是html元素，在其事件中this指向该元素无法获取vue的实例属性和方法
       let _this = this;
       item.onclick = function test() {
-        _this.editorShow = "";
-        _this.$nextTick(() => {
-          _this.nowLayerIndex = index;
-          _this.zoomRange = [
-            _this.layers[index].minzoom,
-            _this.layers[index].maxzoom,
-          ];
-          if (feature.layer.type === "line") {
-            _this.editorShow = "lineEditorShow";
-          } else if (feature.layer.type === "fill") {
-            _this.editorShow = "fillEditorShow";
-          } else if (feature.layer.type === "circle") {
-            _this.editorShow = "circleEditorShow";
-          } else if (feature.layer.type === "fill-extrusion") {
-            _this.editorShow = "fillExtrusionEditorShow";
-          } else if (feature.layer.type === "symbolEditorShow") {
-            _this.editorShow = "symbolEditorShow";
-            _this.getSymbolList();
-            _this.getFontList();
-          } else if(feature.layer.type === "heatmap"){
-            _this.editorShow = "heatMapEditorShow";
-          } else {
-            _this.editorShow = "backgroundEditorShow";
-          }
-          _this.menuButtonShowList = [];
-        });
+        _this.handleLayerEdit(index,feature);
       };
     },
 
@@ -6518,28 +6504,33 @@ h4 {
   /* height: 30px; */
 }
 .item {
+  display: flex;
+  justify-content: left;
+  align-items: center;
   color: black;
   border-radius: 5px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 .item:hover {
   color: #4264fb;
   background-color: #e0e7eb;
   cursor: pointer;
 }
+.iconBox{
+  width: 18px;
+  height: 18px;
+}
 .colorBox {
   width: 18px;
   height: 18px;
-  /* background-color: red; */
-  float: left;
   display: inline-block;
   border-radius: 5px;
-  margin: 1px;
+  margin: 0 5px;
 }
 .item_name {
-  margin-left: 30px;
+  /* margin-left: 30px; */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;  
 }
 /* 未设置过滤条件框样式 */
 .displayBox {

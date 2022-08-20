@@ -1626,7 +1626,7 @@
       @click="reset('open')"
       >重置</el-button
     >
-    <el-button class="menuButton" plain @click="test">test</el-button>
+    <!-- <el-button class="menuButton" plain @click="test">test</el-button> -->
   </div>
 </template>
 <script>
