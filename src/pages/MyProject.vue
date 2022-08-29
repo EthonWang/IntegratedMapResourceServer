@@ -16,14 +16,31 @@
     </div>
 
     <div class="projectsBox">
-      <el-card class="project-item" v-for="(item) in mapProjectData" :key="item.date" shadow="hover">
-        <el-image class="project-item-image" style="" fit="contain" :src="item.mapImgUrl.mapImgUrl ? item.mapImgUrl.mapImgUrl : imgDefault"></el-image>
+      <el-card class="project-item" v-for="(item,index) in mapProjectData" :key="item.date" shadow="hover">
+        <el-image class="project-item-image" fit="contain" :src="item.mapImgUrl.mapImgUrl ? item.mapImgUrl.mapImgUrl : imgDefault"></el-image>
         <div>
 
           <el-row type="flex" align="middle" >
-            <h3 class="project-name" :title="item.name">{{ item.name }}</h3>
+            <el-col :span="16"
+              v-show="prjIndex != index "
+              class="projectTitle"
+              @click.native="prjIndex = index"
+            >
+              <h3 :title="item.name">{{item.name}}</h3>
+              <i class="el-icon-edit"></i>
+            </el-col>
+            <el-col v-show="prjIndex === index" class="projectTitle">
+              <el-input
+                v-model="item.name"
+                size="mini"
+                @change="prjNameChange(item)"
+              ></el-input>
+              <i class="el-icon-check" @click="prjNameChange(item)"></i>
+            </el-col>            
 <!--            <el-tag :type="item.publicBoolean ? 'success':'info'">{{item.publicBoolean ? '已发布':'未发布'}}</el-tag>-->
-            <el-tag v-if="!item.publicBoolean" type="info">未发布</el-tag>
+            <el-col :offset="2" :span="6">
+              <el-tag v-if="!item.publicBoolean" type="info">未发布</el-tag>              
+            </el-col>
 
             <el-popover
                 placement="right"
@@ -102,6 +119,7 @@ export default {
       mapProjectTotal: 0,
       mapProjectNames: {},
       imgDefault: require("../assets/imgs/map-icon.png"),
+      prjIndex: -1,   //工程序号
 
       currentPage: 1,
       pageSize: 8,
@@ -164,6 +182,22 @@ export default {
       let newUrl=this.$router.resolve({path: `/MapEditor/${mapProjectId}`})
       window.open(newUrl.href, '_blank');
 
+    },
+
+    prjNameChange(item){
+      this.prjIndex = -1;
+      requestApi
+        .updateMapProject(JSON.parse(JSON.stringify(item)))
+        .then((res) => {
+          if(res.data.code === 0){
+            console.log("改名成功！");
+          }else{
+            console.log("改名失败！",res);
+          }
+        })  
+        .catch((err)=>{
+        console.log(err);
+        })    
     },
 
     copyMapProject(item) {
@@ -321,7 +355,7 @@ export default {
 .projectsBox {
   padding-top:10px;
   width: 80%;
-  height: calc(100vh - 340px);
+  height: calc(100vh - 300px);
   display: flex;
   justify-content: flex-start;
   /* align-content:center ; */
@@ -344,12 +378,30 @@ export default {
   height: 15vh;
 }
 
-.project-name {
+.projectTitle{
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 45px;
+}
+.projectTitle h3 {
+  display: inline-block;
   margin: 10px 0px;
   width: 100%;
-  text-overflow: ellipsis;
-  overflow: hidden;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.projectTitle .el-icon-edit {
+  display: none;
+}
+.projectTitle:hover .el-icon-edit,.el-icon-check{
+  display: block;
+  cursor: pointer;
+}
+.projectTitle:hover h3 {
+  cursor: pointer;
+  color: #75b9ff;
 }
 
 

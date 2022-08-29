@@ -152,7 +152,7 @@
           !attribute.includes('icon-translate') && 
           !attribute.includes('text-line-height') && 
           !attribute.includes('text-translate') &&
-          !attribute.includes('rotation-alignment')
+          !attribute.includes('rotation-alignment') && false
         "
         class="menuButton"
         plain
@@ -1609,7 +1609,7 @@
       </el-dialog>
     </el-row>
     <!-- 公式编辑框 -->
-    <el-row v-if="formulaShow">
+    <el-row v-if="formulaShow && false">
       <el-input
         type="textarea"
         :autosize="{ minRows: 2 }"
@@ -1814,7 +1814,7 @@ export default {
 
       //zoom范围条件
       colorInit: "",
-      zoomValue: [{ zoom: 0 }, { zoom: 24 }], //先不设置value属性，不同地物属性value类型不同
+      zoomValue: [{ zoom: 0 }, { zoom: 22 }], //先不设置value属性，不同地物属性value类型不同
       zoomEditShow: false,
       zoomEditIndex: 0,
       zoomCondition: [], //是否需要interpolate渲染
@@ -1935,9 +1935,9 @@ export default {
   methods: {
     initInfo() {
       // 初始化页面参数
-      this.spriteList = JSON.parse(localStorage.getItem('spriteList'));
-      this.symbolTableData = JSON.parse(localStorage.getItem('symbolTableData'));
-      this.fontList = JSON.parse(localStorage.getItem('fontList'));
+      this.spriteList = JSON.parse(JSON.stringify(localStorage.getItem('spriteList')));
+      this.symbolTableData = JSON.parse(JSON.stringify(localStorage.getItem('symbolTableData')));
+      this.fontList = JSON.parse(JSON.stringify(localStorage.getItem('fontList')));
 
       // 保留原样式用于重置,
       if (this.layerOrigin == "") {
@@ -1987,9 +1987,9 @@ export default {
           //赋初始值
           case 'zoom':
             console.log('zoom变换读取原数据:',this.layer.attrValueSet[this.attribute].value)
-            this.zoomValue = this.layer.attrValueSet[this.attribute].value.zoomValue;
-            this.zoomRate = this.layer.attrValueSet[this.attribute].value.zoomRate;
-            this.zoomValueOrigin = this.layer.attrValueSet[this.attribute].value.zoomValueOrigin;
+            this.zoomValue = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.zoomValue));
+            this.zoomRate = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.zoomRate));
+            this.zoomValueOrigin = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.zoomValueOrigin));
 
             this.menuButtonShowList[this.attribute] = false;
             this.$bus.$emit("show", { param1: this.attribute, param2: false, param4: 'zoom'});
@@ -1997,13 +1997,13 @@ export default {
             break
           case 'data':
             console.log('data变换读取原数据:',this.layer.attrValueSet[this.attribute].value)
-            this.dataValue = this.layer.attrValueSet[this.attribute].value.dataValue;
-            this.dataRange = this.layer.attrValueSet[this.attribute].value.dataRange;
-            this.dataSelect = this.layer.attrValueSet[this.attribute].value.dataSelect;
-            this.datalength = this.layer.attrValueSet[this.attribute].value.datalength;
-            this.dataInsertIndex = this.layer.attrValueSet[this.attribute].value.dataInsertIndex;
-            this.dataRate = this.layer.attrValueSet[this.attribute].value.dataRate;
-            this.dataValueOrigin = this.layer.attrValueSet[this.attribute].value.dataValueOrigin;
+            this.dataValue = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.dataValue));
+            this.dataRange = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.dataRange));
+            this.dataSelect = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.dataSelect));
+            this.datalength = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.datalength));
+            this.dataInsertIndex = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.dataInsertIndex));
+            this.dataRate = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.dataRate));
+            this.dataValueOrigin = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.dataValueOrigin));
 
             this.menuButtonShowList[this.attribute] = false;
             this.$bus.$emit("show", { param1: this.attribute, param2: false, param4: 'data'});
@@ -2011,11 +2011,11 @@ export default {
             break
           case 'prop':
             console.log('prop变换读取原数据:',this.layer.attrValueSet[this.attribute].value)
-            this.propValue = this.layer.attrValueSet[this.attribute].value.propValue;
-            this.propSelect = this.layer.attrValueSet[this.attribute].value.propSelect;
-            this.propValueFilter = this.layer.attrValueSet[this.attribute].value.propValueFilter;
-            this.propValueList = this.layer.attrValueSet[this.attribute].value.propValueList;
-            this.propValueOrigin = this.layer.attrValueSet[this.attribute].value.propValueOrigin;
+            this.propValue = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.propValue));
+            this.propSelect = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.propSelect));
+            this.propValueFilter = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.propValueFilter));
+            this.propValueList = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.propValueList));
+            this.propValueOrigin = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.propValueOrigin));
 
             this.menuButtonShowList[this.attribute] = false;
             this.$bus.$emit("show", { param1: this.attribute, param2: false, param4: 'prop'});
@@ -2023,8 +2023,8 @@ export default {
             break
           case 'formula':
             console.log('formula变换读取原数据:',this.layer.attrValueSet[this.attribute].value)
-            this.formulaValue = this.layer.attrValueSet[this.attribute].value.formulaValue;
-            this.formValueOrigin = this.layer.attrValueSet[this.attribute].value.formValueOrigin;
+            this.formulaValue = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.formulaValue));
+            this.formValueOrigin = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.formValueOrigin));
 
             this.menuButtonShowList[this.attribute] = false;
             this.$bus.$emit("show", { param1: this.attribute, param2: false, param4: 'formula'});
@@ -2148,25 +2148,34 @@ export default {
       }
     },
     handleCurrentChange(currentPage) {
+      for (let i = 0; i < this.propValueList.length; i++) {
+        //如果有的话，添加进去，把参数设置为true
+        const id = this.propValueList[i].id;
+        if (this.multipleSelectionAll.has(id)) {
+          this.$nextTick(() => {
+            this.$refs.multiplePropTable.toggleRowSelection(this.propValueList[i], true);
+          });
+        }
+      }    
       this.propNowPage = currentPage;
       this.propValueListInit();
-      this.$nextTick(() => {
-        // this.component.chartBind.alDeviceManage 是上次选中的数据
-        // 对当前页进行数据回显
-        console.log("multipleSelectionAll",this.multipleSelectionAll)
-          for(let [,value] of this.multipleSelectionAll) {
-            value.forEach(row=>{
-              this.propValueList.forEach(item => {
-                if( row.id == item.id ) 
-                  this.$refs.multiplePropTable.toggleRowSelection(item, true);
-              });
-            })
-          }
-          // 当前页选中数据存储在Map中
-          // this.multipleSelectionAll.set(this.propNowPage, this.tableChecked);
-          // 将其他页面选中数据存储在Map中
-          // if ( type == 'init') this.findOthertarget();
-      });    
+      // this.$nextTick(() => {
+      //   // this.component.chartBind.alDeviceManage 是上次选中的数据
+      //   // 对当前页进行数据回显
+      //   console.log("multipleSelectionAll",this.multipleSelectionAll)
+      //     for(let [,value] of this.multipleSelectionAll) {
+      //       value.forEach(row=>{
+      //         this.propValueList.forEach(item => {
+      //           if( row.id == item.id ) 
+      //             this.$refs.multiplePropTable.toggleRowSelection(item, true);
+      //         });
+      //       })
+      //     }
+      //     // 当前页选中数据存储在Map中
+      //     // this.multipleSelectionAll.set(this.propNowPage, this.tableChecked);
+      //     // 将其他页面选中数据存储在Map中
+      //     // if ( type == 'init') this.findOthertarget();
+      // });    
     },
     //对zoom变化各行进行处理
     zoomOpen() {
@@ -2175,6 +2184,11 @@ export default {
       const valueOrigin2 = this.layer[this.layoutOrpaint][this.attribute];
       this.zoomValue[0].value = JSON.parse(JSON.stringify(valueOrigin1));
       this.zoomValue[1].value = JSON.parse(JSON.stringify(valueOrigin2));
+      if(this.isNum){
+        this.zoomValue[0].value = Number(JSON.parse(JSON.stringify(valueOrigin1)));
+        this.zoomValue[1].value = Number(JSON.parse(JSON.stringify(valueOrigin2)));
+      }      
+      console.log("aaa",typeof(this.zoomValue[0].value));
       this.zoomValueOrigin = JSON.parse(JSON.stringify(this.zoomValue));
 
       //先初始化参数，再打开相关编辑面板
@@ -2670,8 +2684,32 @@ export default {
     },
     propFilterChange(val) {
       this.propValueFilter[this.propEditIndex] = val;
-      this.multipleSelectionAll.set(this.propNowPage,val);
+      // this.multipleSelectionAll.set(this.propNowPage,val);
       console.log("select", val);
+      const currSelectMap = new Map();
+      for (let i = 0; i < val.length; i++) {
+        currSelectMap.set(val[i].id, true);
+      }
+
+      const selectList = [];
+      this.propValueList.forEach((item) => {
+        const id = item.id;
+        selectList.push({
+          id,
+          selected: currSelectMap.has(id) ? true : false,
+        });
+      });
+      selectList.forEach((item) => {
+        const id = item.id;
+        const selected = item.selected;
+        if (this.multipleSelectionAll.has(id) && !selected) {
+          this.multipleSelectionAll.delete(id);
+        }
+        if (!this.multipleSelectionAll.has(id) && item.selected) {
+          this.multipleSelectionAll.set(id, item);
+        }
+      });
+      console.log("this.multipleSelectionAll", this.multipleSelectionAll);    
     },
     selectall(selection){
       console.log("selection:",selection)

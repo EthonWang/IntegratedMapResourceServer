@@ -228,7 +228,7 @@
                   <el-table-column width="100">
                     <template slot="header">
                       <el-popconfirm
-                        title="确定添加全部样式图层吗？"
+                        title="确定添加全部数据样式吗？"
                         @confirm="addAllSources(dataLayers)"
                       >
                         <!-- <i slot="reference" class="el-icon-refresh-left iconBtn" title="返回原样式"></i> -->
@@ -247,7 +247,7 @@
                   </el-table-column>
                 </el-table>
                 <!-- styleLayer -->
-                <el-table v-if="isStyle" :data="styleLayers.filter(data => (data['source'] != 'natural_earth_shaded_relief') && (data['type'] != 'raster'))" height="313">
+                <el-table v-if="isStyle" :data="styleLayers.filter(data => (layerType.indexOf(data['type']) > 0))" height="313">
                   <el-table-column
                     property="id"
                     width="200"
@@ -257,7 +257,7 @@
                   <el-table-column width="100">
                     <template slot="header">
                       <el-popconfirm
-                        title="确定添加全部样式图层吗？"
+                        title="确定添加全部图层样式吗？"
                         @confirm="addAllStyles(styleLayers)"
                       >
                         <!-- <i slot="reference" class="el-icon-refresh-left iconBtn" title="返回原样式"></i> -->
@@ -331,15 +331,21 @@
       <!--      图层列表-->
       <el-divider class="divider">图层</el-divider>
       <div class="layerTable">
+        <el-switch
+          :width="30" style="position:absolute;left:10px;top:8px;z-index:100"
+          v-model="allLayerShow"
+          @change="allLayerShowSwitchChange($event)"
+        >
+        </el-switch>          
         <el-table
           :data="layers"
           ref="shpLayerTable"
           row-key="id"
-          size="mini"
+          size="mini" height="calc(100vh - 170px)"
           @row-click="handleLayerClick()"
           style="width: 100%"
         >
-          <el-table-column width="40">
+          <el-table-column width="40">               
             <template slot-scope="scope">
               <el-switch
                 :width="30"
@@ -364,6 +370,14 @@
           >
           </el-table-column>
           <el-table-column label="操作" min-width="115">
+            <template slot="header">
+              <el-popconfirm
+                title="确定删除全部图层吗？"
+                @confirm="allLayerDelete()"
+              >
+                <el-button slot="reference" type="info" size="mini">一键删除</el-button>
+              </el-popconfirm>                      
+            </template>               
             <template slot-scope="scope">
               <el-button
                 size="mini"
@@ -538,6 +552,7 @@
         ></el-input>
         <i class="el-icon-check" @click="nameEdit = false"></i>
       </div>
+      
       <el-tabs value="first">
         <el-tab-pane label="样式设置" name="first">
           <!--    圆点图层编辑面板-->
@@ -4098,17 +4113,19 @@
             <el-form-item label="最小级别">
               <el-slider
                 :max="layers[nowLayerIndex]['maxzoom']"
-                :min="zoomRange[0]"
+                :min="parseInt(0)"
                 v-model="layers[nowLayerIndex]['minzoom']"
+                @change="handleZoomChange(layers[nowLayerIndex]['id'],layers[nowLayerIndex]['minzoom'],layers[nowLayerIndex]['maxzoom'])"
                 show-input
               >
               </el-slider>
             </el-form-item>
             <el-form-item label="最大级别">
               <el-slider
-                :max="zoomRange[1]"
+                :max="parseInt(22)"
                 :min="layers[nowLayerIndex]['minzoom']"
                 v-model="layers[nowLayerIndex]['maxzoom']"
+                @change="handleZoomChange(layers[nowLayerIndex]['id'],layers[nowLayerIndex]['minzoom'],layers[nowLayerIndex]['maxzoom'])"
                 show-input
               >
               </el-slider>
@@ -4174,6 +4191,7 @@ export default {
       publishLink: "",
       dataLayers: [],
       mutiPgInfo: "",
+      allLayerShow: true,
 
       //mbtile
       mbTileJsonList: [],
@@ -4191,6 +4209,7 @@ export default {
       styleLayers: [],
       mbTileStyleEditShow: false,
       mbTileStyleInfo:{mapStyleFile : null,tileJsonId:''},
+      layerType: ['circle','line','fill','fill-extrusion','symbol','background','heatmap'],
 
       //左侧shp图层树
       layersNameObject: {}, //检测重复  后端字段为layerTree
@@ -4382,7 +4401,8 @@ export default {
           this.glyphsPath = this.mapProjectInfo.glyphs;
           this.sources = this.mapProjectInfo.sources;
           this.layers = this.mapProjectInfo.layers;
-          this.layersNameObject = this.mapProjectInfo.layerTree;
+          this.layersNameObject = JSON.stringify(this.mapProjectInfo.layerTree) == '{}' ? {} : this.mapProjectInfo.layerTree.layersNameObject;
+          this.sourceNameObject = JSON.stringify(this.mapProjectInfo.layerTree) == '{}' ? {} : this.mapProjectInfo.layerTree.sourceNameObject;
           this.publicBoolean=this.mapProjectInfo.publicBoolean;
           this.createEmptyMap();
           this.initMapWithData();
@@ -4454,11 +4474,10 @@ export default {
       map.on("mousemove", (e) => {
         map.getCanvas().style.cursor = "pointer";
 
-        this.center = String(e.lngLat.lng) + "," + String(e.lngLat.lat);
         this.showCenter =
-          String(e.lngLat.lng.toFixed(5)) +
-          "," +
-          String(e.lngLat.lat.toFixed(5));
+          '(' + String(e.lngLat.lng.toFixed(5)) +
+          "，" +
+          String(e.lngLat.lat.toFixed(5)) + ')';
       });
 
       //选中某元素
@@ -4501,16 +4520,19 @@ export default {
           var item_name = window.document.createElement("div");
           let colorBox = window.document.createElement("div");
           let iconBox = window.document.createElement("div");
+          let iconItem = window.document.createElement("i");
+          iconBox.appendChild(iconItem);
           if(feature.layer.type != 'background'){
-            iconBox.className = this.layerIcon[feature.layer.type];
+            iconItem.className = this.layerIcon[feature.layer.type];
           }
 
           var index = this.layersName.indexOf(feature.layer["id"]);
           container.appendChild(item).className = "item";
-          item.appendChild(iconBox);
+          item.appendChild(iconBox).className = "iconBox";
           item.appendChild(colorBox).className = "colorBox";
           item.appendChild(item_name).className = "item_name";
           item_name.innerHTML = this.layers[index].showName; //显示的是showName
+          item_name.title = this.layers[index].showName;
 
           //根据index获取相关图层信息
           const color_name = feature.layer.type + "-" + "color";
@@ -4577,6 +4599,9 @@ export default {
     saveMap() {
       //现将画布内容转为png图片当做工程封面
       this.canvasSrc = map.getCanvas().toDataURL("image/png");
+      const {lng, lat} = map.getCenter();
+      this.center = lng + ',' + lat;
+      this.zoom = map.getZoom();
       this.$confirm("是否保存地图?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -4596,7 +4621,7 @@ export default {
           this.mapProjectInfo.sources = this.sources;
           // this.mapProjectInfo.layers = {layers: this.layers}
           this.mapProjectInfo.layers = this.layers;
-          this.mapProjectInfo.layerTree = this.layersNameObject;
+          this.mapProjectInfo.layerTree = {"layersNameObject":this.layersNameObject,"sourceNameObject":this.sourceNameObject};
           // this.mapProjectInfo.glyphs = this.reqUrl+"/store/fonts/{fontstack}/{range}.pbf";
           // this.mapProjectInfo.sprite = this.reqUrl+"/store/sprites/mpx_sprite/sprite";
           requestApi
@@ -5483,8 +5508,10 @@ export default {
       for(let i in List){
         let item = List[i];
         console.log('item',item);
-        if((item['source'] != 'natural_earth_shaded_relief') && (item['type'] != 'raster')){
+        if((item['source'] != 'natural_earth_shaded_relief') && (item['type'] != 'raster') && (item['type'] != 'background')){
           this.addStyleMbTileShp(i,item)
+        }else if(item['type'] == 'background'){
+          this.addBackground('mbTile',item)
         }
 
       }
@@ -5562,10 +5589,6 @@ export default {
       // 先关闭模板样式编辑框避免冲突
       this.stylesBoxShow = false;
       this.nowLayerIndex = index;
-      this.zoomRange = [
-        this.layers[this.nowLayerIndex].minzoom,
-        this.layers[this.nowLayerIndex].maxzoom,
-      ];
       //先关闭，否则组件不会初始化
       this.editorShow = "";
       //设置属性编辑界面的展示情况
@@ -5941,7 +5964,49 @@ export default {
         this.handleLayoutChange(row.id, "visibility", "none");
       }
     },
+    //全局开关
+    allLayerShowSwitchChange(val){
+      for (let i in this.layers) {
+        const item = this.layers[i];
+        this.layers[i].show = val;
+        this.handleLayerShowSwitchChange(val,item);
+      }
+    },
 
+    async allLayerDelete(){
+      this.editorShow = "";
+
+      for (let i in this.layers) {
+        let item = JSON.parse(JSON.stringify(this.layers[i]));
+        let aimSource = item.source;
+        let layerOriginName = item.originName;
+        let layerid = item.id;
+        this.layersNameObject[layerOriginName] -= 1;
+        this.handleRemoveLayer(layerid);
+        //如果没有layer使用source，则删除source
+        if (this.layersNameObject[layerOriginName] === 0) {
+
+          delete this.layersNameObject[layerOriginName];        
+          //mbTile不删除source，背景没有source
+          if (item.sourceType != "mbTile" && item.type != "background") {
+            this.handleRemoveSource(aimSource);
+            delete this.sources[aimSource];
+            for (let key in this.sourceNameObject) {
+              if (this.sourceNameObject[key] === aimSource) {
+                delete this.sourceNameObject[key];
+                break;
+              }
+            }          
+            //source没有再使用时,删除后台的tileJson
+            this.deleteTileJson(item.source);
+          }
+        }
+      }
+      // 循环完再进行视图数据初始化,避免循环中渲染。
+      this.layers = [];
+      this.layersName = [];
+      this.originStyle = [];
+    },
     handleRemoveSource(sourceName) {
       map.removeSource(sourceName);
     },
@@ -5958,6 +6023,10 @@ export default {
     handlePaintChange(layerName, key, value) {
       console.log("paint:", layerName, key, value);
       map.setPaintProperty(layerName, key, value);
+    },
+    handleZoomChange(layerName, min, max){
+      console.log("zoom:", layerName, min, max);
+      map.setLayerZoomRange(layerName, min, max);
     },
     //为item添加同handleLayerEdit相同的方法
     addItemEvent(item, feature, index) {
@@ -6111,61 +6180,10 @@ export default {
       console.log("activeName", activeName, this.menuButtonShowList);
       console.log("oldActiveName", oldActiveName, this.menuButtonShowList);
     },
-    test1() {
-      var imgDataSrc = map.getCanvas().toDataURL("image/png");
-      this.canvasSrc = imgDataSrc;
-      console.log("canvasSrc", this.canvasSrc);
-
-      // var data = {
-      //     "geometry": {
-      //         "type": "Point",
-      //         "coordinates": [113.32948058466824,23.19862318628209]
-      //     },
-      //     "type": "Feature",
-      //     "properties": {
-      //         "col1": "学史可以看成败、鉴得失、知兴替；",
-      //         "col2": "学诗可以情飞扬、志高昂、人灵秀；",
-      //         "col3": "学伦理可以知廉耻、懂荣辱、辨是非。",
-      //     }
-      // }
-      // map.addSource('test_source', {
-      //     type: "geojson",
-      //     data: data
-      // });
-      // map.addLayer({
-      //     "id": 'test_layer',
-      //     "type": "symbol",
-      //     "minzoom": 0,
-      //     "maxzoom": 22,
-      //     "source": 'test_source',
-      //     "layout": {
-      //         "text-field": ["format", ["get", "col1"], {
-      //             "text-font": ["literal", ["Open Sans Regular"]],
-      //             "text-color": '#FF0000',
-      //             "font-scale": 0.8
-      //         },
-      //         "\n", {},
-      //         ["get", "col2"], {
-      //             "text-font": ["literal", ["DIN Offc Pro Italic"]],
-      //             "text-color": '#000000',
-      //             "font-scale": 0.8
-      //         },
-      //         "\n", {},
-      //         ["get", "col3"], {
-      //             "text-font": ["literal", ["Arial Unicode MS Regular"]],
-      //             "text-color": '#0000FF',
-      //             "font-scale": 0.8
-      //         }],
-      //         "text-size": 16,
-      //         "text-font": ["Open Sans Regular", "Arial Unicode MS Regular"],
-      //         "text-offset": [0, 0],
-      //         "text-anchor": "left",
-      //         "text-justify": "left",
-      //         "text-max-width": 20,
-      //         "text-allow-overlap": false,
-      //     }
-      // });
-    },
+    // test1() {
+    //   const features = map.querySourceFeatures("62fb9590abf4b6e7a4f6d517",{sourceLayer:"place"});
+    //   console.log("features",features);
+    // },
   },
 };
 </script>
@@ -6210,15 +6228,16 @@ h4 {
 }
 
 .layerTable {
+  position: relative;
   width: 100%;
   height: calc(100vh - 170px);
-  overflow-y: scroll;
+  /* overflow-y: scroll; */
 }
-.layerTable::-webkit-scrollbar {
+/* .layerTable::-webkit-scrollbar {
   width: 0;
   height: 0;
   color: transparent;
-}
+} */
 /* 样式框样式 */
 .stylesBox{
   /* display: flex; */
@@ -6505,6 +6524,7 @@ h4 {
 }
 .item {
   display: flex;
+  margin: 1px 0;
   justify-content: left;
   align-items: center;
   color: black;
@@ -6518,16 +6538,21 @@ h4 {
 .iconBox{
   width: 18px;
   height: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .colorBox {
   width: 18px;
   height: 18px;
   display: inline-block;
+  border: rgba(211, 211, 211, 0.6) 1px solid;
   border-radius: 5px;
-  margin: 0 5px;
+  margin: 0 2px;
 }
 .item_name {
   /* margin-left: 30px; */
+  max-width: 100px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;  
