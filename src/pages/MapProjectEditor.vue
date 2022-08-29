@@ -225,7 +225,17 @@
                     show-overflow-tooltip
                     label="source"
                   ></el-table-column>
-                  <el-table-column width="100" label="操作">
+                  <el-table-column width="100">
+                    <template slot="header">
+                      <el-popconfirm
+                        title="确定添加全部数据样式吗？"
+                        @confirm="addAllSources(dataLayers)"
+                      >
+                        <!-- <i slot="reference" class="el-icon-refresh-left iconBtn" title="返回原样式"></i> -->
+
+                        <el-button slot="reference" type="warning" size="mini">全部添加</el-button>
+                      </el-popconfirm>                      
+                    </template>                    
                     <template slot-scope="scope">
                       <el-button
                         size="mini"
@@ -237,7 +247,7 @@
                   </el-table-column>
                 </el-table>
                 <!-- styleLayer -->
-                <el-table v-if="isStyle" :data="styleLayers.filter(data => (data['source'] != 'natural_earth_shaded_relief') && (data['type'] != 'raster'))" height="313">
+                <el-table v-if="isStyle" :data="styleLayers.filter(data => (layerType.indexOf(data['type']) > 0))" height="313">
                   <el-table-column
                     property="id"
                     width="200"
@@ -247,7 +257,7 @@
                   <el-table-column width="100">
                     <template slot="header">
                       <el-popconfirm
-                        title="确定添加全部样式图层吗？"
+                        title="确定添加全部图层样式吗？"
                         @confirm="addAllStyles(styleLayers)"
                       >
                         <!-- <i slot="reference" class="el-icon-refresh-left iconBtn" title="返回原样式"></i> -->
@@ -321,15 +331,21 @@
       <!--      图层列表-->
       <el-divider class="divider">图层</el-divider>
       <div class="layerTable">
+        <el-switch
+          :width="30" style="position:absolute;left:10px;top:8px;z-index:100"
+          v-model="allLayerShow"
+          @change="allLayerShowSwitchChange($event)"
+        >
+        </el-switch>          
         <el-table
           :data="layers"
           ref="shpLayerTable"
           row-key="id"
-          size="mini"
+          size="mini" height="calc(100vh - 170px)"
           @row-click="handleLayerClick()"
           style="width: 100%"
         >
-          <el-table-column width="40">
+          <el-table-column width="40">               
             <template slot-scope="scope">
               <el-switch
                 :width="30"
@@ -354,6 +370,14 @@
           >
           </el-table-column>
           <el-table-column label="操作" min-width="115">
+            <template slot="header">
+              <el-popconfirm
+                title="确定删除全部图层吗？"
+                @confirm="allLayerDelete()"
+              >
+                <el-button slot="reference" type="info" size="mini">一键删除</el-button>
+              </el-popconfirm>                      
+            </template>               
             <template slot-scope="scope">
               <el-button
                 size="mini"
@@ -412,7 +436,7 @@
           </el-table-column>
         </el-table>
       </div>
-      <el-button @click="test1">test</el-button>
+      <!-- <el-button @click="test1">test</el-button> -->
     </div>
     <div v-if="stylesBoxShow" class="stylesBox">
       <el-row type="flex" align="middle" class="stylesBoxTitle">
@@ -423,23 +447,24 @@
         >
           <i slot="reference" class="el-icon-refresh-left iconBtn" title="返回原样式"></i>
         </el-popconfirm>        
-        <i class="el-icon-close " @click="stylesBoxShow = false"></i>
+        <i class="el-icon-upload iconBtn" style="margin:0 5px" title="将该图层模板上传到样式库" @click="createTypeStyle(layers[nowLayerIndex])"></i>
         <i class="el-icon-close close-button" @click="stylesBoxShow = false"></i>
       </el-row>
       <el-collapse accordion class="templateCol" value="first">
         <el-collapse-item name="first">
           <template slot="title">
-            <h4 style="margin-left:10px">散点图</h4>&nbsp;
-            <i class="el-icon-circle-plus iconBtn"></i>
+            <h4 style="margin-left:10px">自定义样式库</h4>&nbsp;
+            <!-- <i class="el-icon-circle-plus iconBtn"></i> -->
           </template>
-          <el-row type="flex" justify="start" style="flex-wrap:wrap">
+          <el-row type="flex" justify="start" style="flex-wrap:wrap;border-top:1px solid #ebeef5">
             <el-card v-for="(item,index) in typeStyleList[styleTypeSelect]" :key="index" 
                      class="templateCard cursor" shadow="hover" @click.native="addTypeStyle(item)">
+              <i class="el-icon-remove-outline tempDeleBtn" @click="tempCardDelete(item.id)"></i>
               <el-image
                 style="width: 100%; height: 110px; border-bottom:1px solid #dcdfe6"
-                :src="imgDefault"
-                fit="contain"></el-image>
-                <el-row type="flex" align="middle" justify="center">
+                :src="item.styleImgUrl.ImgUrl"
+                fit="fill"></el-image>
+                <el-row type="flex" align="middle" justify="center" class="tempCardName">
                   <span>{{item.description}}</span>
                 </el-row>
             </el-card>
@@ -516,7 +541,7 @@
         class="editBoardTitle"
         @click="nameEdit = true"
       >
-        <div>{{ layers[nowLayerIndex]["showName"] }}</div>
+        <div :title="layers[nowLayerIndex]['showName']">{{ layers[nowLayerIndex]["showName"] }}</div>
         <i class="el-icon-edit"></i>
       </div>
       <div v-show="nameEdit === true" class="editBoardTitle">
@@ -527,6 +552,7 @@
         ></el-input>
         <i class="el-icon-check" @click="nameEdit = false"></i>
       </div>
+      
       <el-tabs value="first">
         <el-tab-pane label="样式设置" name="first">
           <!--    圆点图层编辑面板-->
@@ -3939,163 +3965,167 @@
             </el-form-item>
           </el-form>
           <el-divider></el-divider>
-          <el-row type="flex" justify="space-between" align="middle">
-            <h4>过滤条件配置</h4>&nbsp;
-            <el-select v-model="filterWay" placeholder="请选择" size="small">
-              <el-option
-                v-for="item in [
-                  { value: 'all', label: '满足所有条件' },
-                  { value: 'any', label: '满足任意条件' },
-                  { value: 'none', label: '不满足任意条件' },
-                ]"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              >
-              </el-option>
-            </el-select>
-          </el-row>
-          <br />
-          <el-row
-            v-for="(item, index) in filterCondition"
-            :key="index"
-            class="filterBox"
-          >
-            <el-button
-              type="text"
-              icon="el-icon-remove-outline"
-              @click="filterRemove(index)"
-            ></el-button>
-            <el-col :span="6">
-              <el-select
-                :span="2"
-                v-model="filterCondition[index]['option']"
-                placeholder="请选择"
-                size="small"
-                @change="filterValueInit(index)"
-              >
+          <el-row v-if="layers[nowLayerIndex].sourceType != 'mbTile'">
+            <el-row type="flex" justify="space-between" align="middle">
+              <h4>过滤条件配置</h4>&nbsp;
+              <el-select v-model="filterWay" placeholder="请选择" size="small">
                 <el-option
-                  v-for="item in filterOptions"
-                  :key="item['column_name']"
-                  :label="item['column_name']"
-                  :value="item['column_name']"
-                >
-                </el-option>
-              </el-select>
-            </el-col>
-            <el-col :span="5">
-              <el-select
-                v-model="filterCondition[index]['type']"
-                placeholder="=="
-                size="small"
-              >
-                <el-option
-                  v-for="item in filterTypes"
+                  v-for="item in [
+                    { value: 'all', label: '满足所有条件' },
+                    { value: 'any', label: '满足任意条件' },
+                    { value: 'none', label: '不满足任意条件' },
+                  ]"
                   :key="item.value"
                   :label="item.label"
                   :value="item.value"
                 >
                 </el-option>
               </el-select>
-            </el-col>
-            <el-col :span="10">
-              <el-input
-                placeholder=""
-                v-model="filterCondition[index]['value']"
-                size="small"
-                clearable
-              >
-                <template>
-                  <i class="el-icon-circle-plus"></i>
-                </template>
-              </el-input>
-            </el-col>
-            <el-popover placement="right" width="400" trigger="click">
-              <el-button
-                size="mini"
-                type="primary"
-                @click="filterConfirm"
-                style="position: absolute; top: 24px; z-index: 100"
-                >筛选
-              </el-button>
-              <el-table
-                :data="
-                  filterValueSelect.filter(
-                    (data) =>
-                      !filterSearch ||
-                      data[filterOptionSelectList[index]]
-                        .toLowerCase()
-                        .includes(filterSearch.toLowerCase())
-                  )
-                "
-                @row-click="handleFilter"
-                row-key="id"
-                :highlight-current-row="true"
-                :cell-style="{ textAlign: 'left' }"
-                height="300"
-              >
-                <el-table-column
-                  :prop="filterOptionSelectList[index]"
-                  align="right"
-                >
-                </el-table-column>
-                <el-table-column align="right">
-                  <template slot="header">
-                    <el-input
-                      v-model="filterSearch"
-                      size="mini"
-                      placeholder="搜索"
-                      prefix-icon="el-icon-search"
-                    />
-                  </template>
-                </el-table-column>
-              </el-table>
-              <el-pagination
-                small
-                @current-change="handleCurrentChangeFilter"
-                :current-page="filterSearchPage"
-                :page-size="pageSizeFilter"
-                layout="total, prev, pager, next"
-                :total="totalDataCountFilter"
-                class="flexRowCenter"
-              >
-              </el-pagination>
+            </el-row>
+            <br />
+            <el-row
+              v-for="(item, index) in filterCondition"
+              :key="index"
+              class="filterBox"
+            >
               <el-button
                 type="text"
-                icon="el-icon-circle-plus"
-                slot="reference"
-                @click="handleFilterValue(item, index)"
+                icon="el-icon-remove-outline"
+                @click="filterRemove(index)"
               ></el-button>
-            </el-popover>
+              <el-col :span="6">
+                <el-select
+                  :span="2"
+                  v-model="filterCondition[index]['option']"
+                  placeholder="请选择"
+                  size="small"
+                  @change="filterValueInit(index)"
+                >
+                  <el-option
+                    v-for="item in filterOptions"
+                    :key="item['column_name']"
+                    :label="item['column_name']"
+                    :value="item['column_name']"
+                  >
+                  </el-option>
+                </el-select>
+              </el-col>
+              <el-col :span="5">
+                <el-select
+                  v-model="filterCondition[index]['type']"
+                  placeholder="=="
+                  size="small"
+                >
+                  <el-option
+                    v-for="item in filterTypes"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  >
+                  </el-option>
+                </el-select>
+              </el-col>
+              <el-col :span="10">
+                <el-input
+                  placeholder=""
+                  v-model="filterCondition[index]['value']"
+                  size="small"
+                  clearable
+                >
+                  <template>
+                    <i class="el-icon-circle-plus"></i>
+                  </template>
+                </el-input>
+              </el-col>
+              <el-popover placement="right" width="400" trigger="click">
+                <el-button
+                  size="mini"
+                  type="primary"
+                  @click="filterConfirm"
+                  style="position: absolute; top: 24px; z-index: 100"
+                  >筛选
+                </el-button>
+                <el-table
+                  :data="
+                    filterValueSelect.filter(
+                      (data) =>
+                        !filterSearch ||
+                        data[filterOptionSelectList[index]]
+                          .toLowerCase()
+                          .includes(filterSearch.toLowerCase())
+                    )
+                  "
+                  @row-click="handleFilter"
+                  row-key="id"
+                  :highlight-current-row="true"
+                  :cell-style="{ textAlign: 'left' }"
+                  height="300"
+                >
+                  <el-table-column
+                    :prop="filterOptionSelectList[index]"
+                    align="right"
+                  >
+                  </el-table-column>
+                  <el-table-column align="right">
+                    <template slot="header">
+                      <el-input
+                        v-model="filterSearch"
+                        size="mini"
+                        placeholder="搜索"
+                        prefix-icon="el-icon-search"
+                      />
+                    </template>
+                  </el-table-column>
+                </el-table>
+                <el-pagination
+                  small
+                  @current-change="handleCurrentChangeFilter"
+                  :current-page="filterSearchPage"
+                  :page-size="pageSizeFilter"
+                  layout="total, prev, pager, next"
+                  :total="totalDataCountFilter"
+                  class="flexRowCenter"
+                >
+                </el-pagination>
+                <el-button
+                  type="text"
+                  icon="el-icon-circle-plus"
+                  slot="reference"
+                  @click="handleFilterValue(item, index)"
+                ></el-button>
+              </el-popover>
+            </el-row>
+            <el-col v-if="filterCondition.length < 1" class="displayBox"
+              >未设置过滤条件</el-col
+            >
+            <el-button
+              type="text"
+              icon="el-icon-circle-plus-outline"
+              @click="
+                filterCondition.push({ options: '', type: '==', value: '' })
+              "
+              >添加过滤条件</el-button
+            >
+            <el-divider></el-divider>
           </el-row>
-          <el-col v-if="filterCondition.length < 1" class="displayBox"
-            >未设置过滤条件</el-col
-          >
-          <el-button
-            type="text"
-            icon="el-icon-circle-plus-outline"
-            @click="
-              filterCondition.push({ options: '', type: '==', value: '' })
-            "
-            >添加过滤条件</el-button
-          >
-          <el-divider></el-divider>
           <h4>显示级别配置</h4>
           <el-form label-position="top">
             <el-form-item label="最小级别">
               <el-slider
                 :max="layers[nowLayerIndex]['maxzoom']"
-                :min="zoomRange[0]"
+                :min="parseInt(0)"
                 v-model="layers[nowLayerIndex]['minzoom']"
+                @change="handleZoomChange(layers[nowLayerIndex]['id'],layers[nowLayerIndex]['minzoom'],layers[nowLayerIndex]['maxzoom'])"
                 show-input
               >
               </el-slider>
             </el-form-item>
             <el-form-item label="最大级别">
               <el-slider
-                :max="zoomRange[1]"
+                :max="parseInt(22)"
                 :min="layers[nowLayerIndex]['minzoom']"
                 v-model="layers[nowLayerIndex]['maxzoom']"
+                @change="handleZoomChange(layers[nowLayerIndex]['id'],layers[nowLayerIndex]['minzoom'],layers[nowLayerIndex]['maxzoom'])"
                 show-input
               >
               </el-slider>
@@ -4161,6 +4191,7 @@ export default {
       publishLink: "",
       dataLayers: [],
       mutiPgInfo: "",
+      allLayerShow: true,
 
       //mbtile
       mbTileJsonList: [],
@@ -4178,6 +4209,7 @@ export default {
       styleLayers: [],
       mbTileStyleEditShow: false,
       mbTileStyleInfo:{mapStyleFile : null,tileJsonId:''},
+      layerType: ['circle','line','fill','fill-extrusion','symbol','background','heatmap'],
 
       //左侧shp图层树
       layersNameObject: {}, //检测重复  后端字段为layerTree
@@ -4212,6 +4244,7 @@ export default {
 
       //图标图层样式
       textField: "",
+      layerIcon: {'circle':'fa fa-circle','line':'fa fa-window-minimize','fill':'fa fa-square','symbol':'fa fa-font','fill-extrusion':'fa fa-cube','heatmap':'fa fa-fire','raster':'fa fa-photo','hillshade':'	fa fa-area-chart'},
 
       //编辑框
       menuButtonShowList: [], //由列表来记录图层编辑框下每个tab的显示情况
@@ -4368,7 +4401,8 @@ export default {
           this.glyphsPath = this.mapProjectInfo.glyphs;
           this.sources = this.mapProjectInfo.sources;
           this.layers = this.mapProjectInfo.layers;
-          this.layersNameObject = this.mapProjectInfo.layerTree;
+          this.layersNameObject = JSON.stringify(this.mapProjectInfo.layerTree) == '{}' ? {} : this.mapProjectInfo.layerTree.layersNameObject;
+          this.sourceNameObject = JSON.stringify(this.mapProjectInfo.layerTree) == '{}' ? {} : this.mapProjectInfo.layerTree.sourceNameObject;
           this.publicBoolean=this.mapProjectInfo.publicBoolean;
           this.createEmptyMap();
           this.initMapWithData();
@@ -4440,11 +4474,10 @@ export default {
       map.on("mousemove", (e) => {
         map.getCanvas().style.cursor = "pointer";
 
-        this.center = String(e.lngLat.lng) + "," + String(e.lngLat.lat);
         this.showCenter =
-          String(e.lngLat.lng.toFixed(5)) +
-          "," +
-          String(e.lngLat.lat.toFixed(5));
+          '(' + String(e.lngLat.lng.toFixed(5)) +
+          "，" +
+          String(e.lngLat.lat.toFixed(5)) + ')';
       });
 
       //选中某元素
@@ -4486,21 +4519,28 @@ export default {
           let item = window.document.createElement("div");
           var item_name = window.document.createElement("div");
           let colorBox = window.document.createElement("div");
+          let iconBox = window.document.createElement("div");
+          let iconItem = window.document.createElement("i");
+          iconBox.appendChild(iconItem);
+          if(feature.layer.type != 'background'){
+            iconItem.className = this.layerIcon[feature.layer.type];
+          }
 
           var index = this.layersName.indexOf(feature.layer["id"]);
           container.appendChild(item).className = "item";
+          item.appendChild(iconBox).className = "iconBox";
           item.appendChild(colorBox).className = "colorBox";
           item.appendChild(item_name).className = "item_name";
           item_name.innerHTML = this.layers[index].showName; //显示的是showName
+          item_name.title = this.layers[index].showName;
 
           //根据index获取相关图层信息
           const color_name = feature.layer.type + "-" + "color";
           colorBox.style.setProperty(
             "background-color",
-            this.layers[index].paint[color_name]
+            feature.layer.paint[color_name]
           );
-
-          this.addItemEvent(item, feature, index);
+          this.addItemEvent(item, this.layers[index], index);
         }
 
         console.log("selectedFeatures", selectedFeatures);
@@ -4559,6 +4599,9 @@ export default {
     saveMap() {
       //现将画布内容转为png图片当做工程封面
       this.canvasSrc = map.getCanvas().toDataURL("image/png");
+      const {lng, lat} = map.getCenter();
+      this.center = lng + ',' + lat;
+      this.zoom = map.getZoom();
       this.$confirm("是否保存地图?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -4578,7 +4621,7 @@ export default {
           this.mapProjectInfo.sources = this.sources;
           // this.mapProjectInfo.layers = {layers: this.layers}
           this.mapProjectInfo.layers = this.layers;
-          this.mapProjectInfo.layerTree = this.layersNameObject;
+          this.mapProjectInfo.layerTree = {"layersNameObject":this.layersNameObject,"sourceNameObject":this.sourceNameObject};
           // this.mapProjectInfo.glyphs = this.reqUrl+"/store/fonts/{fontstack}/{range}.pbf";
           // this.mapProjectInfo.sprite = this.reqUrl+"/store/sprites/mpx_sprite/sprite";
           requestApi
@@ -4668,8 +4711,10 @@ export default {
           "mapbox:group": "92ca48f13df25",
         },
       };
-      backLayer.paint["background-color"] =
-        "#" + Math.random().toString(16).substr(2, 6);
+      if(sourceType != "mbTile"){
+        backLayer.paint["background-color"] =
+          "#" + Math.random().toString(16).substr(2, 6);
+      }
       if (
         !Object.prototype.hasOwnProperty.call(
           this.layersNameObject,
@@ -4748,7 +4793,7 @@ export default {
       await this.getStyleListById(this.mbTileSelect); //加载数据后更新styleList，注：但现在没触发
     },
     // 获取不同类型来源的tileJson列表
-    getTileJsonList(type){
+    async getTileJsonList(type){
       requestApi
         .getTileJsonList(type)
         .then((res) => {
@@ -5150,11 +5195,11 @@ export default {
         id: row.originName,
         type: geoType,
         filter: ["all"],
-        layout: layerStyleProperties[geoType].layout,
+        layout: JSON.parse(JSON.stringify(layerStyleProperties[geoType].layout)),   //防止同类型图层样式改变间影响
         maxzoom: 22,
         metadata: "",
         minzoom: 0,
-        paint: layerStyleProperties[geoType].paint,
+        paint: JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint)),
         source: this.sourceNameObject[row.tableName], //通过记录的source名字与id对应，拿到sourceId
         // "source-layer": "default"
         "source-layer": row.tableName,
@@ -5258,11 +5303,11 @@ export default {
         id: row.originName,
         type: geoType,
         filter: ["all"],
-        layout: layerStyleProperties[geoType].layout,
+        layout: JSON.parse(JSON.stringify(layerStyleProperties[geoType].layout)),
         maxzoom: 22,
         metadata: "",
         minzoom: 0,
-        paint: layerStyleProperties[geoType].paint,
+        paint: JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint)),
         source: this.sourceNameObject[row.id], //添加的sourceId
         // "source-layer": "default"
         "source-layer": row.originName,
@@ -5337,11 +5382,11 @@ export default {
         id: row.id,
         type: geoType,
         filter: ["all"],
-        layout: layerStyleProperties[geoType].layout,
+        layout: JSON.parse(JSON.stringify(layerStyleProperties[geoType].layout)),
         maxzoom: typeof(row['maxzoom']) != 'undefined' ? row['maxzoom'] : 22,
         metadata: "",
         minzoom: typeof(row['minzoom']) != 'undefined' ? row['minzoom'] : 0,
-        paint: layerStyleProperties[geoType].paint,
+        paint: JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint)),
         source: this.sourceNameObject[name], //通过记录的source名字与id对应，拿到sourceId
         // "source-layer": "default"
         "source-layer": row.id,
@@ -5427,11 +5472,11 @@ export default {
         id: row.id,
         type: geoType,
         filter: typeof(row['filter']) != "undefined" ? row['filter'] : ['all'],
-        layout: newLayout,
+        layout: JSON.parse(JSON.stringify(newLayout)),
         maxzoom: typeof(row['maxzoom']) != 'undefined' ? row['maxzoom'] : 22,
         metadata: "",
         minzoom: typeof(row['minzoom']) != 'undefined' ? row['minzoom'] : 0,
-        paint: newPaint,
+        paint: JSON.parse(JSON.stringify(newPaint)),
         source: this.sourceNameObject[name], //通过记录的source名字与id对应，拿到sourceId
         // "source-layer": "default"
         "source-layer": row['source-layer'],
@@ -5463,9 +5508,19 @@ export default {
       for(let i in List){
         let item = List[i];
         console.log('item',item);
-        if((item['source'] != 'natural_earth_shaded_relief') && (item['type'] != 'raster')){
+        if((item['source'] != 'natural_earth_shaded_relief') && (item['type'] != 'raster') && (item['type'] != 'background')){
           this.addStyleMbTileShp(i,item)
+        }else if(item['type'] == 'background'){
+          this.addBackground('mbTile',item)
         }
+
+      }
+      console.log('添加所有styleJson图层');
+    },
+    addAllSources(List){
+      for(let i in List){
+        let item = List[i];
+        this.addDataMbTileShp(i,item)
 
       }
       console.log('添加所有styleJson图层');
@@ -5531,11 +5586,9 @@ export default {
 
     handleLayerEdit(index, row) {
       console.log("now edit layer: index, row", index, row);
+      // 先关闭模板样式编辑框避免冲突
+      this.stylesBoxShow = false;
       this.nowLayerIndex = index;
-      this.zoomRange = [
-        this.layers[this.nowLayerIndex].minzoom,
-        this.layers[this.nowLayerIndex].maxzoom,
-      ];
       //先关闭，否则组件不会初始化
       this.editorShow = "";
       //设置属性编辑界面的展示情况
@@ -5575,23 +5628,72 @@ export default {
     //回撤到原来样式
     returnOriginStyle(){
       const style = this.originStyle[this.nowLayerIndex];
-      this.addTypeStyle(style);
+      const aimLayer = this.layers[this.nowLayerIndex];
+      aimLayer.paint = JSON.parse(JSON.stringify(style.paint));
+      aimLayer.layout = JSON.parse(JSON.stringify(style.layout));
+      console.log("应用完图层样式", aimLayer);
+      this.handleRemoveLayer(aimLayer.id);
+      if (this.nowLayerIndex === 0) {
+        this.addLayerToMap(aimLayer);
+      } else {
+        map.addLayer(aimLayer, this.layers[this.nowLayerIndex - 1].id);
+      }    
     },
     async openTemplateEdit(index,row){
+      // 先关闭图层编辑框避免冲突
+      this.editorShow = false;
       this.nowLayerIndex = index;
       this.styleTypeSelect = row.type;
       const type = row.type;      
       this.getTypeStyleList(type);
-      this.getTileJsonList("mbTile");
+      await this.getTileJsonList("mbTile");
       if(this.templateStyleSelect == ""){
         this.templateStyleSelect = this.mbTileStyleList[0].id;  //先默认为第一个
         this.templateStyleJson = this.mbTileStyleList[0];  //先默认为第一个
         this.tempStyleLayers = this.templateStyleJson.layers;
-        console.log('aaa',this.tempStyleLayers);
       }
       this.stylesBoxShow = !this.stylesBoxShow;
 
     },
+    //添加选中图层至样式库
+    createTypeStyle(layer){
+      console.log("layer",layer);
+      const canvasSrc = map.getCanvas().toDataURL("image/png");
+      const body = {
+        "layout": layer.layout,
+        "paint": layer.paint,
+        "type": this.styleTypeSelect,
+        "styleImgUrl": {"ImgUrl":canvasSrc},
+        "description": "",
+      }
+      this.$prompt('请输入样式名称', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+      }).then(({ value }) => {
+        body.description = value;
+        requestApi.createTypeStyle(body)
+          .then((res)=>{
+            this.$message.success(res.data.data);
+            this.getTypeStyleList(this.styleTypeSelect);
+          })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '取消样式上传'
+        });       
+      });
+    },
+    // 删除自定义模板样式
+    tempCardDelete(id){
+      requestApi.deleteTypeStyle(id)
+        .then((res)=>{
+          this.$message.success(res.data.data);
+          this.getTypeStyleList(this.styleTypeSelect);
+        })
+        .catch(()=>{
+          this.$message.info('删除失败');
+        })
+    },    
     //获取地图的类型样式列表
     getTypeStyleList(type){
       requestApi.getTypeStyleList(type)
@@ -5621,16 +5723,12 @@ export default {
     },
     //添加对应的类型样式
     addTypeStyle(row){
-      //先改参数再更新图层，打开图层编辑框
-      console.log("apply",row, "style to", this.layers[this.nowLayerIndex].originName);
+      //先更新原样式
       let aimLayer = this.layers[this.nowLayerIndex];
-      aimLayer.paint = row.paint;
-      // aimLayer.paint = {};
-      aimLayer.layout = row.layout;
-      // aimLayer.layout = {
-      //   "icon-image": "cat",
-      //   "icon-size": 0.25,
-      // };
+      this.originStyle[this.nowLayerIndex].paint = JSON.parse(JSON.stringify(aimLayer.paint));
+      this.originStyle[this.nowLayerIndex].layout = JSON.parse(JSON.stringify(aimLayer.layout));
+      aimLayer.paint = JSON.parse(JSON.stringify(row.paint));
+      aimLayer.layout = JSON.parse(JSON.stringify(row.layout));
       console.log("应用完图层样式", aimLayer);
       this.handleRemoveLayer(aimLayer.id);
       if (this.nowLayerIndex === 0) {
@@ -5638,22 +5736,23 @@ export default {
       } else {
         map.addLayer(aimLayer, this.layers[this.nowLayerIndex - 1].id);
       }
-      //更新图层编辑框样式
-      this.handleLayerEdit(this.nowLayerIndex, aimLayer);
     },
     //给自己数据添加mbTile样式，不需要filter属性
     addMbTileToSelf(row){
       //只替换paint和layout的相关属性
       console.log("row",row)
+      //先更新原样式
       let aimLayer = this.layers[this.nowLayerIndex];
+      this.originStyle[this.nowLayerIndex].paint = JSON.parse(JSON.stringify(aimLayer.paint));
+      this.originStyle[this.nowLayerIndex].layout = JSON.parse(JSON.stringify(aimLayer.layout));      
       if('layout' in row){
         for(let key in row.layout){
-          aimLayer.layout[key] = row.layout[key]
+          aimLayer.layout[key] = JSON.parse(JSON.stringify(row.layout[key]));
         }
       }
       if('paint' in row){
         for(let key in row.paint){
-          aimLayer.paint[key] = row.paint[key]
+          aimLayer.paint[key] = JSON.parse(JSON.stringify(row.paint[key]));
         }
       }      
       //先改参数再更新图层，打开图层编辑框
@@ -5709,14 +5808,8 @@ export default {
       //先改参数再更新图层，打开图层编辑框
       console.log("change layer type to", val);
       let aimLayer = this.layers[this.nowLayerIndex];
-      aimLayer.paint = layerStyle[val].paint;
-      // aimLayer.paint = {};
-      aimLayer.layout = layerStyle[val].layout;
-      // aimLayer.layout = {
-      //   "icon-image": "cat",
-      //   "icon-size": 0.25,
-      // };
-      console.log("layer", aimLayer);
+      aimLayer.paint = JSON.parse(JSON.stringify(layerStyle[val].paint));
+      aimLayer.layout = JSON.parse(JSON.stringify(layerStyle[val].layout));
       this.handleRemoveLayer(aimLayer.id);
       if (this.nowLayerIndex === 0) {
         this.addLayerToMap(aimLayer);
@@ -5852,8 +5945,10 @@ export default {
     handleLayerClick() {
       console.log("layers:", this.layers);
       console.log("layersName",this.layersName);
-      // const source = map.getSource(this.layers[this.nowLayerIndex]["source"]);
-      // console.log("source:", source);
+      if(this.nowLayerIndex > 0){
+        const source = map.getSource(this.layers[this.nowLayerIndex]["source"]);
+        console.log("source:", source);
+      }
       const style = map.getStyle();
       console.log("style:", style);
 
@@ -5869,7 +5964,49 @@ export default {
         this.handleLayoutChange(row.id, "visibility", "none");
       }
     },
+    //全局开关
+    allLayerShowSwitchChange(val){
+      for (let i in this.layers) {
+        const item = this.layers[i];
+        this.layers[i].show = val;
+        this.handleLayerShowSwitchChange(val,item);
+      }
+    },
 
+    async allLayerDelete(){
+      this.editorShow = "";
+
+      for (let i in this.layers) {
+        let item = JSON.parse(JSON.stringify(this.layers[i]));
+        let aimSource = item.source;
+        let layerOriginName = item.originName;
+        let layerid = item.id;
+        this.layersNameObject[layerOriginName] -= 1;
+        this.handleRemoveLayer(layerid);
+        //如果没有layer使用source，则删除source
+        if (this.layersNameObject[layerOriginName] === 0) {
+
+          delete this.layersNameObject[layerOriginName];        
+          //mbTile不删除source，背景没有source
+          if (item.sourceType != "mbTile" && item.type != "background") {
+            this.handleRemoveSource(aimSource);
+            delete this.sources[aimSource];
+            for (let key in this.sourceNameObject) {
+              if (this.sourceNameObject[key] === aimSource) {
+                delete this.sourceNameObject[key];
+                break;
+              }
+            }          
+            //source没有再使用时,删除后台的tileJson
+            this.deleteTileJson(item.source);
+          }
+        }
+      }
+      // 循环完再进行视图数据初始化,避免循环中渲染。
+      this.layers = [];
+      this.layersName = [];
+      this.originStyle = [];
+    },
     handleRemoveSource(sourceName) {
       map.removeSource(sourceName);
     },
@@ -5887,37 +6024,16 @@ export default {
       console.log("paint:", layerName, key, value);
       map.setPaintProperty(layerName, key, value);
     },
+    handleZoomChange(layerName, min, max){
+      console.log("zoom:", layerName, min, max);
+      map.setLayerZoomRange(layerName, min, max);
+    },
     //为item添加同handleLayerEdit相同的方法
     addItemEvent(item, feature, index) {
       //因为item是html元素，在其事件中this指向该元素无法获取vue的实例属性和方法
       let _this = this;
       item.onclick = function test() {
-        _this.editorShow = "";
-        _this.$nextTick(() => {
-          _this.nowLayerIndex = index;
-          _this.zoomRange = [
-            _this.layers[index].minzoom,
-            _this.layers[index].maxzoom,
-          ];
-          if (feature.layer.type === "line") {
-            _this.editorShow = "lineEditorShow";
-          } else if (feature.layer.type === "fill") {
-            _this.editorShow = "fillEditorShow";
-          } else if (feature.layer.type === "circle") {
-            _this.editorShow = "circleEditorShow";
-          } else if (feature.layer.type === "fill-extrusion") {
-            _this.editorShow = "fillExtrusionEditorShow";
-          } else if (feature.layer.type === "symbolEditorShow") {
-            _this.editorShow = "symbolEditorShow";
-            _this.getSymbolList();
-            _this.getFontList();
-          } else if(feature.layer.type === "heatmap"){
-            _this.editorShow = "heatMapEditorShow";
-          } else {
-            _this.editorShow = "backgroundEditorShow";
-          }
-          _this.menuButtonShowList = [];
-        });
+        _this.handleLayerEdit(index,feature);
       };
     },
 
@@ -6064,61 +6180,10 @@ export default {
       console.log("activeName", activeName, this.menuButtonShowList);
       console.log("oldActiveName", oldActiveName, this.menuButtonShowList);
     },
-    test1() {
-      var imgDataSrc = map.getCanvas().toDataURL("image/png");
-      this.canvasSrc = imgDataSrc;
-      console.log("canvasSrc", this.canvasSrc);
-
-      // var data = {
-      //     "geometry": {
-      //         "type": "Point",
-      //         "coordinates": [113.32948058466824,23.19862318628209]
-      //     },
-      //     "type": "Feature",
-      //     "properties": {
-      //         "col1": "学史可以看成败、鉴得失、知兴替；",
-      //         "col2": "学诗可以情飞扬、志高昂、人灵秀；",
-      //         "col3": "学伦理可以知廉耻、懂荣辱、辨是非。",
-      //     }
-      // }
-      // map.addSource('test_source', {
-      //     type: "geojson",
-      //     data: data
-      // });
-      // map.addLayer({
-      //     "id": 'test_layer',
-      //     "type": "symbol",
-      //     "minzoom": 0,
-      //     "maxzoom": 22,
-      //     "source": 'test_source',
-      //     "layout": {
-      //         "text-field": ["format", ["get", "col1"], {
-      //             "text-font": ["literal", ["Open Sans Regular"]],
-      //             "text-color": '#FF0000',
-      //             "font-scale": 0.8
-      //         },
-      //         "\n", {},
-      //         ["get", "col2"], {
-      //             "text-font": ["literal", ["DIN Offc Pro Italic"]],
-      //             "text-color": '#000000',
-      //             "font-scale": 0.8
-      //         },
-      //         "\n", {},
-      //         ["get", "col3"], {
-      //             "text-font": ["literal", ["Arial Unicode MS Regular"]],
-      //             "text-color": '#0000FF',
-      //             "font-scale": 0.8
-      //         }],
-      //         "text-size": 16,
-      //         "text-font": ["Open Sans Regular", "Arial Unicode MS Regular"],
-      //         "text-offset": [0, 0],
-      //         "text-anchor": "left",
-      //         "text-justify": "left",
-      //         "text-max-width": 20,
-      //         "text-allow-overlap": false,
-      //     }
-      // });
-    },
+    // test1() {
+    //   const features = map.querySourceFeatures("62fb9590abf4b6e7a4f6d517",{sourceLayer:"place"});
+    //   console.log("features",features);
+    // },
   },
 };
 </script>
@@ -6163,15 +6228,16 @@ h4 {
 }
 
 .layerTable {
+  position: relative;
   width: 100%;
   height: calc(100vh - 170px);
-  overflow-y: scroll;
+  /* overflow-y: scroll; */
 }
-.layerTable::-webkit-scrollbar {
+/* .layerTable::-webkit-scrollbar {
   width: 0;
   height: 0;
   color: transparent;
-}
+} */
 /* 样式框样式 */
 .stylesBox{
   /* display: flex; */
@@ -6188,7 +6254,7 @@ h4 {
 .stylesBoxTitle{
   height: 40px;
   border-bottom:1px #dcdfe6;
-  background-color: ;
+  /* background-color: ; */
 }
 /* 模板折叠框样式 */
 .templateCol .el-collapse-item__wrap:nth-child(1){
@@ -6204,6 +6270,7 @@ h4 {
 }
 /* 模板展示框样式 */
 .templateCard{
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   flex-direction: column;
@@ -6213,6 +6280,28 @@ h4 {
 }
 .templateCard .el-card__body{
   padding: 0;
+}
+/* 模板名称样式 */
+.tempCardName{
+  padding: 0 25px;
+}
+.tempCardName span{
+  width: 100px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;  
+}
+/* 样式删除按钮 */
+.tempDeleBtn{
+  position: absolute;
+  color: #dcdfe6;
+  font-size: 20px;
+  right: 2px;
+  top: 120px;
+  z-index: 1;
+}
+.tempDeleBtn:hover{
+  color: red;
 }
 /* mbTile折叠框内容样式 */
 .mbTileCollapse{
@@ -6434,28 +6523,39 @@ h4 {
   /* height: 30px; */
 }
 .item {
+  display: flex;
+  margin: 1px 0;
+  justify-content: left;
+  align-items: center;
   color: black;
   border-radius: 5px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 .item:hover {
   color: #4264fb;
   background-color: #e0e7eb;
   cursor: pointer;
 }
+.iconBox{
+  width: 18px;
+  height: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 .colorBox {
   width: 18px;
   height: 18px;
-  /* background-color: red; */
-  float: left;
   display: inline-block;
+  border: rgba(211, 211, 211, 0.6) 1px solid;
   border-radius: 5px;
-  margin: 1px;
+  margin: 0 2px;
 }
 .item_name {
-  margin-left: 30px;
+  /* margin-left: 30px; */
+  max-width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;  
 }
 /* 未设置过滤条件框样式 */
 .displayBox {
