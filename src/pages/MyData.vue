@@ -28,7 +28,7 @@
             <br>
 <!--            <el-button size="mini" @click="helloTest()">测试</el-button>-->
             <el-upload
-                name="file"
+                name="files"
                 drag
                 :action="multiShpUploadUrl"
                 :on-success="handleMultiShpUpSuccess"
