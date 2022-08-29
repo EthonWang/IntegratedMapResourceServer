@@ -96,7 +96,7 @@ export default {
             "text-transform":"none", //One of "none", "uppercase", "lowercase"
             // "text-variable-anchor":["center"], //One of "center", "left", "right", "top", "bottom", "top-left", "top-right", "bottom-left", "bottom-right".
             // "text-writing-mode":["horizontal"], //One of "horizontal", "vertical"
-            // "visibility":"none",
+            "visibility":"visible",
         },
         "paint":{
             // "icon-color":"#000000",
