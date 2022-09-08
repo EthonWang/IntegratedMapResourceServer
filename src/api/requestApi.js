@@ -64,7 +64,7 @@ export default {
         return instance.post(Vue.prototype.reqUrl+"/dataSource/addThirdPartSource",data)
     },      
     getThirdPartSourceList(classification){
-        return instance.post(Vue.prototype.reqUrl+"/dataSource/getThirdPartSourceList"+classification)
+        return instance.post(Vue.prototype.reqUrl+"/dataSource/getThirdPartSourceList/"+classification)
     },      
 
 
