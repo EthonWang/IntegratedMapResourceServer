@@ -117,12 +117,8 @@
                       <el-button @click="addMbTileStyleShow = false"
                         >取 消</el-button
                       >&nbsp;
-                      <el-popconfirm
-                        title="确定添加全部图层样式吗？"
-                        @confirm="addAllStyles(styleLayers);addMbTileStyleShow = false"
-                      >
-                        <el-button slot="reference" type="warning">全部添加</el-button>
-                      </el-popconfirm>                        
+                      <el-button slot="reference" type="warning"
+                                 @click="addAllStyles(styleLayers);addMbTileStyleShow = false">全部添加</el-button>
                       <!-- <el-button type="primary" @click="addAllStyles(styleLayers)"
                         >确 定</el-button
                       > -->
@@ -492,7 +488,12 @@
           <el-row type="flex" justify="start" style="flex-wrap:wrap;border-top:1px solid #ebeef5">
             <el-card v-for="(item,index) in typeStyleBase[styleTypeSelect]" :key="index" 
                      class="templateCard cursor" shadow="hover" @click.native="addTypeStyle(item)">
-              <i class="el-icon-remove-outline tempDeleBtn" @click="tempCardDelete(item.id)"></i>
+              <el-popconfirm
+                  title="确定删除吗？"
+                  @confirm="tempCardDelete(item.id)"
+              >
+                <i class="el-icon-remove-outline  tempDeleBtn" slot="reference"></i>
+              </el-popconfirm>
               <el-image
                 style="width: 100%; height: 110px; border-bottom:1px solid #dcdfe6"
                 :src="item.styleImgUrl.ImgUrl"
@@ -2162,16 +2163,64 @@
                   <el-tabs>
                     <el-tab-pane
                       label="精灵图"
-                      style="height: 200px; overflow-y: scroll"
+                      style="height: 400px; overflow-y: scroll"
                     >
-                      <el-col
-                        class="cursor"
-                        v-for="(item, index) in spriteList"
-                        :key="index"
-                        @click.native="spriteSelect(item)"
-                      >
-                        {{ item }}
-                      </el-col>
+                      <el-row>
+                        <el-select
+                            v-model="spriteNameSelect"
+                            placeholder="请选择精灵图"
+                            @change="spriteChange"
+                        >
+                          <el-option
+                              v-for="item in spriteClassList"
+                              :key="item"
+                              :label="item"
+                              :value="item"
+                          >
+                          </el-option> </el-select
+                        >&nbsp;
+                        <div style="width:400px;display:flex;flex-wrap:wrap" >
+                          <div
+                              v-for="(item, key, index) in spriteJsonSelect"
+                              :key="index"
+                              :title="key"
+                              @click="clickSprite(item, key, index)"
+                              class="spriteCard"
+                              body-style="padding:0"
+                              :style="{
+                              padding: 0,
+                              width: item.width + 30 + 'px',
+                              height: item.height + 30 + 'px',
+                              cursor: 'pointer',
+                            }"
+                          >
+                            <!-- <el-checkbox
+                              v-if="isSpriteEdit" class="spriteCheck"
+                              v-model="deleteSelect[index]"
+                              @change="spriteCheckChange($event,key)">
+                            </el-checkbox> -->
+                            <div
+                                :style="{
+                                'background-image': `url(${spritePngSelect})`,
+                                width: item.width + 'px',
+                                height: item.height + 'px',
+                                'background-position':
+                                  '-' + item.x + 'px -' + item.y + 'px',
+                              }"
+                            ></div>
+                          </div>
+                        </div>
+
+                      </el-row>
+
+<!--                      <el-col-->
+<!--                        class="cursor"-->
+<!--                        v-for="(item, index) in spriteList"-->
+<!--                        :key="index"-->
+<!--                        @click.native="spriteSelect(item)"-->
+<!--                      >-->
+<!--                        {{ item }}-->
+<!--                      </el-col>-->
                     </el-tab-pane>
                     <el-tab-pane label="自定义">
                       <el-row
@@ -2917,6 +2966,17 @@
                     @row-click="fontSelect"
                   >
                     <el-table-column prop="name">
+
+                      <template slot-scope="scope">
+                            <span
+                                :style="{
+                                'font-family': scope.row.name,
+                              }"
+                            >
+                              {{  scope.row.name }}</span
+                            >
+                      </template>
+
                       <template slot="header">
                         <el-input
                           v-model="fontSearch"
@@ -2928,6 +2988,7 @@
                       </template>
                     </el-table-column>
                   </el-table>
+
                   <el-button
                     type="text"
                     icon="el-icon-s-unfold"
@@ -4338,6 +4399,11 @@ export default {
       totalDataCountSymbol: 0,
       fontList: [],
       spriteList: [],
+      spriteNameSelect: '',
+      spriteJsonSelect: {},
+      spritePngSelect: "",
+      spriteClassList: [],
+      spriteItemList: [],
 
 
     };
@@ -4378,7 +4444,7 @@ export default {
     });
     this.mapProjectId = this.$route.params.mapProjectId;
     this.getMapProjectInfo();
-
+    this.spriteInit();
     //layer拖动排序
     this.initSort();
   },
@@ -4419,6 +4485,30 @@ export default {
           this.center = this.mapProjectInfo.center.split(",");
           this.zoom = this.mapProjectInfo.zoom;
           this.spritePath = this.mapProjectInfo.sprite;
+          const end = this.spritePath.lastIndexOf("/");
+          this.spriteNameSelect = this.spritePath.substring(15,end);
+          if (this.spriteNameSelect != "") {
+            const url =
+                this.reqUrl +
+                "/store/sprites/" +
+                this.spriteNameSelect +
+                "/" +
+                "sprite.json";
+            fetch(url)
+                .then((res) => {
+                  return res.json();
+                })
+                .then((json) => {
+                  this.spriteJsonSelect = json;
+                  console.log("精灵图json", this.spriteJsonSelect);
+                });
+            this.spritePngSelect =
+                this.reqUrl +
+                "/store/sprites/" +
+                this.spriteNameSelect +
+                "/" +
+                "sprite.png";
+          }
           this.glyphsPath = this.mapProjectInfo.glyphs;
           this.sources = this.mapProjectInfo.sources;
           this.layers = this.mapProjectInfo.layers;
@@ -4436,6 +4526,8 @@ export default {
               })
             }          
           }
+          document.title = '地图项目'+this.mapProjectInfo.name;
+
         })
         .catch((error) => {
           console.log(error);
@@ -4681,6 +4773,8 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
+        this.saveMap();
+      }).then(()=>{
         requestApi.publicMap(this.mapProjectId)
             .then((res) => {
               if (res.data.code === 0) {
@@ -5430,7 +5524,11 @@ export default {
           sourceType: "vector",
           sourceUrl: tileJsonUrl,
         };
-        this.addSourceToMap(newSourceJson);
+        // this.addSourceToMap(newSourceJson);
+        map.addSource(newSourceJson.sourceName, {
+          type: newSourceJson.sourceType,
+          tiles: [newSourceJson.sourceUrl],
+        });
         this.sources[newSourceJson.sourceName] = {
           type: newSourceJson.sourceType,
           url: newSourceJson.sourceUrl,
@@ -5505,7 +5603,11 @@ export default {
           sourceType: "vector",
           sourceUrl: tileJsonUrl,
         };
-        this.addSourceToMap(newSourceJson);
+        // this.addSourceToMap(newSourceJson);
+        map.addSource(newSourceJson.sourceName, {
+          type: newSourceJson.sourceType,
+          tiles: [newSourceJson.sourceUrl],
+        });
         this.sources[newSourceJson.sourceName] = {
           type: newSourceJson.sourceType,
           url: newSourceJson.sourceUrl,
@@ -5954,6 +6056,61 @@ export default {
         this.layers[this.nowLayerIndex].layout["icon-image"]
       );
     },
+    spriteChange() {
+      this.$confirm('切换精灵图必须保存地图项目，且已使用的其他精灵图图标将不可用，是否保存地图并切换精灵图？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+      }).then(() => {
+        if (this.spriteNameSelect != "") {
+          const url =
+              this.reqUrl +
+              "/store/sprites/" +
+              this.spriteNameSelect +
+              "/" +
+              "sprite.json";
+          fetch(url)
+              .then((res) => {
+                return res.json();
+              })
+              .then((json) => {
+                this.spriteJsonSelect = json;
+                console.log("精灵图json", this.spriteJsonSelect);
+              });
+          this.spritePngSelect =
+              this.reqUrl +
+              "/store/sprites/" +
+              this.spriteNameSelect +
+              "/" +
+              "sprite.png";
+        }
+        this.spritePath = "/store/sprites/"+ this.spriteNameSelect +"/sprite";
+        this.saveMap();
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '取消切换'
+        });
+      });
+
+    },
+    clickSprite(item, key, index) {
+      this.layers[this.nowLayerIndex].layout['icon-image'] = key;
+      this.handleLayoutChange(this.layers[this.nowLayerIndex]['id'],'icon-image',key)
+      console.log("当前点击的精灵图信息", item, key, index);
+    },
+    spriteInit(){
+      requestApi
+        .getSpriteList()
+        .then((res) => {
+          console.log(res);
+          this.spriteClassList = res.data.data;
+
+          // this.spriteNameSelect = this.spriteClassList[0];
+        })
+        .catch((err) => {
+          console.log(err);
+        });      
+    },
     symbolChange(val) {
       if (val == "icon") {
         this.symbolColor = ["#43aaf5", "#838da8"];
@@ -6269,7 +6426,21 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
+/* 精灵图单元格 */
+.spriteCard {
+  width: 400px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.spriteCard:hover {
+  border-radius: 4px;
+  background-color: #57575a;
+  box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.3);
+}
 #temp-features {
   position: absolute;
   top: 0;
@@ -6413,7 +6584,7 @@ h4 {
   position: absolute;
   font-weight: bold;
   width: 140px;
-  left: 20px;
+  left: 170px;
   top: 0;
   height: 40px;
   line-height: 40px;
@@ -6454,7 +6625,7 @@ h4 {
   border-left: 1px solid #e4e7ed;
   border-right: 1px solid #e4e7ed;
   padding-right: 50px;
-  justify-content: right;
+  /*justify-content: right;*/
   display: flex;
 }
 .el-tabs__item {

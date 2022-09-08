@@ -17,7 +17,8 @@
 
     <div class="projectsBox">
       <el-card class="project-item" v-for="(item,index) in mapProjectData" :key="item.date" shadow="hover">
-        <el-image class="project-item-image" fit="contain" :src="item.mapImgUrl.mapImgUrl ? item.mapImgUrl.mapImgUrl : imgDefault"></el-image>
+        <el-image @click="editMapProject(item)" class="project-item-image"  style="cursor: pointer"
+                  fit="contain" :src="item.mapImgUrl.mapImgUrl ? item.mapImgUrl.mapImgUrl : imgDefault"></el-image>
         <div>
 
           <el-row type="flex" align="middle" >
@@ -46,7 +47,7 @@
                 placement="right"
                 title="链接地址"
                 width="200"
-                trigger="hover"
+                trigger="click"
             >
               <el-link
                   type="primary"
@@ -57,10 +58,10 @@
                 {{ publishLink+item.id }}
               </el-link>
               <el-tag
-                  slot="reference"
+                  slot="reference" style="cursor: pointer"
                   v-if="item.publicBoolean"
               >
-                已发布
+                查看发布链接
               </el-tag>
             </el-popover>
 
@@ -129,6 +130,7 @@ export default {
   },
 
   mounted() {
+    document.title = '地图项目';
     this.getMapProjectList()
   },
   methods: {

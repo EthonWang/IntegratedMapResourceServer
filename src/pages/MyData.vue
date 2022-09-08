@@ -480,8 +480,8 @@
           </el-table-column>
           <el-table-column label="操作" show-overflow-tooltip width="200">
             <template slot-scope="scope">
-              <!-- <el-button 
-                type="success" style="margin-right:5px" 
+              <!-- <el-button
+                type="success" style="margin-right:5px"
                 circle size="mini" class="el-icon-plus"
                 title="添加样式数据" @click="openMbStyleEdit">
               </el-button>    -->
@@ -495,8 +495,8 @@
                 @click="handleMbtilesview(scope.row)"
               >
               </el-button>
-              <!-- <el-button 
-                type="primary" style="margin:0px" 
+              <!-- <el-button
+                type="primary" style="margin:0px"
                 circle size="mini" class="el-icon-s-grid"
                 title="查看样式信息" @click="handlePreview(scope.row,'mbTiles')">
               </el-button>    -->
@@ -532,11 +532,11 @@
             label-position="right"
             label-width="150px"
             :model="mbAddInfo"
-            id="myForm"
+            id="myForm1"
             enctype="multipart/form-data"
             name="fileinfo"
             action=""
-            target="uploadFrame"
+            target="uploadFrame2"
           >
             <el-form-item
               label="类型:"
@@ -605,8 +605,8 @@
             </el-form-item>
           </el-form>
           <iframe
-            id="uploadFrame"
-            name="uploadFrame"
+            id="uploadFrame2"
+            name="uploadFrame2"
             style="display: none"
           ></iframe>
           <span slot="footer" class="dialog-footer">
@@ -626,11 +626,11 @@
             label-position="left"
             label-width="100px"
             :model="mbStyleAddInfo"
-            id="myForm"
+            id="myForm2"
             enctype="multipart/form-data"
             name="fileinfo"
             action=""
-            target="uploadFrame"
+            target="uploadFrame1"
           >
             <el-form-item
               label="文件:"
@@ -644,8 +644,8 @@
             </el-form-item>
           </el-form>
           <iframe
-            id="uploadFrame"
-            name="uploadFrame"
+            id="uploadFrame1"
+            name="uploadFrame1"
             style="display: none"
           ></iframe>
           <span slot="footer" class="dialog-footer">
@@ -798,7 +798,7 @@
               </el-table>
             </el-col>
             <!-- <el-col :span="6" v-if="typeof(vecLayerSelect.description) != 'undefined' && vecLayerSelect.description != ''">
-              <h2>{{vecLayerSelect.id}} 图层描述信息</h2> 
+              <h2>{{vecLayerSelect.id}} 图层描述信息</h2>
               <div style="font-size:15px">{{vecLayerSelect.description}}</div>
             </el-col> -->
           </el-row>
@@ -822,7 +822,7 @@
           outUrlItem + " 源信息"
         }}</el-divider>
         <el-table
-          :data="urlBase"
+          :data="urlBase[outUrlItem]"
           stripe
           :row-style="{ height: '10px', padding: '0' }"
           style="width: 100%"
@@ -835,23 +835,23 @@
           <el-table-column prop="url" label="外部服务链接" width="200">
           </el-table-column>
           <el-table-column label="操作" show-overflow-tooltip width="200">
-            <template slot-scope="scope">
-              <el-popconfirm
-                title="确定删除吗？"
-                @confirm="deleteOutUrl(scope.row)"
-              >
-                <el-button
-                  slot="reference"
-                  style="margin: 0 5px"
-                  size="mini"
-                  class="el-icon-delete"
-                  type="danger"
-                  title="删除mbTiles源"
-                  circle
-                >
-                </el-button>
-              </el-popconfirm>
-            </template>
+<!--            <template slot-scope="scope">-->
+<!--              <el-popconfirm-->
+<!--                title="确定删除吗？"-->
+<!--                @confirm="deleteOutUrl(scope.row)"-->
+<!--              >-->
+<!--                <el-button-->
+<!--                  slot="reference"-->
+<!--                  style="margin: 0 5px"-->
+<!--                  size="mini"-->
+<!--                  class="el-icon-delete"-->
+<!--                  type="danger"-->
+<!--                  title="删除mbTiles源"-->
+<!--                  circle-->
+<!--                >-->
+<!--                </el-button>-->
+<!--              </el-popconfirm>-->
+<!--            </template>-->
           </el-table-column>
         </el-table>
         <br />
@@ -868,11 +868,6 @@
             label-position="right"
             label-width="150px"
             :model="addUrlInfo"
-            id="myForm"
-            enctype="multipart/form-data"
-            name="fileinfo"
-            action=""
-            target="uploadFrame"
           >
             <el-form-item
               label="类型:"
@@ -1151,6 +1146,7 @@ export default {
     };
   },
   mounted() {
+    document.title = '数据服务';
     this.getShpDataList();
 
     // this.rowDrop()
@@ -1399,6 +1395,10 @@ export default {
         this.$refs.mbStyleEdit.resetFields();
       });
     },
+    deleteOutUrl(row){
+      console.log('a',row)
+    },
+
     // 添加mbTiles源信息
     async addMbTileData() {
       // 阻止发生默认行为
