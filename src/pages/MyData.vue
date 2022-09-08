@@ -371,7 +371,7 @@
     </span>
       </el-dialog> -->
       <!-- 数据源编辑 -->
-      <!-- <el-dialog
+      <el-dialog
         title="数据库源信息编辑"
         :visible.sync="pgEditShow"
         width="30%"
@@ -407,7 +407,7 @@
           <el-button @click="pgEditShow = false">取 消</el-button>
           <el-button type="primary" @click="addPg">确 定</el-button>
         </span>
-      </el-dialog>   -->
+      </el-dialog>
     </el-card>
     <!--    mbtiles-->
     <el-card
@@ -832,7 +832,7 @@
           </el-table-column>
           <el-table-column prop="description" label="描述" width="200">
           </el-table-column>
-          <el-table-column prop="url" label="外部服务链接" width="200">
+          <el-table-column prop="url" label="外部服务链接" width="400">
           </el-table-column>
           <el-table-column label="操作" show-overflow-tooltip width="200">
 <!--            <template slot-scope="scope">-->
@@ -857,7 +857,7 @@
         <br />
         <el-dialog
           title="mbTiles信息编辑"
-          :visible.sync="mbTilesEditShow"
+          :visible.sync="addUrlEditShow"
           width="30%"
           :modal="false"
           center
@@ -1218,19 +1218,22 @@ export default {
             });
           break;
         case "4":
+          this.getOutService()
           this.outUrlItem = "TERRAIN";
 
           break;
         case "5":
+          this.getOutService()
           this.outUrlItem = "WMTS";
 
           break;
         case "6":
+          this.getOutService()
           this.outUrlItem = "TMS";
 
           break;
         default:
-          this.pgInfoShow = true;
+          // this.pgInfoShow = true;
           break;
       }
     },

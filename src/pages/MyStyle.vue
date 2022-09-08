@@ -279,7 +279,7 @@
             drag
             :action="symbolUploadUrl"
             :on-success="handleFileUpSuccess"
-            accept=".zip"
+            accept=".svg,.png"
           >
             <i class="el-icon-upload"></i>
             <div class="el-upload__text">
@@ -290,7 +290,7 @@
                 <h3 style="display: inline-block; flex: 1">要求:</h3>
                 <h3 style="display: inline-block; flex: 8">
                   图标img上传，png或者svg
-                  <br />!!!不要嵌套文件夹!!!
+                  <br />
                 </h3>
               </el-row>
             </div>
