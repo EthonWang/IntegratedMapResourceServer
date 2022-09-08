@@ -7,6 +7,7 @@ import VueRouter from 'vue-router'
 import router from './router'
 import 'font-awesome/css/font-awesome.min.css'
 import "./assets/css/common.css"
+import '@/assets/font/font.css';
 
 Vue.use(ElementUI);
 Vue.use(VueRouter)

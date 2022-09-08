@@ -311,7 +311,7 @@ export default {
             .then((res) => {
               if (res.data.code === 0) {
                 this.getMapProjectList()
-                this.$message.success("成功删除:" + item.mapProjectName);
+                this.$message.success("成功删除:" + item.name);
               } else {
                 this.$message.info("取消删除");
               }
@@ -344,7 +344,7 @@ export default {
 </script>
 
 
-<style>
+<style scoped>
 .search-box-project {
   width: 50%;
   margin: 20px auto 0px auto;

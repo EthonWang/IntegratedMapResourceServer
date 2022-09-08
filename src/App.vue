@@ -13,6 +13,7 @@ export default {
 </script>
 
 <style>
+@import "./assets/font/font.css";
 html,
 body,
 #app {

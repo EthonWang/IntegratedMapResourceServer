@@ -22,9 +22,101 @@ const instance= axios.create({
 
 export default {
 
+// 数据源相关
+    addMbtiles(data){
+        return instance.post(Vue.prototype.reqUrl+"/dataSource/addMbtiles",data)
+    },    
+    deleteMbtiles(mbtilesId){
+        return instance.get(Vue.prototype.reqUrl+"/dataSource/deleteMbtilesById/"+mbtilesId)
+    },   
+    getMbtilesList(){
+        return  instance.get(Vue.prototype.reqUrl+"/dataSource/getMbtilesList")
+      },          
+    addPg(data){
+        return instance.post(Vue.prototype.reqUrl+"/dataSource/addPg",data)
+    },    
+    deletePg(pgId){
+        return instance.get(Vue.prototype.reqUrl+"/dataSource/deletePgById/"+pgId)
+    },   
+    getPgList(){
+        return instance.get(Vue.prototype.reqUrl+"/dataSource/getPgList")
+    },    
+    getShpListByPgId(pgId){
+        return instance.get(Vue.prototype.reqUrl+"/dataSource/getShpsInfoByPgId/"+pgId)
+    }, 
+    updateShpsInfoByPgId(pgId){
+        return instance.get(Vue.prototype.reqUrl+"/dataSource/updateShpsInfoByPgId/"+pgId)
+    },
+    //获取style样式列表
+    getStyleListById(tileJsonId){
+        return instance.get(Vue.prototype.reqUrl+"/dataSource/getStyleList/"+tileJsonId)
+    },   
+    //保存其他来源的地图样式
+    saveOtherMapStyle(data){
+        return instance.post(Vue.prototype.reqUrl+"/dataSource/saveOtherMapStyle",data)
+    },   
+    deleteStyleJson(styleJsonId){
+        return instance.get(Vue.prototype.reqUrl+"/dataSource/deleteStyleJson/"+styleJsonId)
+    },    
+
+// mvt
+    addThirdPartSource(data){
+        return instance.post(Vue.prototype.reqUrl+"/dataSource/addThirdPartSource",data)
+    },      
+    getThirdPartSourceList(classification){
+        return instance.post(Vue.prototype.reqUrl+"/dataSource/getThirdPartSourceList"+classification)
+    },      
+
+
+
+// 字体相关
+    deleteFont(fontName){
+        return instance.get(Vue.prototype.reqUrl+"/deleteFont/"+fontName)
+    },
+    //字体
+    getFontList(){
+        return instance.get(Vue.prototype.reqUrl+"/getFontList")
+    }, 
+
+// 图标相关
+    // 精灵图
+        // 可用精灵图套型列表
+    getSpriteList(){
+        return instance.post(Vue.prototype.reqUrl+"/getSpriteList")
+    },
+        // 获取某套精灵图
+    getSpriteItem(spriteName,spriteClass,type){
+        return instance.get(Vue.prototype.reqUrl+"/store/sprites/"+spriteName+"/"+spriteClass[type])
+    },    
+    deleteSpriteItem(spriteName){
+        return instance.get(Vue.prototype.reqUrl+"/deleteSprite/"+spriteName)
+    },    
+    // 自定义图标
+    getSymbolList(data){
+        return instance.post(Vue.prototype.reqUrl+"/symbol/getSymbolList",data)
+    },
+    deleteSymbol(symbolId){
+        return instance.get(Vue.prototype.reqUrl+"/symbol/deleteSymbolById", {params:{symbolId}})
+    },
+    getSymbolItem(symbolId){
+        return instance.get(Vue.prototype.reqUrl+"/symbol/deleteSymbolById" + symbolId)
+    },
+
+// OSM样式模板
+    //获取style样式列表
+    getOsmStyleTemplateList(){
+        return instance.get(Vue.prototype.reqUrl+"/styleTemplate/getOsmStyleTemplateList")
+    },   
+    //保存其他来源的地图样式
+    saveOsmStyleTemplate(data){
+        return instance.post(Vue.prototype.reqUrl+"/styleTemplate/saveOsmStyleTemplate",data)
+    },   
+    deleteOsmStyleTemplate(styleTemplateId){
+        return instance.get(Vue.prototype.reqUrl+"/styleTemplate/deleteOsmStyleTemplate/"+styleTemplateId)
+    },      
+
     //shpData
     requestTest() {
-
         return instance.get(Vue.prototype.reqUrl+"/shp/hello")
     },
     getShpList(data){
@@ -42,38 +134,26 @@ export default {
     getMaxMinAttrValue(data){
         return instance.post(Vue.prototype.reqUrl+"/shp/getMaxMinAttrValue", data)
     },  
-    getAttrValueMultiPg(ip,port,data){
-        return instance.post(Vue.prototype.reqUrl+"/shp/getAttrValueMultiPg/"+ip+"/"+port, data)
+    getAttrValueMultiPg(ip,port,name,data){
+        return instance.post(Vue.prototype.reqUrl+"/shp/getAttrValueMultiPg/"+ip+"/"+port+name, data)
     },  
-    getMaxMinAttrMultiPg(ip,port,data){
-        return instance.post(Vue.prototype.reqUrl+"/shp/getMaxMinAttrMultiPg/"+ip+"/"+port, data)
-    },          
-    getShpListById(dataSourceId){
-        return instance.get(Vue.prototype.reqUrl+"/getShpListById/"+dataSourceId)
-    },  
+    getMaxMinAttrMultiPg(ip,port,name,data){
+        return instance.post(Vue.prototype.reqUrl+"/shp/getMaxMinAttrMultiPg/"+ip+"/"+port+name, data)
+    },           
     deleteSourceById(dataSourceId){
         return instance.get(Vue.prototype.reqUrl+"/deleteSourceById/"+dataSourceId)
     },
 
 
-    //symbol
-    getSymbolList(data){
-        return instance.post(Vue.prototype.reqUrl+"/symbol/getSymbolList",data)
-    },
-    deleteSymbol(symbolId){
-        return instance.get(Vue.prototype.reqUrl+"/symbol/deleteSymbolById", {params:{symbolId}})
-    },
 
 
-    //字体
-    getFontList(){
-        return instance.get(Vue.prototype.reqUrl+"/getFontList")
-    },    
 
-    //mbtiles
-    getMbtilesSourceList(){
-      return  instance.get(Vue.prototype.reqUrl+"/getMbtilesList")
-    },
+
+
+
+
+   
+
 
     //Project  del
     // getProjectList(data){
@@ -116,12 +196,6 @@ export default {
     createMapImg(data){
         return instance.post(Vue.prototype.reqUrl+"/mapProject/createMapImg",data)
     },    
-    addDataSource(data){
-        return instance.post(Vue.prototype.reqUrl+"/addDataSource",data)
-    },
-    getDataSourceList(){
-        return instance.get(Vue.prototype.reqUrl+"/getDataSourceList")
-    },
 
     //地图发布相关
     //获取发布的地图样式
@@ -155,14 +229,7 @@ export default {
     getTileJsonList(tileJsonType){
         return instance.post(Vue.prototype.reqUrl+"/getTileJsonList/"+tileJsonType)
     },
-    //获取style样式列表
-    getStyleListById(tileJsonId){
-        return instance.get(Vue.prototype.reqUrl+"/mapServer/getStyleList/"+tileJsonId)
-    },   
-    //保存其他来源的地图样式
-    saveOtherMapStyle(data){
-        return instance.post(Vue.prototype.reqUrl+"/mapServer/saveOtherMapStyle",data)
-    },
+
 
     //地图类型样式
     //创建类型样式

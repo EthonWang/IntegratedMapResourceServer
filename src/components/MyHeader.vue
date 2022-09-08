@@ -3,10 +3,13 @@
     <a href="#" class="logo"><h2>Mapbox管理台</h2></a>
     <ul class="navigation">
       <li>
-        <router-link to="/Map/MyData"><h3>我的数据</h3></router-link>
+        <router-link to="/Map/MyData"><h2>数据服务</h2></router-link>
       </li>
       <li>
-        <router-link to="/Map/MyProject"><h3>我的项目</h3></router-link>
+        <router-link to="/Map/MyStyle"><h2>资源服务</h2></router-link>
+      </li>      
+      <li>
+        <router-link to="/Map/MyProject"><h2>我的项目</h2></router-link>
       </li>
 <!--      <li>-->
 <!--        <router-link target="_blank" to="/MapEditor"><h3>样式库</h3></router-link>-->
@@ -38,17 +41,20 @@ export default {
 
 <style>
 header {
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  box-sizing: border-box;
   box-shadow: 0 2px 4px 0 rgb(0 0 0 / 8%);
-  background: rgba(255, 255, 255, 1);
+  background: #3e7bc5;
   padding: 0px 100px;
-  height: 60px;
+  height: 75px;
+  z-index: 1;
 }
 header .logo {
   position: relative;
-  color: rgb(0, 0, 0);
+  color: #ffffff;
   text-decoration: none;
   align-items: baseline; 
 }
@@ -63,7 +69,7 @@ header .navigation li {
 }
 header .navigation li a {
   text-decoration: none;
-  color: rgb(0, 0, 0);
+  color: #ffffff;
   letter-spacing: 1px;
 }
 
@@ -72,6 +78,6 @@ header .navigation li a {
 } */
 
 .router-link-active {
-  color: rgb(17 101 184) !important;
+  color: #85ce61 !important;
 }
 </style>

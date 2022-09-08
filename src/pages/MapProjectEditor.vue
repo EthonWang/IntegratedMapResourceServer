@@ -5,13 +5,13 @@
     <el-tag class="mapZoomLngLat" type="info">
       Zoom:{{ zoom }} &nbsp; LngLat:{{ showCenter }}
     </el-tag>
+    <!-- 左部菜单栏 -->
     <div class="leftBar">
       <div class="leftBarTitle">
         <h2>{{ mapProjectInfo.name }}</h2>
         <!-- <h3 style="margin: 1.2rem 0;height:400px">编辑区</h3> -->
         <el-divider class="divider"></el-divider>
       </div>
-
       <div class="flexRowSpaceAround" style="width: 100%">
         <!--        打开shp选择框，添加shplayer数据-->
         <div>
@@ -28,8 +28,8 @@
                   >
                     <el-option
                       v-for="item in dataBaseList"
-                      :key="item.dbname"
-                      :label="item.dbname"
+                      :key="item.name"
+                      :label="item.name"
                       :value="item.id"
                     >
                     </el-option>
@@ -65,7 +65,7 @@
                 >
                 </el-pagination>
               </el-tab-pane>
-              <el-tab-pane label="mbTile" name="mbTile">
+              <el-tab-pane label="mbTiles" name="mbTile">
                 <el-row type="flex" align="middle">
                   <h4>数据库源:&nbsp;</h4>
                   <el-select
@@ -83,6 +83,53 @@
                     </el-option> </el-select
                   >&nbsp;
                   <el-button
+                    type="success"
+                    size="mini"
+                    circle  title="添加样式模板"
+                    icon="el-icon-plus"
+                    @click="addMbTileStyleShow = true"
+                  ></el-button>                    
+                  <el-dialog
+                    :title="this.mbTileJson.osmMbtilesBoolean ? 'OSM样式添加' : '样式添加'"
+                    :visible.sync="addMbTileStyleShow"
+                    width="30%"
+                    :modal="false"
+                    center
+                  >
+                    <el-form label-position="right" label-width="150px" :model="stylePatch">
+                      <el-form-item label="样式名称">
+                        <el-select v-model="stylePatch.id" placeholder="选择要添加的样式">
+                          <el-option
+                            v-for="item in mbTileStyleList"
+                            :key="item.id"
+                            :label="item.name"
+                            :value="item.id">
+                          </el-option>
+                        </el-select>                          
+                      </el-form-item>
+
+                    </el-form>                  
+                    <el-row type="flex">
+                      <span></span>
+
+                    </el-row>
+                    <span slot="footer" class="dialog-footer">
+                      <el-button @click="addMbTileStyleShow = false"
+                        >取 消</el-button
+                      >&nbsp;
+                      <el-popconfirm
+                        title="确定添加全部图层样式吗？"
+                        @confirm="addAllStyles(styleLayers);addMbTileStyleShow = false"
+                      >
+                        <el-button slot="reference" type="warning">全部添加</el-button>
+                      </el-popconfirm>                        
+                      <!-- <el-button type="primary" @click="addAllStyles(styleLayers)"
+                        >确 定</el-button
+                      > -->
+                    </span>
+                  </el-dialog>
+                  <!-- 该功能移到数据服务 -->
+                  <!-- <el-button
                     type="success"
                     size="mini"
                     circle 
@@ -116,18 +163,6 @@
                       >
                         <input type="file" ref="mbFile" />
                       </el-form-item>
-                      <!-- <el-form-item
-                        label="文件名:"
-                        :rules="{
-                          required: true,
-                          message: '请输入文件名',
-                          trigger: 'blur',
-                        }"
-                      >
-                        <el-input
-                          v-model="mbTileEditInfo.mbTilesJsonName"
-                        ></el-input>
-                      </el-form-item> -->
                     </el-form>
                     <iframe
                       id="uploadFrame"
@@ -142,9 +177,9 @@
                         >确 定</el-button
                       >
                     </span>
-                  </el-dialog>
+                  </el-dialog> -->
                 </el-row>
-                <br />
+                <!-- <br />
                 <el-row type="flex" align="middle">
                   <h4>特定样式:&nbsp;</h4>
                   <el-select
@@ -216,7 +251,7 @@
                       >
                     </span>
                   </el-dialog>                  
-                </el-row>
+                </el-row> -->
                 <!-- dataLayer -->
                 <el-table v-if="!isStyle" :data="dataLayers" height="313">
                   <el-table-column
@@ -247,7 +282,7 @@
                   </el-table-column>
                 </el-table>
                 <!-- styleLayer -->
-                <el-table v-if="isStyle" :data="styleLayers.filter(data => (layerType.indexOf(data['type']) > 0))" height="313">
+                <!-- <el-table v-if="isStyle" :data="styleLayers.filter(data => (layerType.indexOf(data['type']) > 0))" height="313">
                   <el-table-column
                     property="id"
                     width="200"
@@ -260,8 +295,6 @@
                         title="确定添加全部图层样式吗？"
                         @confirm="addAllStyles(styleLayers)"
                       >
-                        <!-- <i slot="reference" class="el-icon-refresh-left iconBtn" title="返回原样式"></i> -->
-
                         <el-button slot="reference" type="warning" size="mini">全部添加</el-button>
                       </el-popconfirm>                      
                     </template>                   
@@ -274,7 +307,7 @@
                       </el-button>
                     </template>                    
                   </el-table-column>
-                </el-table>
+                </el-table> -->
               </el-tab-pane>
             </el-tabs>
 
@@ -327,7 +360,6 @@
           >添加背景</el-button
         >
       </div>
-
       <!--      图层列表-->
       <el-divider class="divider">图层</el-divider>
       <div class="layerTable">
@@ -401,7 +433,7 @@
                 <el-row type="flex" justify="end">
                   <el-button type="primary" size="mini" @click="returnOriginStyle">返回原样式</el-button>
                 </el-row>
-                <el-table :data="typeStyleList[scope.row.type]" height="313">
+                <el-table :data="typeStyleBase[scope.row.type]" height="313">
                   <el-table-column
                     property="description"
                     width="170"
@@ -438,6 +470,7 @@
       </div>
       <!-- <el-button @click="test1">test</el-button> -->
     </div>
+    <!-- 模板样式库 -->
     <div v-if="stylesBoxShow" class="stylesBox">
       <el-row type="flex" align="middle" class="stylesBoxTitle">
         <h4 style="margin:10px;color:#409eff">可视化模板</h4>&nbsp;
@@ -457,7 +490,7 @@
             <!-- <i class="el-icon-circle-plus iconBtn"></i> -->
           </template>
           <el-row type="flex" justify="start" style="flex-wrap:wrap;border-top:1px solid #ebeef5">
-            <el-card v-for="(item,index) in typeStyleList[styleTypeSelect]" :key="index" 
+            <el-card v-for="(item,index) in typeStyleBase[styleTypeSelect]" :key="index" 
                      class="templateCard cursor" shadow="hover" @click.native="addTypeStyle(item)">
               <i class="el-icon-remove-outline tempDeleBtn" @click="tempCardDelete(item.id)"></i>
               <el-image
@@ -523,7 +556,7 @@
         </el-collapse-item>
       </el-collapse>      
     </div>
-
+    <!-- 样式编辑框 -->
     <div
       class="editBoard"
       v-if="
@@ -4135,22 +4168,10 @@
       </el-tabs>
       <i class="el-icon-close close-button" @click="handleCloseEditBoard"></i>
     </div>
-
+    <!-- 地图容器 -->
     <div class="rightMap">
       <div id="map" class="mapStyle"></div>
     </div>
-    <!-- <div
-      style="
-        position: absolute;
-        top: 300px;
-        left: 600px;
-        z-index: 1000;
-        height: 100px;
-        width: 100px;
-      "
-    >
-      <el-image :src="canvasSrc"></el-image>
-    </div> -->
   </div>
 </template>
 
@@ -4160,13 +4181,11 @@ import requestApi from "../api/requestApi";
 import fileApi from "../api/fileApi";
 import layerStyleProperties from "../assets/js/layerStyleProperties";
 import initTileJson from "../assets/js/initTileJson";
-import layerStyle from "../assets/js/layerStyleProperties";
 // import colorFormat from "../assets/js/colorFormat.js";
 // import myConfig from "../config";
 
 import Sortable from "sortablejs";
 import ConditionRender from "../components/ConditionRender";
-// import Datajson from "../assets/js/liberty";
 // import Vue from "vue";
 
 var map = null;
@@ -4198,7 +4217,10 @@ export default {
       mbTileSelect: "", //储存所选mbTile的id数据
       mbTileSelectIndex: 0, //  记录选择的数据下标
       mbTileJson: {},
-      mbTileEditShow: false,
+      mbJsonSource: {'mbtiles1':'mbtilesSource1','mbtiles2':'mbtilesSource2','mbtiles3':'mbtilesSource3','mbtiles4':'mbtilesSource4'},
+      stylePatch: {id:''},
+      // mbTileEditShow: false,     //功能移出，暂不用
+      addMbTileStyleShow: false,
       mbTileEditInfo: { mbTilesJsonFile: null }, //作为对象，为之后上传文件加其余字段做准备
       //mbTile样式功能
       isStyle: false, //初始mbtile默认添加的是vector_layer数据,true表示为添加style样式
@@ -4220,7 +4242,7 @@ export default {
       stylesBoxShow: false,
       styleTypeSelect: "",
       //类型样式列表
-      typeStyleList: {'circle':[],'line':[],'fill':[],'fill-extrusion':[]},
+      typeStyleBase: {'circle':[],'line':[],'fill':[],'fill-extrusion':[],'symbol':[]},
       originStyle: [],  //图层初始样式，用于应用类型样式后还原样式，注意图层顺序改变时及时更改
       //mbTile模板样式
       templateStyleSelect: "",  //mbTile模板的styleJson选择
@@ -4356,7 +4378,6 @@ export default {
     });
     this.mapProjectId = this.$route.params.mapProjectId;
     this.getMapProjectInfo();
-    this.getDataSourceList();  
 
     //layer拖动排序
     this.initSort();
@@ -4420,12 +4441,13 @@ export default {
           console.log(error);
         });    
     },
-    getDataSourceList() {
+    getPgList() {
       requestApi
-        .getDataSourceList()
+        .getPgList()
         .then((res) => {
           this.dataBaseList = res.data.data;
-          this.dataBaseList.unshift({ dbname: "defaultPG", id: "defaultPG" });
+          this.dataBaseList.unshift({ name: "defaultPG", id: "defaultPG" });
+          console.log('pgList',this.dataBaseList);
         })
         .catch((error) => {
           console.log(error);
@@ -4740,7 +4762,7 @@ export default {
     //打开shp选择框
     async addShpData() {
       if(this.mbTileSelect == ""){
-        await this.getTileJsonList("mbTile");
+        await this.getMbtilesList();
       }
       else{
         this.getStyleListById(this.mbTileSelect);
@@ -4765,6 +4787,7 @@ export default {
             console.log(error);
           });
       }
+      this.getPgList();  
     },
     async addMbTileData() {
       // 阻止发生默认行为
@@ -4777,7 +4800,7 @@ export default {
       console.log("表单信息：", this.mbTileEditInfo);
       this.mbTileEditShow = false;
       await this.onUpload(true,formData)
-      await this.getTileJsonList("mbTile");  //加载数据后更新tileJsonList，注：但现在没触发        
+      await this.getMbtilesList();  //加载数据后更新tileJsonList，注：但现在没触发        
     },
     async addMbStyleData() {
       // 阻止发生默认行为
@@ -4793,20 +4816,21 @@ export default {
       await this.getStyleListById(this.mbTileSelect); //加载数据后更新styleList，注：但现在没触发
     },
     // 获取不同类型来源的tileJson列表
-    async getTileJsonList(type){
+    getTileJsonList(type){
       requestApi
         .getTileJsonList(type)
         .then((res) => {
           if(res.data.data.length != 0){
             switch(type){
-              case "mbTile":
-                this.mbTileJsonList = res.data.data;
-                console.log("mbTileJsonList", this.mbTileJsonList);
-                //mbTiles先默认为第一个osm数据
-                this.mbTileSelect = this.mbTileJsonList[0].id;
-                this.dataLayers = this.mbTileJsonList[0].vector_layers;
-                this.getStyleListById(this.mbTileSelect);
-                break;
+              // mbtiles换新接口
+              // case "mbTile":
+              //   this.mbTileJsonList = res.data.data;
+              //   console.log("mbTileJsonList", this.mbTileJsonList);
+              //   //mbTiles先默认为第一个osm数据
+              //   this.mbTileSelect = this.mbTileJsonList[0].id;
+              //   this.dataLayers = this.mbTileJsonList[0].vector_layers;
+              //   this.getStyleListById(this.mbTileSelect);
+              //   break;
               default:
                 console.log("tileJsonList", res.data.data);
                 break
@@ -4818,8 +4842,61 @@ export default {
           console.log(error);
         });       
     },
+    getMbtilesList(){
+      requestApi.getMbtilesList()
+        .then((res)=>{
+          console.log(res);
+          if(res.data.data.length != 0){
+            this.mbTileJsonList = res.data.data;
+            console.log("mbTileJsonList", this.mbTileJsonList);
+            //mbTiles先默认为第一个osm数据
+            this.mbTileSelect = this.mbTileJsonList[0].id;
+            this.mbTileJson = this.mbTileJsonList[0];
+            this.dataLayers = this.mbTileJsonList[0].tileJsonInfo.vector_layers;
+            this.getStyleListById(this.mbTileSelect);       
+            console.log('dataLayers',this.dataLayers);
+          }          
+        })
+    },
     // 获取mbTile的styleJson列表
-    async getStyleListById(id){
+    getStyleListById(id){
+      if(this.mbTileJson.osmMbtilesBoolean){
+        requestApi.getOsmStyleTemplateList()
+          .then((res) => {
+            if(res.data.data.length != 0){
+              this.mbTileStyleList = res.data.data;
+              console.log("mbTileStyleList", this.mbTileStyleList);
+              //mbTileStyle先默认为第一个数据
+              this.mbTileStyleSelect = this.mbTileStyleList[0].id;
+              this.mbTileStyleJson = this.mbTileStyleList[0];
+              this.styleLayers = this.mbTileStyleJson.layers;
+            }else{
+              this.mbTileStyleList = [];
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          });        
+      }
+      else{
+        requestApi
+          .getStyleListById(id)
+          .then((res) => {
+            if(res.data.data.length != 0){
+              this.mbTileStyleList = res.data.data;
+              console.log("mbTileStyleList", this.mbTileStyleList);
+              //mbTileStyle先默认为第一个数据
+              this.mbTileStyleSelect = this.mbTileStyleList[0].id;
+              this.mbTileStyleJson = this.mbTileStyleList[0];
+              this.styleLayers = this.mbTileStyleJson.layers;
+            }else{
+              this.mbTileStyleList = [];
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          });      
+      }      
       requestApi
         .getStyleListById(id)
         .then((res) => {
@@ -4858,7 +4935,6 @@ export default {
             this.$message.error(e.message);
           });
       }
-
     },
     PgBaseChange(val) {
       //val表示选择的value值
@@ -4889,7 +4965,7 @@ export default {
         }
       });
       this.mbTileJson = this.mbTileJsonList[index];
-      this.dataLayers = this.mbTileJson.vector_layers;
+      this.dataLayers = this.mbTileJson.tileJsonInfo.vector_layers;
       this.mbTileSelect = this.mbTileJsonList[index].id;
       await this.getStyleListById(this.mbTileSelect);
     },
@@ -5074,9 +5150,7 @@ export default {
     //     minzoom: 0,
     //     paint: layerStyleProperties[geoType].paint,
     //     source: this.sourceNameObject[row.tableName], //通过记录的source名字与id对应，拿到sourceId
-    //     // "source-layer": "default"
     //     "source-layer": row.tableName,
-    //     // "source-layer":"my22"
     //   };
 
     //   if (geoType !== "symbol") {
@@ -5188,6 +5262,7 @@ export default {
         show: true,
         originName: row.originName,
         showName: row.originName, //用于展示图层名字
+        bounds: row.bounds,
         shpAttribute: typeof(row.attrInfo) != "undefined" ? row.attrInfo : [],
         attrValueSet: {},
         attrShowList: {},
@@ -5201,9 +5276,7 @@ export default {
         minzoom: 0,
         paint: JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint)),
         source: this.sourceNameObject[row.tableName], //通过记录的source名字与id对应，拿到sourceId
-        // "source-layer": "default"
         "source-layer": row.tableName,
-        // "source-layer":"my22"
       };
 
       if (geoType !== "symbol") {
@@ -5234,7 +5307,7 @@ export default {
     async addPgMultiShp(index, row) {
       //判断该shp是否已添加
       if (
-        !Object.prototype.hasOwnProperty.call(this.sourceNameObject, row.id)
+        !Object.prototype.hasOwnProperty.call(this.sourceNameObject, row.originName)
       ) {
         let newTileJson = initTileJson;
         newTileJson.name = row.originName;
@@ -5243,8 +5316,8 @@ export default {
             "/multiPgSource/" +
             this.mutiPgInfo.ip +
             "/" +
-            this.mutiPgInfo.port +
-            "/" +
+            this.mutiPgInfo.port + 
+            "/" + this.mutiPgInfo.name + '/' +
             row.originName +
             "/{z}/{x}/{y}.pbf",
         ];
@@ -5295,6 +5368,7 @@ export default {
         show: true,
         originName: row.originName,
         showName: row.originName, //用于展示图层名字
+        bounds: row.bounds,        
         shpAttribute: typeof(row.attrInfo) != "undefined" ? row.attrInfo : [],
         mutiPgInfo: this.mutiPgInfo, //用来记录多源pg信息
         attrValueSet: {},
@@ -5309,9 +5383,7 @@ export default {
         minzoom: 0,
         paint: JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint)),
         source: this.sourceNameObject[row.id], //添加的sourceId
-        // "source-layer": "default"
         "source-layer": row.originName,
-        // "source-layer":"my22"
       };
 
       if (geoType !== "symbol") {
@@ -5352,7 +5424,7 @@ export default {
       ) {
         //添加mbTile的shp图层时，相关json已经入库
         let sourceId = this.mbTileSelect;
-        let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceId + ".json";
+        let tileJsonUrl = this.reqUrl + "/"+this.mbJsonSource[this.mbTileJson.classification]+"/"+this.mbTileJson.name + "/{z}/{x}/{y}.pbf";
         let newSourceJson = {
           sourceName: sourceId,
           sourceType: "vector",
@@ -5388,9 +5460,7 @@ export default {
         minzoom: typeof(row['minzoom']) != 'undefined' ? row['minzoom'] : 0,
         paint: JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint)),
         source: this.sourceNameObject[name], //通过记录的source名字与id对应，拿到sourceId
-        // "source-layer": "default"
         "source-layer": row.id,
-        // "source-layer":"my22"
       };
 
       if (geoType !== "symbol") {
@@ -5429,7 +5499,7 @@ export default {
       ) {
         //添加mbTile的shp图层时，相关json已经入库
         let sourceId = this.mbTileSelect;
-        let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceId + ".json";
+        let tileJsonUrl = this.reqUrl + "/"+this.mbJsonSource[this.mbTileJson.classification]+"/"+this.mbTileJson.name + "/{z}/{x}/{y}.pbf";
         let newSourceJson = {
           sourceName: sourceId,
           sourceType: "vector",
@@ -5478,9 +5548,7 @@ export default {
         minzoom: typeof(row['minzoom']) != 'undefined' ? row['minzoom'] : 0,
         paint: JSON.parse(JSON.stringify(newPaint)),
         source: this.sourceNameObject[name], //通过记录的source名字与id对应，拿到sourceId
-        // "source-layer": "default"
         "source-layer": row['source-layer'],
-        // "source-layer":"my22"
       };
 
       if (
@@ -5646,7 +5714,7 @@ export default {
       this.styleTypeSelect = row.type;
       const type = row.type;      
       this.getTypeStyleList(type);
-      await this.getTileJsonList("mbTile");
+      await this.getMbtilesList();
       if(this.templateStyleSelect == ""){
         this.templateStyleSelect = this.mbTileStyleList[0].id;  //先默认为第一个
         this.templateStyleJson = this.mbTileStyleList[0];  //先默认为第一个
@@ -5699,8 +5767,8 @@ export default {
       requestApi.getTypeStyleList(type)
         .then((res)=>{
           if(res.data.code == 0){
-            this.typeStyleList[type] = res.data.data;
-            console.log('typeStyleList',this.typeStyleList); 
+            this.typeStyleBase[type] = res.data.data;
+            console.log('typeStyleBase',this.typeStyleBase); 
           }else{
             console.log(res.data.msg)
           }
@@ -5808,8 +5876,8 @@ export default {
       //先改参数再更新图层，打开图层编辑框
       console.log("change layer type to", val);
       let aimLayer = this.layers[this.nowLayerIndex];
-      aimLayer.paint = JSON.parse(JSON.stringify(layerStyle[val].paint));
-      aimLayer.layout = JSON.parse(JSON.stringify(layerStyle[val].layout));
+      aimLayer.paint = JSON.parse(JSON.stringify(layerStyleProperties[val].paint));
+      aimLayer.layout = JSON.parse(JSON.stringify(layerStyleProperties[val].layout));
       this.handleRemoveLayer(aimLayer.id);
       if (this.nowLayerIndex === 0) {
         this.addLayerToMap(aimLayer);
@@ -5951,6 +6019,19 @@ export default {
       }
       const style = map.getStyle();
       console.log("style:", style);
+      const row = this.layers[this.nowLayerIndex]
+      if('bounds' in row){
+        const bbox = [[row.bounds[0]+0,row.bounds[1]+0],[row.bounds[2]+0,row.bounds[3]+0]]
+        // const center = [Number((row.bounds[0]+row.bounds[2])/2),Number((row.bounds[1]+row.bounds[3])/2)]
+        // this.$nextTick(()=>{
+        //   map.setCenter(center);
+        // });
+        map.fitBounds(bbox, {
+          duration:500,
+          padding: {top: 10, bottom:25, left: 15, right: 5}
+        });
+      }
+        // const center = [Number((row.bounds[0]+row.bounds[2])/2),Number((row.bounds[1]+row.bounds[3])/2)]
 
       // map.flyTo({
       //   center: [113.32948058466824, 23.19862318628209],
@@ -6188,7 +6269,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 #temp-features {
   position: absolute;
   top: 0;
