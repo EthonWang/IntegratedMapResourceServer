@@ -470,13 +470,13 @@
               <h3>{{typeTranslate[styleTypeSelect]+'样式'}}</h3> 
             </div>
             <el-row type="flex" justify="start" style="flex-wrap:wrap">
-              <div v-for="(item,index) in typeStyleBases[styleTypeSelect]" :key="index" 
+              <div v-for="(item,index) in typeStyleBases[styleTypeSelect]" :key="index" style="height: 240px;width: 300px"
                       class="templateCard" @click="showItemInfo(item)">
                 <i class="el-icon-remove-outline tempDeleBtn" @click="tempCardDelete(item.id)"></i>
                 <el-image
                     :style="{
-                    width:(styleContainerWidth-120)/4+'px',
-                    height:(styleContainerWidth-110)*0.1545+'px'
+                    width:300+'px',
+                    height:200+'px'
                   }"                
                 style="width:100%;border-radius:5% 5% 0 0"
                   :src="item.styleImgUrl.ImgUrl ? item.styleImgUrl.ImgUrl : imgDefault"
@@ -630,8 +630,8 @@
                 <i class="el-icon-remove-outline tempDeleBtn" @click="styleDelete(item.id)"></i>
                 <el-image
                     :style="{
-                    width:(styleContainerWidth-120)/4+'px',
-                    height:(styleContainerWidth-110)*0.1545+'px'
+                    width:300+'px',
+                    height:200+'px'
                   }"                
                 style="width:100%;border-radius:5% 5% 0 0"
                   :src="reqUrl+item.imgWebPath ? reqUrl+item.imgWebPath : imgDefault"
@@ -661,7 +661,7 @@ export default {
   data() {
     return {
       // 目录条
-      activeIndex: "4",
+      activeIndex: "1",
 
       //字体库
       fontTableData: [],
@@ -746,6 +746,8 @@ export default {
   //   }
   // },
   mounted() {
+      document.title = '资源服务';
+
       this.styleContainerWidth = `${document.getElementById('styleContainer').offsetWidth}`;  //监测样式容器宽度
 
     // this.getFontList();
@@ -1526,12 +1528,15 @@ h3{
   position: relative;
   display: flex;
   flex-wrap: wrap;
-  flex-direction: column;
+  flex-direction: row;
   box-sizing: border-box;
+  justify-content: center;
+
   margin: 0 15px 15px 0;
   cursor: pointer;
   border: 1px solid #fafafa;
   border-radius: 5% 5% 0 0;
+  background-color: white;
 }  
 .templateCard:hover{
   box-shadow: 0 0 10px 1px rgba(0 0 0 / 20%);
@@ -1542,7 +1547,7 @@ h3{
   color: #dcdfe6;
   font-size: 20px;
   right: 10px;
-  bottom: 10px;
+  top: 210px;
   z-index: 1;
 }
 .tempDeleBtn:hover{

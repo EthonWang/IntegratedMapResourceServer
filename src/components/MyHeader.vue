@@ -9,7 +9,7 @@
         <router-link to="/Map/MyStyle"><h2>资源服务</h2></router-link>
       </li>      
       <li>
-        <router-link to="/Map/MyProject"><h2>我的项目</h2></router-link>
+        <router-link to="/Map/MyProject"><h2>地图项目</h2></router-link>
       </li>
 <!--      <li>-->
 <!--        <router-link target="_blank" to="/MapEditor"><h3>样式库</h3></router-link>-->
