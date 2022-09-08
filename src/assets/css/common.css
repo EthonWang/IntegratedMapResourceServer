@@ -15,6 +15,10 @@
     align-items: center;
 }
 
+.iconBtn:hover{
+    cursor: pointer;
+    color: #409eff;
+  }
 ::-webkit-scrollbar{
     width: 5px;
     height: 7px;

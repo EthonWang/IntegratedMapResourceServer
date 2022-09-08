@@ -1,0 +1,156 @@
+@font-face {
+    font-family: 'Open Sans Bold';
+    src: url("./OpenSans-Bold.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'Open Sans Bold Italic';
+    src: url("./OpenSans-BoldItalic.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'Open Sans Condensed Bold';
+    src: url("./OpenSans-CondBold.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'Open Sans Condensed Light';
+    src: url("./OpenSans-CondLight.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'Open Sans Condensed Light Italic';
+    src: url("./OpenSans-CondLightItalic.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'Open Sans Extra Bold';
+    src: url("./OpenSans-ExtraBold.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'Open Sans Extra Bold Italic';
+    src: url("./OpenSans-ExtraBoldItalic.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'Open Sans Italic';
+    src: url("./OpenSans-Italic.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'Open Sans Light';
+    src: url("./OpenSans-Light.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'Open Sans Light Italic';
+    src: url("./OpenSans-LightItalic.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'Open Sans Regular';
+    src: url("./OpenSans-Regular.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'Open Sans Semibold';
+    src: url("./OpenSans-Semibold.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'Open Sans Semibold Italic';
+    src: url("./OpenSans-SemiboldItalic.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'PT Sans Caption Web Bold';
+    src: url("./PT_Sans-Caption-Web-Bold.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'PT Sans Caption Regular';
+    src: url("./PT_Sans-Caption-Web-Regular.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'PT Sans Bold Italic';
+    src: url("./PT_Sans-Web-BoldItalic.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'PT Sans Narrow Bold';
+    src: url("./PT_Sans-Narrow-Web-Bold.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'PT Sans Narrow Regular';
+    src: url("./PT_Sans-Narrow-Web-Regular.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'PT Sans Bold Italic';
+    src: url("./PT_Sans-Web-Bold.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'PT Sans Italic';
+    src: url("./PT_Sans-Web-Italic.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'PT Sans Regular';
+    src: url("./PT_Sans-Web-Regular.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'Roboto Black';
+    src: url("./Roboto-Black.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'Roboto Black Italic';
+    src: url("./Roboto-BlackItalic.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'Roboto Bold';
+    src: url("./Roboto-Bold.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'Roboto Bold Italic';
+    src: url("./Roboto-BoldItalic.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'Roboto Condensed Bold';
+    src: url("./RobotoCondensed-Bold.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'Roboto Condensed Bold Italic';
+    src: url("./RobotoCondensed-BoldItalic.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'Roboto Condensed Italic';
+    src: url("./RobotoCondensed-Italic.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'Roboto Condensed Light';
+    src: url("./RobotoCondensed-Light.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'Roboto Condensed Light Italic';
+    src: url("./RobotoCondensed-LightItalic.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'Roboto Condensed Regular';
+    src: url("./RobotoCondensed-Regular.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'Roboto Italic';
+    src: url("./Roboto-Italic.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'Roboto Light';
+    src: url("./Roboto-Light.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'Roboto Light Italic';
+    src: url("./Roboto-LightItalic.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'Roboto Light Italic';
+    src: url("./Roboto-Medium.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'Roboto Medium Italic';
+    src: url("./Roboto-MediumItalic.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'Roboto Regular';
+    src: url("./Roboto-Regular.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'Roboto Thin';
+    src: url("./Roboto-Thin.ttf") format("truetype");
+}
+@font-face {
+    font-family: 'Roboto Thin Italic';
+    src: url("./Roboto-ThinItalic.ttf") format("truetype");
+}

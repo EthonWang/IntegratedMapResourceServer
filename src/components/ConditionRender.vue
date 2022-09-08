@@ -1,6 +1,7 @@
 <template>
   <div class="box">
     <el-row v-if="menuButtonShowList[attribute] && conditionShow">
+      <!-- zoom按钮 -->
       <el-button
         v-if="
           !attribute.includes('translate-anchor') &&
@@ -134,6 +135,7 @@
           >按属性条件设置样式</el-button
         >
       </el-popover>
+      <!-- 公式按钮 -->
       <el-button
         v-if="
           !attribute.includes('translate-anchor') &&
@@ -2574,6 +2576,10 @@ export default {
             console.log("res", res);
             this.propValueList = res.data.data.attrValue;
             this.allpropValueListLength = res.data.data.featureCount;
+            this.propValueList = [
+              {id:1,column_name:1},{id:2,column_name:2}
+            ];
+            this.allpropValueListLength = 20;
             console.log("propValueList", this.propValueList);
           })
           .catch((error) => {
