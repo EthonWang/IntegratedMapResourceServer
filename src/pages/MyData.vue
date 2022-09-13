@@ -601,7 +601,7 @@
                 trigger: 'blur',
               }"
             >
-              <el-input v-model="mbAddInfo.path"></el-input>
+              <el-input v-model="mbAddInfo.path" placeholder="E:/MapboxDB/sqlites/2020-10-planet-14.mbtiles"></el-input>
             </el-form-item>
           </el-form>
           <iframe
@@ -1066,7 +1066,7 @@ export default {
   data() {
     return {
       // 目录条
-      activeIndex: "4",
+      activeIndex: "1",
 
       // shpUploadUrl: config.requestUrl + "/shp/uploadShp",
       // symbolUploadUrl: config.requestUrl + "/symbol/uploadSymbol",
@@ -1457,6 +1457,7 @@ export default {
         .then((res) => {
           if (res.data.code == 0) {
             this.$message.success("删除数据源：" + row.name);
+            this.getMbtilesSourceList();
           } else {
             this.$message.info("删除数据源失败！");
           }
@@ -1493,6 +1494,7 @@ export default {
           this.mbTileJsonList = [
             JSON.parse(JSON.stringify(this.mbTileSelect["tileJsonInfo"])),
           ];
+          console.log("mbList", this.mbtilesTableData);
         })
         .catch((error) => {
           console.log(error);
