@@ -32,7 +32,7 @@
     </el-menu>
     <!--    shp文件管理-->
     <el-card
-      v-if="activeIndex == '1' && !pgInfoShow"
+      v-if="activeIndex == '1'"
       class="main-content"
       shadow="never"
     >
@@ -216,7 +216,7 @@
     </el-card>
     <!--    PostgreSQL源管理-->
     <el-card
-      v-if="activeIndex == '2' && !pgInfoShow"
+      v-if="activeIndex == '2'"
       class="main-content"
       shadow="never"
     >
@@ -411,7 +411,7 @@
     </el-card>
     <!--    mbtiles-->
     <el-card
-      v-if="activeIndex == '3' && !pgInfoShow"
+      v-if="activeIndex == '3'"
       class="main-content infoBox"
       shadow="never"
     >
@@ -670,7 +670,7 @@
           </el-row>
           <br />
           <el-row>
-            <el-col :span="8">
+            <!-- <el-col :span="8">
               <h2>
                 {{
                   mbtilesTableData.length > 0
@@ -719,8 +719,8 @@
                   </template>
                 </el-table-column>
               </el-table>
-            </el-col>
-            <el-col :span="12" :offset="1">
+            </el-col> -->
+            <el-col :span="12">
               <el-row>
                 <h2>{{ mbTileSelect["name"] }}详细信息</h2>
                 <el-form
@@ -815,7 +815,7 @@
         <h3>{{ outUrlItem + " 源管理" }}</h3>
       </div>
       <div>
-        <el-button type="primary" round size="small" @click="openMbEdit">{{
+        <el-button type="primary" round size="small" @click="openUrlEdit">{{
           "添加 " + outUrlItem + " 链接"
         }}</el-button>
         <el-divider content-position="center">{{
@@ -830,11 +830,11 @@
         >
           <el-table-column prop="name" label="名称" width="200">
           </el-table-column>
-          <el-table-column prop="description" label="描述" width="200">
+          <el-table-column prop="description" label="描述" width="400">
           </el-table-column>
-          <el-table-column prop="url" label="外部服务链接" width="400">
+          <el-table-column prop="url" label="外部服务链接">
           </el-table-column>
-          <el-table-column label="操作" show-overflow-tooltip width="200">
+          <el-table-column label="操作" show-overflow-tooltip width="400">
 <!--            <template slot-scope="scope">-->
 <!--              <el-popconfirm-->
 <!--                title="确定删除吗？"-->
@@ -927,11 +927,11 @@
     <!-- pg数据信息展示 -->
     <el-card v-if="pgInfoShow" class="main-content infoBox">
       <div slot="header">
-        <h3 class="textStyle" @click="pgInfoShow = false">数据管理</h3>
+        <h3 class="textStyle" @click="backPreview">数据管理</h3>
         &nbsp;
         <h3 style="color: #aea8aa">{{ "/" + " " + dataInfo["originName"] }}</h3>
       </div>
-      <div v-if="pgInfoShow" id="map1"></div>
+      <div id="map1"></div>
       <el-row>
         <h2>属性信息</h2>
         <el-table
@@ -1067,6 +1067,7 @@ export default {
     return {
       // 目录条
       activeIndex: "1",
+      saveIndex: "",  //用于存储activeIndex,处理地图控件残留问题
 
       // shpUploadUrl: config.requestUrl + "/shp/uploadShp",
       // symbolUploadUrl: config.requestUrl + "/symbol/uploadSymbol",
@@ -1179,7 +1180,11 @@ export default {
     // menu导航条
     handleMenuSelect(key) {
       this.activeIndex = key;
-      this.pgInfoShow = false;
+      this.mbDataInfoShow = false;
+      // 等页面渲染完，否则会有地图控件残留在新页面
+      this.$nextTick(()=>{
+        this.pgInfoShow = false;
+      })
       switch (key) {
         case "1":
           this.getShpDataList();
@@ -1218,24 +1223,24 @@ export default {
             });
           break;
         case "4":
-          this.getOutService()
           this.outUrlItem = "TERRAIN";
+          this.getOutService()
 
           break;
         case "5":
-          this.getOutService()
           this.outUrlItem = "WMTS";
+          this.getOutService()
 
           break;
         case "6":
-          this.getOutService()
           this.outUrlItem = "TMS";
+          this.getOutService()
 
           break;
         default:
           // this.pgInfoShow = true;
           break;
-      }
+      }  
     },
     getShpDataList() {
       requestApi
@@ -1665,6 +1670,9 @@ export default {
 
     // 图标操作
     handlePreview(val, type) {
+      // 将index变换，用于隐藏页面
+      this.saveIndex = this.activeIndex;
+      this.activeIndex = "";
       this.dataInfo = val;
       let {
         originName: name,
@@ -1687,6 +1695,12 @@ export default {
         this.createMap(val, type);
       });
       console.log("val", val);
+    },
+    backPreview(){
+      this.activeIndex = this.saveIndex;      
+      this.$nextTick(()=>{
+        this.pgInfoShow = false;
+      })      
     },
     handleDeleteShp(val) {
       this.$confirm("确认删除该文件, 是否继续?", "提示", {

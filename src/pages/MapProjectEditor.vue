@@ -92,7 +92,7 @@
                   ></el-button>
                   <el-dialog
                     :title="
-                      this.mbTileJson.osmMbtilesBoolean
+                      this.mbTileInfo.osmMbtilesBoolean
                         ? 'OSM样式添加'
                         : '样式添加'
                     "
@@ -193,6 +193,8 @@
                     </span>
                   </el-dialog> -->
                 </el-row>
+                <el-button type="primary" @click="test1(true)">test1</el-button>
+                <el-button type="primary" @click="test1(false)">test2</el-button>
                 <!-- <br />
                 <el-row type="flex" align="middle">
                   <h4>特定样式:&nbsp;</h4>
@@ -595,10 +597,39 @@
                     </el-option>
                   </el-select>
                 </el-row>
+                <!-- 非mbSource样式 -->
                 <el-table
+                  v-if="layerSource != 'mbSource'"
                   :data="
                     tempStyleLayers.filter(
                       (data) => data.type == styleTypeSelect
+                    )
+                  "
+                  height="600"
+                >
+                  <el-table-column
+                    property="id"
+                    width="210"
+                    show-overflow-tooltip
+                    label="style"
+                  ></el-table-column>
+                  <el-table-column width="100">
+                    <template slot-scope="scope">
+                      <el-button
+                        size="mini"
+                        type="primary"
+                        @click="addMbTileToSelf(scope.row)"
+                        >应用样式
+                      </el-button>
+                    </template>
+                  </el-table-column>
+                </el-table>
+                <!-- mbSource样式 -->
+                <el-table
+                  v-if="layerSource == 'mbSource'"
+                  :data="
+                    tempStyleLayers.filter(
+                      (data) => data['source-layer'] == layers[nowLayerIndex]['originName']
                     )
                   "
                   height="600"
@@ -4322,6 +4353,8 @@ import requestApi from "../api/requestApi";
 import fileApi from "../api/fileApi";
 import layerStyleProperties from "../assets/js/layerStyleProperties";
 import initTileJson from "../assets/js/initTileJson";
+import streets from "../assets/js/streets-v8-test.js";
+import style from "../assets/js/style.js";
 // import colorFormat from "../assets/js/colorFormat.js";
 // import myConfig from "../config";
 
@@ -4357,7 +4390,8 @@ export default {
       mbTileJsonList: [],
       mbTileSelect: "", //储存所选mbTile的id数据
       mbTileSelectIndex: 0, //  记录选择的数据下标
-      mbTileJson: {},
+      mbTileInfo: {},   // mbTile存在数据库中的信息，tileJsonId记录描述信息
+      mbTileJson: {},   // 通过tileJsonId获取的描述信息
       mbJsonSource: {
         mbtiles1: "mbtilesSource1",
         mbtiles2: "mbtilesSource2",
@@ -4387,6 +4421,27 @@ export default {
         "heatmap",
       ],
 
+                
+      mbsource:{
+                'water_name':'symbol',
+                'transportation_name':'symbol',
+                'aerodrome_label':'circle',
+                'globallandcover':'circle',
+                'mountain_peak':'circle',
+                'housenumber':'circle',
+                'poi':'circle',
+                'transportation':'line',
+                'boundary':'line',
+                'aeroway':'line',
+                'waterway':'line',
+                'park':'fill',
+                'place':'fill',
+                'landuse':'fill',
+                'landcover':'fill',
+                'water':'fill',
+                'building':'fill',
+                },
+
       //左侧shp图层树
       layersNameObject: {}, //检测重复  后端字段为layerTree
       layersName: [], //加载的图层id集合，用于展示图层按index的排列
@@ -4409,6 +4464,8 @@ export default {
       templateStyleJson: {},
       templateStyleSelectIndex: 0, //  记录选择的数据下标
       tempStyleLayers: [],
+      layerSource: '',      // 用于判断当前图层的数据源，依据图层的matadata属性中的'mapbox:type'属性，有primary,osm,mbCustom
+
 
       //mapbox地图
       mapProjectInfo: {},
@@ -4944,7 +5001,7 @@ export default {
         paint: newPaint,
         layout: newLayout,
         metadata: {
-          "mapbox:group": "92ca48f13df25",
+          "mapbox:type":"background",
         },
       };
       if (sourceType != "mbTile") {
@@ -5054,6 +5111,18 @@ export default {
           console.log(error);
         });
     },
+    getTileJsonById(){
+      requestApi
+        .getTileJson('632d75b98cb8c3ac16f79a1b')
+        .then((res) => {
+          this.mbTileJson = res.data;
+          this.dataLayers = res.data.vector_layers;
+          console.log('tileJson',this.mbTileJson);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
     getMbtilesList() {
       requestApi.getMbtilesList().then((res) => {
         console.log(res);
@@ -5062,8 +5131,8 @@ export default {
           console.log("mbTileJsonList", this.mbTileJsonList);
           //mbTiles先默认为第一个osm数据
           this.mbTileSelect = this.mbTileJsonList[0].id;
-          this.mbTileJson = this.mbTileJsonList[0];
-          this.dataLayers = this.mbTileJsonList[0].tileJsonInfo.vector_layers;
+          this.mbTileInfo = this.mbTileJsonList[0];
+          this.getTileJsonById(this.mbTileInfo.tileJsonId);
           this.getStyleListById(this.mbTileSelect, false);
           console.log("dataLayers", this.dataLayers);
         }
@@ -5096,7 +5165,7 @@ export default {
     },
     // 获取mbTile的styleJson列表
     getStyleListById(id, isCallBack) {
-      if (this.mbTileJson.osmMbtilesBoolean || id == "OSM") {
+      if (this.mbTileInfo.osmMbtilesBoolean || id == "OSM") {
         requestApi
           .getOsmStyleTemplateList()
           .then((res) => {
@@ -5203,9 +5272,9 @@ export default {
           this.mbTileSelectIndex = ind;
         }
       });
-      this.mbTileJson = this.mbTileJsonList[index];
-      this.dataLayers = this.mbTileJson.tileJsonInfo.vector_layers;
+      this.mbTileInfo = this.mbTileJsonList[index];
       this.mbTileSelect = this.mbTileJsonList[index].id;
+      this.getTileJsonById(this.mbTileInfo.tileJsonId);
       await this.getStyleListById(this.mbTileSelect, false);
     },
     //获取选定的styleJson和对应layers
@@ -5512,7 +5581,7 @@ export default {
           JSON.stringify(layerStyleProperties[geoType].layout)
         ), //防止同类型图层样式改变间影响
         maxzoom: 22,
-        metadata: "",
+        metadata: {"mapbox:type":"pgDefault"},
         minzoom: 0,
         paint: JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint)),
         source: this.sourceNameObject[row.tableName], //通过记录的source名字与id对应，拿到sourceId
@@ -5628,7 +5697,7 @@ export default {
           JSON.stringify(layerStyleProperties[geoType].layout)
         ),
         maxzoom: 22,
-        metadata: "",
+        metadata: {"mapbox:type":"pgMulti"},
         minzoom: 0,
         paint: JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint)),
         source: this.sourceNameObject[row.id], //添加的sourceId
@@ -5672,34 +5741,43 @@ export default {
         )
       ) {
         //添加mbTile的shp图层时，相关json已经入库
-        let sourceId = this.mbTileSelect;
-        let tileJsonUrl =
-          this.reqUrl +
-          "/" +
-          this.mbJsonSource[this.mbTileJson.classification] +
-          "/" +
-          this.mbTileJson.name +
-          "/{z}/{x}/{y}.pbf";
+            // json写法
+        let sourceId = this.mbTileInfo.tileJsonId;
+        let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceId + ".json";  
         let newSourceJson = {
           sourceName: sourceId,
           sourceType: "vector",
           sourceUrl: tileJsonUrl,
-        };
-        // this.addSourceToMap(newSourceJson);
-        map.addSource(newSourceJson.sourceName, {
-          type: newSourceJson.sourceType,
-          tiles: [newSourceJson.sourceUrl],
-        });
+        };         
+        console.log('请求数据：',newSourceJson);
+        this.addSourceToMap(newSourceJson);        
+            //  直接请求pbf
+        // let tileJsonUrl =
+        //   this.reqUrl +
+        //   "/" +
+        //   this.mbJsonSource[this.mbTileInfo.classification] +
+        //   "/" +
+        //   this.mbTileInfo.name +
+        //   "/{z}/{x}/{y}.pbf";
+        // let newSourceJson = {
+        //   sourceName: sourceId,
+        //   sourceType: "vector",
+        //   sourceUrl: tileJsonUrl,
+        // };
+        // map.addSource(newSourceJson.sourceName, {
+        //   type: newSourceJson.sourceType,
+        //   tiles: [newSourceJson.sourceUrl],
+        // });
         this.sources[newSourceJson.sourceName] = {
           type: newSourceJson.sourceType,
           url: newSourceJson.sourceUrl,
         };
         //记录shp图层和对应的id
         this.sourceNameObject[name] = sourceId;
-      }
+      }    
 
       //前八个是自己用的属性
-      let geoType = "circle";
+      let geoType = this.mbsource[row.id];
       let newLayer = {
         index: index,
         sourceType: "mbTile", //记录数据来源类型，用于区别mbTlie的添加和删除
@@ -5717,7 +5795,7 @@ export default {
           JSON.stringify(layerStyleProperties[geoType].layout)
         ),
         maxzoom: typeof row["maxzoom"] != "undefined" ? row["maxzoom"] : 22,
-        metadata: "",
+        metadata: {"mapbox:type":'mbSource',"mapbox:isOSM":this.mbTileInfo.osmMbtilesBoolean,"mapbox:source":row.id},
         minzoom: typeof row["minzoom"] != "undefined" ? row["minzoom"] : 0,
         paint: JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint)),
         source: this.sourceNameObject[name], //通过记录的source名字与id对应，拿到sourceId
@@ -5759,24 +5837,33 @@ export default {
         )
       ) {
         //添加mbTile的shp图层时，相关json已经入库
-        let sourceId = this.mbTileSelect;
-        let tileJsonUrl =
-          this.reqUrl +
-          "/" +
-          this.mbJsonSource[this.mbTileJson.classification] +
-          "/" +
-          this.mbTileJson.name +
-          "/{z}/{x}/{y}.pbf";
+            // json写法
+        let sourceId = this.mbTileInfo.tileJsonId;
+        let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceId + ".json";  
         let newSourceJson = {
           sourceName: sourceId,
           sourceType: "vector",
           sourceUrl: tileJsonUrl,
-        };
-        // this.addSourceToMap(newSourceJson);
-        map.addSource(newSourceJson.sourceName, {
-          type: newSourceJson.sourceType,
-          tiles: [newSourceJson.sourceUrl],
-        });
+        };         
+        console.log('请求数据：',newSourceJson);
+        this.addSourceToMap(newSourceJson);        
+            //  直接请求pbf        
+        // let tileJsonUrl =
+        //   this.reqUrl +
+        //   "/" +
+        //   this.mbJsonSource[this.mbTileInfo.classification] +
+        //   "/" +
+        //   this.mbTileInfo.name +
+        //   "/{z}/{x}/{y}.pbf";
+        // let newSourceJson = {
+        //   sourceName: sourceId,
+        //   sourceType: "vector",
+        //   sourceUrl: tileJsonUrl,
+        // };
+        // map.addSource(newSourceJson.sourceName, {
+        //   type: newSourceJson.sourceType,
+        //   tiles: [newSourceJson.sourceUrl],
+        // });
         this.sources[newSourceJson.sourceName] = {
           type: newSourceJson.sourceType,
           url: newSourceJson.sourceUrl,
@@ -5815,7 +5902,7 @@ export default {
         filter: typeof row["filter"] != "undefined" ? row["filter"] : ["all"],
         layout: JSON.parse(JSON.stringify(newLayout)),
         maxzoom: typeof row["maxzoom"] != "undefined" ? row["maxzoom"] : 22,
-        metadata: "",
+        metadata: {"mapbox:type":'mbStyle',"mapbox:isOSM":this.mbTileInfo.osmMbtilesBoolean,"mapbox:source":row['source-layer']},
         minzoom: typeof row["minzoom"] != "undefined" ? row["minzoom"] : 0,
         paint: JSON.parse(JSON.stringify(newPaint)),
         source: this.sourceNameObject[name], //通过记录的source名字与id对应，拿到sourceId
@@ -5932,6 +6019,19 @@ export default {
       this.nowLayerIndex = index;
       //先关闭，否则组件不会初始化
       this.editorShow = "";
+      // 判断当前页面数据是否为mbtile,以及是否为osm数据
+      const datatype = this.layers[this.nowLayerIndex]['metadata']['mapbox:type'];
+      switch(datatype){
+        case 'primary':
+          this.layerSource = 'primary';
+          break;
+        case 'mbSource':
+          this.layerSource = 'mbSource';
+          break;
+        case 'mbStyle':
+          this.layerSource = 'mbStyle';
+          break;
+      }      
       //设置属性编辑界面的展示情况
       this.menuButtonShowList = this.layers[this.nowLayerIndex].attrShowList;
       this.menuShowList = JSON.parse(JSON.stringify(this.menuButtonShowList)); //先获取包含各个tab的列表
@@ -5995,12 +6095,26 @@ export default {
       // 先关闭图层编辑框避免冲突
       this.editorShow = false;
       this.nowLayerIndex = index;
+      // 判断当前页面数据是否为mbtile,以及是否为osm数据
+      const datatype = this.layers[this.nowLayerIndex]['metadata']['mapbox:type'];
+      switch(datatype){
+        case 'primary':
+          this.layerSource = 'primary';
+          break;
+        case 'mbSource':
+          this.layerSource = 'mbSource';
+          break;
+        case 'mbStyle':
+          this.layerSource = 'mbStyle';
+          break;
+      }
+
       this.styleTypeSelect = row.type;
       const type = row.type;
       this.getTypeStyleList(type);
       // await this.getMbtilesList();
       this.getOsmMbList();
-      this.stylesBoxShow = !this.stylesBoxShow;
+      this.stylesBoxShow = true;
     },
     //添加选中图层至样式库
     createTypeStyle(layer) {
@@ -6625,10 +6739,16 @@ export default {
       console.log("activeName", activeName, this.menuButtonShowList);
       console.log("oldActiveName", oldActiveName, this.menuButtonShowList);
     },
-    // test1() {
-    //   const features = map.querySourceFeatures("62fb9590abf4b6e7a4f6d517",{sourceLayer:"place"});
-    //   console.log("features",features);
-    // },
+    test1(val) {
+      // const features = map.querySourceFeatures("62fb9590abf4b6e7a4f6d517",{sourceLayer:"place"});
+      // console.log("features",features);
+      if(val){
+        this.dataLayers = streets.vector_layers;
+      }else{
+        // this.styleLayers = style.layers;
+        this.addAllStyles(style.layers)
+      }
+    },
   },
 };
 </script>
@@ -6829,6 +6949,7 @@ h4 {
   background-color: rgb(255, 255, 255);
   width: 300px;
   margin: 0;
+  padding-left: 10px;
   border-left: 1px solid #e4e7ed;
   border-right: 1px solid #e4e7ed;
   padding-right: 50px;

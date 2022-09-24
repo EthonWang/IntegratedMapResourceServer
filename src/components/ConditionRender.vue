@@ -1646,6 +1646,11 @@ export default {
       menuButtonShow: true,
       menuButtonShowList: {},
 
+      // mbTile数据渲染
+      isOSM: false,
+      isMbTile: false,
+      mbSourceLayer: '',
+
       //所用参数
       layer: this.layerSelect,
       layoutOrpaint: "",
@@ -1689,6 +1694,8 @@ export default {
         "line-offset": "偏移",
         "line-cap": "线帽",
         "line-join": "线连接",
+        "line-miter-limit":"最大斜接长度",
+        "line-round-limit":"最小圆角半径",
         "fill-color": "颜色",
         "fill-opacity": "不透明度",
         "fill-outline-color": "边线颜色",
@@ -1828,7 +1835,7 @@ export default {
       dataRange: { min: 0, max: 0 },
       dataSearch: "",
       dataSelect: "",
-      datalength: 2,
+      datalength: {old:2,new:2},    //在插入数据顺序中，
       dataInsertIndex: 1,
       dataRateShow: false,
       dataRate: "linear",
@@ -2037,11 +2044,21 @@ export default {
             return null;
         }
       }
-      //判断编辑图层是否为mbTile和背景图层
-      if(typeof(this.layer["shpAttribute"]) == 'undefined' || this.layer["shpAttribute"].length == 0){
-        this.conditionShow = false;
-        console.log("conditionShow",this.conditionShow);
+    },
+    initMbInfo(){
+      //判断编辑图层是否要打开渲染页面
+      const type = this.layer['metadata']['mapbox:type'];
+      if(type == 'background'||type == 'mbStyle'){
+          this.conditionShow = false;
+          console.log("conditionShow",this.conditionShow);
       }
+      // 判断编辑图层是否为OSM和mbTile
+      this.isOSM = this.layer['metadata']['mapbox:isOSM'];
+      if(type.indexOf('mb') != -1){
+          this.isMbTile = true;
+      }
+      // 初始化相关参数
+      this.mbSourceLayer = this.layer['metadata']['mapbox:source'];
     },
     reset(val) {
       this.$confirm("是否重置当前设置?", "提示", {
@@ -2383,6 +2400,7 @@ export default {
     dataInsert() {
       //按顺序插入中值
       const index = 2 * Number(this.dataInsertIndex) - 1;
+      console.log('index:',this.dataValue,this.dataInsertIndex,index);
       const value = JSON.parse(JSON.stringify(this.dataValue[index - 1].value));
       const data =
         (Number(this.dataValue[index - 1].data) +
@@ -2390,8 +2408,9 @@ export default {
         2;
       this.dataValue.splice(index, 0, { data: data, value: value });
       this.dataInsertIndex = this.dataInsertIndex + 1;
-      if (this.dataInsertIndex == this.datalength) {
-        this.datalength = this.dataValue.length;
+      if (this.dataInsertIndex == this.datalength[['new']]) {
+        this.datalength['old'] = JSON.parse(JSON.stringify(this.dataInsertIndex));  //old用于删除时还原顺序
+        this.datalength['new'] = this.dataValue.length;
         this.dataInsertIndex = 1;
       }
     },
@@ -2529,9 +2548,15 @@ export default {
     dataEditDelete() {
       this.dataEditShow = false;
       this.dataValue.splice(this.dataEditIndex, 1);
+      // 插入顺序返回前一级状态
+      this.dataInsertIndex = this.dataInsertIndex - 1;
       // 防止更新内容出错
       if (this.dataEditIndex != 0) {
         this.dataEditIndex = Number(this.dataEditIndex) - 1;
+      }
+      // 当dataInsertIndex为零时，表示上一级在回合末尾
+      if (this.dataInsertIndex == 0){
+        this.dataInsertIndex = JSON.parse(JSON.stringify(this.datalength['old']))-1;
       }
       //判断，执行类似重置按钮的功能
       if (this.dataValue.length == 1) {
@@ -2831,6 +2856,7 @@ export default {
   },
   created() {
     this.initInfo();
+    this.initMbInfo();
   },
   mounted() {},
 };
