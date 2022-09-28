@@ -51,7 +51,7 @@
       </el-submenu>
       <el-menu-item index="4">
         <i class="el-icon-s-home"></i>
-        <span slot="title">默认样式库</span>
+        <span slot="title">OSM样式库</span>
       </el-menu-item>
     </el-menu>
     <!--  字体文件  -->
@@ -697,12 +697,13 @@
         <div class="rightContent">
           <el-card shadow="never" id="styleContainer">
             <div slot="header">
-              <h3>{{ typeTranslate[styleTypeSelect] + "样式" }}</h3>
+              <h3>OSM 样式</h3>
             </div>
             <el-row type="flex" justify="start" style="flex-wrap: wrap">
               <div
                 v-for="(item, index) in mbTielsStyleList"
                 :key="index"
+                style="height: 240px; width: 300px"
                 class="templateCard"
               >
                 <i
@@ -710,11 +711,7 @@
                   @click="styleDelete(item.id)"
                 ></i>
                 <el-image
-                  :style="{
-                    width: 300 + 'px',
-                    height: 200 + 'px',
-                  }"
-                  style="width: 100%; border-radius: 5% 5% 0 0"
+                  style="width: 300px;height: 200px; border-radius: 5% 5% 0 0"
                   :src="
                     reqUrl + item.imgWebPath
                       ? reqUrl + item.imgWebPath
@@ -1140,6 +1137,7 @@ export default {
             .then(() => {
               this.$message.success("删除成功!");
               this.getSymbolList();
+              this.showSymbol = false;
             })
             .catch((error) => {
               console.log(error);

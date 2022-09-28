@@ -61,7 +61,7 @@ export default {
             "icon-allow-overlap":false,
             "icon-anchor":"center", //One of "center", "left", "right", "top", "bottom", "top-left", "top-right", "bottom-left", "bottom-right".
             "icon-ignore-placement":false,
-            "icon-image":"",
+            "icon-image":"pe-national-2",
             "icon-keep-upright":false,
             "icon-offset":[0,0],
             "icon-optional":false,
@@ -69,7 +69,7 @@ export default {
             "icon-pitch-alignment":"auto", //One of "map", "viewport", "auto"
             "icon-rotate":0,
             "icon-rotation-alignment":"auto", //"map", "viewport", "auto"
-            "icon-size":0.25,
+            "icon-size":0.5,
 
             "symbol-placement":"point",  //One of "point", "line", "line-center"
             // "symbol-sort-key":0,
@@ -178,6 +178,8 @@ export default {
         "line-offset": "偏移",
         "line-cap": "线帽",
         "line-join": "线连接",
+        "line-miter-limit":"最大斜接长度",
+        "line-round-limit":"最小圆角半径",        
         "fill-color": "颜色",
         "fill-opacity": "不透明度",
         "fill-outline-color": "边线颜色",

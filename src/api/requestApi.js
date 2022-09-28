@@ -226,8 +226,13 @@ export default {
     deleteTileJson(tileJsonId){
         return instance.get(Vue.prototype.reqUrl+"/deleteTileJson/"+tileJsonId+".json")
     },
+    // 根据类型获取
     getTileJsonList(tileJsonType){
         return instance.post(Vue.prototype.reqUrl+"/getTileJsonList/"+tileJsonType)
+    },
+    // 根据id获取
+    getTileJson(tileJsonId){
+        return instance.get(Vue.prototype.reqUrl+"/getTileJson/"+tileJsonId+".json")
     },
 
 
