@@ -23,17 +23,18 @@
       <el-popover placement="right" width="400" trigger="click">
         <span>筛选字段</span>
         <el-table
+          v-if="!isMbTile"
           :data="
             propertyList.filter(
               (data) =>
                 !search ||
-                data.column_data.toLowerCase().includes(search.toLowerCase())
+                data.column_name.toLowerCase().includes(search.toLowerCase())
             )
           "
           row-key="id"
           :cell-style="{ textAlign: 'left' }"
           @row-click="dataOpen"
-          height="250"
+          max-height="300"
         >
           <el-table-column prop="column_name" align="right">
             <template slot="header">
@@ -43,6 +44,42 @@
                 placeholder="搜索"
                 prefix-icon="el-icon-search"
               />
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-table
+          v-if="isMbTile"
+          :data="
+            propertyList.filter(
+              (data) =>
+                !search ||
+                data.attribute.toLowerCase().includes(search.toLowerCase())
+            )
+          "
+          row-key="id"
+          :cell-style="{ textAlign: 'left' }"
+          @row-click="dataOpen"
+          max-height="300"
+          :row-class-name="dataTableClassName"
+        >
+          <el-table-column prop="attribute" align="right">
+            <template slot="header">
+              <el-input
+                v-model="dataSearch"
+                size="mini"
+                placeholder="搜索"
+                prefix-icon="el-icon-search"
+              />
+            </template>
+          </el-table-column>
+          <el-table-column align="right">
+            <template slot-scope="scope">
+              <div v-if="scope.row.type != 'number'" style="color: #d0cece">
+                字符串属性
+              </div>
+              <div v-else style="color: #d0cece">
+                {{ scope.row.min + "-" + scope.row.max }}
+              </div>
             </template>
           </el-table-column>
         </el-table>
@@ -58,13 +95,13 @@
             !attribute.includes('gradient') &&
             !attribute.includes('allow-overlap') &&
             !attribute.includes('placement') &&
-            !attribute.includes('optional') && 
-            !attribute.includes('padding') && 
-            !attribute.includes('icon-translate') && 
-            !attribute.includes('text-line-height') && 
+            !attribute.includes('optional') &&
+            !attribute.includes('padding') &&
+            !attribute.includes('icon-translate') &&
+            !attribute.includes('text-line-height') &&
             !attribute.includes('text-translate') &&
             !attribute.includes('rotation-alignment') &&
-            !attribute.includes('heatmap-opacity') 
+            !attribute.includes('heatmap-opacity')
           "
           :disabled="
             attribute == 'fill-outline-color' &&
@@ -80,6 +117,7 @@
       <el-popover placement="right" width="400" trigger="click">
         <span>选择属性</span>
         <el-table
+          v-if="!isMbTile"
           :data="
             propertyList.filter(
               (data) =>
@@ -91,7 +129,7 @@
           :cell-style="{ textAlign: 'left' }"
           class="attList"
           @row-click="propOpen"
-          height="250"
+          max-height="300"
         >
           <el-table-column prop="column_name" align="right">
             <template slot="header">
@@ -101,6 +139,55 @@
                 placeholder="搜索"
                 prefix-icon="el-icon-search"
               />
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-table
+          v-if="isMbTile"
+          :data="
+            propertyList.filter(
+              (data) =>
+                !search ||
+                data.attribute.toLowerCase().includes(search.toLowerCase())
+            )
+          "
+          row-key="id"
+          :cell-style="{ textAlign: 'left' }"
+          @row-click="propOpen"
+          max-height="300"
+          :row-class-name="propTableClassName"
+        >
+          <el-table-column prop="attribute" align="right">
+            <template slot="header">
+              <el-input
+                v-model="dataSearch"
+                size="mini"
+                placeholder="搜索"
+                prefix-icon="el-icon-search"
+              />
+            </template>
+          </el-table-column>
+          <el-table-column align="right">
+            <template slot-scope="scope">
+              <div
+                v-if="
+                  scope.row.type != 'number' && scope.row.values.length == 0
+                "
+                style="color: #d0cece"
+              >
+                Unknowns
+              </div>
+              <div
+                v-else-if="
+                  scope.row.type != 'number' && scope.row.values.length > 0
+                "
+                style="color: #d0cece"
+              >
+                {{ scope.row.values.length + " values" }}
+              </div>
+              <div v-else style="color: #d0cece">
+                {{ scope.row.min + "-" + scope.row.max }}
+              </div>
             </template>
           </el-table-column>
         </el-table>
@@ -117,13 +204,13 @@
             !attribute.includes('gradient') &&
             !attribute.includes('allow-overlap') &&
             !attribute.includes('placement') &&
-            !attribute.includes('optional') && 
-            !attribute.includes('padding') && 
-            !attribute.includes('icon-translate') && 
-            !attribute.includes('text-line-height') && 
+            !attribute.includes('optional') &&
+            !attribute.includes('padding') &&
+            !attribute.includes('icon-translate') &&
+            !attribute.includes('text-line-height') &&
             !attribute.includes('text-translate') &&
             !attribute.includes('rotation-alignment') &&
-            !attribute.includes('heatmap-opacity') 
+            !attribute.includes('heatmap-opacity')
           "
           :disabled="
             attribute == 'fill-outline-color' &&
@@ -149,12 +236,13 @@
           !attribute.includes('gradient') &&
           !attribute.includes('allow-overlap') &&
           !attribute.includes('placement') &&
-          !attribute.includes('optional') && 
-          !attribute.includes('padding') && 
-          !attribute.includes('icon-translate') && 
-          !attribute.includes('text-line-height') && 
+          !attribute.includes('optional') &&
+          !attribute.includes('padding') &&
+          !attribute.includes('icon-translate') &&
+          !attribute.includes('text-line-height') &&
           !attribute.includes('text-translate') &&
-          !attribute.includes('rotation-alignment') && false
+          !attribute.includes('rotation-alignment') &&
+          false
         "
         class="menuButton"
         plain
@@ -245,11 +333,11 @@
             <el-row
               v-if="
                 attribute.includes('radius') ||
-                (attribute.includes('width')&&!attribute.includes('max')) ||
+                (attribute.includes('width') && !attribute.includes('max')) ||
                 attribute.includes('blur') ||
                 attribute.includes('gap-width') ||
                 attribute.includes('line-offset') ||
-                attribute.includes('padding') 
+                attribute.includes('padding')
               "
             >
               <span style="margin-left: 10px"
@@ -279,31 +367,33 @@
                 attribute.includes('text-offset') ||
                 attribute.includes('text-transform') ||
                 attribute.includes('weight') ||
-                attribute.includes('intensity') 
-
+                attribute.includes('intensity')
               "
             >
               <span style="margin-left: 10px">{{ scope.row.value }}</span>
             </el-row>
             <el-row
-              v-if="attribute.includes('text-letter-spacing') || 
-                    attribute.includes('text-line-height') ||
-                    attribute.includes('text-max-width')"
+              v-if="
+                attribute.includes('text-letter-spacing') ||
+                attribute.includes('text-line-height') ||
+                attribute.includes('text-max-width')
+              "
             >
               <span style="margin-left: 10px"
                 >{{ scope.row.value }}&nbsp;em</span
               >
-            </el-row>            
+            </el-row>
             <el-row
-              v-if="attribute.includes('fill-extrusion-height') || attribute.includes('base')"
+              v-if="
+                attribute.includes('fill-extrusion-height') ||
+                attribute.includes('base')
+              "
             >
               <span style="margin-left: 10px"
                 >{{ scope.row.value }}&nbsp;meters</span
               >
             </el-row>
-            <el-row
-              v-if="attribute.includes('rotate')"
-            >
+            <el-row v-if="attribute.includes('rotate')">
               <span style="margin-left: 10px"
                 >{{ scope.row.value }}&nbsp;deg</span
               >
@@ -348,7 +438,14 @@
           >
           </el-color-picker>
         </el-row>
-        <el-row v-if="attribute.includes('opacity')||attribute.includes('weight')||attribute.includes('intensity')" type="flex">
+        <el-row
+          v-if="
+            attribute.includes('opacity') ||
+            attribute.includes('weight') ||
+            attribute.includes('intensity')
+          "
+          type="flex"
+        >
           <el-input
             v-model="zoomValue[zoomEditIndex].value"
             placeholder="something"
@@ -362,11 +459,11 @@
         <el-row
           v-if="
             attribute.includes('radius') ||
-            (attribute.includes('width')&&!attribute.includes('max')) ||
+            (attribute.includes('width') && !attribute.includes('max')) ||
             attribute.includes('blur') ||
             attribute.includes('gap-width') ||
             attribute.includes('line-offset') ||
-            attribute.includes('padding') || 
+            attribute.includes('padding') ||
             attribute.includes('size')
           "
         >
@@ -382,7 +479,10 @@
           </el-input>
         </el-row>
         <el-row
-          v-if="attribute.includes('fill-extrusion-height') || attribute.includes('base')"
+          v-if="
+            attribute.includes('fill-extrusion-height') ||
+            attribute.includes('base')
+          "
         >
           <el-input
             v-model="zoomValue[zoomEditIndex].value"
@@ -395,9 +495,7 @@
             <template slot="append">meters</template>
           </el-input>
         </el-row>
-        <el-row
-          v-if="attribute.includes('rotate')"
-        >
+        <el-row v-if="attribute.includes('rotate')">
           <el-input
             v-model="zoomValue[zoomEditIndex].value"
             placeholder="something"
@@ -410,7 +508,11 @@
           </el-input>
         </el-row>
         <el-row
-          v-if="attribute.includes('text-letter-spacing') || attribute.includes('text-line-height') || attribute.includes('text-max-width')"
+          v-if="
+            attribute.includes('text-letter-spacing') ||
+            attribute.includes('text-line-height') ||
+            attribute.includes('text-max-width')
+          "
         >
           <el-input
             v-model="zoomValue[zoomEditIndex].value"
@@ -423,7 +525,13 @@
             <template slot="append">em</template>
           </el-input>
         </el-row>
-        <el-row v-if="attribute.includes('translate') || attribute.includes('icon-offset') || attribute.includes('text-offset')">
+        <el-row
+          v-if="
+            attribute.includes('translate') ||
+            attribute.includes('icon-offset') ||
+            attribute.includes('text-offset')
+          "
+        >
           <el-input
             v-model="zoomValue[zoomEditIndex].value[0]"
             placeholder="something"
@@ -432,9 +540,15 @@
             <template slot="prepend" body-style="padding:0"
               >x轴方向平移:</template
             >
-            <template v-if="attribute.includes('translate')" slot="append">px</template>
-            <template v-if="attribute.includes('icon-offset')" slot="append">iconsize</template>
-            <template v-if="attribute.includes('text-offset')" slot="append">em</template>
+            <template v-if="attribute.includes('translate')" slot="append"
+              >px</template
+            >
+            <template v-if="attribute.includes('icon-offset')" slot="append"
+              >iconsize</template
+            >
+            <template v-if="attribute.includes('text-offset')" slot="append"
+              >em</template
+            >
           </el-input>
           <br /><br />
           <el-input
@@ -445,11 +559,16 @@
             <template slot="prepend" body-style="padding:0"
               >y轴方向平移:</template
             >
-            <template v-if="attribute.includes('translate')" slot="append">px</template>
-            <template v-if="attribute.includes('icon-offset')" slot="append">iconsize</template>
-            <template v-if="attribute.includes('text-offset')" slot="append">em</template>
+            <template v-if="attribute.includes('translate')" slot="append"
+              >px</template
+            >
+            <template v-if="attribute.includes('icon-offset')" slot="append"
+              >iconsize</template
+            >
+            <template v-if="attribute.includes('text-offset')" slot="append"
+              >em</template
+            >
           </el-input>
-
         </el-row>
         <el-row v-if="attribute.includes('dasharray')">
           <el-row class="zoomDasharray">
@@ -487,13 +606,15 @@
           </el-button>
         </el-row>
         <el-row
-          v-if="attribute.includes('line-cap') || 
-                attribute.includes('join') || 
-                attribute.includes('icon-anchor') || 
-                attribute.includes('symbol-placement') || 
-                attribute.includes('text-justify') || 
-                attribute.includes('text-anchor') ||
-                attribute.includes('text-transform')"
+          v-if="
+            attribute.includes('line-cap') ||
+            attribute.includes('join') ||
+            attribute.includes('icon-anchor') ||
+            attribute.includes('symbol-placement') ||
+            attribute.includes('text-justify') ||
+            attribute.includes('text-anchor') ||
+            attribute.includes('text-transform')
+          "
           type="flex"
           align="middle"
         >
@@ -531,30 +652,33 @@
               :value="item.value"
             >
             </el-option>
-          </el-select>          
+          </el-select>
           <el-select
-            v-if="attribute.includes('icon-anchor') || attribute.includes('text-anchor')"
+            v-if="
+              attribute.includes('icon-anchor') ||
+              attribute.includes('text-anchor')
+            "
             v-model="zoomValue[zoomEditIndex].value"
             placeholder="请选择"
           >
             <el-option
               v-for="item in [
-                      'center',
-                      'left',
-                      'right',
-                      'top',
-                      'bottom',
-                      'top-left',
-                      'top-right',
-                      'bottom-left',
-                      'bottom-right',
+                'center',
+                'left',
+                'right',
+                'top',
+                'bottom',
+                'top-left',
+                'top-right',
+                'bottom-left',
+                'bottom-right',
               ]"
               :key="item"
               :label="item"
               :value="item"
             >
             </el-option>
-          </el-select>           
+          </el-select>
           <el-select
             v-if="attribute.includes('text-justify')"
             v-model="zoomValue[zoomEditIndex].value"
@@ -567,7 +691,7 @@
               :value="item"
             >
             </el-option>
-          </el-select>           
+          </el-select>
           <el-select
             v-if="attribute.includes('symbol-placement')"
             v-model="zoomValue[zoomEditIndex].value"
@@ -580,7 +704,7 @@
               :value="item"
             >
             </el-option>
-          </el-select>           
+          </el-select>
           <el-select
             v-if="attribute.includes('text-transform')"
             v-model="zoomValue[zoomEditIndex].value"
@@ -593,7 +717,7 @@
               :value="item"
             >
             </el-option>
-          </el-select>           
+          </el-select>
         </el-row>
         <el-row
           v-if="
@@ -605,7 +729,7 @@
           "
           type="flex"
         >
-          <span>{{tabName[attribute]}} :</span> &nbsp;&nbsp;&nbsp;&nbsp;
+          <span>{{ tabName[attribute] }} :</span> &nbsp;&nbsp;&nbsp;&nbsp;
           <el-switch v-model="zoomValue[zoomEditIndex].value"> </el-switch>
         </el-row>
         <el-row v-if="attribute.includes('icon-image')" type="flex">
@@ -613,9 +737,7 @@
             v-model="zoomValue[zoomEditIndex].value"
             placeholder="something"
           >
-            <template slot="prepend" body-style="padding:0">
-              图标 :
-            </template>          
+            <template slot="prepend" body-style="padding:0"> 图标 : </template>
           </el-input>
           <el-popover
             ref="iconPopover"
@@ -632,7 +754,7 @@
                   class="cursor"
                   v-for="(item, index) in spriteList"
                   :key="index"
-                  @click.native="spriteSelect(item,'zoom')"
+                  @click.native="spriteSelect(item, 'zoom')"
                 >
                   {{ item }}
                 </el-col>
@@ -653,7 +775,7 @@
                       :src="reqUrl + item.webAddress"
                       fit="cover"
                       class="cursor"
-                      @click="iconSelect(item,'zoom')"
+                      @click="iconSelect(item, 'zoom')"
                     >
                     </el-image>
                   </el-card>
@@ -667,7 +789,7 @@
               slot="reference"
             ></el-button>
           </el-popover>
-        </el-row>  
+        </el-row>
 
         <span slot="footer" class="dialog-footer">
           <el-button @click="zoomEditDelete">删除</el-button>
@@ -736,7 +858,12 @@
         :row-class-name="tableRowClassName"
         @row-click="handleDialogEdit"
       >
-        <el-table-column prop="data" :label="dataSelect" width="80%">
+        <el-table-column
+          prop="data"
+          :show-overflow-tooltip="true"
+          :label="dataSelect"
+          width="80%"
+        >
         </el-table-column>
         <el-table-column :label="tabName[attribute]" width="120%">
           <template slot-scope="scope">
@@ -750,7 +877,7 @@
             <el-row
               v-if="
                 attribute.includes('radius') ||
-                (attribute.includes('width')&&!attribute.includes('max')) ||
+                (attribute.includes('width') && !attribute.includes('max')) ||
                 attribute.includes('blur') ||
                 attribute.includes('gap-width') ||
                 attribute.includes('line-offset')
@@ -785,14 +912,16 @@
               <span style="margin-left: 10px">{{ scope.row.value }}</span>
             </el-row>
             <el-row
-              v-if="attribute.includes('text-letter-spacing') || 
-                    attribute.includes('text-line-height') ||
-                    attribute.includes('text-max-width')"
+              v-if="
+                attribute.includes('text-letter-spacing') ||
+                attribute.includes('text-line-height') ||
+                attribute.includes('text-max-width')
+              "
             >
               <span style="margin-left: 10px"
                 >{{ scope.row.value }}&nbsp;em</span
               >
-            </el-row>             
+            </el-row>
             <el-row v-if="attribute.includes('height')">
               <span style="margin-left: 10px"
                 >{{ scope.row.value }}&nbsp;meters</span
@@ -838,7 +967,14 @@
           >
           </el-color-picker>
         </el-row>
-        <el-row v-if="attribute.includes('opacity')||attribute.includes('weight')||attribute.includes('intensity')" style="display: flex">
+        <el-row
+          v-if="
+            attribute.includes('opacity') ||
+            attribute.includes('weight') ||
+            attribute.includes('intensity')
+          "
+          style="display: flex"
+        >
           <el-input
             v-model="dataValue[dataEditIndex].value"
             placeholder="something"
@@ -852,10 +988,10 @@
         <el-row
           v-if="
             attribute.includes('radius') ||
-            (attribute.includes('width')&&!attribute.includes('max')) ||
+            (attribute.includes('width') && !attribute.includes('max')) ||
             attribute.includes('blur') ||
             attribute.includes('gap-width') ||
-            attribute.includes('line-offset') || 
+            attribute.includes('line-offset') ||
             attribute.includes('size')
           "
         >
@@ -870,9 +1006,7 @@
             <template slot="append">px</template>
           </el-input>
         </el-row>
-        <el-row
-          v-if="attribute.includes('rotate')"
-        >
+        <el-row v-if="attribute.includes('rotate')">
           <el-input
             v-model="dataValue[dataEditIndex].value"
             placeholder="something"
@@ -885,7 +1019,10 @@
           </el-input>
         </el-row>
         <el-row
-          v-if="attribute.includes('text-letter-spacing') || attribute.includes('text-max-width')"
+          v-if="
+            attribute.includes('text-letter-spacing') ||
+            attribute.includes('text-max-width')
+          "
         >
           <el-input
             v-model="dataValue[dataEditIndex].value"
@@ -897,8 +1034,14 @@
             >
             <template slot="append">em</template>
           </el-input>
-        </el-row>   
-        <el-row v-if="attribute.includes('translate') || attribute.includes('icon-offset') || attribute.includes('text-offset')">
+        </el-row>
+        <el-row
+          v-if="
+            attribute.includes('translate') ||
+            attribute.includes('icon-offset') ||
+            attribute.includes('text-offset')
+          "
+        >
           <el-input
             v-model="dataValue[dataEditIndex].value[0]"
             placeholder="something"
@@ -907,9 +1050,15 @@
             <template slot="prepend" body-style="padding:0"
               >x轴方向平移:</template
             >
-            <template v-if="attribute.includes('translate')" slot="append">px</template>
-            <template v-if="attribute.includes('icon-offset')" slot="append">iconsize</template>
-            <template v-if="attribute.includes('text-offset')" slot="append">em</template>
+            <template v-if="attribute.includes('translate')" slot="append"
+              >px</template
+            >
+            <template v-if="attribute.includes('icon-offset')" slot="append"
+              >iconsize</template
+            >
+            <template v-if="attribute.includes('text-offset')" slot="append"
+              >em</template
+            >
           </el-input>
           <br /><br />
           <el-input
@@ -920,11 +1069,16 @@
             <template slot="prepend" body-style="padding:0"
               >y轴方向平移:</template
             >
-            <template v-if="attribute.includes('translate')" slot="append">px</template>
-            <template v-if="attribute.includes('icon-offset')" slot="append">iconsize</template>
-            <template v-if="attribute.includes('text-offset')" slot="append">em</template>
+            <template v-if="attribute.includes('translate')" slot="append"
+              >px</template
+            >
+            <template v-if="attribute.includes('icon-offset')" slot="append"
+              >iconsize</template
+            >
+            <template v-if="attribute.includes('text-offset')" slot="append"
+              >em</template
+            >
           </el-input>
-
         </el-row>
         <el-row v-if="attribute.includes('dasharray')">
           <el-row class="dataDasharray">
@@ -962,12 +1116,14 @@
           </el-button>
         </el-row>
         <el-row
-          v-if="attribute.includes('line-cap') || 
-                attribute.includes('join') || 
-                attribute.includes('icon-anchor') || 
-                attribute.includes('text-anchor') || 
-                attribute.includes('text-transform') || 
-                attribute.includes('text-justify')"
+          v-if="
+            attribute.includes('line-cap') ||
+            attribute.includes('join') ||
+            attribute.includes('icon-anchor') ||
+            attribute.includes('text-anchor') ||
+            attribute.includes('text-transform') ||
+            attribute.includes('text-justify')
+          "
           type="flex"
           align="middle"
         >
@@ -1005,30 +1161,33 @@
               :value="item.value"
             >
             </el-option>
-          </el-select>          
+          </el-select>
           <el-select
-            v-if="attribute.includes('icon-anchor') || attribute.includes('text-anchor')"
+            v-if="
+              attribute.includes('icon-anchor') ||
+              attribute.includes('text-anchor')
+            "
             v-model="dataValue[dataEditIndex].value"
             placeholder="请选择"
           >
             <el-option
               v-for="item in [
-                      'center',
-                      'left',
-                      'right',
-                      'top',
-                      'bottom',
-                      'top-left',
-                      'top-right',
-                      'bottom-left',
-                      'bottom-right',
+                'center',
+                'left',
+                'right',
+                'top',
+                'bottom',
+                'top-left',
+                'top-right',
+                'bottom-left',
+                'bottom-right',
               ]"
               :key="item"
               :label="item"
               :value="item"
             >
             </el-option>
-          </el-select>           
+          </el-select>
           <el-select
             v-if="attribute.includes('text-justify')"
             v-model="dataValue[dataEditIndex].value"
@@ -1041,7 +1200,7 @@
               :value="item"
             >
             </el-option>
-          </el-select>           
+          </el-select>
           <el-select
             v-if="attribute.includes('text-transform')"
             v-model="dataValue[dataEditIndex].value"
@@ -1054,7 +1213,7 @@
               :value="item"
             >
             </el-option>
-          </el-select>           
+          </el-select>
         </el-row>
         <el-row
           v-if="attribute.includes('fill-antialias')"
@@ -1067,9 +1226,7 @@
             v-model="dataValue[dataEditIndex].value"
             placeholder="something"
           >
-            <template slot="prepend" body-style="padding:0">
-              图标 :
-            </template>          
+            <template slot="prepend" body-style="padding:0"> 图标 : </template>
           </el-input>
           <el-popover
             ref="iconPopover"
@@ -1086,7 +1243,7 @@
                   class="cursor"
                   v-for="(item, index) in spriteList"
                   :key="index"
-                  @click.native="spriteSelect(item,'data')"
+                  @click.native="spriteSelect(item, 'data')"
                 >
                   {{ item }}
                 </el-col>
@@ -1107,7 +1264,7 @@
                       :src="reqUrl + item.webAddress"
                       fit="cover"
                       class="cursor"
-                      @click="iconSelect(item,'data')"
+                      @click="iconSelect(item, 'data')"
                     >
                     </el-image>
                   </el-card>
@@ -1121,7 +1278,7 @@
               slot="reference"
             ></el-button>
           </el-popover>
-        </el-row>         
+        </el-row>
 
         <span slot="footer" class="dialog-footer">
           <el-button @click="dataEditDelete">删除</el-button>
@@ -1143,13 +1300,13 @@
           prop="prop"
           :label="propSelect"
           width="80%"
-          show-overflow-tooltip
+          :show-overflow-tooltip="true"
         >
         </el-table-column>
         <el-table-column
           :label="tabName[attribute]"
           width="120%"
-          show-overflow-tooltip
+          :show-overflow-tooltip="true"
         >
           <template slot-scope="scope">
             <el-row v-if="attribute.includes('color')">
@@ -1162,11 +1319,11 @@
             <el-row
               v-if="
                 attribute.includes('radius') ||
-                (attribute.includes('width')&&!attribute.includes('max')) ||
+                (attribute.includes('width') && !attribute.includes('max')) ||
                 attribute.includes('blur') ||
                 attribute.includes('gap-width') ||
                 attribute.includes('line-offset') ||
-                attribute.includes('size') 
+                attribute.includes('size')
               "
             >
               <span style="margin-left: 10px"
@@ -1187,7 +1344,7 @@
                 attribute.includes('icon-anchor') ||
                 attribute.includes('text-anchor') ||
                 attribute.includes('text-offset') ||
-                attribute.includes('icon-offset') ||                
+                attribute.includes('icon-offset') ||
                 attribute.includes('text-transform') ||
                 attribute.includes('text-justify') ||
                 attribute.includes('weight') ||
@@ -1197,14 +1354,16 @@
               <span style="margin-left: 10px">{{ scope.row.value }}</span>
             </el-row>
             <el-row
-              v-if="attribute.includes('text-letter-spacing') || 
-                    attribute.includes('text-line-height') ||
-                    attribute.includes('text-max-width')"
+              v-if="
+                attribute.includes('text-letter-spacing') ||
+                attribute.includes('text-line-height') ||
+                attribute.includes('text-max-width')
+              "
             >
               <span style="margin-left: 10px"
                 >{{ scope.row.value }}&nbsp;em</span
               >
-            </el-row>             
+            </el-row>
             <el-row v-if="attribute.includes('height')">
               <span style="margin-left: 10px"
                 >{{ scope.row.value }}&nbsp;meters</span
@@ -1223,8 +1382,10 @@
         :close-on-click-modal="false"
         :modal="false"
       >
+        <!-- 属性值设置框 -->
         <el-row v-if="propEditIndex != 0" style="margin-bottom: 10px">
           <el-popover
+            v-if="propHasValues"
             ref="propValuePopover"
             placement="right"
             width="400"
@@ -1257,29 +1418,49 @@
             >
             </el-input>
             <br />
-            <el-table
-              ref="multiplePropTable"
-              :data="propValueList"
-              @selection-change="propFilterChange"
-              :row-key="getRowKey"
-              :cell-style="{ textAlign: 'left' }"
-              height="250"
-            >
-              <el-table-column type="selection" width="50" > </el-table-column>
-              <el-table-column :prop="propSelect" align="right">
-              </el-table-column>
-            </el-table>
-            <el-pagination
-              background
-              @current-change="handleCurrentChange"
-              :current-page="propNowPage"
-              :page-size="10"
-              layout="prev, pager, next"
-              :total="allpropValueListLength"
-            >
-            </el-pagination>
+            <!-- 非mbTiles -->
+            <el-row v-if="!isMbTile">
+              <el-table
+                ref="multiplePropTable"
+                :data="propValueList"
+                @selection-change="propFilterChange"
+                :row-key="getRowKey"
+                :cell-style="{ textAlign: 'left' }"
+                height="300"
+              >
+                <el-table-column type="selection" width="50"> </el-table-column>
+                <el-table-column :prop="propSelect" align="right">
+                </el-table-column>
+              </el-table>
+              <el-pagination
+                background
+                @current-change="handleCurrentChange"
+                :current-page="propNowPage"
+                :page-size="10"
+                layout="prev, pager, next"
+                :total="allpropValueListLength"
+              >
+              </el-pagination>
+            </el-row>
+            <!-- mbTiles -->
+            <el-row v-if="isMbTile">
+              <el-table
+                ref="multiplePropTable"
+                :data="propValueList"
+                @selection-change="propFilterChange"
+                :row-key="getRowKey"
+                :cell-style="{ textAlign: 'left' }"
+                height="300"
+              >
+                <el-table-column type="selection"> </el-table-column>
+                <el-table-column :prop="propSelect" label="label">
+                </el-table-column>
+              </el-table>
+            </el-row>
           </el-popover>
+          <!-- 属性有值显示 -->
           <el-input
+            v-if="propHasValues"
             :value="propValue[propEditIndex].prop"
             v-popover:propValuePopover
             placeholder="something"
@@ -1289,7 +1470,20 @@
               >{{ propSelect }}:</template
             >
           </el-input>
+          <!-- 属性无值显示, 绑定一个筛选值 -->
+          <el-input
+            v-if="!propHasValues"
+            v-model="propValueSelf[propEditIndex]"
+            @change="updatePropBySelf"
+            placeholder="something"
+            style="width: 80%"
+          >
+            <template slot="prepend" body-style="padding:0"
+              >{{ propSelect }}:</template
+            >
+          </el-input>
         </el-row>
+        <!-- 样式值设置框 -->
         <el-row v-if="attribute.includes('color')" style="display: flex">
           <el-input
             v-model="propValue[propEditIndex].value"
@@ -1304,7 +1498,14 @@
           >
           </el-color-picker>
         </el-row>
-        <el-row v-if="attribute.includes('opacity')||attribute.includes('weight')||attribute.includes('intensity')" style="display: flex">
+        <el-row
+          v-if="
+            attribute.includes('opacity') ||
+            attribute.includes('weight') ||
+            attribute.includes('intensity')
+          "
+          style="display: flex"
+        >
           <el-input
             v-model="propValue[propEditIndex].value"
             placeholder="something"
@@ -1318,10 +1519,10 @@
         <el-row
           v-if="
             attribute.includes('radius') ||
-            (attribute.includes('width')&&!attribute.includes('max')) ||
+            (attribute.includes('width') && !attribute.includes('max')) ||
             attribute.includes('blur') ||
             attribute.includes('gap-width') ||
-            attribute.includes('line-offset') || 
+            attribute.includes('line-offset') ||
             attribute.includes('size')
           "
         >
@@ -1336,9 +1537,7 @@
             <template slot="append">px</template>
           </el-input>
         </el-row>
-        <el-row
-          v-if="attribute.includes('rotate')"
-        >
+        <el-row v-if="attribute.includes('rotate')">
           <el-input
             v-model="propValue[propEditIndex].value"
             placeholder="something"
@@ -1351,7 +1550,10 @@
           </el-input>
         </el-row>
         <el-row
-          v-if="attribute.includes('text-letter-spacing') || attribute.includes('text-max-width')"
+          v-if="
+            attribute.includes('text-letter-spacing') ||
+            attribute.includes('text-max-width')
+          "
         >
           <el-input
             v-model="propValue[propEditIndex].value"
@@ -1363,8 +1565,14 @@
             >
             <template slot="append">em</template>
           </el-input>
-        </el-row>                
-        <el-row v-if="attribute.includes('translate') || attribute.includes('icon-offset') || attribute.includes('text-offset')">
+        </el-row>
+        <el-row
+          v-if="
+            attribute.includes('translate') ||
+            attribute.includes('icon-offset') ||
+            attribute.includes('text-offset')
+          "
+        >
           <el-input
             v-model="propValue[propEditIndex].value[0]"
             placeholder="something"
@@ -1373,9 +1581,15 @@
             <template slot="prepend" body-style="padding:0"
               >x轴方向平移:</template
             >
-            <template v-if="attribute.includes('translate')" slot="append">px</template>
-            <template v-if="attribute.includes('icon-offset')" slot="append">iconsize</template>
-            <template v-if="attribute.includes('text-offset')" slot="append">em</template>
+            <template v-if="attribute.includes('translate')" slot="append"
+              >px</template
+            >
+            <template v-if="attribute.includes('icon-offset')" slot="append"
+              >iconsize</template
+            >
+            <template v-if="attribute.includes('text-offset')" slot="append"
+              >em</template
+            >
           </el-input>
           <br /><br />
           <el-input
@@ -1386,11 +1600,16 @@
             <template slot="prepend" body-style="padding:0"
               >y轴方向平移:</template
             >
-            <template v-if="attribute.includes('translate')" slot="append">px</template>
-            <template v-if="attribute.includes('icon-offset')" slot="append">iconsize</template>
-            <template v-if="attribute.includes('text-offset')" slot="append">em</template>
+            <template v-if="attribute.includes('translate')" slot="append"
+              >px</template
+            >
+            <template v-if="attribute.includes('icon-offset')" slot="append"
+              >iconsize</template
+            >
+            <template v-if="attribute.includes('text-offset')" slot="append"
+              >em</template
+            >
           </el-input>
-
         </el-row>
         <el-row v-if="attribute.includes('dasharray')">
           <el-row class="zoomDasharray">
@@ -1428,12 +1647,14 @@
           </el-button>
         </el-row>
         <el-row
-          v-if="attribute.includes('line-cap') || 
-                attribute.includes('join') || 
-                attribute.includes('icon-anchor') || 
-                attribute.includes('text-anchor') || 
-                attribute.includes('text-transform') || 
-                attribute.includes('text-justify')"
+          v-if="
+            attribute.includes('line-cap') ||
+            attribute.includes('join') ||
+            attribute.includes('icon-anchor') ||
+            attribute.includes('text-anchor') ||
+            attribute.includes('text-transform') ||
+            attribute.includes('text-justify')
+          "
           type="flex"
           align="middle"
         >
@@ -1471,30 +1692,33 @@
               :value="item.value"
             >
             </el-option>
-          </el-select>          
+          </el-select>
           <el-select
-            v-if="attribute.includes('icon-anchor') || attribute.includes('text-anchor')"
+            v-if="
+              attribute.includes('icon-anchor') ||
+              attribute.includes('text-anchor')
+            "
             v-model="propValue[propEditIndex].value"
             placeholder="请选择"
           >
             <el-option
               v-for="item in [
-                      'center',
-                      'left',
-                      'right',
-                      'top',
-                      'bottom',
-                      'top-left',
-                      'top-right',
-                      'bottom-left',
-                      'bottom-right',
+                'center',
+                'left',
+                'right',
+                'top',
+                'bottom',
+                'top-left',
+                'top-right',
+                'bottom-left',
+                'bottom-right',
               ]"
               :key="item"
               :label="item"
               :value="item"
             >
             </el-option>
-          </el-select>  
+          </el-select>
           <el-select
             v-if="attribute.includes('text-justify')"
             v-model="propValue[propEditIndex].value"
@@ -1507,7 +1731,7 @@
               :value="item"
             >
             </el-option>
-          </el-select>           
+          </el-select>
           <el-select
             v-if="attribute.includes('text-transform')"
             v-model="propValue[propEditIndex].value"
@@ -1520,7 +1744,7 @@
               :value="item"
             >
             </el-option>
-          </el-select>           
+          </el-select>
         </el-row>
         <el-row
           v-if="attribute.includes('fill-antialias')"
@@ -1528,15 +1752,12 @@
         >
           <el-switch v-model="propValue[propEditIndex].value"> </el-switch>
         </el-row>
-        <el-row 
-          v-if="attribute.includes('icon-image')" type="flex">
+        <el-row v-if="attribute.includes('icon-image')" type="flex">
           <el-input
             v-model="propValue[propEditIndex].value"
             placeholder="something"
           >
-            <template slot="prepend" body-style="padding:0">
-              图标 :
-            </template>          
+            <template slot="prepend" body-style="padding:0"> 图标 : </template>
           </el-input>
           <el-popover
             ref="iconPopover"
@@ -1553,7 +1774,7 @@
                   class="cursor"
                   v-for="(item, index) in spriteList"
                   :key="index"
-                  @click.native="spriteSelect(item,'prop')"
+                  @click.native="spriteSelect(item, 'prop')"
                 >
                   {{ item }}
                 </el-col>
@@ -1574,7 +1795,7 @@
                       :src="reqUrl + item.webAddress"
                       fit="cover"
                       class="cursor"
-                      @click="iconSelect(item,'prop')"
+                      @click="iconSelect(item, 'prop')"
                     >
                     </el-image>
                   </el-card>
@@ -1588,23 +1809,27 @@
               slot="reference"
             ></el-button>
           </el-popover>
-        </el-row>          
+        </el-row>
 
         <span slot="footer" class="dialog-footer">
           <el-button :disabled="propEditIndex == 0" @click="propEditDelete"
             >删除</el-button
           >
-          <el-button
-            v-if="propEditIndex != 0"
-            type="primary"
-            @click="propEditFirm"
-            :disabled="propValue[propEditIndex].prop.length == 0"
-            >确 定</el-button
-          >
+          <!-- 编辑第一个级别数据，default的样式值 -->
           <el-button
             v-if="propEditIndex == 0"
             type="primary"
             @click="propEditFirm"
+            >确 定</el-button
+          >
+          <!-- 其余数据，若未选属性值不可点击，若无属性值显示可以点击 -->
+          <el-button
+            v-if="propEditIndex != 0"
+            type="primary"
+            @click="propEditFirm"
+            :disabled="
+              propHasValues && propValue[propEditIndex].prop.length == 0
+            "
             >确 定</el-button
           >
         </span>
@@ -1633,6 +1858,8 @@
 </template>
 <script>
 import requestApi from "../api/requestApi";
+import filedValue from "../assets/js/field_value.js";
+
 export default {
   name: "ConditionRender",
   props: ["layerSelect", "tab"],
@@ -1649,7 +1876,9 @@ export default {
       // mbTile数据渲染
       isOSM: false,
       isMbTile: false,
-      mbSourceLayer: '',
+      mbSourceLayer: "", //当前图层绑定的source图层
+      propHasValues: true, // 用于mbTile属性无值或值太多
+      propValueSelf: [],      // 用户自己输入的值
 
       //所用参数
       layer: this.layerSelect,
@@ -1661,14 +1890,14 @@ export default {
       propValueOrigin: [],
       dataValueOrigin: [],
       formValueOrigin: [],
-      propertyList: [],
+      propertyList: [], // 所选图层所有属性名列表
+      propNumList: [], // 数字类型属性名列表,现在用propertyList做判断暂不用
       conditionShow: true,
 
       //全局参数
       spriteList: [],
       fontList: [],
       symbolTableData: [],
-
 
       //添加新属性，要更新下列属性
       tabName: {
@@ -1694,8 +1923,8 @@ export default {
         "line-offset": "偏移",
         "line-cap": "线帽",
         "line-join": "线连接",
-        "line-miter-limit":"最大斜接长度",
-        "line-round-limit":"最小圆角半径",
+        "line-miter-limit": "最大斜接长度",
+        "line-round-limit": "最小圆角半径",
         "fill-color": "颜色",
         "fill-opacity": "不透明度",
         "fill-outline-color": "边线颜色",
@@ -1753,9 +1982,7 @@ export default {
         "heatmap-opacity": "不透明度",
         "heatmap-radius": "半径",
         "heatmap-weight": "权重",
-        "heatmap-intensity": "密度"
-        
-        
+        "heatmap-intensity": "密度",
       },
       numAttribute: [
         "circle-radius",
@@ -1791,8 +2018,7 @@ export default {
         "heatmap-radius",
         "heatmap-weight",
         "heatmap-intensity",
-
-      ],  //该列表用于渲染时候进行属性判断
+      ], //该列表用于渲染时候进行属性判断
       arrayAttribute: [
         "circle-translate",
         "line-translate",
@@ -1815,7 +2041,7 @@ export default {
         "text-ignore-placement",
         "text-optional",
         "text-padding",
-        "text-translate"
+        "text-translate",
       ],
 
       isNum: false,
@@ -1835,7 +2061,7 @@ export default {
       dataRange: { min: 0, max: 0 },
       dataSearch: "",
       dataSelect: "",
-      datalength: {old:2,new:2},    //在插入数据顺序中，
+      datalength: { old: 2, new: 2 }, //在插入数据顺序中，
       dataInsertIndex: 1,
       dataRateShow: false,
       dataRate: "linear",
@@ -1851,13 +2077,12 @@ export default {
       propSelect: "",
       propValueFilter: [],
       propValueList: [],
-      propSearch: "区",
+      propSearch: "",
       propNowPage: 1,
       propdisable: false,
       //prop多选
-      propTableChecked : [], // 选中数据
-      multipleSelectionAll: new Map(), //所有选中的数据包含跨页数据      
-
+      propTableChecked: [], // 选中数据
+      multipleSelectionAll: new Map(), //所有选中的数据包含跨页数据
 
       //表达式渲染
       formulaValue: "",
@@ -1942,11 +2167,18 @@ export default {
     };
   },
   methods: {
+    // 准备编辑页面要使用的相关参数
     initInfo() {
       // 初始化页面参数
-      this.spriteList = JSON.parse(JSON.stringify(localStorage.getItem('spriteList')));
-      this.symbolTableData = JSON.parse(JSON.stringify(localStorage.getItem('symbolTableData')));
-      this.fontList = JSON.parse(JSON.stringify(localStorage.getItem('fontList')));
+      this.spriteList = JSON.parse(
+        JSON.stringify(localStorage.getItem("spriteList"))
+      );
+      this.symbolTableData = JSON.parse(
+        JSON.stringify(localStorage.getItem("symbolTableData"))
+      );
+      this.fontList = JSON.parse(
+        JSON.stringify(localStorage.getItem("fontList"))
+      );
 
       // 保留原样式用于重置,
       if (this.layerOrigin == "") {
@@ -1965,22 +2197,26 @@ export default {
         this.$message("数据layout和paint属性有误");
         console.log("no this attribute：", this.attribute, this.layer.layout);
       }
-      // 初始化属性表
-      this.propertyList = this.layer.shpAttribute;
       // 初始化tab显示列表
       for (let tab in this.layer["paint"]) {
-        if(this.layer.attrValueSet[tab] == 'primary' || !(this.attribute in this.layer.attrValueSet)){
+        if (
+          this.layer.attrValueSet[tab] == "primary" ||
+          !(this.attribute in this.layer.attrValueSet)
+        ) {
           this.menuButtonShowList[tab] = true;
-          this.layer.attrValueSet[tab] = 'primary';   //若之前未有存档，则初始化为primary
-        }else{
+          this.layer.attrValueSet[tab] = "primary"; //若之前未有存档，则初始化为primary
+        } else {
           this.menuButtonShowList[tab] = false;
         }
       }
       for (let tab in this.layer["layout"]) {
-        if(this.layer.attrValueSet[tab] == 'primary' || !(this.attribute in this.layer.attrValueSet)){
+        if (
+          this.layer.attrValueSet[tab] == "primary" ||
+          !(this.attribute in this.layer.attrValueSet)
+        ) {
           this.menuButtonShowList[tab] = true;
-          this.layer.attrValueSet[tab] = 'primary';
-        }else{
+          this.layer.attrValueSet[tab] = "primary";
+        } else {
           this.menuButtonShowList[tab] = false;
         }
       }
@@ -1990,75 +2226,189 @@ export default {
       this.isArray =
         this.arrayAttribute.indexOf(this.attribute) == -1 ? false : true;
       //初次传递整个导航条的显示情况，依据param2判断是否单个tab显示切换
-      this.$bus.$emit("show", { param1: this.menuButtonShowList, param2: 0 ,param3:this.layer.attrValueSet});
-      if(this.layer.attrValueSet[this.attribute] != 'primary'){
-        switch(this.layer.attrValueSet[this.attribute].type){
+      this.$bus.$emit("show", {
+        param1: this.menuButtonShowList,
+        param2: 0,
+        param3: this.layer.attrValueSet,
+      });
+      if (this.layer.attrValueSet[this.attribute] != "primary") {
+        switch (this.layer.attrValueSet[this.attribute].type) {
           //赋初始值
-          case 'zoom':
-            console.log('zoom变换读取原数据:',this.layer.attrValueSet[this.attribute].value)
-            this.zoomValue = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.zoomValue));
-            this.zoomRate = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.zoomRate));
-            this.zoomValueOrigin = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.zoomValueOrigin));
+          case "zoom":
+            console.log(
+              "zoom变换读取原数据:",
+              this.layer.attrValueSet[this.attribute].value
+            );
+            this.zoomValue = JSON.parse(
+              JSON.stringify(
+                this.layer.attrValueSet[this.attribute].value.zoomValue
+              )
+            );
+            this.zoomRate = JSON.parse(
+              JSON.stringify(
+                this.layer.attrValueSet[this.attribute].value.zoomRate
+              )
+            );
+            this.zoomValueOrigin = JSON.parse(
+              JSON.stringify(
+                this.layer.attrValueSet[this.attribute].value.zoomValueOrigin
+              )
+            );
 
             this.menuButtonShowList[this.attribute] = false;
-            this.$bus.$emit("show", { param1: this.attribute, param2: false, param4: 'zoom'});
-            this.zoomShow = true;          
-            break
-          case 'data':
-            console.log('data变换读取原数据:',this.layer.attrValueSet[this.attribute].value)
-            this.dataValue = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.dataValue));
-            this.dataRange = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.dataRange));
-            this.dataSelect = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.dataSelect));
-            this.datalength = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.datalength));
-            this.dataInsertIndex = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.dataInsertIndex));
-            this.dataRate = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.dataRate));
-            this.dataValueOrigin = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.dataValueOrigin));
+            this.$bus.$emit("show", {
+              param1: this.attribute,
+              param2: false,
+              param4: "zoom",
+            });
+            this.zoomShow = true;
+            break;
+          case "data":
+            console.log(
+              "data变换读取原数据:",
+              this.layer.attrValueSet[this.attribute].value
+            );
+            this.dataValue = JSON.parse(
+              JSON.stringify(
+                this.layer.attrValueSet[this.attribute].value.dataValue
+              )
+            );
+            this.dataRange = JSON.parse(
+              JSON.stringify(
+                this.layer.attrValueSet[this.attribute].value.dataRange
+              )
+            );
+            this.dataSelect = JSON.parse(
+              JSON.stringify(
+                this.layer.attrValueSet[this.attribute].value.dataSelect
+              )
+            );
+            this.datalength = JSON.parse(
+              JSON.stringify(
+                this.layer.attrValueSet[this.attribute].value.datalength
+              )
+            );
+            this.dataInsertIndex = JSON.parse(
+              JSON.stringify(
+                this.layer.attrValueSet[this.attribute].value.dataInsertIndex
+              )
+            );
+            this.dataRate = JSON.parse(
+              JSON.stringify(
+                this.layer.attrValueSet[this.attribute].value.dataRate
+              )
+            );
+            this.dataValueOrigin = JSON.parse(
+              JSON.stringify(
+                this.layer.attrValueSet[this.attribute].value.dataValueOrigin
+              )
+            );
 
             this.menuButtonShowList[this.attribute] = false;
-            this.$bus.$emit("show", { param1: this.attribute, param2: false, param4: 'data'});
-            this.dataShow = true;              
-            break
-          case 'prop':
-            console.log('prop变换读取原数据:',this.layer.attrValueSet[this.attribute].value)
-            this.propValue = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.propValue));
-            this.propSelect = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.propSelect));
-            this.propValueFilter = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.propValueFilter));
-            this.propValueList = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.propValueList));
-            this.propValueOrigin = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.propValueOrigin));
+            this.$bus.$emit("show", {
+              param1: this.attribute,
+              param2: false,
+              param4: "data",
+            });
+            this.dataShow = true;
+            break;
+          case "prop":
+            console.log(
+              "prop变换读取原数据:",
+              this.layer.attrValueSet[this.attribute].value
+            );
+            this.propValue = JSON.parse(
+              JSON.stringify(
+                this.layer.attrValueSet[this.attribute].value.propValue
+              )
+            );
+            this.propSelect = JSON.parse(
+              JSON.stringify(
+                this.layer.attrValueSet[this.attribute].value.propSelect
+              )
+            );
+            this.propValueFilter = JSON.parse(
+              JSON.stringify(
+                this.layer.attrValueSet[this.attribute].value.propValueFilter
+              )
+            );
+            this.propValueList = JSON.parse(
+              JSON.stringify(
+                this.layer.attrValueSet[this.attribute].value.propValueList
+              )
+            );
+            this.propValueOrigin = JSON.parse(
+              JSON.stringify(
+                this.layer.attrValueSet[this.attribute].value.propValueOrigin
+              )
+            );
 
             this.menuButtonShowList[this.attribute] = false;
-            this.$bus.$emit("show", { param1: this.attribute, param2: false, param4: 'prop'});
-            this.propertyShow = true; 
-            break
-          case 'formula':
-            console.log('formula变换读取原数据:',this.layer.attrValueSet[this.attribute].value)
-            this.formulaValue = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.formulaValue));
-            this.formValueOrigin = JSON.parse(JSON.stringify(this.layer.attrValueSet[this.attribute].value.formValueOrigin));
+            this.$bus.$emit("show", {
+              param1: this.attribute,
+              param2: false,
+              param4: "prop",
+            });
+            this.propertyShow = true;
+            break;
+          case "formula":
+            console.log(
+              "formula变换读取原数据:",
+              this.layer.attrValueSet[this.attribute].value
+            );
+            this.formulaValue = JSON.parse(
+              JSON.stringify(
+                this.layer.attrValueSet[this.attribute].value.formulaValue
+              )
+            );
+            this.formValueOrigin = JSON.parse(
+              JSON.stringify(
+                this.layer.attrValueSet[this.attribute].value.formValueOrigin
+              )
+            );
 
             this.menuButtonShowList[this.attribute] = false;
-            this.$bus.$emit("show", { param1: this.attribute, param2: false, param4: 'formula'});
-            this.formulaShow = true;             
-            
-            break
+            this.$bus.$emit("show", {
+              param1: this.attribute,
+              param2: false,
+              param4: "formula",
+            });
+            this.formulaShow = true;
+
+            break;
           default:
             return null;
         }
       }
     },
-    initMbInfo(){
+    // mbTile类型判断以及属性数据的分类型加载
+    initMbInfo() {
       //判断编辑图层是否要打开渲染页面
-      const type = this.layer['metadata']['mapbox:type'];
-      if(type == 'background'||type == 'mbStyle'){
-          this.conditionShow = false;
-          console.log("conditionShow",this.conditionShow);
+      const type = this.layer["metadata"]["mapbox:type"];
+      if (type == "background" || type == "mbStyle") {
+        this.conditionShow = false;
+        console.log("conditionShow", this.conditionShow);
       }
       // 判断编辑图层是否为OSM和mbTile
-      this.isOSM = this.layer['metadata']['mapbox:isOSM'];
-      if(type.indexOf('mb') != -1){
-          this.isMbTile = true;
+      this.isOSM = this.layer["metadata"]["mapbox:isOSM"];
+      if (type.indexOf("mb") != -1) {
+        this.isMbTile = true;
       }
       // 初始化相关参数
-      this.mbSourceLayer = this.layer['metadata']['mapbox:source'];
+      this.mbSourceLayer = this.layer["metadata"]["mapbox:source"];
+      // 初始化属性表
+      if (this.isMbTile) {
+        console.log("条件：",filedValue,this.mbSourceLayer);
+        let List = filedValue.filter(
+          (data) => data.layer == this.mbSourceLayer
+        );
+        this.propertyList = List[0].attributes;
+        this.propNumList = this.propertyList.filter(
+          (data) => data.type == "number"
+        );
+      } else {
+        this.propertyList = this.layer.shpAttribute;
+      }
     },
     reset(val) {
       this.$confirm("是否重置当前设置?", "提示", {
@@ -2087,7 +2437,7 @@ export default {
         console.log("attr", this.menuButtonShowList);
         //在一个图层中，属性的显示情况和值同时存储
         this.menuButtonShowList[this.attribute] = true;
-        this.layer.attrValueSet[this.attribute] = 'primary';
+        this.layer.attrValueSet[this.attribute] = "primary";
         this.$bus.$emit("show", { param1: this.attribute, param2: true });
         // zoom相关
         if (this.zoomShow) {
@@ -2139,8 +2489,14 @@ export default {
       }
       //向父组件传递要修改的参数
       const value = this.layer[this.layoutOrpaint][this.attribute];
-      const parameters = 'primary';
-      this.$emit("callback", this.layoutOrpaint, this.attribute, value, parameters);
+      const parameters = "primary";
+      this.$emit(
+        "callback",
+        this.layoutOrpaint,
+        this.attribute,
+        value,
+        parameters
+      );
     },
 
     //条件渲染相同功能
@@ -2172,10 +2528,13 @@ export default {
         const id = this.propValueList[i].id;
         if (this.multipleSelectionAll.has(id)) {
           this.$nextTick(() => {
-            this.$refs.multiplePropTable.toggleRowSelection(this.propValueList[i], true);
+            this.$refs.multiplePropTable.toggleRowSelection(
+              this.propValueList[i],
+              true
+            );
           });
         }
-      }    
+      }
       this.propNowPage = currentPage;
       this.propValueListInit();
       // this.$nextTick(() => {
@@ -2185,7 +2544,7 @@ export default {
       //     for(let [,value] of this.multipleSelectionAll) {
       //       value.forEach(row=>{
       //         this.propValueList.forEach(item => {
-      //           if( row.id == item.id ) 
+      //           if( row.id == item.id )
       //             this.$refs.multiplePropTable.toggleRowSelection(item, true);
       //         });
       //       })
@@ -2194,7 +2553,7 @@ export default {
       //     // this.multipleSelectionAll.set(this.propNowPage, this.tableChecked);
       //     // 将其他页面选中数据存储在Map中
       //     // if ( type == 'init') this.findOthertarget();
-      // });    
+      // });
     },
     //对zoom变化各行进行处理
     zoomOpen() {
@@ -2203,16 +2562,24 @@ export default {
       const valueOrigin2 = this.layer[this.layoutOrpaint][this.attribute];
       this.zoomValue[0].value = JSON.parse(JSON.stringify(valueOrigin1));
       this.zoomValue[1].value = JSON.parse(JSON.stringify(valueOrigin2));
-      if(this.isNum){
-        this.zoomValue[0].value = Number(JSON.parse(JSON.stringify(valueOrigin1)));
-        this.zoomValue[1].value = Number(JSON.parse(JSON.stringify(valueOrigin2)));
-      }      
-      console.log("aaa",typeof(this.zoomValue[0].value));
+      if (this.isNum) {
+        this.zoomValue[0].value = Number(
+          JSON.parse(JSON.stringify(valueOrigin1))
+        );
+        this.zoomValue[1].value = Number(
+          JSON.parse(JSON.stringify(valueOrigin2))
+        );
+      }
+      console.log("aaa", typeof this.zoomValue[0].value);
       this.zoomValueOrigin = JSON.parse(JSON.stringify(this.zoomValue));
 
       //先初始化参数，再打开相关编辑面板
       this.menuButtonShowList[this.attribute] = false;
-      this.$bus.$emit("show", { param1: this.attribute, param2: false, param4:'zoom'});
+      this.$bus.$emit("show", {
+        param1: this.attribute,
+        param2: false,
+        param4: "zoom",
+      });
       this.zoomShow = true;
       this.zoomEditShow = true;
     },
@@ -2224,32 +2591,48 @@ export default {
       this.dataValue[0].value = JSON.parse(JSON.stringify(valueOrigin1));
       this.dataValue[1].value = JSON.parse(JSON.stringify(valueOrigin2));
       this.dataValueOrigin = JSON.parse(JSON.stringify(this.dataValue));
-      this.dataSelect = row.column_name;
-      this.getDataRange();
+      // 分两种方式获取
+      this.dataSelect = this.isMbTile ? row.attribute : row.column_name;
+      this.getDataRange(row);
       //先初始化参数，再打开相关编辑面板
       this.menuButtonShowList[this.attribute] = false;
-      this.$bus.$emit("show", { param1: this.attribute, param2: false, param4:'data'});
+      this.$bus.$emit("show", {
+        param1: this.attribute,
+        param2: false,
+        param4: "data",
+      });
       this.dataShow = true;
       this.dataEditShow = true;
     },
     propOpen(row) {
-      this.propSelect = row.column_name;
-      this.propValueListInit();
+      // 分两种方式获取
+      this.propSelect = this.isMbTile ? row.attribute : row.column_name;
+      this.propValueListInit(row);
       //初始化prop条件渲染的参数
       const valueOrigin1 = this.layer[this.layoutOrpaint][this.attribute];
       const valueOrigin2 = this.layer[this.layoutOrpaint][this.attribute];
       this.propValue[0].value = JSON.parse(JSON.stringify(valueOrigin1));
       this.propValue[1].value = JSON.parse(JSON.stringify(valueOrigin2));
       this.propValueOrigin = JSON.parse(JSON.stringify(this.propValue));
+      // 未含数值的属性，设置初始化值
+      this.propValueSelf = [[],""]
       //先初始化参数，再打开相关编辑面板
       this.menuButtonShowList[this.attribute] = false;
-      this.$bus.$emit("show", { param1: this.attribute, param2: false, param4:'prop'});
+      this.$bus.$emit("show", {
+        param1: this.attribute,
+        param2: false,
+        param4: "prop",
+      });
       this.propertyShow = true;
       this.propEditShow = true;
     },
     formulaOpen() {
       this.menuButtonShowList[this.attribute] = false;
-      this.$bus.$emit("show", { param1: this.attribute, param2: false, param4:'formula'});
+      this.$bus.$emit("show", {
+        param1: this.attribute,
+        param2: false,
+        param4: "formula",
+      });
       this.formulaShow = true;
     },
 
@@ -2267,7 +2650,9 @@ export default {
           1
         ) {
           let zoom = Number(this.zoomValue[i - 1]["zoom"]) + 1;
-          const value = JSON.parse(JSON.stringify(this.zoomValue[i - 1]["value"]));
+          const value = JSON.parse(
+            JSON.stringify(this.zoomValue[i - 1]["value"])
+          );
           const Object = { zoom: zoom, value: value };
           this.zoomValue.splice(i, 0, Object);
           this.zoomEditIndex = i;
@@ -2349,7 +2734,7 @@ export default {
           zoomCondition1.push(Number(this.zoomValue[i]["zoom"]));
           //js默认为string类型
           if (this.isNum) {
-            this.zoomValue[i]["value"] = Number(this.zoomValue[i]["value"])
+            this.zoomValue[i]["value"] = Number(this.zoomValue[i]["value"]);
             zoomCondition1.push(this.zoomValue[i]["value"]);
             value = zoomCondition1;
             console.log("num", this.isNum);
@@ -2358,8 +2743,12 @@ export default {
             value = zoomCondition1;
             console.log("color");
           } else if (this.isArray) {
-            this.zoomValue[i]["value"][0] = Number(this.zoomValue[i]["value"][0]);
-            this.zoomValue[i]["value"][1] = Number(this.zoomValue[i]["value"][1]);
+            this.zoomValue[i]["value"][0] = Number(
+              this.zoomValue[i]["value"][0]
+            );
+            this.zoomValue[i]["value"][1] = Number(
+              this.zoomValue[i]["value"][1]
+            );
             let value1 = this.zoomValue[i]["value"][0];
             let value2 = this.zoomValue[i]["value"][1];
             zoomCondition1.push(["literal", [value1, value2]]);
@@ -2391,16 +2780,34 @@ export default {
       }
       console.log("zoomCondition:", value);
       const parameters = {
-        value:{zoomValue:this.zoomValue,zoomRate:this.zoomRate,zoomValueOrigin:this.zoomValueOrigin},
-        type:'zoom'};
-      this.$emit("callback", this.layoutOrpaint, this.attribute, value, parameters);
+        value: {
+          zoomValue: this.zoomValue,
+          zoomRate: this.zoomRate,
+          zoomValueOrigin: this.zoomValueOrigin,
+        },
+        type: "zoom",
+      };
+      this.$emit(
+        "callback",
+        this.layoutOrpaint,
+        this.attribute,
+        value,
+        parameters
+      );
     },
 
     //data变化处理
+    // 为属性列表各行设置class
+    dataTableClassName({ row }) {
+      if (row.type != "number") {
+        return "dataNotNum";
+      }
+      return "dataIsNum";
+    },
     dataInsert() {
       //按顺序插入中值
       const index = 2 * Number(this.dataInsertIndex) - 1;
-      console.log('index:',this.dataValue,this.dataInsertIndex,index);
+      console.log("index:", this.dataValue, this.dataInsertIndex, index);
       const value = JSON.parse(JSON.stringify(this.dataValue[index - 1].value));
       const data =
         (Number(this.dataValue[index - 1].data) +
@@ -2408,9 +2815,11 @@ export default {
         2;
       this.dataValue.splice(index, 0, { data: data, value: value });
       this.dataInsertIndex = this.dataInsertIndex + 1;
-      if (this.dataInsertIndex == this.datalength[['new']]) {
-        this.datalength['old'] = JSON.parse(JSON.stringify(this.dataInsertIndex));  //old用于删除时还原顺序
-        this.datalength['new'] = this.dataValue.length;
+      if (this.dataInsertIndex == this.datalength[["new"]]) {
+        this.datalength["old"] = JSON.parse(
+          JSON.stringify(this.dataInsertIndex)
+        ); //old用于删除时还原顺序
+        this.datalength["new"] = this.dataValue.length;
         this.dataInsertIndex = 1;
       }
     },
@@ -2419,7 +2828,7 @@ export default {
       //根据data值，进行数据的排序
       let Object = this.dataValue[this.dataEditIndex];
       let num = Object.data;
-      this.dataValue.splice(this.dataEditIndex, 1);      
+      this.dataValue.splice(this.dataEditIndex, 1);
       for (let i in this.dataValue) {
         //js的var是弱类型，默认是string类型，10>2不成立
         if (num - this.dataValue[i].data < 0) {
@@ -2431,7 +2840,7 @@ export default {
           this.dataValue.push(Object);
           break;
         }
-      }      
+      }
       // 设置多级显示
       let dataCondition1 = [
         "interpolate",
@@ -2468,15 +2877,19 @@ export default {
         (!this.isNum && !this.isArray && !this.attribute.includes("color"))
       ) {
         for (let i in this.dataValue) {
-          if(this.isNum){
+          if (this.isNum) {
             this.dataValue[i]["data"] = Number(this.dataValue[i]["data"]);
           }
           i == 0 || dataCondition2.push(this.dataValue[i]["data"]); //step的data=0时，只加载value
           if (this.attribute.includes("dasharray")) {
-            if(this.isNum){
-              this.dataValue[i]["value"][0] = Number(this.dataValue[i]["value"][0]);
-              this.dataValue[i]["value"][1] = Number(this.dataValue[i]["value"][1]);
-            }            
+            if (this.isNum) {
+              this.dataValue[i]["value"][0] = Number(
+                this.dataValue[i]["value"][0]
+              );
+              this.dataValue[i]["value"][1] = Number(
+                this.dataValue[i]["value"][1]
+              );
+            }
             const value1 = this.dataValue[i]["value"][0];
             const value2 = this.dataValue[i]["value"][1];
             this.dataValue[i]["value"][0] = value1;
@@ -2484,27 +2897,42 @@ export default {
             dataCondition2.push(["literal", [value1, value2]]);
             value = dataCondition2;
             console.log("dasharray");
-          } else if(this.attribute.includes("image")){
+          } else if (this.attribute.includes("image")) {
             dataCondition2.push(this.dataValue[i]["value"]);
             value = dataCondition2;
             console.log("text");
-          }else {
-            if(this.isNum){
+          } else {
+            if (this.isNum) {
               this.dataValue[i]["value"] = Number(this.dataValue[i]["value"]);
-            }            
+            }
             dataCondition2.push(this.dataValue[i]["value"]);
             value = dataCondition2;
             console.log("num");
           }
         }
       }
-      const parameters = 
-        {value:{dataValue:this.dataValue,dataRange:this.dataRange,dataSelect:this.dataSelect,dataValueOrigin:this.dataValueOrigin,
-         datalength:this.datalength,dataInsertIndex:this.dataInsertIndex,dataRate:this.dataRate},type:'data'};
-      this.$emit("callback", this.layoutOrpaint, this.attribute, value, parameters);
+      const parameters = {
+        value: {
+          dataValue: this.dataValue,
+          dataRange: this.dataRange,
+          dataSelect: this.dataSelect,
+          dataValueOrigin: this.dataValueOrigin,
+          datalength: this.datalength,
+          dataInsertIndex: this.dataInsertIndex,
+          dataRate: this.dataRate,
+        },
+        type: "data",
+      };
+      this.$emit(
+        "callback",
+        this.layoutOrpaint,
+        this.attribute,
+        value,
+        parameters
+      );
     },
-    getDataRange() {
-      if(this.layer.sourceType == "pgDefault"){
+    getDataRange(row) {
+      if (this.layer.sourceType == "pgDefault") {
         requestApi
           .getMaxMinAttrValue({
             attrName: this.dataSelect,
@@ -2523,12 +2951,16 @@ export default {
           .catch((err) => {
             console.log("err", err);
           });
-      }else if(this.layer.sourceType == "pgMulti"){
+      } else if (this.layer.sourceType == "pgMulti") {
         requestApi
-          .getMaxMinAttrMultiPg(this.layer.mutiPgInfo.ip,this.layer.mutiPgInfo.port,{
-            attrName: this.dataSelect,
-            shpTableName: this.layer["source-layer"],
-          })
+          .getMaxMinAttrMultiPg(
+            this.layer.mutiPgInfo.ip,
+            this.layer.mutiPgInfo.port,
+            {
+              attrName: this.dataSelect,
+              shpTableName: this.layer["source-layer"],
+            }
+          )
           .then((res) => {
             const value = res.data.data;
             this.dataRange = {
@@ -2541,9 +2973,17 @@ export default {
           })
           .catch((err) => {
             console.log("err", err);
-          });        
+          });
+      } else if (this.isMbTile) {
+        let value = null;
+        value = JSON.parse(JSON.stringify(row));
+        this.dataRange = {
+          min: parseFloat(value.min.toFixed(2)),
+          max: parseFloat(value.max.toFixed(2)),
+        };
+        this.dataValue[0].data = parseFloat(value.min);
+        this.dataValue[1].data = parseFloat(value.max);
       }
-
     },
     dataEditDelete() {
       this.dataEditShow = false;
@@ -2555,8 +2995,9 @@ export default {
         this.dataEditIndex = Number(this.dataEditIndex) - 1;
       }
       // 当dataInsertIndex为零时，表示上一级在回合末尾
-      if (this.dataInsertIndex == 0){
-        this.dataInsertIndex = JSON.parse(JSON.stringify(this.datalength['old']))-1;
+      if (this.dataInsertIndex == 0) {
+        this.dataInsertIndex =
+          JSON.parse(JSON.stringify(this.datalength["old"])) - 1;
       }
       //判断，执行类似重置按钮的功能
       if (this.dataValue.length == 1) {
@@ -2578,6 +3019,10 @@ export default {
     },
 
     //propperty变化处理
+    // 为属性列表各行设置class
+    propTableClassName() {
+      return "propItem";
+    },
     handleTagClose(tag) {
       this.propValueFilter[this.propEditIndex].splice(
         this.propValueFilter[this.propEditIndex].indexOf(tag),
@@ -2586,8 +3031,8 @@ export default {
       console.log("tag", tag);
       console.log("propValue:", this.propValueFilter);
     },
-    propValueListInit() {
-      if(this.layer.sourceType == "pgDefault"){
+    propValueListInit(row) {
+      if (this.layer.sourceType == "pgDefault") {
         requestApi
           .getAttrValue({
             aimAttrName: this.propSelect,
@@ -2601,25 +3046,29 @@ export default {
             console.log("res", res);
             this.propValueList = res.data.data.attrValue;
             this.allpropValueListLength = res.data.data.featureCount;
-            this.propValueList = [
-              {id:1,column_name:1},{id:2,column_name:2}
-            ];
-            this.allpropValueListLength = 20;
+            // this.propValueList = [
+            //   {id:1,column_name:1},{id:2,column_name:2}
+            // ];
+            // this.allpropValueListLength = 20;
             console.log("propValueList", this.propValueList);
           })
           .catch((error) => {
             console.log(error);
           });
-      }else if(this.layer.sourceType == "pgMulti"){
+      } else if (this.layer.sourceType == "pgMulti") {
         requestApi
-          .getAttrValueMultiPg(this.layer.mutiPgInfo.ip,this.layer.mutiPgInfo.port,{
-            aimAttrName: this.propSelect,
-            aimShpTableName: this.layer["source-layer"],
-            page: this.propNowPage,
-            pageSize: 10,
-            searchText: this.propSearch,
-            sort: "asc",
-          })
+          .getAttrValueMultiPg(
+            this.layer.mutiPgInfo.ip,
+            this.layer.mutiPgInfo.port,
+            {
+              aimAttrName: this.propSelect,
+              aimShpTableName: this.layer["source-layer"],
+              page: this.propNowPage,
+              pageSize: 10,
+              searchText: this.propSearch,
+              sort: "asc",
+            }
+          )
           .then((res) => {
             console.log("res", res);
             this.propValueList = res.data.data.attrValue;
@@ -2629,17 +3078,59 @@ export default {
           .catch((error) => {
             console.log(error);
           });
-      }        
-
+      } else if (this.isMbTile) {
+        const type = row.type;
+        let length = null;
+        let List = [];
+        let item = {};
+        switch (type) {
+          case "number":
+            length = row.max - row.min;
+            if (length < 20) {
+              for (let i = row.min; i <= row.max; i++) {
+                // 按照非mbTiles样式添加
+                item = {};
+                item[this.propSelect] = i;
+                List.push(item);
+              }
+              this.propValueList = List;
+              this.propHasValues = true;
+            } else {
+              this.propHasValues = false;
+            }
+            break;
+          case "string":
+            length = row.values.length;
+            if (length > 0) {
+              row.values.forEach((data) => {
+                let item = {};
+                item[this.propSelect] = data;
+                List.push(item);
+              });
+              this.propValueList = JSON.parse(JSON.stringify(List));
+              this.propHasValues = true;
+            } else {
+              this.propHasValues = false;
+            }
+            break;
+        }
+        console.log("propValueList", this.propValueList, this.propHasValues);
+      }
     },
     propInsert() {
       this.propValue.push({ prop: "" });
+      if(!this.propHasValues){
+        this.propValueSelf.push("");
+      }
       this.propEditIndex = this.propValue.length - 1;
       this.propEditShow = true;
     },
     propEditDelete() {
       this.propEditShow = false;
       this.propValue.splice(this.propEditIndex, 1);
+      if(!this.propHasValues){
+        this.propValueSelf.splice(this.propEditIndex, 1);
+      }
       this.propValueFilter.splice(this.propEditIndex, 1);
       // 防止更新内容出错
       if (this.propEditIndex != 0) {
@@ -2662,91 +3153,137 @@ export default {
       }
     },
     propEditFirm() {
+      if (this.propHasValues&&this.propEditIndex!=0) {
+        this.$refs.multiplePropTable.clearSelection();
+      }
       this.propEditShow = false;
+      console.log("filter",this.propValueFilter);
       // let propCondition = ["case",["match",["get",this.propSelect],['坝尾广东省汕头市龙湖区'],true,false,'#00CED1'],this.propValue[0].value];
       //属性条件渲染
       let value = ["case"];
       let num = 1;
-      console.log("propValueFilter", this.propValueFilter);
       for (let i in this.propValueFilter) {
+        if (this.propValueFilter[i].length < 1) {
+          continue; //避开第一个空值
+        }
         let template = ["match", ["get", this.propSelect], [], true, false];
         for (let j in this.propValueFilter[i]) {
           const value1 = this.propValueFilter[i][j][this.propSelect];
+          console.log("value1",value1)
           template[2].push(value1);
         }
         // 第一步 添加条件
         value.push(template);
         // 第二步 添加参数值
-        if(this.isNum){
+        if (this.isNum) {
           this.propValue[num].value = Number(this.propValue[num].value);
         }
         //数组和其他类型不同形式
         let results = this.propValue[num].value;
-        if(this.isArray){
+        if (this.isArray) {
           let value1 = Number(this.propValue[i]["value"][0]);
           let value2 = Number(this.propValue[i]["value"][1]);
           this.propValue[i]["value"][0] = JSON.parse(JSON.stringify(value1));
           this.propValue[i]["value"][1] = JSON.parse(JSON.stringify(value2));
           results = ["literal", [value1, value2]];
-        }          
+        }
         value.push(results);
         num++;
       }
       //数字类型
-      if(this.isNum){
+      if (this.isNum) {
         this.propValue[0].value = Number(this.propValue[0].value);
       }
       let resultDefault = this.propValue[0].value;
       //数组类型
-      if(this.isArray){
+      if (this.isArray) {
         let value1 = Number(this.propValue[0]["value"][0]);
         let value2 = Number(this.propValue[0]["value"][1]);
         this.propValue[0]["value"][0] = JSON.parse(JSON.stringify(value1));
         this.propValue[0]["value"][1] = JSON.parse(JSON.stringify(value2));
         resultDefault = ["literal", [value1, value2]];
         this.propValue[0]["value"] = Number(this.propValue[0].value);
-      }      
+      }
       value.push(resultDefault);
       const parameters = {
-        value:{propValue:this.propValue,propSelect:this.propSelect,propValueFilter:this.propValueFilter,
-        propValueList:this.propValueList,propValueOrigin:this.propValueOrigin},
-        type:'prop'}
-      this.$emit("callback", this.layoutOrpaint, this.attribute, value, parameters);
+        value: {
+          propValue: this.propValue,
+          propSelect: this.propSelect,
+          propValueFilter: this.propValueFilter,
+          propValueList: this.propValueList,
+          propValueOrigin: this.propValueOrigin,
+        },
+        type: "prop",
+      };
+      this.$emit(
+        "callback",
+        this.layoutOrpaint,
+        this.attribute,
+        value,
+        parameters
+      );
     },
     propFilterChange(val) {
-      this.propValueFilter[this.propEditIndex] = val;
-      // this.multipleSelectionAll.set(this.propNowPage,val);
-      console.log("select", val);
-      const currSelectMap = new Map();
-      for (let i = 0; i < val.length; i++) {
-        currSelectMap.set(val[i].id, true);
+      this.propValueFilter[0] = [];
+      // clearSelection函数会触发propFilterChange，因此要做判断
+      if (val.length > 0) {
+        this.propValueFilter[this.propEditIndex] = JSON.parse(
+          JSON.stringify(val)
+        );
       }
+      // this.multipleSelectionAll.set(this.propNowPage,val);
+      console.log("select", this.propValueFilter);
+      console.log("select", val);
+      // 分页多选功能
+      // const currSelectMap = new Map();
+      // for (let i = 0; i < val.length; i++) {
+      //   currSelectMap.set(val[i].id, true);
+      // }
 
-      const selectList = [];
-      this.propValueList.forEach((item) => {
-        const id = item.id;
-        selectList.push({
-          id,
-          selected: currSelectMap.has(id) ? true : false,
-        });
-      });
-      selectList.forEach((item) => {
-        const id = item.id;
-        const selected = item.selected;
-        if (this.multipleSelectionAll.has(id) && !selected) {
-          this.multipleSelectionAll.delete(id);
-        }
-        if (!this.multipleSelectionAll.has(id) && item.selected) {
-          this.multipleSelectionAll.set(id, item);
-        }
-      });
-      console.log("this.multipleSelectionAll", this.multipleSelectionAll);    
+      // const selectList = [];
+      // this.propValueList.forEach((item) => {
+      //   const id = item.id;
+      //   selectList.push({
+      //     id,
+      //     selected: currSelectMap.has(id) ? true : false,
+      //   });
+      // });
+      // selectList.forEach((item) => {
+      //   const id = item.id;
+      //   const selected = item.selected;
+      //   if (this.multipleSelectionAll.has(id) && !selected) {
+      //     this.multipleSelectionAll.delete(id);
+      //   }
+      //   if (!this.multipleSelectionAll.has(id) && item.selected) {
+      //     this.multipleSelectionAll.set(id, item);
+      //   }
+      // });
+      // console.log("this.multipleSelectionAll", this.multipleSelectionAll);
     },
-    selectall(selection){
-      console.log("selection:",selection)
+    updatePropBySelf(val){
+      const item = {};
+      item[this.propSelect] = val
+      this.propValueFilter[0] = [];
+      this.propValueFilter[this.propEditIndex] = [item];
+      // 更新视图信息
+      let string = "";
+      for (let i in this.propValueFilter[this.propEditIndex]) {
+        const value =
+          this.propValueFilter[this.propEditIndex][i][this.propSelect];
+        if (i == 0) {
+          string = value;
+        } else {
+          string = string + "," + value;
+        }
+      }
+      this.propValue[this.propEditIndex].prop = string;      
+      console.log('val',this.propValueFilter);
     },
-    getRowKey(row){
-      return row.id
+    selectall(selection) {
+      console.log("selection:", selection);
+    },
+    getRowKey(row) {
+      return row.id;
     },
     //将选中的filter值更新到propValue中
     propFilterConfirm() {
@@ -2763,6 +3300,7 @@ export default {
       }
       this.propValue[this.propEditIndex].prop = string;
       console.log("propValue", this.propValue);
+      console.log("propValueFilter", this.propValueFilter);
     },
     //将input框添加的内容更新到propFilter中,暂不加此功能
     // propInputChange(val){
@@ -2808,31 +3346,43 @@ export default {
       }
       console.log("array", array);
 
-      const value = e.split('。');
-      const parameters = {value:{formulaValue:this.formulaValue,formValueOrigin:this.formValueOrigin},type:'formula'}
-      console.log('formulaValue2',value);
-      this.$emit("callback",this.layoutOrpaint,this.attribute,value, parameters);
+      const value = e.split("。");
+      const parameters = {
+        value: {
+          formulaValue: this.formulaValue,
+          formValueOrigin: this.formValueOrigin,
+        },
+        type: "formula",
+      };
+      console.log("formulaValue2", value);
+      this.$emit(
+        "callback",
+        this.layoutOrpaint,
+        this.attribute,
+        value,
+        parameters
+      );
     },
 
     //图标层
-    spriteSelect(item,type) {
-      switch(type){
-        case 'zoom':
+    spriteSelect(item, type) {
+      switch (type) {
+        case "zoom":
           this.zoomValue[this.zoomEditIndex].value = item;
-          break
-        case 'data':
+          break;
+        case "data":
           this.dataValue[this.dataEditIndex].value = item;
-          break
-        case 'prop':
+          break;
+        case "prop":
           this.propValue[this.propEditIndex].value = item;
-          break
+          break;
       }
       this.$refs.iconPopover.doClose();
     },
     iconSelect(item) {
       this.zoomValue[this.zoomEditIndex].value = item.originName;
-      this.$refs.iconPopover.doClose();     
-    },    
+      this.$refs.iconPopover.doClose();
+    },
 
     test() {
       // console.log(tab, event);
@@ -2885,6 +3435,23 @@ export default {
   width: 0;
   height: 0;
   color: transparent;
+}
+/* 属性名table(data) */
+/* 非num样式 */
+.el-table /deep/ .dataNotNum {
+  background: #f5f7fa;
+  pointer-events: none;
+}
+.el-table /deep/ .dataNotNum:hover {
+  cursor: not-allowed; /*pointer-events: none使得该效果无效*/
+}
+.el-table /deep/ .dataIsNum:hover {
+  cursor: pointer;
+}
+/* 属性名table(prop) */
+/* 非num样式 */
+.el-table /deep/ .propItem:hover {
+  cursor: pointer;
 }
 /* 属性条件table滚动条 */
 /* .attList .el-table__body{

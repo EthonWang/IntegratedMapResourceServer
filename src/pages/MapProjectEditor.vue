@@ -193,8 +193,8 @@
                     </span>
                   </el-dialog> -->
                 </el-row>
-                <el-button type="primary" @click="test1(true)">test1</el-button>
-                <el-button type="primary" @click="test1(false)">test2</el-button>
+                <!-- <el-button type="primary" @click="test1(true)">test1</el-button>
+                <el-button type="primary" @click="test1(false)">test2</el-button> -->
                 <!-- <br />
                 <el-row type="flex" align="middle">
                   <h4>特定样式:&nbsp;</h4>
@@ -327,6 +327,26 @@
                   </el-table-column>
                 </el-table> -->
               </el-tab-pane>
+               <el-tab-pane label="TMS" name="TMS">
+                <el-table
+                  :data="urlBase[dataBaseSelect]"
+                  style="width: 100%">
+                  <el-table-column
+                    prop="name"
+                    label="名称">
+                  </el-table-column>
+                  <el-table-column width="80" label="操作">
+                    <template slot-scope="scope">
+                      <el-button
+                        size="mini"
+                        type="primary"
+                        @click="handleAddShpLayer(scope.$index, scope.row)"
+                        >添加
+                      </el-button>
+                    </template>
+                  </el-table-column>                  
+                </el-table>
+               </el-tab-pane>
             </el-tabs>
 
             <el-button
@@ -4157,7 +4177,7 @@
             </el-form-item>
           </el-form>
           <el-divider></el-divider>
-          <el-row v-if="layers[nowLayerIndex].sourceType != 'mbTile'">
+          <el-row v-if="layers[nowLayerIndex].metadata['mapbox:type'] == 'mbStyle'">
             <el-row type="flex" justify="space-between" align="middle">
               <h4>过滤条件配置</h4>
               &nbsp;
@@ -4353,8 +4373,9 @@ import requestApi from "../api/requestApi";
 import fileApi from "../api/fileApi";
 import layerStyleProperties from "../assets/js/layerStyleProperties";
 import initTileJson from "../assets/js/initTileJson";
-import streets from "../assets/js/streets-v8-test.js";
-import style from "../assets/js/style.js";
+// import streets from "../assets/js/streets-v8-test.js";
+// import style from "../assets/js/style.js";
+// import filedValue from "../assets/js/field_value.js";
 // import colorFormat from "../assets/js/colorFormat.js";
 // import myConfig from "../config";
 
@@ -4420,8 +4441,7 @@ export default {
         "background",
         "heatmap",
       ],
-
-                
+         
       mbsource:{
                 'water_name':'symbol',
                 'transportation_name':'symbol',
@@ -4430,17 +4450,21 @@ export default {
                 'mountain_peak':'circle',
                 'housenumber':'circle',
                 'poi':'circle',
+                'place':'circle',
                 'transportation':'line',
                 'boundary':'line',
                 'aeroway':'line',
                 'waterway':'line',
                 'park':'fill',
-                'place':'fill',
                 'landuse':'fill',
                 'landcover':'fill',
                 'water':'fill',
                 'building':'fill',
                 },
+
+      // TMS服务
+      // tmsList: [],
+      urlBase: { TERRAIN: [], TMS: [], WMTS: [] },
 
       //左侧shp图层树
       layersNameObject: {}, //检测重复  后端字段为layerTree
@@ -5085,6 +5109,23 @@ export default {
       await this.onUpload(false, formData);
       await this.getStyleListById(this.mbTileSelect, false); //加载数据后更新styleList，注：但现在没触发
     },
+    // TMS服务
+    getOutService() {
+      requestApi
+        .getThirdPartSourceList(this.dataBaseSelect)
+        .then((res) => {
+          if (res.data.code == 0) {
+            this.urlBase[this.dataBaseSelect] = res.data.data;
+          } else {
+            console.log(res.data.csg);
+          }
+          console.log("urlBase",this.urlBase);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+
     // 获取不同类型来源的tileJson列表
     getTileJsonList(type) {
       requestApi
@@ -5298,6 +5339,11 @@ export default {
     dataBaseClick(tab) {
       this.dataBaseSelect = tab.name == "PG" ? "defaultPG" : tab.name;
       console.log("dataBaseSelect", this.dataBaseSelect);
+      switch(tab.name){
+        case "TMS":
+          this.getOutService();
+          break;
+      }
     },
 
     handleCurrentChangeShp(val) {
@@ -5495,6 +5541,9 @@ export default {
         case "cacheTile":
           this.addCacheShp(index, row);
           break;
+        case "TMS":
+          this.addTMS(index, row);
+          break;          
         case "mbTile":
           if (!this.isStyle) {
             this.addDataMbTileShp(index, row);
@@ -5929,6 +5978,104 @@ export default {
       });
       this.addLayerToMap(newLayer);
     },
+    async addTMS(index, row) {
+      //判断该shp是否已添加
+      if (
+        !Object.prototype.hasOwnProperty.call(
+          this.sourceNameObject,
+          row.id
+        )
+      ) {
+        let newTileJson = initTileJson;
+        newTileJson.name = row.name;
+        newTileJson.tiles = [
+          row.url
+        ];
+        let vector_layer = {
+          description: "",
+          fields: "",
+          id: row.id,
+        };
+        newTileJson.vector_layers = [vector_layer];
+        newTileJson.tileJsonType = this.dataBaseSelect;
+        let res = await this.createTileJson(newTileJson);
+        if (res.data.code !== 0) {
+          console.log("添加source失败");
+          return;
+        }
+        //添加source
+        let sourceId = res.data.data.tileJsonId;
+        // let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceId + ".json";
+        // let newSourceJson = {
+        //   sourceName: sourceId,
+        //   sourceType: "raster",
+        //   sourceUrl: tileJsonUrl,
+        // };
+        // map.addSource(newSourceJson.sourceName, {
+        //   type: newSourceJson.sourceType,
+        //   url: newSourceJson.sourceUrl,
+        //   tileSize: 256
+        // });
+        // this.addSourceToMap(newSourceJson);
+            //  直接请求pbf        
+        let tileJsonUrl = 	
+"https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+        let newSourceJson = {
+          sourceName: sourceId,
+          sourceType: "raster",
+          sourceUrl: tileJsonUrl,
+        };
+        map.addSource(newSourceJson.sourceName, {
+          type: newSourceJson.sourceType,
+          tiles: [newSourceJson.sourceUrl],
+          tileSize: 256
+        });        
+        // 记录shp图层和对应的id        
+        this.sources[newSourceJson.sourceName] = {
+          type: newSourceJson.sourceType,
+          tiles: [newSourceJson.sourceUrl],
+          tileSize: 256
+        };
+
+
+        this.sourceNameObject[row.id] = sourceId;
+      }
+      //添加layer
+      //前八个是自己用的属性
+      let newLayer = {
+        index: index,
+        sourceType: "TMS", //记录数据来源类型，用于区别mbTlie的添加和删除
+        show: true,
+        originName: "",
+        showName: row.name, //用于展示图层名字
+        attrValueSet: {},
+        attrShowList: {},
+        filterValueSet: {},
+        id: row.id,
+        type: "raster",
+        maxzoom: 22,
+        metadata: {"mapbox:type":"TMS"},
+        minzoom: 0,
+        source: this.sourceNameObject[row.id], //通过记录的source名字与id对应，拿到sourceId
+      };
+      if (
+        !Object.prototype.hasOwnProperty.call(
+          this.layersNameObject,
+          newLayer.originName
+        )
+      ) {
+        this.layersNameObject[newLayer.name] = 1;
+      } else {
+        this.layersNameObject[newLayer.name] += 1;
+        newLayer.id =
+          row.name + this.layersNameObject[newLayer.name];
+        newLayer.showName =
+          row.name + this.layersNameObject[newLayer.name];
+      }
+      this.layers.unshift(newLayer);
+      this.layersName.unshift(newLayer.id);
+      this.addLayerToMap(newLayer);
+    },    
     //添加所有styleJson图层
     addAllStyles(List) {
       for (let i in List) {
@@ -6739,16 +6886,16 @@ export default {
       console.log("activeName", activeName, this.menuButtonShowList);
       console.log("oldActiveName", oldActiveName, this.menuButtonShowList);
     },
-    test1(val) {
+    // test1(val) {
       // const features = map.querySourceFeatures("62fb9590abf4b6e7a4f6d517",{sourceLayer:"place"});
       // console.log("features",features);
-      if(val){
-        this.dataLayers = streets.vector_layers;
-      }else{
+      // if(val){
+      //   this.dataLayers = streets.vector_layers;
+      // }else{
         // this.styleLayers = style.layers;
-        this.addAllStyles(style.layers)
-      }
-    },
+        // this.addAllStyles(style.layers)
+      // }
+    // },
   },
 };
 </script>
