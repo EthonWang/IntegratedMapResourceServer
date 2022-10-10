@@ -27,7 +27,7 @@
                     @change="PgBaseChange($event)"
                   >
                     <el-option
-                      v-for="item in dataBaseList"
+                      v-for="item in pgShpList"
                       :key="item.name"
                       :label="item.name"
                       :value="item.id"
@@ -2221,7 +2221,7 @@
                   "
                 >
                 </el-switch>
-              </el-row>
+              </el-row>leaveTab
               <el-divider></el-divider>
               <ConditionRender
                 :layerSelect="layers[nowLayerIndex]"
@@ -4392,15 +4392,17 @@ export default {
       imgDefault: require("../assets/imgs/map-icon.png"),
 
       //添加shp数据时列表
-      shpTableData: [],
       multiShpTable: [],
-      dataBaseList: [],
-      PgBaseSelect: "defaultPG",
+      //#
       dataBaseSelect: "defaultPG", //用于数据库类型判断(四种)
+      pgShpList: [],
+      shpTableData: [],
+      PgBaseSelect: "defaultPG",
       currentPageShp: 1,
       pageSizeShp: 5,
       searchInputShp: "",
       totalDataCountShp: 0,
+
       addSourceShow: true,
       publishLink: "",
       dataLayers: [],
@@ -4725,18 +4727,7 @@ export default {
           console.log(error);
         });
     },
-    getPgList() {
-      requestApi
-        .getPgList()
-        .then((res) => {
-          this.dataBaseList = res.data.data;
-          this.dataBaseList.unshift({ name: "defaultPG", id: "defaultPG" });
-          console.log("pgList", this.dataBaseList);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
+
     //创建空地图
     createEmptyMap() {
       mapboxgl.accessToken =
@@ -5053,36 +5044,7 @@ export default {
       }
     },
 
-    //添加数据库相关
-    //打开shp选择框
-    async addShpData() {
-      if (this.mbTileSelect == "") {
-        await this.getMbtilesList();
-      } else {
-        this.getStyleListById(this.mbTileSelect, false);
-      }
-      //依据所选的mbTile，获取对应的styleJson
 
-      if (this.PgBaseSelect == "defaultPG") {
-        requestApi
-          .getShpList({
-            asc: false,
-            page: this.currentPageShp,
-            pageSize: this.pageSizeShp,
-            searchText: this.searchInputShp,
-            sortField: "createTime",
-          })
-          .then((res) => {
-            console.log("shpbase", res.data);
-            this.shpTableData = res.data.data.content;
-            this.totalDataCountShp = res.data.data.totalElements;
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      }
-      this.getPgList();
-    },
     async addMbTileData() {
       // 阻止发生默认行为
       let formData = new FormData();
@@ -5109,22 +5071,7 @@ export default {
       await this.onUpload(false, formData);
       await this.getStyleListById(this.mbTileSelect, false); //加载数据后更新styleList，注：但现在没触发
     },
-    // TMS服务
-    getOutService() {
-      requestApi
-        .getThirdPartSourceList(this.dataBaseSelect)
-        .then((res) => {
-          if (res.data.code == 0) {
-            this.urlBase[this.dataBaseSelect] = res.data.data;
-          } else {
-            console.log(res.data.csg);
-          }
-          console.log("urlBase",this.urlBase);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
+
 
     // 获取不同类型来源的tileJson列表
     getTileJsonList(type) {
@@ -5152,33 +5099,8 @@ export default {
           console.log(error);
         });
     },
-    getTileJsonById(){
-      requestApi
-        .getTileJson('632d75b98cb8c3ac16f79a1b')
-        .then((res) => {
-          this.mbTileJson = res.data;
-          this.dataLayers = res.data.vector_layers;
-          console.log('tileJson',this.mbTileJson);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
-    getMbtilesList() {
-      requestApi.getMbtilesList().then((res) => {
-        console.log(res);
-        if (res.data.data.length != 0) {
-          this.mbTileJsonList = res.data.data;
-          console.log("mbTileJsonList", this.mbTileJsonList);
-          //mbTiles先默认为第一个osm数据
-          this.mbTileSelect = this.mbTileJsonList[0].id;
-          this.mbTileInfo = this.mbTileJsonList[0];
-          this.getTileJsonById(this.mbTileInfo.tileJsonId);
-          this.getStyleListById(this.mbTileSelect, false);
-          console.log("dataLayers", this.dataLayers);
-        }
-      });
-    },
+
+
     //获取osm数据和非osm数据的mbTiles列表
     getOsmMbList() {
       requestApi
@@ -5285,26 +5207,7 @@ export default {
           });
       }
     },
-    PgBaseChange(val) {
-      //val表示选择的value值
-      let index = 0;
-      //获取select选择内容的下标
-      this.dataBaseList.forEach((e, ind) => {
-        if (e.id == val) {
-          index = ind;
-        }
-      });
-      //更改pg数据库源，同时修改dataBaseSelect类型
-      this.dataBaseSelect =
-        this.PgBaseSelect == "defaultPG" ? "defaultPG" : "multiPG";
-      console.log("PgBaseSelect2", this.PgBaseSelect);
-      if (this.PgBaseSelect != "defaultPG") {
-        this.shpTableData = this.dataBaseList[index].dataInfo;
-        this.mutiPgInfo = this.dataBaseList[index]; //用于展示IP、端口信息
-      } else {
-        this.addShpData();
-      }
-    },
+
     async mbTileChange(val) {
       let index = 0;
       this.mbTileJsonList.forEach((e, ind) => {
@@ -5336,24 +5239,9 @@ export default {
         this.styleLayers = this.mbTileStyleJson.layers;
       }
     },
-    dataBaseClick(tab) {
-      this.dataBaseSelect = tab.name == "PG" ? "defaultPG" : tab.name;
-      console.log("dataBaseSelect", this.dataBaseSelect);
-      switch(tab.name){
-        case "TMS":
-          this.getOutService();
-          break;
-      }
-    },
 
-    handleCurrentChangeShp(val) {
-      this.currentPageShp = val;
-      if (this.PgBaseSelect != "defaultPG") {
-        this.PgBaseChange();
-      } else {
-        this.addShpData();
-      }
-    },
+
+
 
     initSort() {
       const tbody = this.$refs.shpLayerTable.$el.querySelectorAll(
@@ -5391,143 +5279,6 @@ export default {
       }
     },
 
-    //向shp树添加shp,即source,同时添加shplayer
-    // async handleAddShpLayer(index, row) {
-    //   console.log("add shp row: ", row);
-    //   //旧source写法
-    //   // let newSource = {
-    //   //   sourceName: row.tableName,
-    //   //   sourceType: "vector",
-    //   //   sourceTiles: [this.reqUrl+"/mvt/" + row.tableName + "/{z}/{x}/{y}.pbf"],
-    //   // }
-    //   // if (!Object.prototype.hasOwnProperty.call(this.sources, newSource.sourceName)) {
-    //   //   this.sources[newSource.sourceName] = {
-    //   //     type: newSource.sourceType,
-    //   //     tiles: newSource.sourceTiles,
-    //   //   }
-    //   //   this.addSourceToMap(newSource)
-    //   // }
-
-    //   //如果没有添加过source则添加
-    //   if (
-    //     !Object.prototype.hasOwnProperty.call(
-    //       this.sourceNameObject,
-    //       row.tableName
-    //     )
-    //   ) {
-    //     let newTileJson = initTileJson;
-    //     newTileJson.name = row.tableName;
-    //     // if(this.PgBaseSelect == 'defaultPG'){
-    //     //   newTileJson.tiles = [myConfig.requestUrl + "/mvt/" + row.tableName + "/{z}/{x}/{y}.pbf"]
-    //     // }else{
-    //     //   newTileJson.tiles = ["/MultiSource/" + myConfig.requestUrl + "//" + row.tableName + "/{z}/{x}/{y}.pbf"]
-    //     // }
-    //     if (this.dataBaseSelect == "mbTile") {
-    //       newTileJson.tiles = [
-    //         "https://api.maptiler.com/tiles/v3/{z}/{x}/{y}.pbf?key=XAapkmkXQpx839NCfnxD",
-    //       ];
-    //     } else if (this.PgBaseSelect == "defaultPG") {
-    //       newTileJson.tiles = [
-    //         this.reqUrl + "/mvt/" + row.tableName + "/{z}/{x}/{y}.pbf",
-    //       ];
-    //     } else {
-    //       newTileJson.tiles = [
-    //         "/MultiSource/" +
-    //           this.reqUrl +
-    //           "//" +
-    //           row.tableName +
-    //           "/{z}/{x}/{y}.pbf",
-    //       ];
-    //     }
-    //     if (this.dataBaseSelect == "mbTile") {
-    //       newTileJson.vector_layers = this.dataLayers;
-    //     } else {
-    //       let vector_layer = {
-    //         description: "",
-    //         fields: row.attrInfo,
-    //         id: row.tableName,
-    //       };
-    //       newTileJson.vector_layers = [vector_layer];
-    //     }
-
-    //     let res = await this.createTileJson(newTileJson);
-    //     if (res.data.code !== 0) {
-    //       console.log("添加source失败");
-    //       return;
-    //     }
-    //     let sourceId = res.data.data.tileJsonId;
-
-    //     // let tileJsonUrl = myConfig.requestUrl + "/getTileJson/" + sourceId + ".json"
-    //     let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceId + ".json";
-    //     let newSourceJson = {
-    //       sourceName: sourceId,
-    //       sourceType: "vector",
-    //       sourceUrl: tileJsonUrl,
-    //     };
-    //     this.addSourceToMap(newSourceJson);
-    //     this.sources[newSourceJson.sourceName] = {
-    //       type: newSourceJson.sourceType,
-    //       url: newSourceJson.sourceUrl,
-    //     };
-    //     if (this.dataBaseSelect == "mbTile") {
-    //       this.sourceNameObject[this.dataLayers.id] = sourceId;
-    //     } else {
-    //       this.sourceNameObject[row.tableName] = sourceId;
-    //     }
-    //   }
-
-    //   let geoType = row.geoType;
-    //   if (row.geoType.indexOf("LINE") !== -1) {
-    //     geoType = "line";
-    //   } else if (row.geoType.indexOf("POLYGON") !== -1) {
-    //     geoType = "fill";
-    //   } else {
-    //     geoType = "circle";
-    //   }
-
-    //   //前八个是自己用的属性
-    //   let newLayer = {
-    //     index: index,
-    //     sourceType: "mbTile",     //记录数据来源类型，用于区别mbTlie的添加和删除
-    //     show: true,
-    //     originName: row.originName,
-    //     shpAttribute: typeof(row.attrInfo) != "undefined" ? row.attrInfo : [],
-    //     attrValueSet: {},
-    //     attrShowList: {},
-    //     filterValueSet: {},
-    //     id: row.originName,
-    //     type: geoType,
-    //     filter: ["all"],
-    //     layout: layerStyleProperties[geoType].layout,
-    //     maxzoom: 22,
-    //     metadata: "",
-    //     minzoom: 0,
-    //     paint: layerStyleProperties[geoType].paint,
-    //     source: this.sourceNameObject[row.tableName], //通过记录的source名字与id对应，拿到sourceId
-    //     "source-layer": row.tableName,
-    //   };
-
-    //   if (geoType !== "symbol") {
-    //     newLayer.paint[geoType + "-color"] =
-    //       "#" + Math.random().toString(16).substr(2, 6);
-    //   }
-
-    //   if (
-    //     !Object.prototype.hasOwnProperty.call(
-    //       this.layersNameObject,
-    //       newLayer.originName
-    //     )
-    //   ) {
-    //     this.layersNameObject[newLayer.originName] = 1;
-    //   } else {
-    //     this.layersNameObject[newLayer.originName] += 1;
-    //     newLayer.id =
-    //       row.originName + this.layersNameObject[newLayer.originName];
-    //   }
-    //   this.layers.unshift(newLayer);
-    //   this.layersName.unshift(newLayer.id);
-    //   this.addLayerToMap(newLayer);
-    // },
     async handleAddShpLayer(index, row) {
       console.log("add shp row: ", row);
       //分类型进行创建shp的json入库并返回对应id
@@ -6896,6 +6647,129 @@ export default {
         // this.addAllStyles(style.layers)
       // }
     // },
+    // 待删除
+    //添加数据库相关
+    //打开shp选择框
+    async addShpData() {
+      if (this.mbTileSelect == "") {
+        await this.getMbtilesList();
+      } else {
+        this.getStyleListById(this.mbTileSelect, false);
+      }
+      //依据所选的mbTile，获取对应的styleJson
+
+      if (this.PgBaseSelect == "defaultPG") {
+        requestApi
+          .getShpList({
+            asc: false,
+            page: this.currentPageShp,
+            pageSize: this.pageSizeShp,
+            searchText: this.searchInputShp,
+            sortField: "createTime",
+          })
+          .then((res) => {
+            console.log("shpbase", res.data);
+            this.shpTableData = res.data.data.content;
+            this.totalDataCountShp = res.data.data.totalElements;
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+      this.getPgList();
+    }, 
+    getTileJsonById(id){
+      requestApi
+        .getTileJson(id)
+        .then((res) => {
+          this.mbTileJson = res.data;
+          this.dataLayers = res.data.vector_layers;
+          console.log('tileJson',this.mbTileJson);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },    
+    getPgList() {
+      requestApi
+        .getPgList()
+        .then((res) => {
+          this.pgShpList = res.data.data;
+          this.pgShpList.unshift({ name: "defaultPG", id: "defaultPG" });
+          console.log("pgList", this.pgShpList);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }, 
+    handleCurrentChangeShp(val) {
+      this.currentPageShp = val;
+      if (this.PgBaseSelect != "defaultPG") {
+        this.PgBaseChange();
+      } else {
+        this.addShpData();
+      }
+    },
+    PgBaseChange(val) {
+      //val表示选择的value值
+      let index = 0;
+      //获取select选择内容的下标
+      this.pgShpList.forEach((e, ind) => {
+        if (e.id == val) {
+          index = ind;
+        }
+      });
+      //更改pg数据库源，同时修改dataBaseSelect类型
+      this.dataBaseSelect =
+        this.PgBaseSelect == "defaultPG" ? "defaultPG" : "multiPG";
+      console.log("PgBaseSelect2", this.PgBaseSelect);
+      if (this.PgBaseSelect != "defaultPG") {
+        this.shpTableData = this.pgShpList[index].dataInfo;
+        this.mutiPgInfo = this.pgShpList[index]; //用于展示IP、端口信息
+      } else {
+        this.addShpData();
+      }
+    },           
+    getMbtilesList() {
+      requestApi.getMbtilesList().then((res) => {
+        console.log(res);
+        if (res.data.data.length != 0) {
+          this.mbTileJsonList = res.data.data;
+          console.log("mbTileJsonList", this.mbTileJsonList);
+          //mbTiles先默认为第一个osm数据
+          this.mbTileSelect = this.mbTileJsonList[0].id;
+          this.mbTileInfo = this.mbTileJsonList[0];
+          this.getTileJsonById(this.mbTileInfo.tileJsonId);
+          this.getStyleListById(this.mbTileSelect, false);
+          console.log("dataLayers", this.dataLayers);
+        }
+      });
+    },       
+    dataBaseClick(tab) {
+      this.dataBaseSelect = tab.name == "PG" ? "defaultPG" : tab.name;
+      console.log("dataBaseSelect", this.dataBaseSelect);
+      switch(tab.name){
+        case "TMS":
+          this.getOutService();
+          break;
+      }
+    },
+    // TMS服务
+    getOutService() {
+      requestApi
+        .getThirdPartSourceList(this.dataBaseSelect)
+        .then((res) => {
+          if (res.data.code == 0) {
+            this.urlBase[this.dataBaseSelect] = res.data.data;
+          } else {
+            console.log(res.data.csg);
+          }
+          console.log("urlBase",this.urlBase);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },    
   },
 };
 </script>
@@ -7175,7 +7049,7 @@ h4 {
   .el-tabs.el-tabs--top
   > .el-tabs__content
   > .el-tab-pane:nth-child(2) {
-  width: 310px;
+  width: 320px;
   height: calc(100vh - 81px);
   background-color: white;
   padding: 20px;

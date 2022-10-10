@@ -5,10 +5,10 @@ import MapEditor from "./pages/MapEditor"
 import MyData from "./pages/MyData"
 import MyProject from "./pages/MyProject"
 import MapProjectEditor from "./pages/MapProjectEditor"
+import MapEditMain from "./pages/mapEditPage/MapEditMain"
 import MyStyle from "./pages/MyStyle"
-// import TestPage from "./pages/TestPage"
-import MapboxView from "./components/MapboxView.vue"
-import ConditionRender from "./components/ConditionRender.vue"
+import MapboxView from "./components/MapboxView"
+import ConditionRender from "./components/ConditionRender"
 
 const mapBaseRoute="/Map";
 
@@ -17,7 +17,8 @@ const route = new VueRouter({
 		{
 			path: '/',
 			redirect:mapBaseRoute
-		},{
+		},
+		{
 			path: mapBaseRoute,
 			component:MainPage,
 			redirect: mapBaseRoute+'/MyData',
@@ -35,22 +36,28 @@ const route = new VueRouter({
 					component:MyStyle
 				}
 			]
-		},{
+		},
+		{
+			path: "/MapEdit/:mapProjectId",
+			component: MapEditMain,
+		},
+		{
+			path: "/ConditionRender",
+			component: ConditionRender
+		},		
+		{
 			path: "/MapEditor",
 			component: MapEditor
 		},
 		{
-            path: "/MapEditor/:mapProjectId",
+      path: "/MapEditor/:mapProjectId",
 			component: MapProjectEditor
-        },
-		{
-            path: "/MapboxView",
-			component: MapboxView
-        },
-		{
-			path: "/ConditionRender",
-			component: ConditionRender
 		},
+		{
+      path: "/MapboxView",
+			component: MapboxView
+    },
+
 	
 						
 	]

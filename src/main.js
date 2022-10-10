@@ -8,6 +8,7 @@ import router from './router'
 import 'font-awesome/css/font-awesome.min.css'
 import "./assets/css/common.css"
 import '@/assets/font/font.css';
+import store from './store';
 
 Vue.use(ElementUI);
 Vue.use(VueRouter)
@@ -20,6 +21,7 @@ Vue.config.productionTip = false
 
 new Vue({
   render: h => h(App),
+  store,
   router:router,
   beforeCreate() {
     Vue.prototype.$bus = this // 安装全局事件总线，$bus 就是当前应用的 vm

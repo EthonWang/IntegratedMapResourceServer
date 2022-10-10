@@ -128,7 +128,7 @@ export default
 				"iso_3166_2": "Text. The ISO 3166-2 code of the state/province/region the feature is in.",
 				"type": "The value of either the 'barrier' or 'man_made' tag from OSM, or for cliffs either cliff or earth_bank."
 			},
-			"id": "park",
+			"id": "structure",
 			"minzoom": 13,
 			"source": "mapbox.mapbox-streets-v8",
 			"source_name": "Mapbox Streets v8"
