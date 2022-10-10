@@ -10,8 +10,6 @@ import MyStyle from "./pages/MyStyle"
 import MapboxView from "./components/MapboxView"
 import ConditionRender from "./components/ConditionRender"
 // import TestPage from "./pages/TestPage"
-import MapboxView from "./components/MapboxView.vue"
-import ConditionRender from "./components/ConditionRender.vue"
 import LayersTree from "./components/LayersTree.vue"
 
 const mapBaseRoute="/Map";
@@ -69,10 +67,6 @@ const route = new VueRouter({
 			path: "/LayersTree",
 			component: LayersTree
 		}
-    },
-
-
-						
 	]
 })
 
