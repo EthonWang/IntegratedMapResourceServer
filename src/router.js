@@ -9,6 +9,8 @@ import MapEditMain from "./pages/mapEditPage/MapEditMain"
 import MyStyle from "./pages/MyStyle"
 import MapboxView from "./components/MapboxView"
 import ConditionRender from "./components/ConditionRender"
+// import TestPage from "./pages/TestPage"
+import LayersTree from "./components/LayersTree.vue"
 
 const mapBaseRoute="/Map";
 
@@ -44,7 +46,7 @@ const route = new VueRouter({
 		{
 			path: "/ConditionRender",
 			component: ConditionRender
-		},		
+		},
 		{
 			path: "/MapEditor",
 			component: MapEditor
@@ -56,10 +58,15 @@ const route = new VueRouter({
 		{
       path: "/MapboxView",
 			component: MapboxView
-    },
-
-	
-						
+        },
+		{
+			path: "/ConditionRender",
+			component: ConditionRender
+		},
+		{
+			path: "/LayersTree",
+			component: LayersTree
+		}
 	]
 })
 
