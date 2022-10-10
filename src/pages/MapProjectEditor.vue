@@ -21,47 +21,47 @@
                 <el-row type="flex" align="middle">
                   <h4>数据库源:&nbsp;</h4>
                   <el-select
-                      v-model="PgBaseSelect"
-                      placeholder="请选择"
-                      style="width: 80%"
-                      @change="PgBaseChange($event)"
+                    v-model="PgBaseSelect"
+                    placeholder="请选择"
+                    style="width: 80%"
+                    @change="PgBaseChange($event)"
                   >
                     <el-option
-                        v-for="item in dataBaseList"
-                        :key="item.name"
-                        :label="item.name"
-                        :value="item.id"
+                      v-for="item in pgShpList"
+                      :key="item.name"
+                      :label="item.name"
+                      :value="item.id"
                     >
                     </el-option>
                   </el-select>
                 </el-row>
                 <el-table :data="shpTableData" height="313">
                   <el-table-column
-                      property="originName"
-                      width="220"
-                      show-overflow-tooltip
-                      label="名称"
+                    property="originName"
+                    width="220"
+                    show-overflow-tooltip
+                    label="名称"
                   ></el-table-column>
                   <el-table-column width="80" label="操作">
                     <template slot-scope="scope">
                       <el-button
-                          size="mini"
-                          type="primary"
-                          @click="handleAddShpLayer(scope.$index, scope.row)"
-                      >添加
+                        size="mini"
+                        type="primary"
+                        @click="handleAddShpLayer(scope.$index, scope.row)"
+                        >添加
                       </el-button>
                     </template>
                   </el-table-column>
                 </el-table>
                 <el-pagination
-                    v-if="PgBaseSelect == 'defaultPG'"
-                    small
-                    @current-change="handleCurrentChangeShp"
-                    :current-page="currentPageShp"
-                    :page-size="pageSizeShp"
-                    layout="total, prev, pager, next"
-                    :total="totalDataCountShp"
-                    class="flexRowCenter"
+                  v-if="PgBaseSelect == 'defaultPG'"
+                  small
+                  @current-change="handleCurrentChangeShp"
+                  :current-page="currentPageShp"
+                  :page-size="pageSizeShp"
+                  layout="total, prev, pager, next"
+                  :total="totalDataCountShp"
+                  class="flexRowCenter"
                 >
                 </el-pagination>
               </el-tab-pane>
@@ -69,54 +69,53 @@
                 <el-row type="flex" align="middle">
                   <h4>数据库源:&nbsp;</h4>
                   <el-select
-                      v-model="mbTileSelect"
-                      placeholder="请选择"
-                      style="width: 73%"
-                      @change="mbTileChange($event)"
+                    v-model="mbTileSelect"
+                    placeholder="请选择"
+                    style="width: 73%"
+                    @change="mbTileChange($event)"
                   >
                     <el-option
-                        v-for="item in mbTileJsonList"
-                        :key="item.id"
-                        :label="item.name"
-                        :value="item.id"
+                      v-for="item in mbTileJsonList"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
                     >
-                    </el-option>
-                  </el-select
+                    </el-option> </el-select
                   >&nbsp;
                   <el-button
-                      type="success"
-                      size="mini"
-                      circle
-                      title="添加样式模板"
-                      icon="el-icon-plus"
-                      @click="addMbTileStyleShow = true"
+                    type="success"
+                    size="mini"
+                    circle
+                    title="添加样式模板"
+                    icon="el-icon-plus"
+                    @click="addMbTileStyleShow = true"
                   ></el-button>
                   <el-dialog
-                      :title="
+                    :title="
                       this.mbTileInfo.osmMbtilesBoolean
                         ? 'OSM样式添加'
                         : '样式添加'
                     "
-                      :visible.sync="addMbTileStyleShow"
-                      width="30%"
-                      :modal="false"
-                      center
+                    :visible.sync="addMbTileStyleShow"
+                    width="30%"
+                    :modal="false"
+                    center
                   >
                     <el-form
-                        label-position="right"
-                        label-width="150px"
-                        :model="stylePatch"
+                      label-position="right"
+                      label-width="150px"
+                      :model="stylePatch"
                     >
                       <el-form-item label="样式名称">
                         <el-select
-                            v-model="stylePatch.id"
-                            placeholder="选择要添加的样式"
+                          v-model="stylePatch.id"
+                          placeholder="选择要添加的样式"
                         >
                           <el-option
-                              v-for="item in mbTileStyleList"
-                              :key="item.id"
-                              :label="item.name"
-                              :value="item.id"
+                            v-for="item in mbTileStyleList"
+                            :key="item.id"
+                            :label="item.name"
+                            :value="item.id"
                           >
                           </el-option>
                         </el-select>
@@ -127,16 +126,16 @@
                     </el-row>
                     <span slot="footer" class="dialog-footer">
                       <el-button @click="addMbTileStyleShow = false"
-                      >取 消</el-button
+                        >取 消</el-button
                       >&nbsp;
                       <el-button
-                          slot="reference"
-                          type="warning"
-                          @click="
+                        slot="reference"
+                        type="warning"
+                        @click="
                           addAllStyles(styleLayers);
                           addMbTileStyleShow = false;
                         "
-                      >全部添加</el-button
+                        >全部添加</el-button
                       >
                       <!-- <el-button type="primary" @click="addAllStyles(styleLayers)"
                         >确 定</el-button
@@ -272,31 +271,30 @@
                 <!-- dataLayer -->
                 <el-table v-if="!isStyle" :data="dataLayers" height="313">
                   <el-table-column
-                      property="id"
-                      width="200"
-                      show-overflow-tooltip
-                      label="source"
+                    property="id"
+                    width="200"
+                    show-overflow-tooltip
+                    label="source"
                   ></el-table-column>
                   <el-table-column width="100">
                     <template slot="header">
                       <el-popconfirm
-                          title="确定添加全部数据样式吗？"
-                          @confirm="addAllSources(dataLayers)"
+                        title="确定添加全部数据样式吗？"
+                        @confirm="addAllSources(dataLayers)"
                       >
                         <!-- <i slot="reference" class="el-icon-refresh-left iconBtn" title="返回原样式"></i> -->
 
                         <el-button slot="reference" type="warning" size="mini"
-                        >全部添加
-                        </el-button
+                          >全部添加</el-button
                         >
                       </el-popconfirm>
                     </template>
                     <template slot-scope="scope">
                       <el-button
-                          size="mini"
-                          type="primary"
-                          @click="handleAddShpLayer(scope.$index, scope.row)"
-                      >添加
+                        size="mini"
+                        type="primary"
+                        @click="handleAddShpLayer(scope.$index, scope.row)"
+                        >添加
                       </el-button>
                     </template>
                   </el-table-column>
@@ -329,35 +327,34 @@
                   </el-table-column>
                 </el-table> -->
               </el-tab-pane>
-              <el-tab-pane label="TMS" name="TMS">
+               <el-tab-pane label="TMS" name="TMS">
                 <el-table
-                    :data="urlBase[dataBaseSelect]"
-                    style="width: 100%">
+                  :data="urlBase[dataBaseSelect]"
+                  style="width: 100%">
                   <el-table-column
-                      prop="name"
-                      label="名称">
+                    prop="name"
+                    label="名称">
                   </el-table-column>
                   <el-table-column width="80" label="操作">
                     <template slot-scope="scope">
                       <el-button
-                          size="mini"
-                          type="primary"
-                          @click="handleAddShpLayer(scope.$index, scope.row)"
-                      >添加
+                        size="mini"
+                        type="primary"
+                        @click="handleAddShpLayer(scope.$index, scope.row)"
+                        >添加
                       </el-button>
                     </template>
-                  </el-table-column>
+                  </el-table-column>                  
                 </el-table>
-              </el-tab-pane>
+               </el-tab-pane>
             </el-tabs>
 
             <el-button
-                type="primary"
-                size="mini"
-                slot="reference"
-                @click="addShpData"
-            >添加数据
-            </el-button
+              type="primary"
+              size="mini"
+              slot="reference"
+              @click="addShpData"
+              >添加数据</el-button
             >
           </el-popover>
         </div>
@@ -366,115 +363,110 @@
         <!-- <el-button type="success" size="mini">暂存</el-button>
         </el-button-group> -->
         <el-button
-            v-if="!publicBoolean"
-            type="warning"
-            size="mini"
-            @click="publicMap"
-        >发布
-        </el-button
+          v-if="!publicBoolean"
+          type="warning"
+          size="mini"
+          @click="publicMap"
+          >发布</el-button
         >
 
         <el-popover
-            v-else
-            placement="right"
-            title="链接地址"
-            width="200"
-            trigger="hover"
+          v-else
+          placement="right"
+          title="链接地址"
+          width="200"
+          trigger="hover"
         >
           <el-link
-              type="primary"
-              target="_blank"
-              :underline="false"
-              :href="reqUrl + '/mapProject/getPublishedMap/' + mapProjectId"
+            type="primary"
+            target="_blank"
+            :underline="false"
+            :href="reqUrl + '/mapProject/getPublishedMap/' + mapProjectId"
           >
             {{ reqUrl + "/mapProject/getPublishedMap/" + mapProjectId }}
           </el-link>
-          <el-tag type="warning" slot="reference"> 已发布</el-tag>
+          <el-tag type="warning" slot="reference"> 已发布 </el-tag>
         </el-popover>
         <el-button
-            type="danger"
-            size="mini"
-            @click="addBackground('multiPG', {})"
-        >添加背景
-        </el-button
+          type="danger"
+          size="mini"
+          @click="addBackground('multiPG', {})"
+          >添加背景</el-button
         >
       </div>
       <!--      图层列表-->
       <el-divider class="divider">图层</el-divider>
       <div class="layerTable">
         <el-switch
-            :width="30"
-            style="position: absolute; left: 10px; top: 8px; z-index: 100"
-            v-model="allLayerShow"
-            @change="allLayerShowSwitchChange($event)"
+          :width="30"
+          style="position: absolute; left: 10px; top: 8px; z-index: 100"
+          v-model="allLayerShow"
+          @change="allLayerShowSwitchChange($event)"
         >
         </el-switch>
         <el-table
-            :data="layers"
-            ref="shpLayerTable"
-            row-key="id"
-            size="mini"
-            height="calc(100vh - 170px)"
-            @row-click="handleLayerClick()"
-            style="width: 100%"
+          :data="layers"
+          ref="shpLayerTable"
+          row-key="id"
+          size="mini"
+          height="calc(100vh - 170px)"
+          @row-click="handleLayerClick()"
+          style="width: 100%"
         >
           <el-table-column width="40">
             <template slot-scope="scope">
               <el-switch
-                  :width="30"
-                  v-model="scope.row.show"
-                  @change="handleLayerShowSwitchChange($event, scope.row)"
+                :width="30"
+                v-model="scope.row.show"
+                @change="handleLayerShowSwitchChange($event, scope.row)"
               >
               </el-switch>
             </template>
           </el-table-column>
           <el-table-column
-              label="类型"
-              prop="type"
-              min-width="60"
-              show-overflow-tooltip
+            label="类型"
+            prop="type"
+            min-width="60"
+            show-overflow-tooltip
           >
           </el-table-column>
           <el-table-column
-              label="名称"
-              prop="showName"
-              min-width="100"
-              show-overflow-tooltip
+            label="名称"
+            prop="showName"
+            min-width="100"
+            show-overflow-tooltip
           >
           </el-table-column>
           <el-table-column label="操作" min-width="115">
             <template slot="header">
               <el-popconfirm
-                  title="确定删除全部图层吗？"
-                  @confirm="allLayerDelete()"
+                title="确定删除全部图层吗？"
+                @confirm="allLayerDelete()"
               >
                 <el-button slot="reference" type="info" size="mini"
-                >一键删除
-                </el-button
+                  >一键删除</el-button
                 >
               </el-popconfirm>
             </template>
-
             <template slot-scope="scope">
-
               <el-button
-                  size="mini"
-                  type="success"
-                  @click="handleLayerEdit(scope.$index, scope.row)"
-                  icon="el-icon-edit"
-                  circle
-                  title="编辑图层"
-                  style="margin-left: 5px"
+                size="mini"
+                type="success"
+                @click="handleLayerEdit(scope.$index, scope.row)"
+                icon="el-icon-edit"
+                circle
+                title="编辑图层"
+                style="margin-left: 5px"
               >
               </el-button>
               <el-button
-                  size="mini"
-                  type="danger"
-                  @click="handleLayerDelete(scope.$index, scope.row)"
-                  icon="el-icon-delete"
-                  circle
-                  title="删除图层"
-                  style="margin-left: 5px"
+                size="mini"
+                type="danger"
+                @click="handleLayerDelete(scope.$index, scope.row)"
+                icon="el-icon-delete"
+                circle
+                title="删除图层"
+                style="margin-left: 5px"
               >
               </el-button>
               <!-- <el-popover placement="right" width="250" trigger="click">
@@ -500,15 +492,15 @@
                   </el-table-column>
                 </el-table>                -->
               <el-button
-                  v-if="scope.row.type != 'background'"
-                  size="mini"
-                  slot="reference"
-                  type="primary"
-                  @click="openTemplateEdit(scope.$index, scope.row)"
-                  icon="el-icon-s-grid"
-                  circle
-                  :title="'应用' + scope.row['type'] + '样式'"
-                  style="margin-left: 5px"
+                v-if="scope.row.type != 'background'"
+                size="mini"
+                slot="reference"
+                type="primary"
+                @click="openTemplateEdit(scope.$index, scope.row)"
+                icon="el-icon-s-grid"
+                circle
+                :title="'应用' + scope.row['type'] + '样式'"
+                style="margin-left: 5px"
               >
               </el-button>
               <!-- </el-popover> -->
@@ -525,20 +517,20 @@
         &nbsp;
         <el-popconfirm title="确认返回原样式吗？" @confirm="returnOriginStyle">
           <i
-              slot="reference"
-              class="el-icon-refresh-left iconBtn"
-              title="返回原样式"
+            slot="reference"
+            class="el-icon-refresh-left iconBtn"
+            title="返回原样式"
           ></i>
         </el-popconfirm>
         <i
-            class="el-icon-upload iconBtn"
-            style="margin: 0 5px"
-            title="将该图层模板上传到样式库"
-            @click="createTypeStyle(layers[nowLayerIndex])"
+          class="el-icon-upload iconBtn"
+          style="margin: 0 5px"
+          title="将该图层模板上传到样式库"
+          @click="createTypeStyle(layers[nowLayerIndex])"
         ></i>
         <i
-            class="el-icon-close close-button"
-            @click="stylesBoxShow = false"
+          class="el-icon-close close-button"
+          @click="stylesBoxShow = false"
         ></i>
       </el-row>
       <el-collapse accordion class="templateCol" value="first">
@@ -549,40 +541,40 @@
             <!-- <i class="el-icon-circle-plus iconBtn"></i> -->
           </template>
           <el-row
-              type="flex"
-              justify="start"
-              style="flex-wrap: wrap; border-top: 1px solid #ebeef5"
+            type="flex"
+            justify="start"
+            style="flex-wrap: wrap; border-top: 1px solid #ebeef5"
           >
             <el-card
-                v-for="(item, index) in typeStyleBase[styleTypeSelect]"
-                :key="index"
-                class="templateCard cursor"
-                shadow="hover"
-                @click.native="addTypeStyle(item)"
+              v-for="(item, index) in typeStyleBase[styleTypeSelect]"
+              :key="index"
+              class="templateCard cursor"
+              shadow="hover"
+              @click.native="addTypeStyle(item)"
             >
               <el-popconfirm
-                  title="确定删除吗？"
-                  @confirm="tempCardDelete(item.id)"
+                title="确定删除吗？"
+                @confirm="tempCardDelete(item.id)"
               >
                 <i
-                    class="el-icon-remove-outline tempDeleBtn"
-                    slot="reference"
+                  class="el-icon-remove-outline tempDeleBtn"
+                  slot="reference"
                 ></i>
               </el-popconfirm>
               <el-image
-                  style="
+                style="
                   width: 100%;
                   height: 110px;
                   border-bottom: 1px solid #dcdfe6;
                 "
-                  :src="item.styleImgUrl.ImgUrl"
-                  fit="fill"
+                :src="item.styleImgUrl.ImgUrl"
+                fit="fill"
               ></el-image>
               <el-row
-                  type="flex"
-                  align="middle"
-                  justify="center"
-                  class="tempCardName"
+                type="flex"
+                align="middle"
+                justify="center"
+                class="tempCardName"
               >
                 <span>{{ item.description }}</span>
               </el-row>
@@ -597,8 +589,8 @@
           </template>
           <el-collapse accordion value="first">
             <el-collapse-item
-                v-for="(item, index) in mbTileJsonList"
-                :key="index"
+              v-for="(item, index) in mbTileJsonList"
+              :key="index"
             >
               <template slot="title">
                 <h4 style="margin-left: 20px; color: #9e9399">
@@ -611,70 +603,70 @@
                   <h4>特定样式:</h4>
                   &nbsp;
                   <el-select
-                      v-model="templateStyleSelect"
-                      placeholder="请选择"
-                      style="width: 73%"
-                      @change="templateStyleChange($event)"
+                    v-model="templateStyleSelect"
+                    placeholder="请选择"
+                    style="width: 73%"
+                    @change="templateStyleChange($event)"
                   >
                     <el-option
-                        v-for="item in mbTileStyleList"
-                        :key="item.id"
-                        :label="item.name"
-                        :value="item.id"
+                      v-for="item in mbTileStyleList"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
                     >
                     </el-option>
                   </el-select>
                 </el-row>
                 <!-- 非mbSource样式 -->
                 <el-table
-                    v-if="layerSource != 'mbSource'"
-                    :data="
+                  v-if="layerSource != 'mbSource'"
+                  :data="
                     tempStyleLayers.filter(
                       (data) => data.type == styleTypeSelect
                     )
                   "
-                    height="600"
+                  height="600"
                 >
                   <el-table-column
-                      property="id"
-                      width="210"
-                      show-overflow-tooltip
-                      label="style"
+                    property="id"
+                    width="210"
+                    show-overflow-tooltip
+                    label="style"
                   ></el-table-column>
                   <el-table-column width="100">
                     <template slot-scope="scope">
                       <el-button
-                          size="mini"
-                          type="primary"
-                          @click="addMbTileToSelf(scope.row)"
-                      >应用样式
+                        size="mini"
+                        type="primary"
+                        @click="addMbTileToSelf(scope.row)"
+                        >应用样式
                       </el-button>
                     </template>
                   </el-table-column>
                 </el-table>
                 <!-- mbSource样式 -->
                 <el-table
-                    v-if="layerSource == 'mbSource'"
-                    :data="
+                  v-if="layerSource == 'mbSource'"
+                  :data="
                     tempStyleLayers.filter(
                       (data) => data['source-layer'] == layers[nowLayerIndex]['originName']
                     )
                   "
-                    height="600"
+                  height="600"
                 >
                   <el-table-column
-                      property="id"
-                      width="210"
-                      show-overflow-tooltip
-                      label="style"
+                    property="id"
+                    width="210"
+                    show-overflow-tooltip
+                    label="style"
                   ></el-table-column>
                   <el-table-column width="100">
                     <template slot-scope="scope">
                       <el-button
-                          size="mini"
-                          type="primary"
-                          @click="addMbTileToSelf(scope.row)"
-                      >应用样式
+                        size="mini"
+                        type="primary"
+                        @click="addMbTileToSelf(scope.row)"
+                        >应用样式
                       </el-button>
                     </template>
                   </el-table-column>
@@ -687,8 +679,8 @@
     </div>
     <!-- 样式编辑框 -->
     <div
-        class="editBoard"
-        v-if="
+      class="editBoard"
+      v-if="
         editorShow == 'circleEditorShow' ||
         editorShow == 'lineEditorShow' ||
         editorShow == 'fillEditorShow' ||
@@ -699,9 +691,9 @@
       "
     >
       <div
-          v-show="nameEdit === false"
-          class="editBoardTitle"
-          @click="nameEdit = true"
+        v-show="nameEdit === false"
+        class="editBoardTitle"
+        @click="nameEdit = true"
       >
         <div :title="layers[nowLayerIndex]['showName']">
           {{ layers[nowLayerIndex]["showName"] }}
@@ -710,9 +702,9 @@
       </div>
       <div v-show="nameEdit === true" class="editBoardTitle">
         <el-input
-            v-model="layers[nowLayerIndex]['showName']"
-            size="mini"
-            @change="nameEdit = false"
+          v-model="layers[nowLayerIndex]['showName']"
+          size="mini"
+          @change="nameEdit = false"
         ></el-input>
         <i class="el-icon-check" @click="nameEdit = false"></i>
       </div>
@@ -721,322 +713,322 @@
         <el-tab-pane label="样式设置" name="first">
           <!--    圆点图层编辑面板-->
           <el-tabs
-              :before-leave="leaveTab"
-              v-if="editorShow == 'circleEditorShow'"
-              type="border-card"
-              value="first"
-              tab-position="left"
+            :before-leave="leaveTab"
+            v-if="editorShow == 'circleEditorShow'"
+            type="border-card"
+            value="first"
+            tab-position="left"
           >
             <el-tab-pane label="颜色" name="first">
               <h3>颜色</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['circle-color']">{{
-                  menuShowList["circle-color"]
-                }}</span>
+                menuShowList["circle-color"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['circle-color']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['circle-color']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-color-picker
-                    v-model="layers[nowLayerIndex].paint['circle-color']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['circle-color']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'circle-color',
                       layers[nowLayerIndex].paint['circle-color']
                     )
                   "
-                    :predefine="predefineColors"
+                  :predefine="predefineColors"
                 >
                 </el-color-picker>
                 <el-input
-                    v-model="layers[nowLayerIndex].paint['circle-color']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['circle-color']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'circle-color',
                       layers[nowLayerIndex].paint['circle-color']
                     )
                   "
-                    placeholder="something"
+                  placeholder="something"
                 ></el-input>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="circle-color"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="circle-color"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="半径" name="second">
               <h3>半径（px）</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['circle-radius']">{{
-                  menuShowList["circle-radius"]
-                }}</span>
+                menuShowList["circle-radius"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['circle-radius']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['circle-radius']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-input-number
-                    v-model="layers[nowLayerIndex].paint['circle-radius']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['circle-radius']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'circle-radius',
                       layers[nowLayerIndex].paint['circle-radius']
                     )
                   "
-                    :min="0"
-                    :max="99999"
-                    size="medium"
-                    label="描述文字"
+                  :min="0"
+                  :max="99999"
+                  size="medium"
+                  label="描述文字"
                 >
                 </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="circle-radius"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="circle-radius"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="不透明度" name="third">
               <h3>不透明度</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['circle-opacity']">{{
-                  menuShowList["circle-opacity"]
-                }}</span>
+                menuShowList["circle-opacity"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['circle-opacity']"
-                  style="margin-top: 10px"
+                v-if="menuButtonShowList['circle-opacity']"
+                style="margin-top: 10px"
               >
                 <el-slider
-                    v-model="layers[nowLayerIndex].paint['circle-opacity']"
-                    :min="0"
-                    :max="1"
-                    :marks="{ 0: '0', 0.5: '0.5', 1: '1' }"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['circle-opacity']"
+                  :min="0"
+                  :max="1"
+                  :marks="{ 0: '0', 0.5: '0.5', 1: '1' }"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'circle-opacity',
                       layers[nowLayerIndex].paint['circle-opacity']
                     )
                   "
-                    :step="0.1"
+                  :step="0.1"
                 >
                 </el-slider>
-                <br/>
+                <br />
                 <el-input-number
-                    v-model="layers[nowLayerIndex].paint['circle-opacity']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['circle-opacity']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'circle-opacity',
                       layers[nowLayerIndex].paint['circle-opacity']
                     )
                   "
-                    :min="0"
-                    :max="1"
-                    :step="0.1"
-                    size="medium"
-                    label="描述文字"
+                  :min="0"
+                  :max="1"
+                  :step="0.1"
+                  size="medium"
+                  label="描述文字"
                 >
                 </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="circle-opacity"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="circle-opacity"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="边线颜色" name="forth">
               <h3>边线颜色</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['circle-stroke-color']">{{
-                  menuShowList["circle-stroke-color"]
-                }}</span>
+                menuShowList["circle-stroke-color"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['circle-stroke-color']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['circle-stroke-color']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-input
-                    v-model="layers[nowLayerIndex].paint['circle-stroke-color']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['circle-stroke-color']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'circle-stroke-color',
                       layers[nowLayerIndex].paint['circle-stroke-color']
                     )
                   "
-                    placeholder="something"
+                  placeholder="something"
                 ></el-input>
                 <el-color-picker
-                    v-model="layers[nowLayerIndex].paint['circle-stroke-color']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['circle-stroke-color']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'circle-stroke-color',
                       layers[nowLayerIndex].paint['circle-stroke-color']
                     )
                   "
-                    :predefine="predefineColors"
+                  :predefine="predefineColors"
                 >
                 </el-color-picker>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="circle-stroke-color"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="circle-stroke-color"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="边线宽度" name="fifth">
               <h3>边线宽度</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['circle-stroke-width']">{{
-                  menuShowList["circle-stroke-width"]
-                }}</span>
+                menuShowList["circle-stroke-width"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['circle-stroke-width']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['circle-stroke-width']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-input-number
-                    v-model="layers[nowLayerIndex].paint['circle-stroke-width']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['circle-stroke-width']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'circle-stroke-width',
                       layers[nowLayerIndex].paint['circle-stroke-width']
                     )
                   "
-                    :min="0"
-                    :max="99999"
-                    size="medium"
-                    label="描述文字"
+                  :min="0"
+                  :max="99999"
+                  size="medium"
+                  label="描述文字"
                 >
                 </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="circle-stroke-width"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="circle-stroke-width"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="边线不透明度" name="sixth">
               <h3>边线不透明度</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['circle-stroke-opacity']">{{
-                  menuShowList["circle-stroke-opacity"]
-                }}</span>
+                menuShowList["circle-stroke-opacity"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['circle-stroke-opacity']"
-                  style="margin-top: 10px"
+                v-if="menuButtonShowList['circle-stroke-opacity']"
+                style="margin-top: 10px"
               >
                 <el-slider
-                    v-model="layers[nowLayerIndex].paint['circle-stroke-opacity']"
-                    :min="0"
-                    :max="1"
-                    :marks="{ 0: '0', 0.5: '0.5', 1: '1' }"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['circle-stroke-opacity']"
+                  :min="0"
+                  :max="1"
+                  :marks="{ 0: '0', 0.5: '0.5', 1: '1' }"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'circle-stroke-opacity',
                       layers[nowLayerIndex].paint['circle-stroke-opacity']
                     )
                   "
-                    :step="0.1"
+                  :step="0.1"
                 >
                 </el-slider>
-                <br/>
+                <br />
                 <el-input-number
-                    v-model="layers[nowLayerIndex].paint['circle-stroke-opacity']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['circle-stroke-opacity']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'circle-stroke-opacity',
                       layers[nowLayerIndex].paint['circle-stroke-opacity']
                     )
                   "
-                    :min="0"
-                    :max="1"
-                    :step="0.1"
-                    size="medium"
-                    label="描述文字"
+                  :min="0"
+                  :max="1"
+                  :step="0.1"
+                  size="medium"
+                  label="描述文字"
                 >
                 </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="circle-stroke-opacity"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="circle-stroke-opacity"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="模糊" name="seventh">
               <h3>模糊度</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['circle-blur']">{{
-                  menuShowList["circle-blur"]
-                }}</span>
+                menuShowList["circle-blur"]
+              }}</span>
               <el-row v-if="menuButtonShowList['circle-blur']">
                 <el-slider
-                    v-model="layers[nowLayerIndex].paint['circle-blur']"
-                    :min="0"
-                    :max="1"
-                    :marks="{ 0: '0', 0.5: '0.5', 1: '1' }"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['circle-blur']"
+                  :min="0"
+                  :max="1"
+                  :marks="{ 0: '0', 0.5: '0.5', 1: '1' }"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'circle-blur',
                       layers[nowLayerIndex].paint['circle-blur']
                     )
                   "
-                    :step="0.1"
+                  :step="0.1"
                 >
                 </el-slider>
-                <br/>
+                <br />
                 <el-input-number
-                    v-model="layers[nowLayerIndex].paint['circle-blur']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['circle-blur']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'circle-blur',
                       layers[nowLayerIndex].paint['circle-blur']
                     )
                   "
-                    :min="0"
-                    :max="1"
-                    :step="0.1"
-                    size="medium"
-                    label="描述文字"
+                  :min="0"
+                  :max="1"
+                  :step="0.1"
+                  size="medium"
+                  label="描述文字"
                 >
                 </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="circle-blur"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="circle-blur"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="平移" name="eighth">
               <h3>平移</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['circle-translate']">{{
-                  menuShowList["circle-translate"]
-                }}</span>
+                menuShowList["circle-translate"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['circle-translate']"
-                  style="margin-top: 10px; display: flex"
+                v-if="menuButtonShowList['circle-translate']"
+                style="margin-top: 10px; display: flex"
               >
                 <h4>x轴(px):&nbsp;</h4>
                 <el-input-number
-                    v-model="layers[nowLayerIndex].paint['circle-translate'][0]"
-                    :step="1"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['circle-translate'][0]"
+                  :step="1"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'circle-translate',
@@ -1047,14 +1039,14 @@
                 </el-input-number>
               </el-row>
               <el-row
-                  v-if="menuButtonShowList['circle-translate']"
-                  style="display: flex"
+                v-if="menuButtonShowList['circle-translate']"
+                style="display: flex"
               >
                 <h4>y轴(px):&nbsp;</h4>
                 <el-input-number
-                    v-model="layers[nowLayerIndex].paint['circle-translate'][1]"
-                    :step="1"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['circle-translate'][1]"
+                  :step="1"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'circle-translate',
@@ -1066,27 +1058,27 @@
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="circle-translate"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="circle-translate"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="平移参考" name="ninth">
               <h3>平移参考</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['circle-translate-anchor']">{{
-                  menuShowList["circle-translate-anchor"]
-                }}</span>
+                menuShowList["circle-translate-anchor"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['circle-translate-anchor']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['circle-translate-anchor']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-select
-                    v-model="
+                  v-model="
                     layers[nowLayerIndex].paint['circle-translate-anchor']
                   "
-                    placeholder="请选择"
-                    @change="
+                  placeholder="请选择"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'circle-translate-anchor',
@@ -1095,37 +1087,37 @@
                   "
                 >
                   <el-option
-                      v-for="item in ['map', 'viewport']"
-                      :key="item"
-                      :label="item"
-                      :value="item"
+                    v-for="item in ['map', 'viewport']"
+                    :key="item"
+                    :label="item"
+                    :value="item"
                   >
                   </el-option>
                 </el-select>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="circle-translate-anchor"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="circle-translate-anchor"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="倾斜对齐" name="tentn">
               <h3>倾斜对齐</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['circle-pitch-alignment']">{{
-                  menuShowList["circle-pitch-alignment"]
-                }}</span>
+                menuShowList["circle-pitch-alignment"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['circle-pitch-alignment']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['circle-pitch-alignment']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-select
-                    v-model="
+                  v-model="
                     layers[nowLayerIndex].paint['circle-pitch-alignment']
                   "
-                    placeholder="请选择"
-                    @change="
+                  placeholder="请选择"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'circle-pitch-alignment',
@@ -1134,35 +1126,35 @@
                   "
                 >
                   <el-option
-                      v-for="item in ['map', 'viewport']"
-                      :key="item"
-                      :label="item"
-                      :value="item"
+                    v-for="item in ['map', 'viewport']"
+                    :key="item"
+                    :label="item"
+                    :value="item"
                   >
                   </el-option>
                 </el-select>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="circle-pitch-alignment"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="circle-pitch-alignment"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="倾斜缩放" name="eleven">
               <h3>倾斜缩放</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['circle-pitch-scale']">{{
-                  menuShowList["circle-pitch-scale"]
-                }}</span>
+                menuShowList["circle-pitch-scale"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['circle-pitch-scale']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['circle-pitch-scale']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-select
-                    v-model="layers[nowLayerIndex].paint['circle-pitch-scale']"
-                    placeholder="请选择"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['circle-pitch-scale']"
+                  placeholder="请选择"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'circle-pitch-scale',
@@ -1171,203 +1163,203 @@
                   "
                 >
                   <el-option
-                      v-for="item in ['map', 'viewport']"
-                      :key="item"
-                      :label="item"
-                      :value="item"
+                    v-for="item in ['map', 'viewport']"
+                    :key="item"
+                    :label="item"
+                    :value="item"
                   >
                   </el-option>
                 </el-select>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="circle-pitch-scale"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="circle-pitch-scale"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
           </el-tabs>
           <!--    线图层编辑面板-->
           <el-tabs
-              :before-leave="leaveTab"
-              v-if="editorShow == 'lineEditorShow'"
-              type="border-card"
-              value="first"
-              tab-position="left"
+            :before-leave="leaveTab"
+            v-if="editorShow == 'lineEditorShow'"
+            type="border-card"
+            value="first"
+            tab-position="left"
           >
             <el-tab-pane label="颜色" name="first">
               <h3>线颜色</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['line-color']">{{
-                  menuShowList["line-color"]
-                }}</span>
+                menuShowList["line-color"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['line-color']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['line-color']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-color-picker
-                    v-model="layers[nowLayerIndex].paint['line-color']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['line-color']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'line-color',
                       layers[nowLayerIndex].paint['line-color']
                     )
                   "
-                    :predefine="predefineColors"
+                  :predefine="predefineColors"
                 >
                 </el-color-picker>
                 <el-input
-                    v-model="layers[nowLayerIndex].paint['line-color']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['line-color']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'line-color',
                       layers[nowLayerIndex].paint['line-color']
                     )
                   "
-                    placeholder="something"
+                  placeholder="something"
                 ></el-input>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="line-color"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="line-color"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="线宽" name="second">
               <h3>线宽（px）</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['line-width']">{{
-                  menuShowList["line-width"]
-                }}</span>
+                menuShowList["line-width"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['line-width']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['line-width']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-input-number
-                    v-model="layers[nowLayerIndex].paint['line-width']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['line-width']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'line-width',
                       layers[nowLayerIndex].paint['line-width']
                     )
                   "
-                    :min="0"
-                    :max="99999"
-                    size="medium"
-                    label="描述文字"
+                  :min="0"
+                  :max="99999"
+                  size="medium"
+                  label="描述文字"
                 >
                 </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="line-width"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="line-width"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="不透明度" name="third">
               <h3>不透明度</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['line-opacity']">{{
-                  menuShowList["line-opacity"]
-                }}</span>
+                menuShowList["line-opacity"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['line-opacity']"
-                  style="margin-top: 10px"
+                v-if="menuButtonShowList['line-opacity']"
+                style="margin-top: 10px"
               >
                 <el-slider
-                    v-model="layers[nowLayerIndex].paint['line-opacity']"
-                    :min="0"
-                    :max="1"
-                    :marks="{ 0: '0', 0.5: '0.5', 1: '1' }"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['line-opacity']"
+                  :min="0"
+                  :max="1"
+                  :marks="{ 0: '0', 0.5: '0.5', 1: '1' }"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'line-opacity',
                       layers[nowLayerIndex].paint['line-opacity']
                     )
                   "
-                    :step="0.1"
+                  :step="0.1"
                 >
                 </el-slider>
-                <br/>
+                <br />
                 <el-input-number
-                    v-model="layers[nowLayerIndex].paint['line-opacity']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['line-opacity']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'line-opacity',
                       layers[nowLayerIndex].paint['line-opacity']
                     )
                   "
-                    :min="0"
-                    :max="1"
-                    :step="0.1"
-                    size="medium"
-                    label="描述文字"
+                  :min="0"
+                  :max="1"
+                  :step="0.1"
+                  size="medium"
+                  label="描述文字"
                 >
                 </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="line-opacity"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="line-opacity"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="虚线" name="forth">
               <h3>虚线</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['line-dasharray']">{{
-                  menuShowList["line-dasharray"]
-                }}</span>
+                menuShowList["line-dasharray"]
+              }}</span>
               <el-row
-                  v-if="layers[nowLayerIndex].paint['line-dasharray'].length == 0"
-                  style="margin-top: 10px"
+                v-if="layers[nowLayerIndex].paint['line-dasharray'].length == 0"
+                style="margin-top: 10px"
               >
                 <el-col class="displayBox">未设置过滤条件</el-col>
               </el-row>
               <el-row
-                  v-if="menuButtonShowList['line-dasharray']"
-                  style="margin-top: 10px"
+                v-if="menuButtonShowList['line-dasharray']"
+                style="margin-top: 10px"
               >
                 <div
-                    class="flexRowSpaceAround"
-                    v-for="(item, index) in layers[nowLayerIndex].paint[
+                  class="flexRowSpaceAround"
+                  v-for="(item, index) in layers[nowLayerIndex].paint[
                     'line-dasharray'
                   ]"
-                    :key="index"
-                    style="height: 40px"
+                  :key="index"
+                  style="height: 40px"
                 >
                   <h4 v-if="index % 2 == 0">实部:</h4>
                   <h4 v-else>虚部:</h4>
                   <el-input-number
-                      v-model="
+                    v-model="
                       layers[nowLayerIndex].paint['line-dasharray'][index]
                     "
-                      @change="
+                    @change="
                       handlePaintChange(
                         layers[nowLayerIndex]['id'],
                         'line-dasharray',
                         layers[nowLayerIndex].paint['line-dasharray']
                       )
                     "
-                      :min="0"
-                      size="small"
-                      label="描述文字"
+                    :min="0"
+                    size="small"
+                    label="描述文字"
                   >
                   </el-input-number
                   >&nbsp;
                   <el-button
-                      type="danger"
-                      icon="el-icon-delete"
-                      size="mini"
-                      circle
-                      @click="
+                    type="danger"
+                    icon="el-icon-delete"
+                    size="mini"
+                    circle
+                    @click="
                       layers[nowLayerIndex].paint['line-dasharray'].splice(
                         index,
                         1
@@ -1376,114 +1368,114 @@
                   ></el-button>
                 </div>
                 <el-button
-                    type="primary"
-                    round
-                    @click="layers[nowLayerIndex].paint['line-dasharray'].push(0)"
-                >添加虚线设置
+                  type="primary"
+                  round
+                  @click="layers[nowLayerIndex].paint['line-dasharray'].push(0)"
+                  >添加虚线设置
                 </el-button>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="line-dasharray"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="line-dasharray"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="线间隙" name="fifth">
               <h3>线间隙宽度</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['line-gap-width']">{{
-                  menuShowList["line-gap-width"]
-                }}</span>
+                menuShowList["line-gap-width"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['line-gap-width']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['line-gap-width']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-input-number
-                    v-model="layers[nowLayerIndex].paint['line-gap-width']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['line-gap-width']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'line-gap-width',
                       layers[nowLayerIndex].paint['line-gap-width']
                     )
                   "
-                    :min="0"
-                    :max="99999"
-                    size="medium"
-                    label="描述文字"
+                  :min="0"
+                  :max="99999"
+                  size="medium"
+                  label="描述文字"
                 >
                 </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="line-gap-width"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="line-gap-width"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="模糊" name="sixth">
               <h3>模糊度</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['line-blur']">{{
-                  menuShowList["line-blur"]
-                }}</span>
+                menuShowList["line-blur"]
+              }}</span>
               <el-row v-if="menuButtonShowList['line-blur']">
                 <el-slider
-                    v-model="layers[nowLayerIndex].paint['line-blur']"
-                    :min="0"
-                    :max="1"
-                    :marks="{ 0: '0', 0.5: '0.5', 1: '1' }"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['line-blur']"
+                  :min="0"
+                  :max="1"
+                  :marks="{ 0: '0', 0.5: '0.5', 1: '1' }"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'line-blur',
                       layers[nowLayerIndex].paint['line-blur']
                     )
                   "
-                    :step="0.1"
+                  :step="0.1"
                 >
                 </el-slider>
-                <br/>
+                <br />
                 <el-input-number
-                    v-model="layers[nowLayerIndex].paint['line-blur']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['line-blur']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'line-blur',
                       layers[nowLayerIndex].paint['line-blur']
                     )
                   "
-                    :min="0"
-                    :max="1"
-                    :step="0.1"
-                    size="medium"
-                    label="描述文字"
+                  :min="0"
+                  :max="1"
+                  :step="0.1"
+                  size="medium"
+                  label="描述文字"
                 >
                 </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="line-blur"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="line-blur"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="平移" name="seventh">
               <h3>平移</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['line-translate']">{{
-                  menuShowList["line-translate"]
-                }}</span>
+                menuShowList["line-translate"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['line-translate']"
-                  style="margin-top: 10px; display: flex"
+                v-if="menuButtonShowList['line-translate']"
+                style="margin-top: 10px; display: flex"
               >
                 <h4>x轴(px):&nbsp;</h4>
                 <el-input-number
-                    v-model="layers[nowLayerIndex].paint['line-translate'][0]"
-                    :step="1"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['line-translate'][0]"
+                  :step="1"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'line-translate',
@@ -1494,14 +1486,14 @@
                 </el-input-number>
               </el-row>
               <el-row
-                  v-if="menuButtonShowList['line-translate']"
-                  style="display: flex"
+                v-if="menuButtonShowList['line-translate']"
+                style="display: flex"
               >
                 <h4>y轴(px):&nbsp;</h4>
                 <el-input-number
-                    v-model="layers[nowLayerIndex].paint['line-translate'][1]"
-                    :step="1"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['line-translate'][1]"
+                  :step="1"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'line-translate',
@@ -1513,25 +1505,25 @@
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="line-translate"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="line-translate"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="平移参考" name="eighth">
               <h3>平移参考</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['line-translate-anchor']">{{
-                  menuShowList["line-translate-anchor"]
-                }}</span>
+                menuShowList["line-translate-anchor"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['line-translate-anchor']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['line-translate-anchor']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-select
-                    v-model="layers[nowLayerIndex].paint['line-translate-anchor']"
-                    placeholder="请选择"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['line-translate-anchor']"
+                  placeholder="请选择"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'line-translate-anchor',
@@ -1540,68 +1532,68 @@
                   "
                 >
                   <el-option
-                      v-for="item in ['map', 'viewport']"
-                      :key="item"
-                      :label="item"
-                      :value="item"
+                    v-for="item in ['map', 'viewport']"
+                    :key="item"
+                    :label="item"
+                    :value="item"
                   >
                   </el-option>
                 </el-select>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="line-translate-anchor"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="line-translate-anchor"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="偏移" name="ninth">
               <h3>偏移</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['line-offset']">{{
-                  menuShowList["line-offset"]
-                }}</span>
+                menuShowList["line-offset"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['line-offset']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['line-offset']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-input-number
-                    v-model="layers[nowLayerIndex].paint['line-offset']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['line-offset']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'line-offset',
                       layers[nowLayerIndex].paint['line-offset']
                     )
                   "
-                    :min="0"
-                    :max="99999"
-                    size="medium"
-                    label="描述文字"
+                  :min="0"
+                  :max="99999"
+                  size="medium"
+                  label="描述文字"
                 >
                 </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="line-offset"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="line-offset"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="线帽" name="tentn">
               <h3>线帽</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['line-cap']">{{
-                  menuShowList["line-cap"]
-                }}</span>
+                menuShowList["line-cap"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['line-cap']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['line-cap']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-select
-                    v-model="layers[nowLayerIndex].layout['line-cap']"
-                    placeholder="请选择"
-                    @change="
+                  v-model="layers[nowLayerIndex].layout['line-cap']"
+                  placeholder="请选择"
+                  @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'line-cap',
@@ -1610,39 +1602,39 @@
                   "
                 >
                   <el-option
-                      v-for="item in [
+                    v-for="item in [
                       { label: '平直 butt', value: 'butt' },
                       { label: '圆形 round', value: 'round' },
                       { label: '方形 square', value: 'square' },
                     ]"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
                   >
                   </el-option>
                 </el-select>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="line-cap"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="line-cap"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="线连接" name="eleven">
               <h3>线连接</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['line-join']">{{
-                  menuShowList["line-join"]
-                }}</span>
+                menuShowList["line-join"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['line-join']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['line-join']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-select
-                    v-model="layers[nowLayerIndex].layout['line-join']"
-                    placeholder="请选择"
-                    @change="
+                  v-model="layers[nowLayerIndex].layout['line-join']"
+                  placeholder="请选择"
+                  @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'line-join',
@@ -1651,188 +1643,188 @@
                   "
                 >
                   <el-option
-                      v-for="item in [
+                    v-for="item in [
                       { label: '尖角 miter', value: 'miter' },
                       { label: '圆角 round', value: 'round' },
                       { label: '斜角 bevel', value: 'bevel' },
                     ]"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
                   >
                   </el-option>
                 </el-select>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="line-join"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="line-join"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
           </el-tabs>
           <!--    面图层编辑面板-->
           <el-tabs
-              :before-leave="leaveTab"
-              v-if="editorShow == 'fillEditorShow'"
-              type="border-card"
-              value="first"
-              tab-position="left"
+            :before-leave="leaveTab"
+            v-if="editorShow == 'fillEditorShow'"
+            type="border-card"
+            value="first"
+            tab-position="left"
           >
             <el-tab-pane label="颜色" name="first">
               <h3>填充颜色</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['fill-color']">{{
-                  menuShowList["fill-color"]
-                }}</span>
+                menuShowList["fill-color"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['fill-color']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['fill-color']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-color-picker
-                    v-model="layers[nowLayerIndex].paint['fill-color']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['fill-color']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'fill-color',
                       layers[nowLayerIndex].paint['fill-color']
                     )
                   "
-                    :predefine="predefineColors"
+                  :predefine="predefineColors"
                 >
                 </el-color-picker>
                 <el-input
-                    v-model="layers[nowLayerIndex].paint['fill-color']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['fill-color']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'fill-color',
                       layers[nowLayerIndex].paint['fill-color']
                     )
                   "
-                    placeholder="something"
+                  placeholder="something"
                 ></el-input>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="fill-color"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="fill-color"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="不透明度" name="second">
               <h3>不透明度</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['fill-opacity']">{{
-                  menuShowList["fill-opacity"]
-                }}</span>
+                menuShowList["fill-opacity"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['fill-opacity']"
-                  style="margin-top: 10px"
+                v-if="menuButtonShowList['fill-opacity']"
+                style="margin-top: 10px"
               >
                 <el-slider
-                    v-model="layers[nowLayerIndex].paint['fill-opacity']"
-                    :min="0"
-                    :max="1"
-                    :marks="{ 0: '0', 0.5: '0.5', 1: '1' }"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['fill-opacity']"
+                  :min="0"
+                  :max="1"
+                  :marks="{ 0: '0', 0.5: '0.5', 1: '1' }"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'fill-opacity',
                       layers[nowLayerIndex].paint['fill-opacity']
                     )
                   "
-                    :step="0.1"
+                  :step="0.1"
                 >
                 </el-slider>
-                <br/>
+                <br />
                 <el-input-number
-                    v-model="layers[nowLayerIndex].paint['fill-opacity']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['fill-opacity']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'fill-opacity',
                       layers[nowLayerIndex].paint['fill-opacity']
                     )
                   "
-                    :min="0"
-                    :max="1"
-                    :step="0.1"
-                    size="medium"
-                    label="描述文字"
+                  :min="0"
+                  :max="1"
+                  :step="0.1"
+                  size="medium"
+                  label="描述文字"
                 >
                 </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="fill-opacity"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="fill-opacity"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="边线颜色" name="third">
               <h3>边线颜色</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['fill-outline-color']">{{
-                  menuShowList["fill-outline-color"]
-                }}</span>
-              <br/>
+                menuShowList["fill-outline-color"]
+              }}</span>
+              <br />
               <span style="font-size: 10px; color: #909399"
-              >（该属性需要抗锯齿属性为true）</span
+                >（该属性需要抗锯齿属性为true）</span
               >
               <el-row
-                  v-if="
+                v-if="
                   menuButtonShowList['fill-outline-color'] &&
                   layers[nowLayerIndex].paint['fill-antialias']
                 "
-                  style="display: flex; margin-top: 10px"
+                style="display: flex; margin-top: 10px"
               >
                 <el-input
-                    v-model="layers[nowLayerIndex].paint['fill-outline-color']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['fill-outline-color']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'fill-outline-color',
                       layers[nowLayerIndex].paint['fill-outline-color']
                     )
                   "
-                    placeholder="something"
+                  placeholder="something"
                 ></el-input>
                 <el-color-picker
-                    v-model="layers[nowLayerIndex].paint['fill-outline-color']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['fill-outline-color']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'fill-outline-color',
                       layers[nowLayerIndex].paint['fill-outline-color']
                     )
                   "
-                    :predefine="predefineColors"
+                  :predefine="predefineColors"
                 >
                 </el-color-picker>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="fill-outline-color"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="fill-outline-color"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="平移" name="forth">
               <h3>平移</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['fill-translate']">{{
-                  menuShowList["fill-translate"]
-                }}</span>
+                menuShowList["fill-translate"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['fill-translate']"
-                  style="margin-top: 10px; display: flex"
+                v-if="menuButtonShowList['fill-translate']"
+                style="margin-top: 10px; display: flex"
               >
                 <h4>x轴(px):&nbsp;</h4>
                 <el-input-number
-                    v-model="layers[nowLayerIndex].paint['fill-translate'][0]"
-                    :step="1"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['fill-translate'][0]"
+                  :step="1"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'fill-translate',
@@ -1843,14 +1835,14 @@
                 </el-input-number>
               </el-row>
               <el-row
-                  v-if="menuButtonShowList['fill-translate']"
-                  style="display: flex"
+                v-if="menuButtonShowList['fill-translate']"
+                style="display: flex"
               >
                 <h4>y轴(px):&nbsp;</h4>
                 <el-input-number
-                    v-model="layers[nowLayerIndex].paint['fill-translate'][1]"
-                    :step="1"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['fill-translate'][1]"
+                  :step="1"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'fill-translate',
@@ -1862,25 +1854,25 @@
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="fill-translate"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="fill-translate"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="平移参考" name="fifth">
               <h3>平移参考</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['fill-translate-anchor']">{{
-                  menuShowList["fill-translate-anchor"]
-                }}</span>
+                menuShowList["fill-translate-anchor"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['fill-translate-anchor']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['fill-translate-anchor']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-select
-                    v-model="layers[nowLayerIndex].paint['fill-translate-anchor']"
-                    placeholder="请选择"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['fill-translate-anchor']"
+                  placeholder="请选择"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'fill-translate-anchor',
@@ -1889,34 +1881,34 @@
                   "
                 >
                   <el-option
-                      v-for="item in ['map', 'viewport']"
-                      :key="item"
-                      :label="item"
-                      :value="item"
+                    v-for="item in ['map', 'viewport']"
+                    :key="item"
+                    :label="item"
+                    :value="item"
                   >
                   </el-option>
                 </el-select>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="fill-translate-anchor"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="fill-translate-anchor"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="抗锯齿" name="sixth">
               <h3>抗锯齿</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['fill-antialias']">{{
-                  menuShowList["fill-antialias"]
-                }}</span>
+                menuShowList["fill-antialias"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['fill-antialias']"
-                  style="margin-top: 10px; display: flex"
+                v-if="menuButtonShowList['fill-antialias']"
+                style="margin-top: 10px; display: flex"
               >
                 <el-switch
-                    v-model="layers[nowLayerIndex].paint['fill-antialias']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['fill-antialias']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'fill-antialias',
@@ -1928,199 +1920,199 @@
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="fill-antialias"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="fill-antialias"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
           </el-tabs>
           <!--    三维面图层编辑面板-->
           <el-tabs
-              :before-leave="leaveTab"
-              v-if="editorShow == 'fillExtrusionEditorShow'"
-              type="border-card"
-              value="first"
-              tab-position="left"
+            :before-leave="leaveTab"
+            v-if="editorShow == 'fillExtrusionEditorShow'"
+            type="border-card"
+            value="first"
+            tab-position="left"
           >
             <el-tab-pane label="颜色" name="first">
               <h3>填充颜色</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['fill-extrusion-color']">{{
-                  menuShowList["fill-extrusion-color"]
-                }}</span>
+                menuShowList["fill-extrusion-color"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['fill-extrusion-color']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['fill-extrusion-color']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-color-picker
-                    v-model="layers[nowLayerIndex].paint['fill-extrusion-color']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['fill-extrusion-color']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'fill-extrusion-color',
                       layers[nowLayerIndex].paint['fill-extrusion-color']
                     )
                   "
-                    :predefine="predefineColors"
+                  :predefine="predefineColors"
                 >
                 </el-color-picker>
                 <el-input
-                    v-model="layers[nowLayerIndex].paint['fill-extrusion-color']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['fill-extrusion-color']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'fill-extrusion-color',
                       layers[nowLayerIndex].paint['fill-extrusion-color']
                     )
                   "
-                    placeholder="something"
+                  placeholder="something"
                 ></el-input>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="fill-extrusion-color"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="fill-extrusion-color"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="不透明度" name="second">
               <h3>不透明度</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['fill-extrusion-opacity']">{{
-                  menuShowList["fill-extrusion-opacity"]
-                }}</span>
+                menuShowList["fill-extrusion-opacity"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['fill-extrusion-opacity']"
-                  style="margin-top: 10px"
+                v-if="menuButtonShowList['fill-extrusion-opacity']"
+                style="margin-top: 10px"
               >
                 <el-slider
-                    v-model="
+                  v-model="
                     layers[nowLayerIndex].paint['fill-extrusion-opacity']
                   "
-                    :min="0"
-                    :max="1"
-                    :marks="{ 0: '0', 0.5: '0.5', 1: '1' }"
-                    @change="
+                  :min="0"
+                  :max="1"
+                  :marks="{ 0: '0', 0.5: '0.5', 1: '1' }"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'fill-extrusion-opacity',
                       layers[nowLayerIndex].paint['fill-extrusion-opacity']
                     )
                   "
-                    :step="0.1"
+                  :step="0.1"
                 >
                 </el-slider>
-                <br/>
+                <br />
                 <el-input-number
-                    v-model="
+                  v-model="
                     layers[nowLayerIndex].paint['fill-extrusion-opacity']
                   "
-                    @change="
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'fill-extrusion-opacity',
                       layers[nowLayerIndex].paint['fill-extrusion-opacity']
                     )
                   "
-                    :min="0"
-                    :max="1"
-                    :step="0.1"
-                    size="medium"
-                    label="描述文字"
+                  :min="0"
+                  :max="1"
+                  :step="0.1"
+                  size="medium"
+                  label="描述文字"
                 >
                 </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="fill-extrusion-opacity"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="fill-extrusion-opacity"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="高度" name="third">
               <h3>高度</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['fill-extrusion-height']">{{
-                  menuShowList["fill-extrusion-height"]
-                }}</span>
+                menuShowList["fill-extrusion-height"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['fill-extrusion-height']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['fill-extrusion-height']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-input-number
-                    v-model="layers[nowLayerIndex].paint['fill-extrusion-height']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['fill-extrusion-height']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'fill-extrusion-height',
                       layers[nowLayerIndex].paint['fill-extrusion-height']
                     )
                   "
-                    :min="0"
-                    :max="99999"
-                    size="medium"
-                    label="描述文字"
+                  :min="0"
+                  :max="99999"
+                  size="medium"
+                  label="描述文字"
                 >
                 </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="fill-extrusion-height"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="fill-extrusion-height"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="底部高度" name="forth">
               <h3>底部高度</h3>
               &nbsp;
-              <br/>
+              <br />
               <span v-if="!menuButtonShowList['fill-extrusion-base']">{{
-                  menuShowList["fill-extrusion-base"]
-                }}</span>
+                menuShowList["fill-extrusion-base"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['fill-extrusion-base']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['fill-extrusion-base']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-input-number
-                    v-model="layers[nowLayerIndex].paint['fill-extrusion-base']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['fill-extrusion-base']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'fill-extrusion-base',
                       layers[nowLayerIndex].paint['fill-extrusion-base']
                     )
                   "
-                    :min="0"
-                    :max="99999"
-                    size="medium"
-                    label="描述文字"
+                  :min="0"
+                  :max="99999"
+                  size="medium"
+                  label="描述文字"
                 >
                 </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="fill-extrusion-base"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="fill-extrusion-base"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="平移" name="fifth">
               <h3>平移</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['fill-extrusion-translate']">{{
-                  menuShowList["fill-extrusion-translate"]
-                }}</span>
+                menuShowList["fill-extrusion-translate"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['fill-extrusion-translate']"
-                  style="margin-top: 10px; display: flex"
+                v-if="menuButtonShowList['fill-extrusion-translate']"
+                style="margin-top: 10px; display: flex"
               >
                 <h4>x轴(px):&nbsp;</h4>
                 <el-input-number
-                    v-model="
+                  v-model="
                     layers[nowLayerIndex].paint['fill-extrusion-translate'][0]
                   "
-                    :step="1"
-                    @change="
+                  :step="1"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'fill-extrusion-translate',
@@ -2131,16 +2123,16 @@
                 </el-input-number>
               </el-row>
               <el-row
-                  v-if="menuButtonShowList['fill-extrusion-translate']"
-                  style="display: flex"
+                v-if="menuButtonShowList['fill-extrusion-translate']"
+                style="display: flex"
               >
                 <h4>y轴(px):&nbsp;</h4>
                 <el-input-number
-                    v-model="
+                  v-model="
                     layers[nowLayerIndex].paint['fill-extrusion-translate'][1]
                   "
-                    :step="1"
-                    @change="
+                  :step="1"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'fill-extrusion-translate',
@@ -2152,30 +2144,30 @@
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="fill-extrusion-translate"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="fill-extrusion-translate"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="平移参考" name="sixth">
               <h3>平移参考</h3>
               &nbsp;
               <span
-                  v-if="!menuButtonShowList['fill-extrusion-translate-anchor']"
-              >{{ menuShowList["fill-extrusion-translate-anchor"] }}</span
+                v-if="!menuButtonShowList['fill-extrusion-translate-anchor']"
+                >{{ menuShowList["fill-extrusion-translate-anchor"] }}</span
               >
               <el-row
-                  v-if="menuButtonShowList['fill-extrusion-translate-anchor']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['fill-extrusion-translate-anchor']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-select
-                    v-model="
+                  v-model="
                     layers[nowLayerIndex].paint[
                       'fill-extrusion-translate-anchor'
                     ]
                   "
-                    placeholder="请选择"
-                    @change="
+                  placeholder="请选择"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'fill-extrusion-translate-anchor',
@@ -2186,39 +2178,39 @@
                   "
                 >
                   <el-option
-                      v-for="item in ['map', 'viewport']"
-                      :key="item"
-                      :label="item"
-                      :value="item"
+                    v-for="item in ['map', 'viewport']"
+                    :key="item"
+                    :label="item"
+                    :value="item"
                   >
                   </el-option>
                 </el-select>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="fill-extrusion-translate-anchor"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="fill-extrusion-translate-anchor"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="渐变填充" name="seven">
               <h3>渐变填充</h3>
               &nbsp;
               <span
-                  v-if="!menuButtonShowList['fill-extrusion-vertical-gradient']"
-              >{{ menuShowList["fill-extrusion-vertical-gradient"] }}</span
+                v-if="!menuButtonShowList['fill-extrusion-vertical-gradient']"
+                >{{ menuShowList["fill-extrusion-vertical-gradient"] }}</span
               >
               <el-row
-                  v-if="menuButtonShowList['fill-extrusion-vertical-gradient']"
-                  style="margin-top: 10px; display: flex"
+                v-if="menuButtonShowList['fill-extrusion-vertical-gradient']"
+                style="margin-top: 10px; display: flex"
               >
                 <el-switch
-                    v-model="
+                  v-model="
                     layers[nowLayerIndex].paint[
                       'fill-extrusion-vertical-gradient'
                     ]
                   "
-                    @change="
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'fill-extrusion-vertical-gradient',
@@ -2229,98 +2221,97 @@
                   "
                 >
                 </el-switch>
-              </el-row>
+              </el-row>leaveTab
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="fill-extrusion-vertical-gradient"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="fill-extrusion-vertical-gradient"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
           </el-tabs>
           <!--    图标图层编辑面板-->
           <div v-if="editorShow == 'symbolEditorShow'" class="symbolSort">
             <span
-                type="text"
-                @click="symbolChange('icon')"
-                :style="{ color: symbolColor[0] }"
-            >图标</span
+              type="text"
+              @click="symbolChange('icon')"
+              :style="{ color: symbolColor[0] }"
+              >图标</span
             >
             <span
-                type="text"
-                @click="symbolChange('tag')"
-                :style="{ color: symbolColor[1] }"
-            >标注</span
+              type="text"
+              @click="symbolChange('tag')"
+              :style="{ color: symbolColor[1] }"
+              >标注</span
             >
           </div>
           <el-tabs
-              class="symbolBox"
-              :before-leave="leaveTab"
-              v-if="editorShow == 'symbolEditorShow'"
-              v-show="isSymbol"
-              type="border-card"
-              value="first"
-              tab-position="left"
+            class="symbolBox"
+            :before-leave="leaveTab"
+            v-if="editorShow == 'symbolEditorShow'"
+            v-show="isSymbol"
+            type="border-card"
+            value="first"
+            tab-position="left"
           >
             <el-tab-pane label="图标" name="first">
               <h3>图标选择</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['icon-image']">{{
-                  menuShowList["icon-image"]
-                }}</span>
-              <br/>
+                menuShowList["icon-image"]
+              }}</span>
+              <br />
               <el-row
-                  v-if="menuButtonShowList['icon-image']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['icon-image']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-input
-                    v-model="layers[nowLayerIndex].layout['icon-image']"
-                    @change="
+                  v-model="layers[nowLayerIndex].layout['icon-image']"
+                  @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'icon-image',
                       layers[nowLayerIndex].layout['icon-image']
                     )
                   "
-                    placeholder="something"
+                  placeholder="something"
                 ></el-input>
                 <el-popover
-                    ref="iconPopover"
-                    placement="right"
-                    width="400"
-                    trigger="click"
+                  ref="iconPopover"
+                  placement="right"
+                  width="400"
+                  trigger="click"
                 >
                   <el-tabs>
                     <el-tab-pane
-                        label="精灵图"
-                        style="height: 400px; overflow-y: scroll"
+                      label="精灵图"
+                      style="height: 400px; overflow-y: scroll"
                     >
                       <el-row>
                         <el-select
-                            v-model="spriteNameSelect"
-                            placeholder="请选择精灵图"
-                            @change="spriteChange"
+                          v-model="spriteNameSelect"
+                          placeholder="请选择精灵图"
+                          @change="spriteChange"
                         >
                           <el-option
-                              v-for="item in spriteClassList"
-                              :key="item"
-                              :label="item"
-                              :value="item"
+                            v-for="item in spriteClassList"
+                            :key="item"
+                            :label="item"
+                            :value="item"
                           >
-                          </el-option>
-                        </el-select
+                          </el-option> </el-select
                         >&nbsp;
                         <div
-                            style="width: 400px; display: flex; flex-wrap: wrap"
+                          style="width: 400px; display: flex; flex-wrap: wrap"
                         >
                           <div
-                              v-for="(item, key, index) in spriteJsonSelect"
-                              :key="index"
-                              :title="key"
-                              @click="clickSprite(item, key, index)"
-                              class="spriteCard"
-                              body-style="padding:0"
-                              :style="{
+                            v-for="(item, key, index) in spriteJsonSelect"
+                            :key="index"
+                            :title="key"
+                            @click="clickSprite(item, key, index)"
+                            class="spriteCard"
+                            body-style="padding:0"
+                            :style="{
                               padding: 0,
                               width: item.width + 30 + 'px',
                               height: item.height + 30 + 'px',
@@ -2333,7 +2324,7 @@
                               @change="spriteCheckChange($event,key)">
                             </el-checkbox> -->
                             <div
-                                :style="{
+                              :style="{
                                 'background-image': `url(${spritePngSelect})`,
                                 width: item.width + 'px',
                                 height: item.height + 'px',
@@ -2356,21 +2347,21 @@
                     </el-tab-pane>
                     <el-tab-pane label="自定义">
                       <el-row
-                          type="flex"
-                          justify="start"
-                          style="flex-wrap: wrap; width: 100%"
+                        type="flex"
+                        justify="start"
+                        style="flex-wrap: wrap; width: 100%"
                       >
                         <el-card
-                            class="spriteImage"
-                            v-for="(item, index) in symbolTableData"
-                            :key="index"
+                          class="spriteImage"
+                          v-for="(item, index) in symbolTableData"
+                          :key="index"
                         >
                           <el-image
-                              style="width: 100px; height: 100px"
-                              :src="reqUrl + item.webAddress"
-                              fit="cover"
-                              class="cursor"
-                              @click="iconSelect(item)"
+                            style="width: 100px; height: 100px"
+                            :src="reqUrl + item.webAddress"
+                            fit="cover"
+                            class="cursor"
+                            @click="iconSelect(item)"
                           >
                           </el-image>
                         </el-card>
@@ -2379,115 +2370,115 @@
                   </el-tabs>
 
                   <el-button
-                      type="text"
-                      icon="el-icon-s-unfold"
-                      slot="reference"
+                    type="text"
+                    icon="el-icon-s-unfold"
+                    slot="reference"
                   ></el-button>
                 </el-popover>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="icon-image"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="icon-image"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="图标大小">
               <h3>图标大小</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['icon-size']">{{
-                  menuShowList["icon-size"]
-                }}</span>
+                menuShowList["icon-size"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['icon-size']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['icon-size']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-input-number
-                    v-model="layers[nowLayerIndex].layout['icon-size']"
-                    @change="
+                  v-model="layers[nowLayerIndex].layout['icon-size']"
+                  @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'icon-size',
                       layers[nowLayerIndex].layout['icon-size']
                     )
                   "
-                    :min="0"
-                    :max="99999"
-                    size="medium"
-                    label="描述文字"
+                  :min="0"
+                  :max="99999"
+                  size="medium"
+                  label="描述文字"
                 >
                 </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="icon-size"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="icon-size"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="不透明度">
               <h3>不透明度</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['icon-opacity']">{{
-                  menuShowList["icon-opacity"]
-                }}</span>
+                menuShowList["icon-opacity"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['icon-opacity']"
-                  style="margin-top: 10px"
+                v-if="menuButtonShowList['icon-opacity']"
+                style="margin-top: 10px"
               >
                 <el-slider
-                    v-model="layers[nowLayerIndex].paint['icon-opacity']"
-                    :min="0"
-                    :max="1"
-                    :marks="{ 0: '0', 0.5: '0.5', 1: '1' }"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['icon-opacity']"
+                  :min="0"
+                  :max="1"
+                  :marks="{ 0: '0', 0.5: '0.5', 1: '1' }"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'icon-opacity',
                       layers[nowLayerIndex].paint['icon-opacity']
                     )
                   "
-                    :step="0.1"
+                  :step="0.1"
                 >
                 </el-slider>
-                <br/>
+                <br />
                 <el-input-number
-                    v-model="layers[nowLayerIndex].paint['icon-opacity']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['icon-opacity']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'icon-opacity',
                       layers[nowLayerIndex].paint['icon-opacity']
                     )
                   "
-                    :min="0"
-                    :max="1"
-                    :step="0.1"
-                    size="medium"
-                    label="描述文字"
+                  :min="0"
+                  :max="1"
+                  :step="0.1"
+                  size="medium"
+                  label="描述文字"
                 >
                 </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="icon-opacity"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="icon-opacity"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="允许压盖">
               <h3>允许压盖</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['icon-allow-overlap']">{{
-                  menuShowList["icon-allow-overlap"]
-                }}</span>
+                menuShowList["icon-allow-overlap"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['icon-allow-overlap']"
-                  style="margin-top: 10px; display: flex"
+                v-if="menuButtonShowList['icon-allow-overlap']"
+                style="margin-top: 10px; display: flex"
               >
                 <el-switch
-                    v-model="layers[nowLayerIndex].layout['icon-allow-overlap']"
-                    @change="
+                  v-model="layers[nowLayerIndex].layout['icon-allow-overlap']"
+                  @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'icon-allow-overlap',
@@ -2499,26 +2490,26 @@
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="icon-allow-overlap"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="icon-allow-overlap"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="忽略放置">
               <h3>忽略放置</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['icon-ignore-placement']">{{
-                  menuShowList["icon-ignore-placement"]
-                }}</span>
+                menuShowList["icon-ignore-placement"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['icon-ignore-placement']"
-                  style="margin-top: 10px; display: flex"
+                v-if="menuButtonShowList['icon-ignore-placement']"
+                style="margin-top: 10px; display: flex"
               >
                 <el-switch
-                    v-model="
+                  v-model="
                     layers[nowLayerIndex].layout['icon-ignore-placement']
                   "
-                    @change="
+                  @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'icon-ignore-placement',
@@ -2530,24 +2521,24 @@
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="icon-ignore-placement"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="icon-ignore-placement"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="图标可选">
               <h3>图标可选</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['icon-optional']">{{
-                  menuShowList["icon-optional"]
-                }}</span>
+                menuShowList["icon-optional"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['icon-optional']"
-                  style="margin-top: 10px; display: flex"
+                v-if="menuButtonShowList['icon-optional']"
+                style="margin-top: 10px; display: flex"
               >
                 <el-switch
-                    v-model="layers[nowLayerIndex].layout['icon-optional']"
-                    @change="
+                  v-model="layers[nowLayerIndex].layout['icon-optional']"
+                  @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'icon-optional',
@@ -2559,59 +2550,59 @@
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="icon-optional"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="icon-optional"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="内边距">
               <h3>内边距（px）</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['icon-padding']">{{
-                  menuShowList["icon-padding"]
-                }}</span>
+                menuShowList["icon-padding"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['icon-padding']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['icon-padding']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-input-number
-                    v-model="layers[nowLayerIndex].layout['icon-padding']"
-                    @change="
+                  v-model="layers[nowLayerIndex].layout['icon-padding']"
+                  @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'icon-padding',
                       layers[nowLayerIndex].layout['icon-padding']
                     )
                   "
-                    :min="0"
-                    :max="99999"
-                    size="medium"
-                    label="描述文字"
+                  :min="0"
+                  :max="99999"
+                  size="medium"
+                  label="描述文字"
                 >
                 </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="icon-padding"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="icon-padding"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="偏移">
               <h3>偏移（iconsize）</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['icon-offset']">{{
-                  menuShowList["icon-offset"]
-                }}</span>
+                menuShowList["icon-offset"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['icon-offset']"
-                  style="margin-top: 10px; display: flex"
+                v-if="menuButtonShowList['icon-offset']"
+                style="margin-top: 10px; display: flex"
               >
                 <h4>x轴:&nbsp;</h4>
                 <el-input-number
-                    v-model="layers[nowLayerIndex].layout['icon-offset'][0]"
-                    :step="1"
-                    @change="
+                  v-model="layers[nowLayerIndex].layout['icon-offset'][0]"
+                  :step="1"
+                  @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'icon-offset',
@@ -2622,14 +2613,14 @@
                 </el-input-number>
               </el-row>
               <el-row
-                  v-if="menuButtonShowList['icon-offset']"
-                  style="display: flex"
+                v-if="menuButtonShowList['icon-offset']"
+                style="display: flex"
               >
                 <h4>y轴:&nbsp;</h4>
                 <el-input-number
-                    v-model="layers[nowLayerIndex].layout['icon-offset'][1]"
-                    :step="1"
-                    @change="
+                  v-model="layers[nowLayerIndex].layout['icon-offset'][1]"
+                  :step="1"
+                  @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'icon-offset',
@@ -2641,26 +2632,26 @@
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="icon-offset"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="icon-offset"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="平移">
               <h3>平移</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['icon-translate']">{{
-                  menuShowList["icon-translate"]
-                }}</span>
+                menuShowList["icon-translate"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['icon-translate']"
-                  style="margin-top: 10px; display: flex"
+                v-if="menuButtonShowList['icon-translate']"
+                style="margin-top: 10px; display: flex"
               >
                 <h4>x轴(px):&nbsp;</h4>
                 <el-input-number
-                    v-model="layers[nowLayerIndex].paint['icon-translate'][0]"
-                    :step="1"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['icon-translate'][0]"
+                  :step="1"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'icon-translate',
@@ -2671,14 +2662,14 @@
                 </el-input-number>
               </el-row>
               <el-row
-                  v-if="menuButtonShowList['icon-translate']"
-                  style="display: flex"
+                v-if="menuButtonShowList['icon-translate']"
+                style="display: flex"
               >
                 <h4>y轴(px):&nbsp;</h4>
                 <el-input-number
-                    v-model="layers[nowLayerIndex].paint['icon-translate'][1]"
-                    :step="1"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['icon-translate'][1]"
+                  :step="1"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'icon-translate',
@@ -2690,25 +2681,25 @@
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="icon-translate"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="icon-translate"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="平移参考">
               <h3>平移参考</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['icon-translate-anchor']">{{
-                  menuShowList["icon-translate-anchor"]
-                }}</span>
+                menuShowList["icon-translate-anchor"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['icon-translate-anchor']"
-                  style="margin-top: 10px; display: flex"
+                v-if="menuButtonShowList['icon-translate-anchor']"
+                style="margin-top: 10px; display: flex"
               >
                 <el-select
-                    v-model="layers[nowLayerIndex].paint['icon-translate-anchor']"
-                    placeholder="请选择"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['icon-translate-anchor']"
+                  placeholder="请选择"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'icon-translate-anchor',
@@ -2717,35 +2708,35 @@
                   "
                 >
                   <el-option
-                      v-for="item in ['map', 'viewport']"
-                      :key="item"
-                      :label="item"
-                      :value="item"
+                    v-for="item in ['map', 'viewport']"
+                    :key="item"
+                    :label="item"
+                    :value="item"
                   >
                   </el-option>
                 </el-select>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="icon-translate-anchor"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="icon-translate-anchor"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="图标锚点">
               <h3>图标锚点</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['icon-anchor']">{{
-                  menuShowList["icon-anchor"]
-                }}</span>
+                menuShowList["icon-anchor"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['icon-anchor']"
-                  style="margin-top: 10px; display: flex"
+                v-if="menuButtonShowList['icon-anchor']"
+                style="margin-top: 10px; display: flex"
               >
                 <el-select
-                    v-model="layers[nowLayerIndex].layout['icon-anchor']"
-                    placeholder="请选择"
-                    @change="
+                  v-model="layers[nowLayerIndex].layout['icon-anchor']"
+                  placeholder="请选择"
+                  @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'icon-anchor',
@@ -2754,7 +2745,7 @@
                   "
                 >
                   <el-option
-                      v-for="item in [
+                    v-for="item in [
                       'center',
                       'left',
                       'right',
@@ -2765,67 +2756,67 @@
                       'bottom-left',
                       'bottom-right',
                     ]"
-                      :key="item"
-                      :label="item"
-                      :value="item"
+                    :key="item"
+                    :label="item"
+                    :value="item"
                   >
                   </el-option>
                 </el-select>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="icon-anchor"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="icon-anchor"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="旋转角度">
               <h3>旋转角度（deg）</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['icon-rotate']">{{
-                  menuShowList["icon-rotate"]
-                }}</span>
+                menuShowList["icon-rotate"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['icon-rotate']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['icon-rotate']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-input-number
-                    v-model="layers[nowLayerIndex].layout['icon-rotate']"
-                    @change="
+                  v-model="layers[nowLayerIndex].layout['icon-rotate']"
+                  @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'icon-rotate',
                       layers[nowLayerIndex].layout['icon-rotate']
                     )
                   "
-                    :min="0"
-                    :max="99999"
-                    size="medium"
-                    label="描述文字"
+                  :min="0"
+                  :max="99999"
+                  size="medium"
+                  label="描述文字"
                 >
                 </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="icon-rotate"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="icon-rotate"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="倾斜对齐">
               <h3>倾斜对齐</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['icon-pitch-alignment']">{{
-                  menuShowList["icon-pitch-alignment"]
-                }}</span>
+                menuShowList["icon-pitch-alignment"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['icon-pitch-alignment']"
-                  style="margin-top: 10px; display: flex"
+                v-if="menuButtonShowList['icon-pitch-alignment']"
+                style="margin-top: 10px; display: flex"
               >
                 <el-select
-                    v-model="layers[nowLayerIndex].layout['icon-pitch-alignment']"
-                    placeholder="请选择"
-                    @change="
+                  v-model="layers[nowLayerIndex].layout['icon-pitch-alignment']"
+                  placeholder="请选择"
+                  @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'icon-pitch-alignment',
@@ -2834,37 +2825,37 @@
                   "
                 >
                   <el-option
-                      v-for="item in ['auto', 'map', 'viewport']"
-                      :key="item"
-                      :label="item"
-                      :value="item"
+                    v-for="item in ['auto', 'map', 'viewport']"
+                    :key="item"
+                    :label="item"
+                    :value="item"
                   >
                   </el-option>
                 </el-select>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="icon-pitch-alignment"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="icon-pitch-alignment"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="旋转对齐">
               <h3>旋转对齐</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['icon-rotation-alignment']">{{
-                  menuShowList["icon-rotation-alignment"]
-                }}</span>
+                menuShowList["icon-rotation-alignment"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['icon-rotation-alignment']"
-                  style="margin-top: 10px; display: flex"
+                v-if="menuButtonShowList['icon-rotation-alignment']"
+                style="margin-top: 10px; display: flex"
               >
                 <el-select
-                    v-model="
+                  v-model="
                     layers[nowLayerIndex].layout['icon-rotation-alignment']
                   "
-                    placeholder="请选择"
-                    @change="
+                  placeholder="请选择"
+                  @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'icon-rotation-alignment',
@@ -2873,60 +2864,60 @@
                   "
                 >
                   <el-option
-                      v-for="item in ['auto', 'map', 'viewport']"
-                      :key="item"
-                      :label="item"
-                      :value="item"
+                    v-for="item in ['auto', 'map', 'viewport']"
+                    :key="item"
+                    :label="item"
+                    :value="item"
                   >
                   </el-option>
                 </el-select>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="icon-rotation-alignment"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="icon-rotation-alignment"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
           </el-tabs>
           <el-tabs
-              class="symbolBox"
-              :before-leave="leaveTab"
-              v-if="editorShow == 'symbolEditorShow'"
-              v-show="!isSymbol"
-              type="border-card"
-              value="first"
-              tab-position="left"
+            class="symbolBox"
+            :before-leave="leaveTab"
+            v-if="editorShow == 'symbolEditorShow'"
+            v-show="!isSymbol"
+            type="border-card"
+            value="first"
+            tab-position="left"
           >
             <el-tab-pane label="标注字段" name="first">
               <h3>标注字段</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-field']">{{
-                  menuShowList["text-field"]
-                }}</span>
+                menuShowList["text-field"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['text-field']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['text-field']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-input
-                    v-model="textField"
-                    @change="
+                  v-model="textField"
+                  @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'text-field',
                       ['get', textField]
                     )
                   "
-                    placeholder="something"
+                  placeholder="something"
                 ></el-input>
                 <el-popover
-                    ref="fieldPopover"
-                    placement="right"
-                    width="400"
-                    trigger="click"
+                  ref="fieldPopover"
+                  placement="right"
+                  width="400"
+                  trigger="click"
                 >
                   <el-table
-                      :data="
+                    :data="
                       filterOptions.filter(
                         (data) =>
                           !textFieldSearch ||
@@ -2935,155 +2926,155 @@
                             .includes(textFieldSearch.toLowerCase())
                       )
                     "
-                      :cell-style="{ textAlign: 'left' }"
-                      height="400"
-                      @row-click="fieldSelect"
+                    :cell-style="{ textAlign: 'left' }"
+                    height="400"
+                    @row-click="fieldSelect"
                   >
                     <el-table-column prop="column_name" align="right">
                       <template slot="header">
                         <el-input
-                            v-model="textFieldSearch"
-                            size="mini"
-                            placeholder="搜索"
-                            prefix-icon="el-icon-search"
+                          v-model="textFieldSearch"
+                          size="mini"
+                          placeholder="搜索"
+                          prefix-icon="el-icon-search"
                         />
                       </template>
                     </el-table-column>
                   </el-table>
                   <el-button
-                      type="text"
-                      icon="el-icon-s-unfold"
-                      slot="reference"
+                    type="text"
+                    icon="el-icon-s-unfold"
+                    slot="reference"
                   ></el-button>
                 </el-popover>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="text-field"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-field"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="颜色">
               <h3>颜色</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-color']">{{
-                  menuShowList["text-color"]
-                }}</span>
+                menuShowList["text-color"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['text-color']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['text-color']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-color-picker
-                    v-model="layers[nowLayerIndex].paint['text-color']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['text-color']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'text-color',
                       layers[nowLayerIndex].paint['text-color']
                     )
                   "
-                    :predefine="predefineColors"
+                  :predefine="predefineColors"
                 >
                 </el-color-picker>
                 <el-input
-                    v-model="layers[nowLayerIndex].paint['text-color']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['text-color']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'text-color',
                       layers[nowLayerIndex].paint['text-color']
                     )
                   "
-                    placeholder="something"
+                  placeholder="something"
                 ></el-input>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="text-color"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-color"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="不透明度">
               <h3>不透明度</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-opacity']">{{
-                  menuShowList["text-opacity"]
-                }}</span>
+                menuShowList["text-opacity"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['text-opacity']"
-                  style="margin-top: 10px"
+                v-if="menuButtonShowList['text-opacity']"
+                style="margin-top: 10px"
               >
                 <el-slider
-                    v-model="layers[nowLayerIndex].paint['text-opacity']"
-                    :min="0"
-                    :max="1"
-                    :marks="{ 0: '0', 0.5: '0.5', 1: '1' }"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['text-opacity']"
+                  :min="0"
+                  :max="1"
+                  :marks="{ 0: '0', 0.5: '0.5', 1: '1' }"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'text-opacity',
                       layers[nowLayerIndex].paint['text-opacity']
                     )
                   "
-                    :step="0.1"
+                  :step="0.1"
                 >
                 </el-slider>
-                <br/>
+                <br />
                 <el-input-number
-                    v-model="layers[nowLayerIndex].paint['text-opacity']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['text-opacity']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'text-opacity',
                       layers[nowLayerIndex].paint['text-opacity']
                     )
                   "
-                    :min="0"
-                    :max="1"
-                    :step="0.1"
-                    size="medium"
-                    label="描述文字"
+                  :min="0"
+                  :max="1"
+                  :step="0.1"
+                  size="medium"
+                  label="描述文字"
                 >
                 </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="text-opacity"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-opacity"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="字体">
               <h3>字体</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-font']">{{
-                  menuShowList["text-font"]
-                }}</span>
+                menuShowList["text-font"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['text-font']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['text-font']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-input
-                    v-model="layers[nowLayerIndex].layout['text-font'][0]"
-                    @change="
+                  v-model="layers[nowLayerIndex].layout['text-font'][0]"
+                  @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'text-font',
                       layers[nowLayerIndex].layout['text-font']
                     )
                   "
-                    placeholder="something"
+                  placeholder="something"
                 ></el-input>
                 <el-popover
-                    ref="fontPopover"
-                    placement="right"
-                    width="400"
-                    trigger="click"
+                  ref="fontPopover"
+                  placement="right"
+                  width="400"
+                  trigger="click"
                 >
                   <el-table
-                      :data="
+                    :data="
                       fontList.filter(
                         (data) =>
                           !fontSearch ||
@@ -3093,14 +3084,14 @@
                             data.type == 'offline')
                       )
                     "
-                      :cell-style="{ textAlign: 'left' }"
-                      height="400"
-                      @row-click="fontSelect"
+                    :cell-style="{ textAlign: 'left' }"
+                    height="400"
+                    @row-click="fontSelect"
                   >
                     <el-table-column prop="name">
                       <template slot-scope="scope">
                         <span
-                            :style="{
+                          :style="{
                             'font-family': scope.row.name,
                           }"
                         >
@@ -3110,10 +3101,10 @@
 
                       <template slot="header">
                         <el-input
-                            v-model="fontSearch"
-                            size="mini"
-                            placeholder="搜索"
-                            prefix-icon="el-icon-search"
+                          v-model="fontSearch"
+                          size="mini"
+                          placeholder="搜索"
+                          prefix-icon="el-icon-search"
                         >
                         </el-input>
                       </template>
@@ -3121,66 +3112,66 @@
                   </el-table>
 
                   <el-button
-                      type="text"
-                      icon="el-icon-s-unfold"
-                      slot="reference"
+                    type="text"
+                    icon="el-icon-s-unfold"
+                    slot="reference"
                   ></el-button>
                 </el-popover>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="text-font"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-font"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="字体大小">
               <h3>字体大小（px）</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-size']">{{
-                  menuShowList["text-size"]
-                }}</span>
+                menuShowList["text-size"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['text-size']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['text-size']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-input-number
-                    v-model="layers[nowLayerIndex].layout['text-size']"
-                    @change="
+                  v-model="layers[nowLayerIndex].layout['text-size']"
+                  @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'text-size',
                       layers[nowLayerIndex].layout['text-size']
                     )
                   "
-                    :min="0"
-                    :max="99999"
-                    size="medium"
-                    label="描述文字"
+                  :min="0"
+                  :max="99999"
+                  size="medium"
+                  label="描述文字"
                 >
                 </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="text-size"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-size"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="放置位置">
               <h3>放置位置</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['symbol-placement']">{{
-                  menuShowList["symbol-placement"]
-                }}</span>
+                menuShowList["symbol-placement"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['symbol-placement']"
-                  style="margin-top: 10px; display: flex"
+                v-if="menuButtonShowList['symbol-placement']"
+                style="margin-top: 10px; display: flex"
               >
                 <el-select
-                    v-model="layers[nowLayerIndex].layout['symbol-placement']"
-                    placeholder="请选择"
-                    @change="
+                  v-model="layers[nowLayerIndex].layout['symbol-placement']"
+                  placeholder="请选择"
+                  @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'symbol-placement',
@@ -3189,35 +3180,35 @@
                   "
                 >
                   <el-option
-                      v-for="item in ['point', 'line', 'line-center']"
-                      :key="item"
-                      :label="item"
-                      :value="item"
+                    v-for="item in ['point', 'line', 'line-center']"
+                    :key="item"
+                    :label="item"
+                    :value="item"
                   >
                   </el-option>
                 </el-select>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="symbol-placement"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="symbol-placement"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="图标锚点">
               <h3>图标锚点</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-anchor']">{{
-                  menuShowList["text-anchor"]
-                }}</span>
+                menuShowList["text-anchor"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['text-anchor']"
-                  style="margin-top: 10px; display: flex"
+                v-if="menuButtonShowList['text-anchor']"
+                style="margin-top: 10px; display: flex"
               >
                 <el-select
-                    v-model="layers[nowLayerIndex].layout['text-anchor']"
-                    placeholder="请选择"
-                    @change="
+                  v-model="layers[nowLayerIndex].layout['text-anchor']"
+                  placeholder="请选择"
+                  @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'text-anchor',
@@ -3226,7 +3217,7 @@
                   "
                 >
                   <el-option
-                      v-for="item in [
+                    v-for="item in [
                       'center',
                       'left',
                       'right',
@@ -3237,34 +3228,34 @@
                       'bottom-left',
                       'bottom-right',
                     ]"
-                      :key="item"
-                      :label="item"
-                      :value="item"
+                    :key="item"
+                    :label="item"
+                    :value="item"
                   >
                   </el-option>
                 </el-select>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="text-anchor"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-anchor"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="文本对齐">
               <h3>文本对齐</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-justify']">{{
-                  menuShowList["text-justify"]
-                }}</span>
+                menuShowList["text-justify"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['text-justify']"
-                  style="margin-top: 10px; display: flex"
+                v-if="menuButtonShowList['text-justify']"
+                style="margin-top: 10px; display: flex"
               >
                 <el-select
-                    v-model="layers[nowLayerIndex].layout['text-justify']"
-                    placeholder="请选择"
-                    @change="
+                  v-model="layers[nowLayerIndex].layout['text-justify']"
+                  placeholder="请选择"
+                  @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'text-justify',
@@ -3273,133 +3264,133 @@
                   "
                 >
                   <el-option
-                      v-for="item in ['auto', 'center', 'right', 'left']"
-                      :key="item"
-                      :label="item"
-                      :value="item"
+                    v-for="item in ['auto', 'center', 'right', 'left']"
+                    :key="item"
+                    :label="item"
+                    :value="item"
                   >
                   </el-option>
                 </el-select>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="text-justify"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-justify"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="字符边距">
               <h3>字符边距（em）</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-letter-spacing']">{{
-                  menuShowList["text-letter-spacing"]
-                }}</span>
+                menuShowList["text-letter-spacing"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['text-letter-spacing']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['text-letter-spacing']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-input-number
-                    v-model="layers[nowLayerIndex].layout['text-letter-spacing']"
-                    @change="
+                  v-model="layers[nowLayerIndex].layout['text-letter-spacing']"
+                  @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'text-letter-spacing',
                       layers[nowLayerIndex].layout['text-letter-spacing']
                     )
                   "
-                    :min="0"
-                    :max="99999"
-                    size="medium"
-                    label="描述文字"
+                  :min="0"
+                  :max="99999"
+                  size="medium"
+                  label="描述文字"
                 >
                 </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="text-letter-spacing"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-letter-spacing"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="行高">
               <h3>行高（em）</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-line-height']">{{
-                  menuShowList["text-line-height"]
-                }}</span>
+                menuShowList["text-line-height"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['text-line-height']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['text-line-height']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-input-number
-                    v-model="layers[nowLayerIndex].layout['text-line-height']"
-                    @change="
+                  v-model="layers[nowLayerIndex].layout['text-line-height']"
+                  @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'text-line-height',
                       layers[nowLayerIndex].layout['text-line-height']
                     )
                   "
-                    :min="0"
-                    :max="99999"
-                    size="medium"
-                    label="描述文字"
+                  :min="0"
+                  :max="99999"
+                  size="medium"
+                  label="描述文字"
                 >
                 </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="text-line-height"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-line-height"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="最大宽度">
               <h3>最大宽度（em）</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-max-width']">{{
-                  menuShowList["text-max-width"]
-                }}</span>
+                menuShowList["text-max-width"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['text-max-width']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['text-max-width']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-input-number
-                    v-model="layers[nowLayerIndex].layout['text-max-width']"
-                    @change="
+                  v-model="layers[nowLayerIndex].layout['text-max-width']"
+                  @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'text-max-width',
                       layers[nowLayerIndex].layout['text-max-width']
                     )
                   "
-                    :min="0"
-                    :max="99999"
-                    size="medium"
-                    label="描述文字"
+                  :min="0"
+                  :max="99999"
+                  size="medium"
+                  label="描述文字"
                 >
                 </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="text-max-width"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-max-width"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="允许压盖">
               <h3>允许压盖</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-allow-overlap']">{{
-                  menuShowList["text-allow-overlap"]
-                }}</span>
+                menuShowList["text-allow-overlap"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['text-allow-overlap']"
-                  style="margin-top: 10px; display: flex"
+                v-if="menuButtonShowList['text-allow-overlap']"
+                style="margin-top: 10px; display: flex"
               >
                 <el-switch
-                    v-model="layers[nowLayerIndex].layout['text-allow-overlap']"
-                    @change="
+                  v-model="layers[nowLayerIndex].layout['text-allow-overlap']"
+                  @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'text-allow-overlap',
@@ -3411,26 +3402,26 @@
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="text-allow-overlap"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-allow-overlap"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="忽略放置">
               <h3>忽略放置</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-ignore-placement']">{{
-                  menuShowList["text-ignore-placement"]
-                }}</span>
+                menuShowList["text-ignore-placement"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['text-ignore-placement']"
-                  style="margin-top: 10px; display: flex"
+                v-if="menuButtonShowList['text-ignore-placement']"
+                style="margin-top: 10px; display: flex"
               >
                 <el-switch
-                    v-model="
+                  v-model="
                     layers[nowLayerIndex].layout['text-ignore-placement']
                   "
-                    @change="
+                  @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'text-ignore-placement',
@@ -3442,24 +3433,24 @@
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="text-ignore-placement"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-ignore-placement"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="标注可选">
               <h3>标注可选</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-optional']">{{
-                  menuShowList["text-optional"]
-                }}</span>
+                menuShowList["text-optional"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['text-optional']"
-                  style="margin-top: 10px; display: flex"
+                v-if="menuButtonShowList['text-optional']"
+                style="margin-top: 10px; display: flex"
               >
                 <el-switch
-                    v-model="layers[nowLayerIndex].layout['text-optional']"
-                    @change="
+                  v-model="layers[nowLayerIndex].layout['text-optional']"
+                  @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'text-optional',
@@ -3471,25 +3462,25 @@
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="text-optional"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-optional"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="大小写转换">
               <h3>大小写转换</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-transform']">{{
-                  menuShowList["text-transform"]
-                }}</span>
+                menuShowList["text-transform"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['text-transform']"
-                  style="margin-top: 10px; display: flex"
+                v-if="menuButtonShowList['text-transform']"
+                style="margin-top: 10px; display: flex"
               >
                 <el-select
-                    v-model="layers[nowLayerIndex].layout['text-transform']"
-                    placeholder="请选择"
-                    @change="
+                  v-model="layers[nowLayerIndex].layout['text-transform']"
+                  placeholder="请选择"
+                  @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'text-transform',
@@ -3498,69 +3489,69 @@
                   "
                 >
                   <el-option
-                      v-for="item in ['none', 'uppercase', 'lowercase']"
-                      :key="item"
-                      :label="item"
-                      :value="item"
+                    v-for="item in ['none', 'uppercase', 'lowercase']"
+                    :key="item"
+                    :label="item"
+                    :value="item"
                   >
                   </el-option>
                 </el-select>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="text-transform"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-transform"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="内边距">
               <h3>内边距（px）</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-padding']">{{
-                  menuShowList["text-padding"]
-                }}</span>
+                menuShowList["text-padding"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['text-padding']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['text-padding']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-input-number
-                    v-model="layers[nowLayerIndex].layout['text-padding']"
-                    @change="
+                  v-model="layers[nowLayerIndex].layout['text-padding']"
+                  @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'text-padding',
                       layers[nowLayerIndex].layout['text-padding']
                     )
                   "
-                    :min="0"
-                    :max="99999"
-                    size="medium"
-                    label="描述文字"
+                  :min="0"
+                  :max="99999"
+                  size="medium"
+                  label="描述文字"
                 >
                 </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="text-padding"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-padding"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="偏移">
               <h3>偏移(em)</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-offset']">{{
-                  menuShowList["text-offset"]
-                }}</span>
+                menuShowList["text-offset"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['text-offset']"
-                  style="margin-top: 10px; display: flex"
+                v-if="menuButtonShowList['text-offset']"
+                style="margin-top: 10px; display: flex"
               >
                 <h4>x轴:&nbsp;</h4>
                 <el-input-number
-                    v-model="layers[nowLayerIndex].layout['text-offset'][0]"
-                    :step="1"
-                    @change="
+                  v-model="layers[nowLayerIndex].layout['text-offset'][0]"
+                  :step="1"
+                  @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'text-offset',
@@ -3571,14 +3562,14 @@
                 </el-input-number>
               </el-row>
               <el-row
-                  v-if="menuButtonShowList['text-offset']"
-                  style="display: flex"
+                v-if="menuButtonShowList['text-offset']"
+                style="display: flex"
               >
                 <h4>y轴:&nbsp;</h4>
                 <el-input-number
-                    v-model="layers[nowLayerIndex].layout['text-offset'][1]"
-                    :step="1"
-                    @change="
+                  v-model="layers[nowLayerIndex].layout['text-offset'][1]"
+                  :step="1"
+                  @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'text-offset',
@@ -3590,26 +3581,26 @@
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="text-offset"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-offset"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="平移">
               <h3>平移(px)</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-translate']">{{
-                  menuShowList["text-translate"]
-                }}</span>
+                menuShowList["text-translate"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['text-translate']"
-                  style="margin-top: 10px; display: flex"
+                v-if="menuButtonShowList['text-translate']"
+                style="margin-top: 10px; display: flex"
               >
                 <h4>x轴(px):&nbsp;</h4>
                 <el-input-number
-                    v-model="layers[nowLayerIndex].paint['text-translate'][0]"
-                    :step="1"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['text-translate'][0]"
+                  :step="1"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'text-translate',
@@ -3620,14 +3611,14 @@
                 </el-input-number>
               </el-row>
               <el-row
-                  v-if="menuButtonShowList['text-translate']"
-                  style="display: flex"
+                v-if="menuButtonShowList['text-translate']"
+                style="display: flex"
               >
                 <h4>y轴(px):&nbsp;</h4>
                 <el-input-number
-                    v-model="layers[nowLayerIndex].paint['text-translate'][1]"
-                    :step="1"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['text-translate'][1]"
+                  :step="1"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'text-translate',
@@ -3639,58 +3630,58 @@
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="text-translate"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-translate"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="旋转角度">
               <h3>旋转角度（deg）</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-rotate']">{{
-                  menuShowList["text-rotate"]
-                }}</span>
+                menuShowList["text-rotate"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['text-rotate']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['text-rotate']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-input-number
-                    v-model="layers[nowLayerIndex].layout['text-rotate']"
-                    @change="
+                  v-model="layers[nowLayerIndex].layout['text-rotate']"
+                  @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'text-rotate',
                       layers[nowLayerIndex].layout['text-rotate']
                     )
                   "
-                    :min="0"
-                    :max="99999"
-                    size="medium"
-                    label="描述文字"
+                  :min="0"
+                  :max="99999"
+                  size="medium"
+                  label="描述文字"
                 >
                 </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="text-rotate"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-rotate"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="倾斜对齐">
               <h3>倾斜对齐</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-pitch-alignment']">{{
-                  menuShowList["text-pitch-alignment"]
-                }}</span>
+                menuShowList["text-pitch-alignment"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['text-pitch-alignment']"
-                  style="margin-top: 10px; display: flex"
+                v-if="menuButtonShowList['text-pitch-alignment']"
+                style="margin-top: 10px; display: flex"
               >
                 <el-select
-                    v-model="layers[nowLayerIndex].layout['text-pitch-alignment']"
-                    placeholder="请选择"
-                    @change="
+                  v-model="layers[nowLayerIndex].layout['text-pitch-alignment']"
+                  placeholder="请选择"
+                  @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'text-pitch-alignment',
@@ -3699,37 +3690,37 @@
                   "
                 >
                   <el-option
-                      v-for="item in ['auto', 'map', 'viewport']"
-                      :key="item"
-                      :label="item"
-                      :value="item"
+                    v-for="item in ['auto', 'map', 'viewport']"
+                    :key="item"
+                    :label="item"
+                    :value="item"
                   >
                   </el-option>
                 </el-select>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="text-pitch-alignment"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-pitch-alignment"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="旋转对齐">
               <h3>旋转对齐</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-rotation-alignment']">{{
-                  menuShowList["text-rotation-alignment"]
-                }}</span>
+                menuShowList["text-rotation-alignment"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['text-rotation-alignment']"
-                  style="margin-top: 10px; display: flex"
+                v-if="menuButtonShowList['text-rotation-alignment']"
+                style="margin-top: 10px; display: flex"
               >
                 <el-select
-                    v-model="
+                  v-model="
                     layers[nowLayerIndex].layout['text-rotation-alignment']
                   "
-                    placeholder="请选择"
-                    @change="
+                  placeholder="请选择"
+                  @change="
                     handleLayoutChange(
                       layers[nowLayerIndex]['id'],
                       'text-rotation-alignment',
@@ -3738,163 +3729,163 @@
                   "
                 >
                   <el-option
-                      v-for="item in ['auto', 'map', 'viewport']"
-                      :key="item"
-                      :label="item"
-                      :value="item"
+                    v-for="item in ['auto', 'map', 'viewport']"
+                    :key="item"
+                    :label="item"
+                    :value="item"
                   >
                   </el-option>
                 </el-select>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="text-rotation-alignment"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-rotation-alignment"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="掩膜颜色">
               <h3>颜色</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-halo-color']">{{
-                  menuShowList["text-halo-color"]
-                }}</span>
+                menuShowList["text-halo-color"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['text-halo-color']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['text-halo-color']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-color-picker
-                    v-model="layers[nowLayerIndex].paint['text-halo-color']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['text-halo-color']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'text-halo-color',
                       layers[nowLayerIndex].paint['text-halo-color']
                     )
                   "
-                    :predefine="predefineColors"
+                  :predefine="predefineColors"
                 >
                 </el-color-picker>
                 <el-input
-                    v-model="layers[nowLayerIndex].paint['text-halo-color']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['text-halo-color']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'text-halo-color',
                       layers[nowLayerIndex].paint['text-halo-color']
                     )
                   "
-                    placeholder="something"
+                  placeholder="something"
                 ></el-input>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="text-halo-color"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-halo-color"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="掩膜宽度">
               <h3>掩膜宽度（px）</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-halo-width']">{{
-                  menuShowList["text-halo-width"]
-                }}</span>
+                menuShowList["text-halo-width"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['text-halo-width']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['text-halo-width']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-input-number
-                    v-model="layers[nowLayerIndex].paint['text-halo-width']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['text-halo-width']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'text-halo-width',
                       layers[nowLayerIndex].paint['text-halo-width']
                     )
                   "
-                    :min="0"
-                    :max="99999"
-                    size="medium"
-                    label="描述文字"
+                  :min="0"
+                  :max="99999"
+                  size="medium"
+                  label="描述文字"
                 >
                 </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="text-halo-width"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-halo-width"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="掩膜模糊">
               <h3>掩膜模糊（px）</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['text-halo-blur']">{{
-                  menuShowList["text-halo-blur"]
-                }}</span>
+                menuShowList["text-halo-blur"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['text-halo-blur']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['text-halo-blur']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-input-number
-                    v-model="layers[nowLayerIndex].paint['text-halo-blur']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['text-halo-blur']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'text-halo-blur',
                       layers[nowLayerIndex].paint['text-halo-blur']
                     )
                   "
-                    :min="0"
-                    :max="99999"
-                    size="medium"
-                    label="描述文字"
+                  :min="0"
+                  :max="99999"
+                  size="medium"
+                  label="描述文字"
                 >
                 </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="text-halo-blur"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="text-halo-blur"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
           </el-tabs>
           <!-- 背景图层编辑面板 -->
           <el-tabs
-              :before-leave="leaveTab"
-              v-if="editorShow == 'backgroundEditorShow'"
-              type="border-card"
-              value="first"
-              tab-position="left"
+            :before-leave="leaveTab"
+            v-if="editorShow == 'backgroundEditorShow'"
+            type="border-card"
+            value="first"
+            tab-position="left"
           >
             <el-tab-pane label="颜色" name="first">
               <h3>填充颜色</h3>
               &nbsp;
               <el-row style="display: flex; margin-top: 10px">
                 <el-color-picker
-                    v-model="layers[nowLayerIndex].paint['background-color']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['background-color']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'background-color',
                       layers[nowLayerIndex].paint['background-color']
                     )
                   "
-                    :predefine="predefineColors"
+                  :predefine="predefineColors"
                 >
                 </el-color-picker>
                 <el-input
-                    v-model="layers[nowLayerIndex].paint['background-color']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['background-color']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'background-color',
                       layers[nowLayerIndex].paint['background-color']
                     )
                   "
-                    placeholder="something"
+                  placeholder="something"
                 ></el-input>
               </el-row>
               <el-divider></el-divider>
@@ -3904,35 +3895,35 @@
               &nbsp;
               <el-row style="margin-top: 10px">
                 <el-slider
-                    v-model="layers[nowLayerIndex].paint['background-opacity']"
-                    :min="0"
-                    :max="1"
-                    :marks="{ 0: '0', 0.5: '0.5', 1: '1' }"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['background-opacity']"
+                  :min="0"
+                  :max="1"
+                  :marks="{ 0: '0', 0.5: '0.5', 1: '1' }"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'background-opacity',
                       layers[nowLayerIndex].paint['background-opacity']
                     )
                   "
-                    :step="0.1"
+                  :step="0.1"
                 >
                 </el-slider>
-                <br/>
+                <br />
                 <el-input-number
-                    v-model="layers[nowLayerIndex].paint['background-opacity']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['background-opacity']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'background-opacity',
                       layers[nowLayerIndex].paint['background-opacity']
                     )
                   "
-                    :min="0"
-                    :max="1"
-                    :step="0.1"
-                    size="medium"
-                    label="描述文字"
+                  :min="0"
+                  :max="1"
+                  :step="0.1"
+                  size="medium"
+                  label="描述文字"
                 >
                 </el-input-number>
               </el-row>
@@ -3941,11 +3932,11 @@
           </el-tabs>
           <!-- 热力图 -->
           <el-tabs
-              :before-leave="leaveTab"
-              v-if="editorShow == 'heatMapEditorShow'"
-              type="border-card"
-              value="first"
-              tab-position="left"
+            :before-leave="leaveTab"
+            v-if="editorShow == 'heatMapEditorShow'"
+            type="border-card"
+            value="first"
+            tab-position="left"
           >
             <!-- <el-tab-pane label="颜色" name="first">
               <h3>热力图颜色渲染</h3>
@@ -3992,160 +3983,160 @@
               <h3>不透明度</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['heatmap-opacity']">{{
-                  menuShowList["heatmap-opacity"]
-                }}</span>
+                menuShowList["heatmap-opacity"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['heatmap-opacity']"
-                  style="margin-top: 10px"
+                v-if="menuButtonShowList['heatmap-opacity']"
+                style="margin-top: 10px"
               >
                 <el-slider
-                    v-model="layers[nowLayerIndex].paint['heatmap-opacity']"
-                    :min="0"
-                    :max="1"
-                    :marks="{ 0: '0', 0.5: '0.5', 1: '1' }"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['heatmap-opacity']"
+                  :min="0"
+                  :max="1"
+                  :marks="{ 0: '0', 0.5: '0.5', 1: '1' }"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'heatmap-opacity',
                       layers[nowLayerIndex].paint['heatmap-opacity']
                     )
                   "
-                    :step="0.1"
+                  :step="0.1"
                 >
                 </el-slider>
-                <br/>
+                <br />
                 <el-input-number
-                    v-model="layers[nowLayerIndex].paint['heatmap-opacity']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['heatmap-opacity']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'heatmap-opacity',
                       layers[nowLayerIndex].paint['heatmap-opacity']
                     )
                   "
-                    :min="0"
-                    :max="1"
-                    :step="0.1"
-                    size="medium"
-                    label="描述文字"
+                  :min="0"
+                  :max="1"
+                  :step="0.1"
+                  size="medium"
+                  label="描述文字"
                 >
                 </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="heatmap-opacity"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="heatmap-opacity"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="半径" name="third">
               <h3>半径</h3>
               &nbsp;
               <span v-if="!menuButtonShowList['heatmap-radius']">{{
-                  menuShowList["heatmap-radius"]
-                }}</span>
+                menuShowList["heatmap-radius"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['heatmap-radius']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['heatmap-radius']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-input-number
-                    v-model="layers[nowLayerIndex].paint['heatmap-radius']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['heatmap-radius']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'heatmap-radius',
                       layers[nowLayerIndex].paint['heatmap-radius']
                     )
                   "
-                    :min="0"
-                    :max="99999"
-                    size="medium"
-                    label="描述文字"
+                  :min="0"
+                  :max="99999"
+                  size="medium"
+                  label="描述文字"
                 >
                 </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="heatmap-radius"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="heatmap-radius"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="权重" name="forth">
               <h3>权重</h3>
               &nbsp;
-              <br/>
+              <br />
               <span v-if="!menuButtonShowList['heatmap-weight']">{{
-                  menuShowList["heatmap-weight"]
-                }}</span>
+                menuShowList["heatmap-weight"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['heatmap-weight']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['heatmap-weight']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-input-number
-                    v-model="layers[nowLayerIndex].paint['heatmap-weight']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['heatmap-weight']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'heatmap-weight',
                       layers[nowLayerIndex].paint['heatmap-weight']
                     )
                   "
-                    :min="0"
-                    :max="99999"
-                    size="medium"
-                    label="描述文字"
+                  :min="0"
+                  :max="99999"
+                  size="medium"
+                  label="描述文字"
                 >
                 </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="heatmap-weight"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="heatmap-weight"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
             <el-tab-pane label="密度" name="fifth">
               <h3>密度</h3>
               &nbsp;
-              <br/>
+              <br />
               <span v-if="!menuButtonShowList['heatmap-intensity']">{{
-                  menuShowList["heatmap-intensity"]
-                }}</span>
+                menuShowList["heatmap-intensity"]
+              }}</span>
               <el-row
-                  v-if="menuButtonShowList['heatmap-intensity']"
-                  style="display: flex; margin-top: 10px"
+                v-if="menuButtonShowList['heatmap-intensity']"
+                style="display: flex; margin-top: 10px"
               >
                 <el-input-number
-                    v-model="layers[nowLayerIndex].paint['heatmap-intensity']"
-                    @change="
+                  v-model="layers[nowLayerIndex].paint['heatmap-intensity']"
+                  @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
                       'heatmap-intensity',
                       layers[nowLayerIndex].paint['heatmap-intensity']
                     )
                   "
-                    :min="0"
-                    :max="99999"
-                    size="medium"
-                    label="描述文字"
+                  :min="0"
+                  :max="99999"
+                  size="medium"
+                  label="描述文字"
                 >
                 </el-input-number>
               </el-row>
               <el-divider></el-divider>
               <ConditionRender
-                  :layerSelect="layers[nowLayerIndex]"
-                  tab="heatmap-intensity"
-                  @callback="callback"
+                :layerSelect="layers[nowLayerIndex]"
+                tab="heatmap-intensity"
+                @callback="callback"
               ></ConditionRender>
             </el-tab-pane>
           </el-tabs>
         </el-tab-pane>
 
         <el-tab-pane
-            v-if="editorShow != 'backgroundEditorShow'"
-            label="数据设置"
-            name="second"
+          v-if="editorShow != 'backgroundEditorShow'"
+          label="数据设置"
+          name="second"
         >
           <h4>数据源配置</h4>
           <el-form label-position="right" label-width="100px">
@@ -4160,12 +4151,12 @@
             </el-form-item>
             <el-form-item label="图层类型">
               <el-select
-                  v-model="layers[nowLayerIndex].type"
-                  placeholder="请选择图层类型"
-                  @change="layerTypeChange"
+                v-model="layers[nowLayerIndex].type"
+                placeholder="请选择图层类型"
+                @change="layerTypeChange"
               >
                 <el-option
-                    v-for="item in [
+                  v-for="item in [
                     { value: 'circle', label: '圆(circle)' },
                     { value: 'symbol', label: '符号(symbol)' },
                     { value: 'line', label: '线(line)' },
@@ -4177,9 +4168,9 @@
                     { value: 'background', label: '背景(background)' },
                     { value: 'heatmap', label: '热力图(heatmap)' },
                   ]"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
                 >
                 </el-option>
               </el-select>
@@ -4192,67 +4183,67 @@
               &nbsp;
               <el-select v-model="filterWay" placeholder="请选择" size="small">
                 <el-option
-                    v-for="item in [
+                  v-for="item in [
                     { value: 'all', label: '满足所有条件' },
                     { value: 'any', label: '满足任意条件' },
                     { value: 'none', label: '不满足任意条件' },
                   ]"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
                 >
                 </el-option>
               </el-select>
             </el-row>
-            <br/>
+            <br />
             <el-row
-                v-for="(item, index) in filterCondition"
-                :key="index"
-                class="filterBox"
+              v-for="(item, index) in filterCondition"
+              :key="index"
+              class="filterBox"
             >
               <el-button
-                  type="text"
-                  icon="el-icon-remove-outline"
-                  @click="filterRemove(index)"
+                type="text"
+                icon="el-icon-remove-outline"
+                @click="filterRemove(index)"
               ></el-button>
               <el-col :span="6">
                 <el-select
-                    :span="2"
-                    v-model="filterCondition[index]['option']"
-                    placeholder="请选择"
-                    size="small"
-                    @change="filterValueInit(index)"
+                  :span="2"
+                  v-model="filterCondition[index]['option']"
+                  placeholder="请选择"
+                  size="small"
+                  @change="filterValueInit(index)"
                 >
                   <el-option
-                      v-for="item in filterOptions"
-                      :key="item['column_name']"
-                      :label="item['column_name']"
-                      :value="item['column_name']"
+                    v-for="item in filterOptions"
+                    :key="item['column_name']"
+                    :label="item['column_name']"
+                    :value="item['column_name']"
                   >
                   </el-option>
                 </el-select>
               </el-col>
               <el-col :span="5">
                 <el-select
-                    v-model="filterCondition[index]['type']"
-                    placeholder="=="
-                    size="small"
+                  v-model="filterCondition[index]['type']"
+                  placeholder="=="
+                  size="small"
                 >
                   <el-option
-                      v-for="item in filterTypes"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value"
+                    v-for="item in filterTypes"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
                   >
                   </el-option>
                 </el-select>
               </el-col>
               <el-col :span="10">
                 <el-input
-                    placeholder=""
-                    v-model="filterCondition[index]['value']"
-                    size="small"
-                    clearable
+                  placeholder=""
+                  v-model="filterCondition[index]['value']"
+                  size="small"
+                  clearable
                 >
                   <template>
                     <i class="el-icon-circle-plus"></i>
@@ -4261,14 +4252,14 @@
               </el-col>
               <el-popover placement="right" width="400" trigger="click">
                 <el-button
-                    size="mini"
-                    type="primary"
-                    @click="filterConfirm"
-                    style="position: absolute; top: 24px; z-index: 100"
-                >筛选
+                  size="mini"
+                  type="primary"
+                  @click="filterConfirm"
+                  style="position: absolute; top: 24px; z-index: 100"
+                  >筛选
                 </el-button>
                 <el-table
-                    :data="
+                  :data="
                     filterValueSelect.filter(
                       (data) =>
                         !filterSearch ||
@@ -4277,58 +4268,56 @@
                           .includes(filterSearch.toLowerCase())
                     )
                   "
-                    @row-click="handleFilter"
-                    row-key="id"
-                    :highlight-current-row="true"
-                    :cell-style="{ textAlign: 'left' }"
-                    height="300"
+                  @row-click="handleFilter"
+                  row-key="id"
+                  :highlight-current-row="true"
+                  :cell-style="{ textAlign: 'left' }"
+                  height="300"
                 >
                   <el-table-column
-                      :prop="filterOptionSelectList[index]"
-                      align="right"
+                    :prop="filterOptionSelectList[index]"
+                    align="right"
                   >
                   </el-table-column>
                   <el-table-column align="right">
                     <template slot="header">
                       <el-input
-                          v-model="filterSearch"
-                          size="mini"
-                          placeholder="搜索"
-                          prefix-icon="el-icon-search"
+                        v-model="filterSearch"
+                        size="mini"
+                        placeholder="搜索"
+                        prefix-icon="el-icon-search"
                       />
                     </template>
                   </el-table-column>
                 </el-table>
                 <el-pagination
-                    small
-                    @current-change="handleCurrentChangeFilter"
-                    :current-page="filterSearchPage"
-                    :page-size="pageSizeFilter"
-                    layout="total, prev, pager, next"
-                    :total="totalDataCountFilter"
-                    class="flexRowCenter"
+                  small
+                  @current-change="handleCurrentChangeFilter"
+                  :current-page="filterSearchPage"
+                  :page-size="pageSizeFilter"
+                  layout="total, prev, pager, next"
+                  :total="totalDataCountFilter"
+                  class="flexRowCenter"
                 >
                 </el-pagination>
                 <el-button
-                    type="text"
-                    icon="el-icon-circle-plus"
-                    slot="reference"
-                    @click="handleFilterValue(item, index)"
+                  type="text"
+                  icon="el-icon-circle-plus"
+                  slot="reference"
+                  @click="handleFilterValue(item, index)"
                 ></el-button>
               </el-popover>
             </el-row>
             <el-col v-if="filterCondition.length < 1" class="displayBox"
-            >未设置过滤条件
-            </el-col
+              >未设置过滤条件</el-col
             >
             <el-button
-                type="text"
-                icon="el-icon-circle-plus-outline"
-                @click="
+              type="text"
+              icon="el-icon-circle-plus-outline"
+              @click="
                 filterCondition.push({ options: '', type: '==', value: '' })
               "
-            >添加过滤条件
-            </el-button
+              >添加过滤条件</el-button
             >
             <el-divider></el-divider>
           </el-row>
@@ -4336,33 +4325,33 @@
           <el-form label-position="top">
             <el-form-item label="最小级别">
               <el-slider
-                  :max="layers[nowLayerIndex]['maxzoom']"
-                  :min="parseInt(0)"
-                  v-model="layers[nowLayerIndex]['minzoom']"
-                  @change="
+                :max="layers[nowLayerIndex]['maxzoom']"
+                :min="parseInt(0)"
+                v-model="layers[nowLayerIndex]['minzoom']"
+                @change="
                   handleZoomChange(
                     layers[nowLayerIndex]['id'],
                     layers[nowLayerIndex]['minzoom'],
                     layers[nowLayerIndex]['maxzoom']
                   )
                 "
-                  show-input
+                show-input
               >
               </el-slider>
             </el-form-item>
             <el-form-item label="最大级别">
               <el-slider
-                  :max="parseInt(22)"
-                  :min="layers[nowLayerIndex]['minzoom']"
-                  v-model="layers[nowLayerIndex]['maxzoom']"
-                  @change="
+                :max="parseInt(22)"
+                :min="layers[nowLayerIndex]['minzoom']"
+                v-model="layers[nowLayerIndex]['maxzoom']"
+                @change="
                   handleZoomChange(
                     layers[nowLayerIndex]['id'],
                     layers[nowLayerIndex]['minzoom'],
                     layers[nowLayerIndex]['maxzoom']
                   )
                 "
-                  show-input
+                show-input
               >
               </el-slider>
             </el-form-item>
@@ -4397,21 +4386,23 @@ import ConditionRender from "../components/ConditionRender";
 var map = null;
 
 export default {
-  components: {ConditionRender},
+  components: { ConditionRender },
   data() {
     return {
       imgDefault: require("../assets/imgs/map-icon.png"),
 
       //添加shp数据时列表
-      shpTableData: [],
       multiShpTable: [],
-      dataBaseList: [],
-      PgBaseSelect: "defaultPG",
+      //#
       dataBaseSelect: "defaultPG", //用于数据库类型判断(四种)
+      pgShpList: [],
+      shpTableData: [],
+      PgBaseSelect: "defaultPG",
       currentPageShp: 1,
       pageSizeShp: 5,
       searchInputShp: "",
       totalDataCountShp: 0,
+
       addSourceShow: true,
       publishLink: "",
       dataLayers: [],
@@ -4430,10 +4421,10 @@ export default {
         mbtiles3: "mbtilesSource3",
         mbtiles4: "mbtilesSource4",
       },
-      stylePatch: {id: ""},
+      stylePatch: { id: "" },
       // mbTileEditShow: false,     //功能移出，暂不用
       addMbTileStyleShow: false,
-      mbTileEditInfo: {mbTilesJsonFile: null}, //作为对象，为之后上传文件加其余字段做准备
+      mbTileEditInfo: { mbTilesJsonFile: null }, //作为对象，为之后上传文件加其余字段做准备
       //mbTile样式功能
       isStyle: false, //初始mbtile默认添加的是vector_layer数据,true表示为添加style样式
       mbTileStyleSelect: "", //储存所选的mbtile的样式id
@@ -4442,7 +4433,7 @@ export default {
       mbTileStyleSelectIndex: 0, //  记录选择的数据下标
       styleLayers: [],
       mbTileStyleEditShow: false,
-      mbTileStyleInfo: {mapStyleFile: null, tileJsonId: ""},
+      mbTileStyleInfo: { mapStyleFile: null, tileJsonId: "" },
       layerType: [
         "circle",
         "line",
@@ -4452,30 +4443,30 @@ export default {
         "background",
         "heatmap",
       ],
-
-      mbsource: {
-        'water_name': 'symbol',
-        'transportation_name': 'symbol',
-        'aerodrome_label': 'circle',
-        'globallandcover': 'circle',
-        'mountain_peak': 'circle',
-        'housenumber': 'circle',
-        'poi': 'circle',
-        'place': 'circle',
-        'transportation': 'line',
-        'boundary': 'line',
-        'aeroway': 'line',
-        'waterway': 'line',
-        'park': 'fill',
-        'landuse': 'fill',
-        'landcover': 'fill',
-        'water': 'fill',
-        'building': 'fill',
-      },
+         
+      mbsource:{
+                'water_name':'symbol',
+                'transportation_name':'symbol',
+                'aerodrome_label':'circle',
+                'globallandcover':'circle',
+                'mountain_peak':'circle',
+                'housenumber':'circle',
+                'poi':'circle',
+                'place':'circle',
+                'transportation':'line',
+                'boundary':'line',
+                'aeroway':'line',
+                'waterway':'line',
+                'park':'fill',
+                'landuse':'fill',
+                'landcover':'fill',
+                'water':'fill',
+                'building':'fill',
+                },
 
       // TMS服务
       // tmsList: [],
-      urlBase: {TERRAIN: [], TMS: [], WMTS: []},
+      urlBase: { TERRAIN: [], TMS: [], WMTS: [] },
 
       //左侧shp图层树
       layersNameObject: {}, //检测重复  后端字段为layerTree
@@ -4546,7 +4537,7 @@ export default {
         linear: "线性：在刚好小于和刚好大于输入的停止点对之间进行线性插值。",
         exponential: "指数：在小于和大于输入的停靠点之间以指数方式插值。",
         "cubic-bezier":
-            "贝塞尔曲线：使用由给定控制点定义的三次贝塞尔曲线进行插值。",
+          "贝塞尔曲线：使用由给定控制点定义的三次贝塞尔曲线进行插值。",
       },
 
       //文字
@@ -4560,16 +4551,16 @@ export default {
       filterOptions: [],
       filterOptionSelectList: [],
       filterTypes: [
-        {value: "==", label: "=="},
-        {value: "!=", label: "!="},
-        {value: ">", label: ">"},
-        {value: ">=", label: ">="},
-        {value: "<", label: "<"},
-        {value: "<=", label: "<="},
-        {value: "in", label: "in"},
-        {value: "!in", label: "!in"},
-        {value: "has", label: "has"},
-        {value: "!has", label: "!has"},
+        { value: "==", label: "==" },
+        { value: "!=", label: "!=" },
+        { value: ">", label: ">" },
+        { value: ">=", label: ">=" },
+        { value: "<", label: "<" },
+        { value: "<=", label: "<=" },
+        { value: "in", label: "in" },
+        { value: "!in", label: "!in" },
+        { value: "has", label: "has" },
+        { value: "!has", label: "!has" },
       ],
       filterValue: [],
       filterValueSelect: [], //分页信息显示
@@ -4676,82 +4667,71 @@ export default {
 
     getMapProjectInfo() {
       requestApi
-          .getMapProjectById(this.mapProjectId)
-          .then((res) => {
-            this.mapProjectInfo = res.data.data;
-            console.log("mapProjectInfo:", this.mapProjectInfo);
-            this.center = this.mapProjectInfo.center.split(",");
-            this.zoom = this.mapProjectInfo.zoom;
-            this.spritePath = this.mapProjectInfo.sprite;
-            const end = this.spritePath.lastIndexOf("/");
-            this.spriteNameSelect = this.spritePath.substring(15, end);
-            if (this.spriteNameSelect != "") {
-              const url =
-                  this.reqUrl +
-                  "/store/sprites/" +
-                  this.spriteNameSelect +
-                  "/" +
-                  "sprite.json";
-              fetch(url)
-                  .then((res) => {
-                    return res.json();
-                  })
-                  .then((json) => {
-                    this.spriteJsonSelect = json;
-                    console.log("精灵图json", this.spriteJsonSelect);
-                  });
-              this.spritePngSelect =
-                  this.reqUrl +
-                  "/store/sprites/" +
-                  this.spriteNameSelect +
-                  "/" +
-                  "sprite.png";
+        .getMapProjectById(this.mapProjectId)
+        .then((res) => {
+          this.mapProjectInfo = res.data.data;
+          console.log("mapProjectInfo:", this.mapProjectInfo);
+          this.center = this.mapProjectInfo.center.split(",");
+          this.zoom = this.mapProjectInfo.zoom;
+          this.spritePath = this.mapProjectInfo.sprite;
+          const end = this.spritePath.lastIndexOf("/");
+          this.spriteNameSelect = this.spritePath.substring(15, end);
+          if (this.spriteNameSelect != "") {
+            const url =
+              this.reqUrl +
+              "/store/sprites/" +
+              this.spriteNameSelect +
+              "/" +
+              "sprite.json";
+            fetch(url)
+              .then((res) => {
+                return res.json();
+              })
+              .then((json) => {
+                this.spriteJsonSelect = json;
+                console.log("精灵图json", this.spriteJsonSelect);
+              });
+            this.spritePngSelect =
+              this.reqUrl +
+              "/store/sprites/" +
+              this.spriteNameSelect +
+              "/" +
+              "sprite.png";
+          }
+          this.glyphsPath = this.mapProjectInfo.glyphs;
+          this.sources = this.mapProjectInfo.sources;
+          this.layers = this.mapProjectInfo.layers;
+          this.layersNameObject =
+            JSON.stringify(this.mapProjectInfo.layerTree) == "{}"
+              ? {}
+              : this.mapProjectInfo.layerTree.layersNameObject;
+          this.sourceNameObject =
+            JSON.stringify(this.mapProjectInfo.layerTree) == "{}"
+              ? {}
+              : this.mapProjectInfo.layerTree.sourceNameObject;
+          this.publicBoolean = this.mapProjectInfo.publicBoolean;
+          this.createEmptyMap();
+          this.initMapWithData();
+          for (const item of this.layers) {
+            this.layersName.push(item.id);
+            if (item.type != "background") {
+              this.originStyle.push({
+                paint: item["paint"],
+                layout: item["layout"],
+              });
             }
-            this.glyphsPath = this.mapProjectInfo.glyphs;
-            this.sources = this.mapProjectInfo.sources;
-            this.layers = this.mapProjectInfo.layers;
-            this.layersNameObject =
-                JSON.stringify(this.mapProjectInfo.layerTree) == "{}"
-                    ? {}
-                    : this.mapProjectInfo.layerTree.layersNameObject;
-            this.sourceNameObject =
-                JSON.stringify(this.mapProjectInfo.layerTree) == "{}"
-                    ? {}
-                    : this.mapProjectInfo.layerTree.sourceNameObject;
-            this.publicBoolean = this.mapProjectInfo.publicBoolean;
-            this.createEmptyMap();
-            this.initMapWithData();
-            for (const item of this.layers) {
-              this.layersName.push(item.id);
-              if (item.type != "background") {
-                this.originStyle.push({
-                  paint: item["paint"],
-                  layout: item["layout"],
-                });
-              }
-            }
-            document.title = "地图项目" + this.mapProjectInfo.name;
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+          }
+          document.title = "地图项目" + this.mapProjectInfo.name;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
-    getPgList() {
-      requestApi
-          .getPgList()
-          .then((res) => {
-            this.dataBaseList = res.data.data;
-            this.dataBaseList.unshift({name: "defaultPG", id: "defaultPG"});
-            console.log("pgList", this.dataBaseList);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-    },
+
     //创建空地图
     createEmptyMap() {
       mapboxgl.accessToken =
-          "pk.eyJ1Ijoid3lqcSIsImEiOiJjbDBnZDdwajUxMXRzM2htdWxubDh1MzJrIn0.2e2_rdU2nOUvtwltBIZtZg";
+        "pk.eyJ1Ijoid3lqcSIsImEiOiJjbDBnZDdwajUxMXRzM2htdWxubDh1MzJrIn0.2e2_rdU2nOUvtwltBIZtZg";
       map = new mapboxgl.Map({
         container: "map",
         preserveDrawingBuffer: true, //为true，则可以使用map.getCanvas().toDataURL()转为PNG
@@ -4774,12 +4754,12 @@ export default {
 
       //添加定位控件
       map.addControl(
-          new mapboxgl.GeolocateControl({
-            positionOptions: {
-              enableHighAccuracy: true,
-            },
-            trackUserLocation: true,
-          })
+        new mapboxgl.GeolocateControl({
+          positionOptions: {
+            enableHighAccuracy: true,
+          },
+          trackUserLocation: true,
+        })
       );
 
       //zoom
@@ -4792,11 +4772,11 @@ export default {
         map.getCanvas().style.cursor = "pointer";
 
         this.showCenter =
-            "(" +
-            String(e.lngLat.lng.toFixed(5)) +
-            "，" +
-            String(e.lngLat.lat.toFixed(5)) +
-            ")";
+          "(" +
+          String(e.lngLat.lng.toFixed(5)) +
+          "，" +
+          String(e.lngLat.lat.toFixed(5)) +
+          ")";
       });
 
       //选中某元素
@@ -4856,8 +4836,8 @@ export default {
           //根据index获取相关图层信息
           const color_name = feature.layer.type + "-" + "color";
           colorBox.style.setProperty(
-              "background-color",
-              feature.layer.paint[color_name]
+            "background-color",
+            feature.layer.paint[color_name]
           );
           this.addItemEvent(item, this.layers[index], index);
         }
@@ -4865,19 +4845,19 @@ export default {
         console.log("selectedFeatures", selectedFeatures);
 
         new mapboxgl.Popup()
-            .setLngLat(e.lngLat)
-            .setDOMContent(container)
-            .addTo(map);
+          .setLngLat(e.lngLat)
+          .setDOMContent(container)
+          .addTo(map);
       });
 
       map.on("load", function () {
         map.loadImage(
-            // this.reqUrl+"/store/symbols/右道封闭_62ab327448d8acac7319a4cc.png",
-            "https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Cat_silhouette.svg/400px-Cat_silhouette.svg.png",
-            function (error, image) {
-              if (error) throw error;
-              map.addImage("cat", image);
-            }
+          // this.reqUrl+"/store/symbols/右道封闭_62ab327448d8acac7319a4cc.png",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Cat_silhouette.svg/400px-Cat_silhouette.svg.png",
+          function (error, image) {
+            if (error) throw error;
+            map.addImage("cat", image);
+          }
         );
       });
     },
@@ -4918,7 +4898,7 @@ export default {
     saveMap() {
       //现将画布内容转为png图片当做工程封面
       this.canvasSrc = map.getCanvas().toDataURL("image/png");
-      const {lng, lat} = map.getCenter();
+      const { lng, lat } = map.getCenter();
       this.center = lng + "," + lat;
       this.zoom = map.getZoom();
       this.$confirm("是否保存地图?", "提示", {
@@ -4926,55 +4906,54 @@ export default {
         cancelButtonText: "取消",
         type: "warning",
       })
-          .then(() => {
-            for (let i in this.layers) {
-              this.layers[i].layout.visibility = this.layers[i].show
-                  ? "visible"
-                  : "none";
-            }
+        .then(() => {
+          for (let i in this.layers) {
+            this.layers[i].layout.visibility = this.layers[i].show
+              ? "visible"
+              : "none";
+          }
 
-            this.mapProjectInfo.zoom = this.zoom;
-            this.mapProjectInfo.center = this.center;
-            this.mapProjectInfo.sprite = this.spritePath;
-            this.mapProjectInfo.glyphs = this.glyphsPath;
-            this.mapProjectInfo.sources = this.sources;
-            // this.mapProjectInfo.layers = {layers: this.layers}
-            this.mapProjectInfo.layers = this.layers;
-            this.mapProjectInfo.layerTree = {
-              layersNameObject: this.layersNameObject,
-              sourceNameObject: this.sourceNameObject,
-            };
-            // this.mapProjectInfo.glyphs = this.reqUrl+"/store/fonts/{fontstack}/{range}.pbf";
-            // this.mapProjectInfo.sprite = this.reqUrl+"/store/sprites/mpx_sprite/sprite";
-            requestApi
-                .updateMapProject(JSON.stringify(this.mapProjectInfo))
-                .then(() => {
-                  this.$message.success("保存成功!");
-                  //保存截图到工程字段
-                  requestApi
-                      .createMapImg({
-                        imgUrl: this.canvasSrc,
-                        mapProjectId: this.mapProjectId,
-                      })
-                      .then(() => {
-                      })
-                      .catch((error) => {
-                        console.log(error);
-                      });
+          this.mapProjectInfo.zoom = this.zoom;
+          this.mapProjectInfo.center = this.center;
+          this.mapProjectInfo.sprite = this.spritePath;
+          this.mapProjectInfo.glyphs = this.glyphsPath;
+          this.mapProjectInfo.sources = this.sources;
+          // this.mapProjectInfo.layers = {layers: this.layers}
+          this.mapProjectInfo.layers = this.layers;
+          this.mapProjectInfo.layerTree = {
+            layersNameObject: this.layersNameObject,
+            sourceNameObject: this.sourceNameObject,
+          };
+          // this.mapProjectInfo.glyphs = this.reqUrl+"/store/fonts/{fontstack}/{range}.pbf";
+          // this.mapProjectInfo.sprite = this.reqUrl+"/store/sprites/mpx_sprite/sprite";
+          requestApi
+            .updateMapProject(JSON.stringify(this.mapProjectInfo))
+            .then(() => {
+              this.$message.success("保存成功!");
+              //保存截图到工程字段
+              requestApi
+                .createMapImg({
+                  imgUrl: this.canvasSrc,
+                  mapProjectId: this.mapProjectId,
                 })
+                .then(() => {})
                 .catch((error) => {
                   console.log(error);
                 });
-          })
-          .catch(() => {
-            this.$message.info("取消保存");
-          });
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        })
+        .catch(() => {
+          this.$message.info("取消保存");
+        });
     },
     publish() {
       // this.publishLink = myConfig.requestUrl+'/mapServer/'+this.mapProjectId;
       // this.publishLink = this.reqUrl + "/mapProject/getPublishedMap/" + this.mapProjectId;
       this.publishLink =
-          this.reqUrl + "/mapProject/getPublishedMap/" + this.mapProjectId;
+        this.reqUrl + "/mapProject/getPublishedMap/" + this.mapProjectId;
     },
 
     publicMap() {
@@ -4983,27 +4962,27 @@ export default {
         cancelButtonText: "取消",
         type: "warning",
       })
-          .then(() => {
-            this.saveMap();
-          })
-          .then(() => {
-            requestApi
-                .publicMap(this.mapProjectId)
-                .then((res) => {
-                  if (res.data.code === 0) {
-                    this.publicBoolean = true;
-                    this.$message.success("地图发布成功");
-                  } else {
-                    this.$message.info("地图发布失败");
-                  }
-                })
-                .catch((error) => {
-                  console.log(error);
-                });
-          })
-          .catch(() => {
-            this.$message.info("地图发布失败");
-          });
+        .then(() => {
+          this.saveMap();
+        })
+        .then(() => {
+          requestApi
+            .publicMap(this.mapProjectId)
+            .then((res) => {
+              if (res.data.code === 0) {
+                this.publicBoolean = true;
+                this.$message.success("地图发布成功");
+              } else {
+                this.$message.info("地图发布失败");
+              }
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        })
+        .catch(() => {
+          this.$message.info("地图发布失败");
+        });
     },
     addBackground(sourceType, row) {
       const index = this.layers.length;
@@ -5037,18 +5016,18 @@ export default {
         paint: newPaint,
         layout: newLayout,
         metadata: {
-          "mapbox:type": "background",
+          "mapbox:type":"background",
         },
       };
       if (sourceType != "mbTile") {
         backLayer.paint["background-color"] =
-            "#" + Math.random().toString(16).substr(2, 6);
+          "#" + Math.random().toString(16).substr(2, 6);
       }
       if (
-          !Object.prototype.hasOwnProperty.call(
-              this.layersNameObject,
-              "background"
-          )
+        !Object.prototype.hasOwnProperty.call(
+          this.layersNameObject,
+          "background"
+        )
       ) {
         this.layersNameObject["background"] = 1;
       } else {
@@ -5065,36 +5044,7 @@ export default {
       }
     },
 
-    //添加数据库相关
-    //打开shp选择框
-    async addShpData() {
-      if (this.mbTileSelect == "") {
-        await this.getMbtilesList();
-      } else {
-        this.getStyleListById(this.mbTileSelect, false);
-      }
-      //依据所选的mbTile，获取对应的styleJson
 
-      if (this.PgBaseSelect == "defaultPG") {
-        requestApi
-            .getShpList({
-              asc: false,
-              page: this.currentPageShp,
-              pageSize: this.pageSizeShp,
-              searchText: this.searchInputShp,
-              sortField: "createTime",
-            })
-            .then((res) => {
-              console.log("shpbase", res.data);
-              this.shpTableData = res.data.data.content;
-              this.totalDataCountShp = res.data.data.totalElements;
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-      }
-      this.getPgList();
-    },
     async addMbTileData() {
       // 阻止发生默认行为
       let formData = new FormData();
@@ -5121,157 +5071,117 @@ export default {
       await this.onUpload(false, formData);
       await this.getStyleListById(this.mbTileSelect, false); //加载数据后更新styleList，注：但现在没触发
     },
-    // TMS服务
-    getOutService() {
-      requestApi
-          .getThirdPartSourceList(this.dataBaseSelect)
-          .then((res) => {
-            if (res.data.code == 0) {
-              this.urlBase[this.dataBaseSelect] = res.data.data;
-            } else {
-              console.log(res.data.csg);
-            }
-            console.log("urlBase", this.urlBase);
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-    },
+
 
     // 获取不同类型来源的tileJson列表
     getTileJsonList(type) {
       requestApi
-          .getTileJsonList(type)
-          .then((res) => {
-            if (res.data.data.length != 0) {
-              switch (type) {
-                  // mbtiles换新接口
-                  // case "mbTile":
-                  //   this.mbTileJsonList = res.data.data;
-                  //   console.log("mbTileJsonList", this.mbTileJsonList);
-                  //   //mbTiles先默认为第一个osm数据
-                  //   this.mbTileSelect = this.mbTileJsonList[0].id;
-                  //   this.dataLayers = this.mbTileJsonList[0].vector_layers;
-                  //   this.getStyleListById(this.mbTileSelect);
-                  //   break;
-                default:
-                  console.log("tileJsonList", res.data.data);
-                  break;
-              }
+        .getTileJsonList(type)
+        .then((res) => {
+          if (res.data.data.length != 0) {
+            switch (type) {
+              // mbtiles换新接口
+              // case "mbTile":
+              //   this.mbTileJsonList = res.data.data;
+              //   console.log("mbTileJsonList", this.mbTileJsonList);
+              //   //mbTiles先默认为第一个osm数据
+              //   this.mbTileSelect = this.mbTileJsonList[0].id;
+              //   this.dataLayers = this.mbTileJsonList[0].vector_layers;
+              //   this.getStyleListById(this.mbTileSelect);
+              //   break;
+              default:
+                console.log("tileJsonList", res.data.data);
+                break;
             }
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
-    getTileJsonById(id) {
-      requestApi
-          .getTileJson(id)
-          .then((res) => {
-            this.mbTileJson = res.data;
-            this.dataLayers = res.data.vector_layers;
-            console.log('tileJson', this.mbTileJson);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-    },
-    getMbtilesList() {
-      requestApi.getMbtilesList().then((res) => {
-        console.log(res);
-        if (res.data.data.length != 0) {
-          this.mbTileJsonList = res.data.data;
-          console.log("mbTileJsonList", this.mbTileJsonList);
-          //mbTiles先默认为第一个osm数据
-          this.mbTileSelect = this.mbTileJsonList[0].id;
-          this.mbTileInfo = this.mbTileJsonList[0];
-          this.getTileJsonById(this.mbTileInfo.tileJsonId);
-          this.getStyleListById(this.mbTileSelect, false);
-          console.log("dataLayers", this.dataLayers);
-        }
-      });
-    },
+
+
     //获取osm数据和非osm数据的mbTiles列表
     getOsmMbList() {
       requestApi
-          .getMbtilesList()
-          .then((res) => {
-            if (res.data.data.length != 0) {
-              const mbOriginList = res.data.data;
-              this.mbTileJsonList = mbOriginList.filter(
-                  (data) => !data.osmMbtilesBoolean
-              ); //获取非mbTiles源数据列表
-              this.mbTileJsonList.unshift({
-                id: "OSM",
-                name: "OSM (OpenStreetMap)",
-              }); //首位添加OSM数据
-              this.mbTileSelect = JSON.parse(
-                  JSON.stringify(this.mbTileJsonList[0].id)
-              );
-              this.getStyleListById(this.mbTileSelect, true); //初始化第一个mbtile包含的样式数据
-              // console.log('dataLayers',this.dataLayers);
-            }
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+        .getMbtilesList()
+        .then((res) => {
+          if (res.data.data.length != 0) {
+            const mbOriginList = res.data.data;
+            this.mbTileJsonList = mbOriginList.filter(
+              (data) => !data.osmMbtilesBoolean
+            ); //获取非mbTiles源数据列表
+            this.mbTileJsonList.unshift({
+              id: "OSM",
+              name: "OSM (OpenStreetMap)",
+            }); //首位添加OSM数据
+            this.mbTileSelect = JSON.parse(
+              JSON.stringify(this.mbTileJsonList[0].id)
+            );
+            this.getStyleListById(this.mbTileSelect, true); //初始化第一个mbtile包含的样式数据
+            // console.log('dataLayers',this.dataLayers);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
     // 获取mbTile的styleJson列表
     getStyleListById(id, isCallBack) {
       if (this.mbTileInfo.osmMbtilesBoolean || id == "OSM") {
         requestApi
-            .getOsmStyleTemplateList()
-            .then((res) => {
-              if (res.data.data.length != 0) {
-                this.mbTileStyleList = res.data.data;
-                console.log("mbTileStyleList", this.mbTileStyleList);
-                //mbTileStyle先默认为第一个数据
-                this.mbTileStyleSelect = this.mbTileStyleList[0].id;
-                this.mbTileStyleJson = this.mbTileStyleList[0];
-                this.styleLayers = this.mbTileStyleJson.layers;
-                if (isCallBack) {
-                  // 等getStyleListById执行完得到mbTileStyleList数据
-                  console.log("dataLayers", this.mbTileStyleList);
-                  if (this.templateStyleSelect == "") {
-                    this.templateStyleSelect = this.mbTileStyleList[0].id; //先默认为第一个
-                    this.templateStyleJson = this.mbTileStyleList[0]; //先默认为第一个
-                    this.tempStyleLayers = this.templateStyleJson.layers;
-                  }
+          .getOsmStyleTemplateList()
+          .then((res) => {
+            if (res.data.data.length != 0) {
+              this.mbTileStyleList = res.data.data;
+              console.log("mbTileStyleList", this.mbTileStyleList);
+              //mbTileStyle先默认为第一个数据
+              this.mbTileStyleSelect = this.mbTileStyleList[0].id;
+              this.mbTileStyleJson = this.mbTileStyleList[0];
+              this.styleLayers = this.mbTileStyleJson.layers;
+              if (isCallBack) {
+                // 等getStyleListById执行完得到mbTileStyleList数据
+                console.log("dataLayers", this.mbTileStyleList);
+                if (this.templateStyleSelect == "") {
+                  this.templateStyleSelect = this.mbTileStyleList[0].id; //先默认为第一个
+                  this.templateStyleJson = this.mbTileStyleList[0]; //先默认为第一个
+                  this.tempStyleLayers = this.templateStyleJson.layers;
                 }
-              } else {
-                this.mbTileStyleList = [];
               }
-            })
-            .catch((error) => {
-              console.log(error);
-            });
+            } else {
+              this.mbTileStyleList = [];
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          });
       } else {
         requestApi
-            .getStyleListById(id)
-            .then((res) => {
-              if (res.data.data.length != 0) {
-                this.mbTileStyleList = res.data.data;
-                console.log("mbTileStyleList", this.mbTileStyleList);
-                //mbTileStyle先默认为第一个数据
-                this.mbTileStyleSelect = this.mbTileStyleList[0].id;
-                this.mbTileStyleJson = this.mbTileStyleList[0];
-                this.styleLayers = this.mbTileStyleJson.layers;
-                if (isCallBack) {
-                  // 等getStyleListById执行完得到mbTileStyleList数据
-                  console.log("dataLayers", this.mbTileStyleList);
-                  if (this.templateStyleSelect == "") {
-                    this.templateStyleSelect = this.mbTileStyleList[0].id; //先默认为第一个
-                    this.templateStyleJson = this.mbTileStyleList[0]; //先默认为第一个
-                    this.tempStyleLayers = this.templateStyleJson.layers;
-                  }
+          .getStyleListById(id)
+          .then((res) => {
+            if (res.data.data.length != 0) {
+              this.mbTileStyleList = res.data.data;
+              console.log("mbTileStyleList", this.mbTileStyleList);
+              //mbTileStyle先默认为第一个数据
+              this.mbTileStyleSelect = this.mbTileStyleList[0].id;
+              this.mbTileStyleJson = this.mbTileStyleList[0];
+              this.styleLayers = this.mbTileStyleJson.layers;
+              if (isCallBack) {
+                // 等getStyleListById执行完得到mbTileStyleList数据
+                console.log("dataLayers", this.mbTileStyleList);
+                if (this.templateStyleSelect == "") {
+                  this.templateStyleSelect = this.mbTileStyleList[0].id; //先默认为第一个
+                  this.templateStyleJson = this.mbTileStyleList[0]; //先默认为第一个
+                  this.tempStyleLayers = this.templateStyleJson.layers;
                 }
-              } else {
-                this.mbTileStyleList = [];
               }
-            })
-            .catch((error) => {
-              console.log(error);
-            });
+            } else {
+              this.mbTileStyleList = [];
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          });
       }
     },
 
@@ -5279,44 +5189,25 @@ export default {
     onUpload(status, formData) {
       if (status) {
         fileApi
-            .mbTileUpload(formData)
-            .then(() => {
-              this.$message.success("mbTile数据上传成功！");
-            })
-            .catch((e) => {
-              this.$message.error(e.message);
-            });
+          .mbTileUpload(formData)
+          .then(() => {
+            this.$message.success("mbTile数据上传成功！");
+          })
+          .catch((e) => {
+            this.$message.error(e.message);
+          });
       } else {
         fileApi
-            .mbStyleUpload(formData)
-            .then(() => {
-              this.$message.success("style数据上传成功！");
-            })
-            .catch((e) => {
-              this.$message.error(e.message);
-            });
+          .mbStyleUpload(formData)
+          .then(() => {
+            this.$message.success("style数据上传成功！");
+          })
+          .catch((e) => {
+            this.$message.error(e.message);
+          });
       }
     },
-    PgBaseChange(val) {
-      //val表示选择的value值
-      let index = 0;
-      //获取select选择内容的下标
-      this.dataBaseList.forEach((e, ind) => {
-        if (e.id == val) {
-          index = ind;
-        }
-      });
-      //更改pg数据库源，同时修改dataBaseSelect类型
-      this.dataBaseSelect =
-          this.PgBaseSelect == "defaultPG" ? "defaultPG" : "multiPG";
-      console.log("PgBaseSelect2", this.PgBaseSelect);
-      if (this.PgBaseSelect != "defaultPG") {
-        this.shpTableData = this.dataBaseList[index].dataInfo;
-        this.mutiPgInfo = this.dataBaseList[index]; //用于展示IP、端口信息
-      } else {
-        this.addShpData();
-      }
-    },
+
     async mbTileChange(val) {
       let index = 0;
       this.mbTileJsonList.forEach((e, ind) => {
@@ -5348,34 +5239,19 @@ export default {
         this.styleLayers = this.mbTileStyleJson.layers;
       }
     },
-    dataBaseClick(tab) {
-      this.dataBaseSelect = tab.name == "PG" ? "defaultPG" : tab.name;
-      console.log("dataBaseSelect", this.dataBaseSelect);
-      switch (tab.name) {
-        case "TMS":
-          this.getOutService();
-          break;
-      }
-    },
 
-    handleCurrentChangeShp(val) {
-      this.currentPageShp = val;
-      if (this.PgBaseSelect != "defaultPG") {
-        this.PgBaseChange();
-      } else {
-        this.addShpData();
-      }
-    },
+
+
 
     initSort() {
       const tbody = this.$refs.shpLayerTable.$el.querySelectorAll(
-          ".el-table__body-wrapper > table > tbody"
+        ".el-table__body-wrapper > table > tbody"
       )[0];
       const _this = this;
       Sortable.create(tbody, {
         draggable: ".el-table__row",
         animation: 150,
-        onEnd({newIndex, oldIndex}) {
+        onEnd({ newIndex, oldIndex }) {
           _this.handleCloseEditBoard();
           const currRow = _this.layers.splice(oldIndex, 1)[0];
           const currRow2 = _this.originStyle.splice(oldIndex, 1)[0];
@@ -5403,143 +5279,6 @@ export default {
       }
     },
 
-    //向shp树添加shp,即source,同时添加shplayer
-    // async handleAddShpLayer(index, row) {
-    //   console.log("add shp row: ", row);
-    //   //旧source写法
-    //   // let newSource = {
-    //   //   sourceName: row.tableName,
-    //   //   sourceType: "vector",
-    //   //   sourceTiles: [this.reqUrl+"/mvt/" + row.tableName + "/{z}/{x}/{y}.pbf"],
-    //   // }
-    //   // if (!Object.prototype.hasOwnProperty.call(this.sources, newSource.sourceName)) {
-    //   //   this.sources[newSource.sourceName] = {
-    //   //     type: newSource.sourceType,
-    //   //     tiles: newSource.sourceTiles,
-    //   //   }
-    //   //   this.addSourceToMap(newSource)
-    //   // }
-
-    //   //如果没有添加过source则添加
-    //   if (
-    //     !Object.prototype.hasOwnProperty.call(
-    //       this.sourceNameObject,
-    //       row.tableName
-    //     )
-    //   ) {
-    //     let newTileJson = initTileJson;
-    //     newTileJson.name = row.tableName;
-    //     // if(this.PgBaseSelect == 'defaultPG'){
-    //     //   newTileJson.tiles = [myConfig.requestUrl + "/mvt/" + row.tableName + "/{z}/{x}/{y}.pbf"]
-    //     // }else{
-    //     //   newTileJson.tiles = ["/MultiSource/" + myConfig.requestUrl + "//" + row.tableName + "/{z}/{x}/{y}.pbf"]
-    //     // }
-    //     if (this.dataBaseSelect == "mbTile") {
-    //       newTileJson.tiles = [
-    //         "https://api.maptiler.com/tiles/v3/{z}/{x}/{y}.pbf?key=XAapkmkXQpx839NCfnxD",
-    //       ];
-    //     } else if (this.PgBaseSelect == "defaultPG") {
-    //       newTileJson.tiles = [
-    //         this.reqUrl + "/mvt/" + row.tableName + "/{z}/{x}/{y}.pbf",
-    //       ];
-    //     } else {
-    //       newTileJson.tiles = [
-    //         "/MultiSource/" +
-    //           this.reqUrl +
-    //           "//" +
-    //           row.tableName +
-    //           "/{z}/{x}/{y}.pbf",
-    //       ];
-    //     }
-    //     if (this.dataBaseSelect == "mbTile") {
-    //       newTileJson.vector_layers = this.dataLayers;
-    //     } else {
-    //       let vector_layer = {
-    //         description: "",
-    //         fields: row.attrInfo,
-    //         id: row.tableName,
-    //       };
-    //       newTileJson.vector_layers = [vector_layer];
-    //     }
-
-    //     let res = await this.createTileJson(newTileJson);
-    //     if (res.data.code !== 0) {
-    //       console.log("添加source失败");
-    //       return;
-    //     }
-    //     let sourceId = res.data.data.tileJsonId;
-
-    //     // let tileJsonUrl = myConfig.requestUrl + "/getTileJson/" + sourceId + ".json"
-    //     let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceId + ".json";
-    //     let newSourceJson = {
-    //       sourceName: sourceId,
-    //       sourceType: "vector",
-    //       sourceUrl: tileJsonUrl,
-    //     };
-    //     this.addSourceToMap(newSourceJson);
-    //     this.sources[newSourceJson.sourceName] = {
-    //       type: newSourceJson.sourceType,
-    //       url: newSourceJson.sourceUrl,
-    //     };
-    //     if (this.dataBaseSelect == "mbTile") {
-    //       this.sourceNameObject[this.dataLayers.id] = sourceId;
-    //     } else {
-    //       this.sourceNameObject[row.tableName] = sourceId;
-    //     }
-    //   }
-
-    //   let geoType = row.geoType;
-    //   if (row.geoType.indexOf("LINE") !== -1) {
-    //     geoType = "line";
-    //   } else if (row.geoType.indexOf("POLYGON") !== -1) {
-    //     geoType = "fill";
-    //   } else {
-    //     geoType = "circle";
-    //   }
-
-    //   //前八个是自己用的属性
-    //   let newLayer = {
-    //     index: index,
-    //     sourceType: "mbTile",     //记录数据来源类型，用于区别mbTlie的添加和删除
-    //     show: true,
-    //     originName: row.originName,
-    //     shpAttribute: typeof(row.attrInfo) != "undefined" ? row.attrInfo : [],
-    //     attrValueSet: {},
-    //     attrShowList: {},
-    //     filterValueSet: {},
-    //     id: row.originName,
-    //     type: geoType,
-    //     filter: ["all"],
-    //     layout: layerStyleProperties[geoType].layout,
-    //     maxzoom: 22,
-    //     metadata: "",
-    //     minzoom: 0,
-    //     paint: layerStyleProperties[geoType].paint,
-    //     source: this.sourceNameObject[row.tableName], //通过记录的source名字与id对应，拿到sourceId
-    //     "source-layer": row.tableName,
-    //   };
-
-    //   if (geoType !== "symbol") {
-    //     newLayer.paint[geoType + "-color"] =
-    //       "#" + Math.random().toString(16).substr(2, 6);
-    //   }
-
-    //   if (
-    //     !Object.prototype.hasOwnProperty.call(
-    //       this.layersNameObject,
-    //       newLayer.originName
-    //     )
-    //   ) {
-    //     this.layersNameObject[newLayer.originName] = 1;
-    //   } else {
-    //     this.layersNameObject[newLayer.originName] += 1;
-    //     newLayer.id =
-    //       row.originName + this.layersNameObject[newLayer.originName];
-    //   }
-    //   this.layers.unshift(newLayer);
-    //   this.layersName.unshift(newLayer.id);
-    //   this.addLayerToMap(newLayer);
-    // },
     async handleAddShpLayer(index, row) {
       console.log("add shp row: ", row);
       //分类型进行创建shp的json入库并返回对应id
@@ -5555,7 +5294,7 @@ export default {
           break;
         case "TMS":
           this.addTMS(index, row);
-          break;
+          break;          
         case "mbTile":
           if (!this.isStyle) {
             this.addDataMbTileShp(index, row);
@@ -5573,10 +5312,10 @@ export default {
     async addPgDefaultShp(index, row) {
       //判断该shp是否已添加
       if (
-          !Object.prototype.hasOwnProperty.call(
-              this.sourceNameObject,
-              row.tableName
-          )
+        !Object.prototype.hasOwnProperty.call(
+          this.sourceNameObject,
+          row.tableName
+        )
       ) {
         let newTileJson = initTileJson;
         newTileJson.name = row.tableName;
@@ -5639,10 +5378,10 @@ export default {
         type: geoType,
         filter: ["all"],
         layout: JSON.parse(
-            JSON.stringify(layerStyleProperties[geoType].layout)
+          JSON.stringify(layerStyleProperties[geoType].layout)
         ), //防止同类型图层样式改变间影响
         maxzoom: 22,
-        metadata: {"mapbox:type": "pgDefault"},
+        metadata: {"mapbox:type":"pgDefault"},
         minzoom: 0,
         paint: JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint)),
         source: this.sourceNameObject[row.tableName], //通过记录的source名字与id对应，拿到sourceId
@@ -5651,22 +5390,22 @@ export default {
 
       if (geoType !== "symbol") {
         newLayer.paint[geoType + "-color"] =
-            "#" + Math.random().toString(16).substr(2, 6);
+          "#" + Math.random().toString(16).substr(2, 6);
       }
 
       if (
-          !Object.prototype.hasOwnProperty.call(
-              this.layersNameObject,
-              newLayer.originName
-          )
+        !Object.prototype.hasOwnProperty.call(
+          this.layersNameObject,
+          newLayer.originName
+        )
       ) {
         this.layersNameObject[newLayer.originName] = 1;
       } else {
         this.layersNameObject[newLayer.originName] += 1;
         newLayer.id =
-            row.originName + this.layersNameObject[newLayer.originName];
+          row.originName + this.layersNameObject[newLayer.originName];
         newLayer.showName =
-            row.originName + this.layersNameObject[newLayer.originName];
+          row.originName + this.layersNameObject[newLayer.originName];
       }
       this.layers.unshift(newLayer);
       this.layersName.unshift(newLayer.id);
@@ -5679,24 +5418,24 @@ export default {
     async addPgMultiShp(index, row) {
       //判断该shp是否已添加
       if (
-          !Object.prototype.hasOwnProperty.call(
-              this.sourceNameObject,
-              row.originName
-          )
+        !Object.prototype.hasOwnProperty.call(
+          this.sourceNameObject,
+          row.originName
+        )
       ) {
         let newTileJson = initTileJson;
         newTileJson.name = row.originName;
         newTileJson.tiles = [
           this.reqUrl +
-          "/multiPgSource/" +
-          this.mutiPgInfo.ip +
-          "/" +
-          this.mutiPgInfo.port +
-          "/" +
-          this.mutiPgInfo.name +
-          "/" +
-          row.originName +
-          "/{z}/{x}/{y}.pbf",
+            "/multiPgSource/" +
+            this.mutiPgInfo.ip +
+            "/" +
+            this.mutiPgInfo.port +
+            "/" +
+            this.mutiPgInfo.name +
+            "/" +
+            row.originName +
+            "/{z}/{x}/{y}.pbf",
         ];
         let vector_layer = {
           description: "",
@@ -5755,10 +5494,10 @@ export default {
         type: geoType,
         filter: ["all"],
         layout: JSON.parse(
-            JSON.stringify(layerStyleProperties[geoType].layout)
+          JSON.stringify(layerStyleProperties[geoType].layout)
         ),
         maxzoom: 22,
-        metadata: {"mapbox:type": "pgMulti"},
+        metadata: {"mapbox:type":"pgMulti"},
         minzoom: 0,
         paint: JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint)),
         source: this.sourceNameObject[row.id], //添加的sourceId
@@ -5767,22 +5506,22 @@ export default {
 
       if (geoType !== "symbol") {
         newLayer.paint[geoType + "-color"] =
-            "#" + Math.random().toString(16).substr(2, 6);
+          "#" + Math.random().toString(16).substr(2, 6);
       }
 
       if (
-          !Object.prototype.hasOwnProperty.call(
-              this.layersNameObject,
-              newLayer.originName
-          )
+        !Object.prototype.hasOwnProperty.call(
+          this.layersNameObject,
+          newLayer.originName
+        )
       ) {
         this.layersNameObject[newLayer.originName] = 1;
       } else {
         this.layersNameObject[newLayer.originName] += 1;
         newLayer.id =
-            row.originName + this.layersNameObject[newLayer.originName];
+          row.originName + this.layersNameObject[newLayer.originName];
         newLayer.showName =
-            row.originName + this.layersNameObject[newLayer.originName];
+          row.originName + this.layersNameObject[newLayer.originName];
       }
       this.layers.unshift(newLayer);
       this.layersName.unshift(newLayer.id);
@@ -5796,23 +5535,23 @@ export default {
       let name = this.mbTileJsonList[this.mbTileSelectIndex].name;
       //判断该shp是否已添加
       if (
-          !Object.prototype.hasOwnProperty.call(
-              this.sourceNameObject,
-              name //mbtile的souce都是一个,用该json的名字来统计记录
-          )
+        !Object.prototype.hasOwnProperty.call(
+          this.sourceNameObject,
+          name //mbtile的souce都是一个,用该json的名字来统计记录
+        )
       ) {
         //添加mbTile的shp图层时，相关json已经入库
-        // json写法
+            // json写法
         let sourceId = this.mbTileInfo.tileJsonId;
-        let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceId + ".json";
+        let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceId + ".json";  
         let newSourceJson = {
           sourceName: sourceId,
           sourceType: "vector",
           sourceUrl: tileJsonUrl,
-        };
-        console.log('请求数据：', newSourceJson);
-        this.addSourceToMap(newSourceJson);
-        //  直接请求pbf
+        };         
+        console.log('请求数据：',newSourceJson);
+        this.addSourceToMap(newSourceJson);        
+            //  直接请求pbf
         // let tileJsonUrl =
         //   this.reqUrl +
         //   "/" +
@@ -5835,7 +5574,7 @@ export default {
         };
         //记录shp图层和对应的id
         this.sourceNameObject[name] = sourceId;
-      }
+      }    
 
       //前八个是自己用的属性
       let geoType = this.mbsource[row.id];
@@ -5853,14 +5592,10 @@ export default {
         type: geoType,
         filter: ["all"],
         layout: JSON.parse(
-            JSON.stringify(layerStyleProperties[geoType].layout)
+          JSON.stringify(layerStyleProperties[geoType].layout)
         ),
         maxzoom: typeof row["maxzoom"] != "undefined" ? row["maxzoom"] : 22,
-        metadata: {
-          "mapbox:type": 'mbSource',
-          "mapbox:isOSM": this.mbTileInfo.osmMbtilesBoolean,
-          "mapbox:source": row.id
-        },
+        metadata: {"mapbox:type":'mbSource',"mapbox:isOSM":this.mbTileInfo.osmMbtilesBoolean,"mapbox:source":row.id},
         minzoom: typeof row["minzoom"] != "undefined" ? row["minzoom"] : 0,
         paint: JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint)),
         source: this.sourceNameObject[name], //通过记录的source名字与id对应，拿到sourceId
@@ -5869,14 +5604,14 @@ export default {
 
       if (geoType !== "symbol") {
         newLayer.paint[geoType + "-color"] =
-            "#" + Math.random().toString(16).substr(2, 6);
+          "#" + Math.random().toString(16).substr(2, 6);
       }
 
       if (
-          !Object.prototype.hasOwnProperty.call(
-              this.layersNameObject,
-              newLayer.originName
-          )
+        !Object.prototype.hasOwnProperty.call(
+          this.layersNameObject,
+          newLayer.originName
+        )
       ) {
         this.layersNameObject[newLayer.originName] = 1;
       } else {
@@ -5896,23 +5631,23 @@ export default {
       let name = this.mbTileJsonList[this.mbTileSelectIndex].name;
       //判断该shp是否已添加
       if (
-          !Object.prototype.hasOwnProperty.call(
-              this.sourceNameObject,
-              name //mbtile的souce都是一个,用该json的名字来统计记录
-          )
+        !Object.prototype.hasOwnProperty.call(
+          this.sourceNameObject,
+          name //mbtile的souce都是一个,用该json的名字来统计记录
+        )
       ) {
         //添加mbTile的shp图层时，相关json已经入库
-        // json写法
+            // json写法
         let sourceId = this.mbTileInfo.tileJsonId;
-        let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceId + ".json";
+        let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceId + ".json";  
         let newSourceJson = {
           sourceName: sourceId,
           sourceType: "vector",
           sourceUrl: tileJsonUrl,
-        };
-        console.log('请求数据：', newSourceJson);
-        this.addSourceToMap(newSourceJson);
-        //  直接请求pbf
+        };         
+        console.log('请求数据：',newSourceJson);
+        this.addSourceToMap(newSourceJson);        
+            //  直接请求pbf        
         // let tileJsonUrl =
         //   this.reqUrl +
         //   "/" +
@@ -5967,11 +5702,7 @@ export default {
         filter: typeof row["filter"] != "undefined" ? row["filter"] : ["all"],
         layout: JSON.parse(JSON.stringify(newLayout)),
         maxzoom: typeof row["maxzoom"] != "undefined" ? row["maxzoom"] : 22,
-        metadata: {
-          "mapbox:type": 'mbStyle',
-          "mapbox:isOSM": this.mbTileInfo.osmMbtilesBoolean,
-          "mapbox:source": row['source-layer']
-        },
+        metadata: {"mapbox:type":'mbStyle',"mapbox:isOSM":this.mbTileInfo.osmMbtilesBoolean,"mapbox:source":row['source-layer']},
         minzoom: typeof row["minzoom"] != "undefined" ? row["minzoom"] : 0,
         paint: JSON.parse(JSON.stringify(newPaint)),
         source: this.sourceNameObject[name], //通过记录的source名字与id对应，拿到sourceId
@@ -5979,10 +5710,10 @@ export default {
       };
 
       if (
-          !Object.prototype.hasOwnProperty.call(
-              this.layersNameObject,
-              newLayer.originName
-          )
+        !Object.prototype.hasOwnProperty.call(
+          this.layersNameObject,
+          newLayer.originName
+        )
       ) {
         this.layersNameObject[newLayer.originName] = 1;
       } else {
@@ -6001,10 +5732,10 @@ export default {
     async addTMS(index, row) {
       //判断该shp是否已添加
       if (
-          !Object.prototype.hasOwnProperty.call(
-              this.sourceNameObject,
-              row.id
-          )
+        !Object.prototype.hasOwnProperty.call(
+          this.sourceNameObject,
+          row.id
+        )
       ) {
         let newTileJson = initTileJson;
         newTileJson.name = row.name;
@@ -6037,9 +5768,9 @@ export default {
         //   tileSize: 256
         // });
         // this.addSourceToMap(newSourceJson);
-        //  直接请求pbf
-        let tileJsonUrl =
-            "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+            //  直接请求pbf        
+        let tileJsonUrl = 	
+"https://tile.openstreetmap.org/{z}/{x}/{y}.png";
         let newSourceJson = {
           sourceName: sourceId,
           sourceType: "raster",
@@ -6049,7 +5780,7 @@ export default {
           type: newSourceJson.sourceType,
           tiles: [newSourceJson.sourceUrl],
           tileSize: 256
-        });
+        });        
         // 记录shp图层和对应的id        
         this.sources[newSourceJson.sourceName] = {
           type: newSourceJson.sourceType,
@@ -6074,37 +5805,37 @@ export default {
         id: row.id,
         type: "raster",
         maxzoom: 22,
-        metadata: {"mapbox:type": "TMS"},
+        metadata: {"mapbox:type":"TMS"},
         minzoom: 0,
         source: this.sourceNameObject[row.id], //通过记录的source名字与id对应，拿到sourceId
       };
       if (
-          !Object.prototype.hasOwnProperty.call(
-              this.layersNameObject,
-              newLayer.originName
-          )
+        !Object.prototype.hasOwnProperty.call(
+          this.layersNameObject,
+          newLayer.originName
+        )
       ) {
         this.layersNameObject[newLayer.name] = 1;
       } else {
         this.layersNameObject[newLayer.name] += 1;
         newLayer.id =
-            row.name + this.layersNameObject[newLayer.name];
+          row.name + this.layersNameObject[newLayer.name];
         newLayer.showName =
-            row.name + this.layersNameObject[newLayer.name];
+          row.name + this.layersNameObject[newLayer.name];
       }
       this.layers.unshift(newLayer);
       this.layersName.unshift(newLayer.id);
       this.addLayerToMap(newLayer);
-    },
+    },    
     //添加所有styleJson图层
     addAllStyles(List) {
       for (let i in List) {
         let item = List[i];
         console.log("item", item);
         if (
-            item["source"] != "natural_earth_shaded_relief" &&
-            item["type"] != "raster" &&
-            item["type"] != "background"
+          item["source"] != "natural_earth_shaded_relief" &&
+          item["type"] != "raster" &&
+          item["type"] != "background"
         ) {
           this.addStyleMbTileShp(i, item);
         } else if (item["type"] == "background") {
@@ -6134,13 +5865,13 @@ export default {
 
     deleteTileJson(tileJsonId) {
       requestApi
-          .deleteTileJson(tileJsonId)
-          .then((res) => {
-            console.log("delete tileJson: ", res);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+        .deleteTileJson(tileJsonId)
+        .then((res) => {
+          console.log("delete tileJson: ", res);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
 
     //向地图添加数据源source
@@ -6188,7 +5919,7 @@ export default {
       this.editorShow = "";
       // 判断当前页面数据是否为mbtile,以及是否为osm数据
       const datatype = this.layers[this.nowLayerIndex]['metadata']['mapbox:type'];
-      switch (datatype) {
+      switch(datatype){
         case 'primary':
           this.layerSource = 'primary';
           break;
@@ -6198,7 +5929,7 @@ export default {
         case 'mbStyle':
           this.layerSource = 'mbStyle';
           break;
-      }
+      }      
       //设置属性编辑界面的展示情况
       this.menuButtonShowList = this.layers[this.nowLayerIndex].attrShowList;
       this.menuShowList = JSON.parse(JSON.stringify(this.menuButtonShowList)); //先获取包含各个tab的列表
@@ -6224,23 +5955,23 @@ export default {
         this.menuButtonShowList = [];
       });
       this.filterOptions =
-          typeof this.layers[this.nowLayerIndex]["shpAttribute"] != "undefined"
-              ? this.layers[this.nowLayerIndex]["shpAttribute"]
-              : [];
+        typeof this.layers[this.nowLayerIndex]["shpAttribute"] != "undefined"
+          ? this.layers[this.nowLayerIndex]["shpAttribute"]
+          : [];
       //filter赋值
       if (
-          JSON.stringify(this.layers[this.nowLayerIndex].filterValueSet) != "{}"
+        JSON.stringify(this.layers[this.nowLayerIndex].filterValueSet) != "{}"
       ) {
         this.filterCondition =
-            this.layers[this.nowLayerIndex].filterValueSet["filterCondition"];
+          this.layers[this.nowLayerIndex].filterValueSet["filterCondition"];
         this.filterValue =
-            this.layers[this.nowLayerIndex].filterValueSet["filterValue"];
+          this.layers[this.nowLayerIndex].filterValueSet["filterValue"];
         this.filterOptionSelectList =
-            this.layers[this.nowLayerIndex].filterValueSet[
-                "filterOptionSelectList"
-                ];
+          this.layers[this.nowLayerIndex].filterValueSet[
+            "filterOptionSelectList"
+          ];
         this.filterValueSelect =
-            this.layers[this.nowLayerIndex].filterValueSet["filterValueSelect"];
+          this.layers[this.nowLayerIndex].filterValueSet["filterValueSelect"];
       }
     },
 
@@ -6264,7 +5995,7 @@ export default {
       this.nowLayerIndex = index;
       // 判断当前页面数据是否为mbtile,以及是否为osm数据
       const datatype = this.layers[this.nowLayerIndex]['metadata']['mapbox:type'];
-      switch (datatype) {
+      switch(datatype){
         case 'primary':
           this.layerSource = 'primary';
           break;
@@ -6291,54 +6022,54 @@ export default {
         layout: layer.layout,
         paint: layer.paint,
         type: this.styleTypeSelect,
-        styleImgUrl: {ImgUrl: canvasSrc},
+        styleImgUrl: { ImgUrl: canvasSrc },
         description: "",
       };
       this.$prompt("请输入样式名称", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
       })
-          .then(({value}) => {
-            body.description = value;
-            requestApi.createTypeStyle(body).then((res) => {
-              this.$message.success(res.data.data);
-              this.getTypeStyleList(this.styleTypeSelect);
-            });
-          })
-          .catch(() => {
-            this.$message({
-              type: "info",
-              message: "取消样式上传",
-            });
+        .then(({ value }) => {
+          body.description = value;
+          requestApi.createTypeStyle(body).then((res) => {
+            this.$message.success(res.data.data);
+            this.getTypeStyleList(this.styleTypeSelect);
           });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "取消样式上传",
+          });
+        });
     },
     // 删除自定义模板样式
     tempCardDelete(id) {
       requestApi
-          .deleteTypeStyle(id)
-          .then((res) => {
-            this.$message.success(res.data.data);
-            this.getTypeStyleList(this.styleTypeSelect);
-          })
-          .catch(() => {
-            this.$message.info("删除失败");
-          });
+        .deleteTypeStyle(id)
+        .then((res) => {
+          this.$message.success(res.data.data);
+          this.getTypeStyleList(this.styleTypeSelect);
+        })
+        .catch(() => {
+          this.$message.info("删除失败");
+        });
     },
     //获取地图的类型样式列表
     getTypeStyleList(type) {
       requestApi
-          .getTypeStyleList(type)
-          .then((res) => {
-            if (res.data.code == 0) {
-              this.typeStyleBase[type] = res.data.data;
-              console.log("typeStyleBase", this.typeStyleBase);
-            } else {
-              console.log(res.data.msg);
-            }
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+        .getTypeStyleList(type)
+        .then((res) => {
+          if (res.data.code == 0) {
+            this.typeStyleBase[type] = res.data.data;
+            console.log("typeStyleBase", this.typeStyleBase);
+          } else {
+            console.log(res.data.msg);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
     templateStyleChange(val) {
       let index = 0;
@@ -6356,10 +6087,10 @@ export default {
       //先更新原样式
       let aimLayer = this.layers[this.nowLayerIndex];
       this.originStyle[this.nowLayerIndex].paint = JSON.parse(
-          JSON.stringify(aimLayer.paint)
+        JSON.stringify(aimLayer.paint)
       );
       this.originStyle[this.nowLayerIndex].layout = JSON.parse(
-          JSON.stringify(aimLayer.layout)
+        JSON.stringify(aimLayer.layout)
       );
       aimLayer.paint = JSON.parse(JSON.stringify(row.paint));
       aimLayer.layout = JSON.parse(JSON.stringify(row.layout));
@@ -6378,10 +6109,10 @@ export default {
       //先更新原样式
       let aimLayer = this.layers[this.nowLayerIndex];
       this.originStyle[this.nowLayerIndex].paint = JSON.parse(
-          JSON.stringify(aimLayer.paint)
+        JSON.stringify(aimLayer.paint)
       );
       this.originStyle[this.nowLayerIndex].layout = JSON.parse(
-          JSON.stringify(aimLayer.layout)
+        JSON.stringify(aimLayer.layout)
       );
       if ("layout" in row) {
         for (let key in row.layout) {
@@ -6395,10 +6126,10 @@ export default {
       }
       //先改参数再更新图层，打开图层编辑框
       console.log(
-          "apply",
-          row,
-          "style to",
-          this.layers[this.nowLayerIndex].originName
+        "apply",
+        row,
+        "style to",
+        this.layers[this.nowLayerIndex].originName
       );
       console.log("应用完Mbtile图层样式", aimLayer);
       this.handleRemoveLayer(aimLayer.id);
@@ -6451,10 +6182,10 @@ export default {
       console.log("change layer type to", val);
       let aimLayer = this.layers[this.nowLayerIndex];
       aimLayer.paint = JSON.parse(
-          JSON.stringify(layerStyleProperties[val].paint)
+        JSON.stringify(layerStyleProperties[val].paint)
       );
       aimLayer.layout = JSON.parse(
-          JSON.stringify(layerStyleProperties[val].layout)
+        JSON.stringify(layerStyleProperties[val].layout)
       );
       this.handleRemoveLayer(aimLayer.id);
       if (this.nowLayerIndex === 0) {
@@ -6468,58 +6199,58 @@ export default {
     //图标图层相关
     getSymbolList() {
       requestApi
-          .getSymbolList({
-            asc: false,
-            page: this.currentPageSymbol,
-            pageSize: this.pageSizeSymbol,
-            searchText: this.searchInputSymbol,
-            sortField: "createTime",
-          })
-          .then((res) => {
-            console.log("SymbolList:", res.data);
-            this.symbolTableData = res.data.data.content;
-            this.totalDataCountSymbol = res.data.data.totalElements;
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+        .getSymbolList({
+          asc: false,
+          page: this.currentPageSymbol,
+          pageSize: this.pageSizeSymbol,
+          searchText: this.searchInputSymbol,
+          sortField: "createTime",
+        })
+        .then((res) => {
+          console.log("SymbolList:", res.data);
+          this.symbolTableData = res.data.data.content;
+          this.totalDataCountSymbol = res.data.data.totalElements;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
       this.spriteList = map.listImages();
       // 将固定的数据用于组件访问
       localStorage.setItem("spriteList", JSON.stringify(this.spriteList));
       localStorage.setItem(
-          "symbolTableData",
-          JSON.stringify(this.symbolTableData)
+        "symbolTableData",
+        JSON.stringify(this.symbolTableData)
       );
     },
     getFontList() {
       requestApi
-          .getFontList()
-          .then((res) => {
-            for (let i in res.data.data) {
-              this.fontList.push({
-                name: res.data.data[i],
-                type: "offline",
-              });
-            }
-            console.log("fontList", this.fontList);
-            localStorage.setItem("fontList", JSON.stringify(this.fontList));
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+        .getFontList()
+        .then((res) => {
+          for (let i in res.data.data) {
+            this.fontList.push({
+              name: res.data.data[i],
+              type: "offline",
+            });
+          }
+          console.log("fontList", this.fontList);
+          localStorage.setItem("fontList", JSON.stringify(this.fontList));
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
     iconSelect(item) {
       this.layers[this.nowLayerIndex].layout["icon-image"] = item.originName;
       this.$refs.iconPopover.doClose();
 
       this.loadAndAddImg(
-          this.reqUrl + "/symbol/getSymbolById/" + item.id,
-          item.originName
+        this.reqUrl + "/symbol/getSymbolById/" + item.id,
+        item.originName
       );
       this.handleLayoutChange(
-          this.layers[this.nowLayerIndex]["id"],
-          "icon-image",
-          this.layers[this.nowLayerIndex].layout["icon-image"]
+        this.layers[this.nowLayerIndex]["id"],
+        "icon-image",
+        this.layers[this.nowLayerIndex].layout["icon-image"]
       );
     },
     spriteSelect(item) {
@@ -6527,75 +6258,75 @@ export default {
       this.layers[this.nowLayerIndex].layout["icon-image"] = item;
       this.$refs.iconPopover.doClose();
       this.handleLayoutChange(
-          this.layers[this.nowLayerIndex]["id"],
-          "icon-image",
-          this.layers[this.nowLayerIndex].layout["icon-image"]
+        this.layers[this.nowLayerIndex]["id"],
+        "icon-image",
+        this.layers[this.nowLayerIndex].layout["icon-image"]
       );
     },
     spriteChange() {
       this.$confirm(
-          "切换精灵图必须保存地图项目，且已使用的其他精灵图图标将不可用，是否保存地图并切换精灵图？",
-          "提示",
-          {
-            confirmButtonText: "确定",
-            cancelButtonText: "取消",
-          }
+        "切换精灵图必须保存地图项目，且已使用的其他精灵图图标将不可用，是否保存地图并切换精灵图？",
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+        }
       )
-          .then(() => {
-            if (this.spriteNameSelect != "") {
-              const url =
-                  this.reqUrl +
-                  "/store/sprites/" +
-                  this.spriteNameSelect +
-                  "/" +
-                  "sprite.json";
-              fetch(url)
-                  .then((res) => {
-                    return res.json();
-                  })
-                  .then((json) => {
-                    this.spriteJsonSelect = json;
-                    console.log("精灵图json", this.spriteJsonSelect);
-                  });
-              this.spritePngSelect =
-                  this.reqUrl +
-                  "/store/sprites/" +
-                  this.spriteNameSelect +
-                  "/" +
-                  "sprite.png";
-            }
-            this.spritePath =
-                "/store/sprites/" + this.spriteNameSelect + "/sprite";
-            this.saveMap();
-          })
-          .catch(() => {
-            this.$message({
-              type: "info",
-              message: "取消切换",
-            });
+        .then(() => {
+          if (this.spriteNameSelect != "") {
+            const url =
+              this.reqUrl +
+              "/store/sprites/" +
+              this.spriteNameSelect +
+              "/" +
+              "sprite.json";
+            fetch(url)
+              .then((res) => {
+                return res.json();
+              })
+              .then((json) => {
+                this.spriteJsonSelect = json;
+                console.log("精灵图json", this.spriteJsonSelect);
+              });
+            this.spritePngSelect =
+              this.reqUrl +
+              "/store/sprites/" +
+              this.spriteNameSelect +
+              "/" +
+              "sprite.png";
+          }
+          this.spritePath =
+            "/store/sprites/" + this.spriteNameSelect + "/sprite";
+          this.saveMap();
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "取消切换",
           });
+        });
     },
     clickSprite(item, key, index) {
       this.layers[this.nowLayerIndex].layout["icon-image"] = key;
       this.handleLayoutChange(
-          this.layers[this.nowLayerIndex]["id"],
-          "icon-image",
-          key
+        this.layers[this.nowLayerIndex]["id"],
+        "icon-image",
+        key
       );
       console.log("当前点击的精灵图信息", item, key, index);
     },
     spriteInit() {
       requestApi
-          .getSpriteList()
-          .then((res) => {
-            console.log(res);
-            this.spriteClassList = res.data.data;
+        .getSpriteList()
+        .then((res) => {
+          console.log(res);
+          this.spriteClassList = res.data.data;
 
-            // this.spriteNameSelect = this.spriteClassList[0];
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+          // this.spriteNameSelect = this.spriteClassList[0];
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
     symbolChange(val) {
       if (val == "icon") {
@@ -6629,22 +6360,22 @@ export default {
         this.textField,
       ];
       this.handleLayoutChange(
-          this.layers[this.nowLayerIndex]["id"],
-          "text-field",
-          ["get", this.textField]
+        this.layers[this.nowLayerIndex]["id"],
+        "text-field",
+        ["get", this.textField]
       );
       console.log(
-          "text-field",
-          this.layers[this.nowLayerIndex].layout["text-field"]
+        "text-field",
+        this.layers[this.nowLayerIndex].layout["text-field"]
       );
     },
     fontSelect(row) {
       this.layers[this.nowLayerIndex].layout["text-font"][0] = row.name;
       this.$refs.fontPopover.doClose();
       this.handleLayoutChange(
-          this.layers[this.nowLayerIndex]["id"],
-          "text-font",
-          this.layers[this.nowLayerIndex].layout["text-font"]
+        this.layers[this.nowLayerIndex]["id"],
+        "text-font",
+        this.layers[this.nowLayerIndex].layout["text-font"]
       );
     },
 
@@ -6674,7 +6405,7 @@ export default {
         // });
         map.fitBounds(bbox, {
           duration: 500,
-          padding: {top: 10, bottom: 25, left: 15, right: 5},
+          padding: { top: 10, bottom: 25, left: 15, right: 5 },
         });
       }
       // const center = [Number((row.bounds[0]+row.bounds[2])/2),Number((row.bounds[1]+row.bounds[3])/2)]
@@ -6766,56 +6497,56 @@ export default {
     filterValueInit(index) {
       //更新筛选条件的列表
       this.filterOptionSelectList.splice(
-          index,
-          0,
-          this.filterCondition[index].option
+        index,
+        0,
+        this.filterCondition[index].option
       );
       requestApi
-          .getAttrValue({
-            aimAttrName: this.filterCondition[this.nowFilterIndex].option,
-            aimShpTableName: this.layers[this.nowLayerIndex]["source-layer"],
-            page: this.filterSearchPage,
-            pageSize: 10,
-            searchText: this.filterSearch,
-            sort: "asc",
-          })
-          .then((res) => {
-            console.log("filterlist", res);
-            this.filterValue.splice(
-                [this.nowFilterIndex],
-                0,
-                res.data.data.attrValue
-            );
-            this.filterValueSelect = this.filterValue[this.nowFilterIndex];
-            this.totalDataCountFilter = res.data.data.featureCount;
-            console.log("filterValue", this.filterValue);
-            console.log("filtertotal", this.totalDataCountFilter);
-            console.log("filterValueSelect", this.filterValueSelect);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+        .getAttrValue({
+          aimAttrName: this.filterCondition[this.nowFilterIndex].option,
+          aimShpTableName: this.layers[this.nowLayerIndex]["source-layer"],
+          page: this.filterSearchPage,
+          pageSize: 10,
+          searchText: this.filterSearch,
+          sort: "asc",
+        })
+        .then((res) => {
+          console.log("filterlist", res);
+          this.filterValue.splice(
+            [this.nowFilterIndex],
+            0,
+            res.data.data.attrValue
+          );
+          this.filterValueSelect = this.filterValue[this.nowFilterIndex];
+          this.totalDataCountFilter = res.data.data.featureCount;
+          console.log("filterValue", this.filterValue);
+          console.log("filtertotal", this.totalDataCountFilter);
+          console.log("filterValueSelect", this.filterValueSelect);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
 
     handleCurrentChangeFilter(val) {
       this.filterSearchPage = val;
       requestApi
-          .getAttrValue({
-            aimAttrName: this.filterCondition[this.nowFilterIndex].option,
-            aimShpTableName: this.layers[this.nowLayerIndex]["source-layer"],
-            page: this.filterSearchPage,
-            pageSize: 10,
-            searchText: this.filterSearch,
-            sort: "asc",
-          })
-          .then((res) => {
-            console.log("res", res);
-            this.filterValueSelect = res.data.data.attrValue;
-            this.totalDataCountFilter = res.data.data.featureCount;
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+        .getAttrValue({
+          aimAttrName: this.filterCondition[this.nowFilterIndex].option,
+          aimShpTableName: this.layers[this.nowLayerIndex]["source-layer"],
+          page: this.filterSearchPage,
+          pageSize: 10,
+          searchText: this.filterSearch,
+          sort: "asc",
+        })
+        .then((res) => {
+          console.log("res", res);
+          this.filterValueSelect = res.data.data.attrValue;
+          this.totalDataCountFilter = res.data.data.featureCount;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
     //添加筛选框用户输入的value
     handleFilterValue(item, index) {
@@ -6861,7 +6592,7 @@ export default {
     },
     handleFilter(row) {
       this.filterCondition[this.nowFilterIndex].value =
-          row[this.filterOptionSelectList[this.nowFilterIndex]];
+        row[this.filterOptionSelectList[this.nowFilterIndex]];
     },
     filterConfirm() {
       let judge = this.filterWay;
@@ -6897,7 +6628,7 @@ export default {
       this.layers[this.nowLayerIndex][layoutOrpaint][attribute] = value;
       const id = this.layers[this.nowLayerIndex]["id"];
       layoutOrpaint == "layout" &&
-      this.handleLayoutChange(id, attribute, value);
+        this.handleLayoutChange(id, attribute, value);
       layoutOrpaint == "paint" && this.handlePaintChange(id, attribute, value);
       this.attrValueSet[attribute] = parameters;
       console.log("parameters1:", this.attrValueSet[attribute]);
@@ -6907,15 +6638,138 @@ export default {
       console.log("oldActiveName", oldActiveName, this.menuButtonShowList);
     },
     // test1(val) {
-    // const features = map.querySourceFeatures("62fb9590abf4b6e7a4f6d517",{sourceLayer:"place"});
-    // console.log("features",features);
-    // if(val){
-    //   this.dataLayers = streets.vector_layers;
-    // }else{
-    // this.styleLayers = style.layers;
-    // this.addAllStyles(style.layers)
-    // }
+      // const features = map.querySourceFeatures("62fb9590abf4b6e7a4f6d517",{sourceLayer:"place"});
+      // console.log("features",features);
+      // if(val){
+      //   this.dataLayers = streets.vector_layers;
+      // }else{
+        // this.styleLayers = style.layers;
+        // this.addAllStyles(style.layers)
+      // }
     // },
+    // 待删除
+    //添加数据库相关
+    //打开shp选择框
+    async addShpData() {
+      if (this.mbTileSelect == "") {
+        await this.getMbtilesList();
+      } else {
+        this.getStyleListById(this.mbTileSelect, false);
+      }
+      //依据所选的mbTile，获取对应的styleJson
+
+      if (this.PgBaseSelect == "defaultPG") {
+        requestApi
+          .getShpList({
+            asc: false,
+            page: this.currentPageShp,
+            pageSize: this.pageSizeShp,
+            searchText: this.searchInputShp,
+            sortField: "createTime",
+          })
+          .then((res) => {
+            console.log("shpbase", res.data);
+            this.shpTableData = res.data.data.content;
+            this.totalDataCountShp = res.data.data.totalElements;
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+      this.getPgList();
+    }, 
+    getTileJsonById(id){
+      requestApi
+        .getTileJson(id)
+        .then((res) => {
+          this.mbTileJson = res.data;
+          this.dataLayers = res.data.vector_layers;
+          console.log('tileJson',this.mbTileJson);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },    
+    getPgList() {
+      requestApi
+        .getPgList()
+        .then((res) => {
+          this.pgShpList = res.data.data;
+          this.pgShpList.unshift({ name: "defaultPG", id: "defaultPG" });
+          console.log("pgList", this.pgShpList);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }, 
+    handleCurrentChangeShp(val) {
+      this.currentPageShp = val;
+      if (this.PgBaseSelect != "defaultPG") {
+        this.PgBaseChange();
+      } else {
+        this.addShpData();
+      }
+    },
+    PgBaseChange(val) {
+      //val表示选择的value值
+      let index = 0;
+      //获取select选择内容的下标
+      this.pgShpList.forEach((e, ind) => {
+        if (e.id == val) {
+          index = ind;
+        }
+      });
+      //更改pg数据库源，同时修改dataBaseSelect类型
+      this.dataBaseSelect =
+        this.PgBaseSelect == "defaultPG" ? "defaultPG" : "multiPG";
+      console.log("PgBaseSelect2", this.PgBaseSelect);
+      if (this.PgBaseSelect != "defaultPG") {
+        this.shpTableData = this.pgShpList[index].dataInfo;
+        this.mutiPgInfo = this.pgShpList[index]; //用于展示IP、端口信息
+      } else {
+        this.addShpData();
+      }
+    },           
+    getMbtilesList() {
+      requestApi.getMbtilesList().then((res) => {
+        console.log(res);
+        if (res.data.data.length != 0) {
+          this.mbTileJsonList = res.data.data;
+          console.log("mbTileJsonList", this.mbTileJsonList);
+          //mbTiles先默认为第一个osm数据
+          this.mbTileSelect = this.mbTileJsonList[0].id;
+          this.mbTileInfo = this.mbTileJsonList[0];
+          this.getTileJsonById(this.mbTileInfo.tileJsonId);
+          this.getStyleListById(this.mbTileSelect, false);
+          console.log("dataLayers", this.dataLayers);
+        }
+      });
+    },       
+    dataBaseClick(tab) {
+      this.dataBaseSelect = tab.name == "PG" ? "defaultPG" : tab.name;
+      console.log("dataBaseSelect", this.dataBaseSelect);
+      switch(tab.name){
+        case "TMS":
+          this.getOutService();
+          break;
+      }
+    },
+    // TMS服务
+    getOutService() {
+      requestApi
+        .getThirdPartSourceList(this.dataBaseSelect)
+        .then((res) => {
+          if (res.data.code == 0) {
+            this.urlBase[this.dataBaseSelect] = res.data.data;
+          } else {
+            console.log(res.data.csg);
+          }
+          console.log("urlBase",this.urlBase);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },    
   },
 };
 </script>
@@ -6930,13 +6784,11 @@ export default {
   align-items: center;
   flex-direction: column;
 }
-
 .spriteCard:hover {
   border-radius: 4px;
   background-color: #57575a;
   box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.3);
 }
-
 #temp-features {
   position: absolute;
   top: 0;
@@ -6946,17 +6798,14 @@ export default {
   overflow: auto;
   background: rgba(255, 255, 255, 0.8);
 }
-
 h3 {
   margin: 0;
   display: inline-block;
 }
-
 h4 {
   margin: 5px 0;
   white-space: nowrap;
 }
-
 .Container {
   width: 100%;
   height: 100%;
@@ -6984,7 +6833,6 @@ h4 {
   height: calc(100vh - 170px);
   /* overflow-y: scroll; */
 }
-
 /* .layerTable::-webkit-scrollbar {
   width: 0;
   height: 0;
@@ -7002,29 +6850,24 @@ h4 {
   margin-left: 330px;
   z-index: 99;
 }
-
 /* 样式框标题 */
 .stylesBoxTitle {
   height: 40px;
   border-bottom: 1px #dcdfe6;
   /* background-color: ; */
 }
-
 /* 模板折叠框样式 */
 .templateCol .el-collapse-item__wrap:nth-child(1) {
   max-height: 550px;
   overflow-y: scroll;
 }
-
 .templateCol .el-collapse-item__wrap:nth-child(2) {
   max-height: calc(100vh - 200px);
   overflow-y: hidden;
 }
-
 .templateCol .el-collapse-item__wrap::-webkit-scrollbar {
   width: 0px;
 }
-
 /* 模板展示框样式 */
 .templateCard {
   position: relative;
@@ -7035,23 +6878,19 @@ h4 {
   width: 150px;
   margin: 5px 10px;
 }
-
 .templateCard .el-card__body {
   padding: 0;
 }
-
 /* 模板名称样式 */
 .tempCardName {
   padding: 0 25px;
 }
-
 .tempCardName span {
   width: 100px;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
 }
-
 /* 样式删除按钮 */
 .tempDeleBtn {
   position: absolute;
@@ -7061,11 +6900,9 @@ h4 {
   top: 120px;
   z-index: 1;
 }
-
 .tempDeleBtn:hover {
   color: red;
 }
-
 /* mbTile折叠框内容样式 */
 .mbTileCollapse {
   width: 100%;
@@ -7090,7 +6927,6 @@ h4 {
   height: 40px;
   line-height: 40px;
 }
-
 /* 编辑框文本名框 */
 .editBoardTitle {
   position: absolute;
@@ -7105,7 +6941,6 @@ h4 {
   display: flex;
   align-items: center;
 }
-
 .editBoardTitle div {
   display: inline-block;
   width: 120px;
@@ -7114,16 +6949,13 @@ h4 {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
 .editBoardTitle .el-icon-edit {
   display: none;
 }
-
 .editBoardTitle:hover .el-icon-edit {
   display: block;
   cursor: pointer;
 }
-
 .editBoardTitle:hover div {
   cursor: pointer;
   color: #75b9ff;
@@ -7133,7 +6965,6 @@ h4 {
   cursor: pointer;
   color: Red;
 }
-
 /* 编辑框导航条tabs */
 .editBoard .el-tabs__header.is-top {
   background-color: rgb(255, 255, 255);
@@ -7146,7 +6977,6 @@ h4 {
   /*justify-content: right;*/
   display: flex;
 }
-
 .el-tabs__item {
   padding: 0 10px;
 }
@@ -7154,7 +6984,6 @@ h4 {
 .editBoard .el-tabs__header.is-top .el-tabs__nav-wrap.is-top {
   text-align: left;
 }
-
 /* 样式设置tabs导航条样式 */
 .editBoard .el-tabs--border-card > .el-tabs__header {
   background-color: rgb(255, 255, 255);
@@ -7171,23 +7000,20 @@ h4 {
   padding: 0px 10px;
   /*margin: 10px 0px;*/
 }
-
 /* 删除导航条前后箭头 */
 .editBoard
-.el-tabs__header.is-left
-.el-tabs__nav-wrap.is-scrollable.is-left
-.el-tabs__nav-prev,
+  .el-tabs__header.is-left
+  .el-tabs__nav-wrap.is-scrollable.is-left
+  .el-tabs__nav-prev,
 .editBoard
-.el-tabs__header.is-left
-.el-tabs__nav-wrap.is-scrollable.is-left
-.el-tabs__nav-next {
+  .el-tabs__header.is-left
+  .el-tabs__nav-wrap.is-scrollable.is-left
+  .el-tabs__nav-next {
   display: none;
 }
-
 .editBoard .el-tabs__header.is-left .el-tabs__nav-wrap.is-scrollable.is-left {
   padding: 0px;
 }
-
 /* 样式设置tab内容框样式 */
 .editBoard .el-tabs--border-card > .el-tabs__content {
   /* margin: 5px 10px 0px 0px; */
@@ -7195,7 +7021,6 @@ h4 {
   height: calc(100vh - 82px);
   overflow-y: scroll;
 }
-
 /* 图标编辑框导航条 */
 .symbolSort {
   position: absolute;
@@ -7208,70 +7033,60 @@ h4 {
   align-items: center;
   z-index: 10000;
 }
-
 .symbolSort span {
   font-size: 14px;
 }
-
 .symbolSort span:hover {
   cursor: pointer;
 }
-
 .symbolBox .el-tabs__nav-scroll {
   margin-top: 40px;
   overflow: scroll;
   height: calc(100vh - 42px - 40px);
 }
-
 /* 数据设置tabs内容框样式 */
 .editBoard
-.el-tabs.el-tabs--top
-> .el-tabs__content
-> .el-tab-pane:nth-child(2) {
-  width: 310px;
+  .el-tabs.el-tabs--top
+  > .el-tabs__content
+  > .el-tab-pane:nth-child(2) {
+  width: 320px;
   height: calc(100vh - 81px);
   background-color: white;
   padding: 20px;
   border: 1px solid #e4e7ed;
   overflow-y: scroll;
 }
-
 /* 隐藏样式和数据设置的滚动条 */
 .symbolBox .el-tabs__nav-scroll::-webkit-scrollbar,
 .editBoard
-.el-tabs.el-tabs--top
-> .el-tabs__content
-> .el-tab-pane:nth-child(2)::-webkit-scrollbar,
+  .el-tabs.el-tabs--top
+  > .el-tabs__content
+  > .el-tab-pane:nth-child(2)::-webkit-scrollbar,
 .editBoard .el-tabs--border-card > .el-tabs__content::-webkit-scrollbar {
   width: 0;
   height: 0;
   color: transparent;
 }
-
 /* 属性框样式 */
 .tableCondition .el-table__body-wrapper.is-scrolling-none:hover {
   cursor: pointer;
   background-color: #f5f7fa;
 }
-
 /* 数据源配置form */
 .editBoard .el-form.el-form--label-right > .el-form-item {
   margin: 0;
 }
-
 .editBoard
-.el-form.el-form--label-right
-> .el-form-item
-.el-form-item__content {
+  .el-form.el-form--label-right
+  > .el-form-item
+  .el-form-item__content {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
 .editBoard .el-divider--horizontal {
   margin: 12px 0;
 }
-
 .rightMap {
   width: 100%;
 }
@@ -7308,7 +7123,6 @@ h4 {
   width: 150px;
   /* height: 30px; */
 }
-
 .item {
   display: flex;
   margin: 1px 0;
@@ -7317,13 +7131,11 @@ h4 {
   color: black;
   border-radius: 5px;
 }
-
 .item:hover {
   color: #4264fb;
   background-color: #e0e7eb;
   cursor: pointer;
 }
-
 .iconBox {
   width: 18px;
   height: 18px;
@@ -7331,7 +7143,6 @@ h4 {
   justify-content: center;
   align-items: center;
 }
-
 .colorBox {
   width: 18px;
   height: 18px;
@@ -7340,7 +7151,6 @@ h4 {
   border-radius: 5px;
   margin: 0 2px;
 }
-
 .item_name {
   /* margin-left: 30px; */
   max-width: 100px;
@@ -7348,7 +7158,6 @@ h4 {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
 /* 未设置过滤条件框样式 */
 .displayBox {
   width: 100%;
@@ -7360,7 +7169,6 @@ h4 {
   pointer-events: none;
   color: #d3d3d3;
 }
-
 /* 筛选条件框样式 */
 .filterBox {
   display: flex;
@@ -7379,7 +7187,6 @@ h4 {
   min-width: calc((100% - 20px) / 3);
   max-width: calc((100% - 20px) / 3);
 }
-
 .spriteImage:nth-child(3n) {
   margin-right: 0;
 }
@@ -7388,7 +7195,6 @@ h4 {
 .cursor:hover {
   cursor: pointer;
 }
-
 /* 图标按钮样式 */
 .iconBtn:hover {
   cursor: pointer;

@@ -71,6 +71,8 @@
           <div class="time">{{ item.created }}</div>
           <div class="bts">
             <el-button size="mini" type="success" icon="el-icon-edit-outline" circle title="编辑"
+                       @click="editMapProject1(item)"></el-button>
+            <el-button size="mini" type="success" icon="el-icon-edit-outline" circle title="编辑"
                        @click="editMapProject(item)"></el-button>
             <el-button size="mini" type="info" icon="el-icon-document-copy" circle title="复制"
                        @click="copyMapProject(item)"></el-button>
@@ -183,7 +185,11 @@ export default {
       let mapProjectId = item.id
       let newUrl=this.$router.resolve({path: `/MapEditor/${mapProjectId}`})
       window.open(newUrl.href, '_blank');
-
+    },
+    editMapProject1(item) {
+      let mapProjectId = item.id
+      let newUrl=this.$router.resolve({path: `/MapEdit/${mapProjectId}`})
+      window.open(newUrl.href, '_blank');
     },
 
     prjNameChange(item){

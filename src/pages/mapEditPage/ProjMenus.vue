@@ -1,0 +1,77 @@
+<template>
+  <div class="menuPanel">
+    <!-- 标题 -->
+    <div class="menuTitle">
+      <h2>{{ mapProjectInfoProp.name }}</h2>
+      <el-divider class="divider"></el-divider>
+    </div>
+    <!-- 按钮组 -->
+    <ProjButtons></ProjButtons>
+    <ProjLayers></ProjLayers>
+  </div>
+</template>
+<script>
+// import requestApi from "@/api/requestApi";
+import { mapState, mapActions, mapMutations } from "vuex";
+import ProjButtons from "./ProjButtons.vue";
+import ProjLayers from "./ProjLayers.vue";
+
+export default {
+  components: { ProjButtons,ProjLayers },
+  name: "ProjMenus",
+  props: ["", ""],
+  data() {
+    return {
+      // 公共参数
+      mapProjectId: "",
+      // mapProjectInfo: '',
+      // layersName: '',
+
+      // 发布
+      publicBoolean: false,
+    };
+  },
+  computed: {
+    ...mapState({
+      mapProjectInfoProp: "mapProjectInfo",
+      layersNameProp: "layersName",
+      layersProp: "layers",
+      sourcesProp: "sources",
+    }),
+  },
+  mounted() {
+    // 等初始组件信息加载完
+    this.$bus.$on("init", () => {
+      this.infoInit();
+    });
+  },
+  methods: {
+    // vuex
+    ...mapActions({ updateParm: "update" }), //将 `this.updateParm(data)` 映射为 `this.$store.dispatch('update',data)`
+    ...mapMutations({ UPDATEPARM: "UPDATE" }), //将 `this.UPDATEPARM(data)` 映射为 `this.$store.commit('UPDATE',data)`
+    infoInit() {
+      // 初始化公共参数
+      this.mapProjectInfo = this.mapProjectInfoProp;
+      this.layersName = this.layersNameProp;
+      this.layers = this.layersProp;
+      this.sources = this.sourcesProp;
+    },
+  },
+};
+</script>
+
+<style scoped>
+.menuPanel {
+  width: 330px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.menuTitle {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+</style>
