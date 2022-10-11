@@ -233,9 +233,9 @@ export default {
     return{
       // 传递的参数
       sourceNameObject: {},      //检测source重复
-      layersNameObject: {},      //检测重复  后端字段为layerTree
+      layersNameObject: {},      //检测重复  后端字段为nameObject
       layers: [],
-      sources: [],
+      sources:{},
       layersName: [],
       mapProjectId: '',
       originStyle: [],
@@ -420,6 +420,8 @@ export default {
       }
       this.$bus.$emit("mapEdit",{type:'off'});
     },
+
+
     async addPgDefaultShp(index, row) {
       console.log("add pgDefault shp row: ", row);
       //判断该shp是否已添加
@@ -486,6 +488,7 @@ export default {
         attrValueSet: {},
         attrShowList: {},
         filterValueSet: {},
+        nodeType: "layer", //组和图层区分
         id: row.originName,
         type: geoType,
         filter: ["all"],
@@ -535,6 +538,8 @@ export default {
       this.UPDATEPARM({parm:'layersNameObject',value:this.layersNameObject});
 
     },
+
+
     async addPgMultiShp(index, row) {
       console.log("add pgMulti shp row: ", row);
       //判断该shp是否已添加
@@ -611,6 +616,7 @@ export default {
         attrValueSet: {},
         attrShowList: {},
         filterValueSet: {},
+        nodeType: "layer", //组和图层区分
         id: row.originName,
         type: geoType,
         filter: ["all"],
@@ -659,6 +665,8 @@ export default {
       this.UPDATEPARM({parm:'sourceNameObject',value:this.sourceNameObject});
       this.UPDATEPARM({parm:'layersNameObject',value:this.layersNameObject});      
     },
+
+
     async addDataMbTileShp(index, row) {
       console.log("add mbDate shp row: ", row);
       let name = this.mbTileJsonList[this.mbTileSelectIndex].name;
@@ -700,6 +708,7 @@ export default {
         attrValueSet: {},
         attrShowList: {},
         filterValueSet: {},
+        nodeType: "layer", //组和图层区分
         id: row.id,
         type: geoType,
         filter: ["all"],
@@ -746,6 +755,8 @@ export default {
       this.UPDATEPARM({parm:'sourceNameObject',value:this.sourceNameObject});
       this.UPDATEPARM({parm:'layersNameObject',value:this.layersNameObject});      
     },
+
+
     async addStyleMbTileShp(index, row) {
       console.log("add mbStyle shp row: ", row);
       let name = this.mbTileJsonList[this.mbTileSelectIndex].name;
@@ -800,6 +811,7 @@ export default {
         attrValueSet: {},
         attrShowList: {},
         filterValueSet: {},
+        nodeType: "layer", //组和图层区分
         id: row.id,
         type: geoType,
         filter: typeof row["filter"] != "undefined" ? row["filter"] : ["all"],
@@ -839,6 +851,7 @@ export default {
       this.UPDATEPARM({parm:'sourceNameObject',value:this.sourceNameObject});
       this.UPDATEPARM({parm:'layersNameObject',value:this.layersNameObject});      
     },
+
     async addTMS(index, row) {
       console.log("add TMS shp row: ", row);
       //判断该shp是否已添加
@@ -894,6 +907,7 @@ export default {
         attrValueSet: {},
         attrShowList: {},
         filterValueSet: {},
+        nodeType: "layer", //组和图层区分
         id: row.id,
         type: "raster",
         maxzoom: 22,
@@ -924,7 +938,8 @@ export default {
       this.UPDATEPARM({parm:'layersName',value:this.layersName});
       this.UPDATEPARM({parm:'sourceNameObject',value:this.sourceNameObject});
       this.UPDATEPARM({parm:'layersNameObject',value:this.layersNameObject});      
-    },  
+    },
+
     addBackground(sourceType, row) {
       const index = this.layers.length;       // 判断是否有图层，有则添加在最后一位，否则直接添加
       const newLayout = layerStyleProperties["background"].layout;
@@ -991,7 +1006,8 @@ export default {
       // 更新vuex参数
       this.UPDATEPARM({parm:'layers',value:this.layers})          
       this.UPDATEPARM({parm:'layersName',value:this.layersName})          
-      this.UPDATEPARM({parm:'layersNameObject',value:this.layersNameObject})               
+      this.UPDATEPARM({parm:'layersNameObject',value:this.layersNameObject})
+
     },    
     // 保存地图
     saveMap(flag) {

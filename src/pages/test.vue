@@ -871,7 +871,7 @@ export default {
       totalDataCountShp: 0,
 
       //左侧shp图层树
-      layersNameObject: {}, //检测重复  后端字段为layerTree
+      layersNameObject: {}, //检测重复  后端字段为nameObject
       layersName: [], //加载的图层id集合，用于展示图层按index的排列
 
       //mapbox地图
@@ -954,7 +954,7 @@ export default {
             this.zoom = this.mapProjectInfo.zoom
             this.sources = this.mapProjectInfo.sources
             this.layers = this.mapProjectInfo.layers.layers
-            this.layersNameObject = this.mapProjectInfo.layerTree
+            this.layersNameObject = this.mapProjectInfo.nameObject
             this.createEmptyMap()
             this.initMapWithData()
             for (const i in this.layers) {
@@ -1140,7 +1140,7 @@ export default {
         this.mapProjectInfo.center = this.center.toString()
         this.mapProjectInfo.sources = this.sources
         this.mapProjectInfo.layers = {layers: this.layers}
-        this.mapProjectInfo.layerTree = this.layersNameObject
+        this.mapProjectInfo.nameObject = this.layersNameObject
 
         requestApi.updateMapProject(JSON.stringify(this.mapProjectInfo))
             .then(() => {

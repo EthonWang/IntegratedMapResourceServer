@@ -28,8 +28,9 @@ export default {
       spritePath: "",
       glyphsPath: "",
       sources: {},
-      layers: [],      
-      layersNameObject: {}, //检测重复  后端字段为layerTree
+      layers: [],
+      layersTree:[],
+      layersNameObject: {}, //检测重复  后端字段为nameObject
       layersName: [], //加载的图层id集合，用于展示图层按index的排列
       sourceNameObject: {}, //检测source重复
 
@@ -126,14 +127,15 @@ export default {
           this.glyphsPath = this.mapProjectInfo.glyphs;
           this.sources = this.mapProjectInfo.sources;
           this.layers = this.mapProjectInfo.layers;
+          this.layersTree=this.mapProjectInfo.layersTree
           this.layersNameObject =
-            JSON.stringify(this.mapProjectInfo.layerTree) == "{}"
+            JSON.stringify(this.mapProjectInfo.nameObject) == "{}"
               ? {}
-              : this.mapProjectInfo.layerTree.layersNameObject;
+              : this.mapProjectInfo.nameObject.layersNameObject;
           this.sourceNameObject =
-            JSON.stringify(this.mapProjectInfo.layerTree) == "{}"
+            JSON.stringify(this.mapProjectInfo.nameObject) == "{}"
               ? {}
-              : this.mapProjectInfo.layerTree.sourceNameObject;
+              : this.mapProjectInfo.nameObject.sourceNameObject;
           this.publicBoolean = this.mapProjectInfo.publicBoolean;
           for (const item of this.layers) {
             this.layersName.push(item.id);
@@ -145,12 +147,14 @@ export default {
             }
           }
           // 将相关参数放入vuex管理
-          this.UPDATEPARM({parm:'mapProjectInfo',value:this.mapProjectInfo})          
+          this.UPDATEPARM({parm:'mapProjectInfo',value:this.mapProjectInfo})
           this.UPDATEPARM({parm:'layers',value:this.layers});
+          this.UPDATEPARM({parm:'sources',value:this.sources});
           this.UPDATEPARM({parm:'layersName',value:this.layersName});
           this.UPDATEPARM({parm:'layersNameObject',value:this.layersNameObject});
           this.UPDATEPARM({parm:'sourceNameObject',value:this.sourceNameObject});
           this.UPDATEPARM({parm:'originStyle',value:this.originStyle});
+          this.UPDATEPARM({parm:'layersTree',value:this.layersTree});
           document.title = "地图项目" + this.mapProjectInfo.name;
 
           // 加载完参数，其他组件开始初始化

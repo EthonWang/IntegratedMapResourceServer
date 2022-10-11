@@ -49,13 +49,13 @@ export default {
       this.sources = this.mapProjectInfo.sources;
       this.layers = this.mapProjectInfo.layers;
       this.layersNameObject =
-        JSON.stringify(this.mapProjectInfo.layerTree) == "{}"
+        JSON.stringify(this.mapProjectInfo.nameObject) == "{}"
           ? {}
-          : this.mapProjectInfo.layerTree.layersNameObject;
+          : this.mapProjectInfo.nameObject.layersNameObject;
       this.sourceNameObject =
-        JSON.stringify(this.mapProjectInfo.layerTree) == "{}"
+        JSON.stringify(this.mapProjectInfo.nameObject) == "{}"
           ? {}
-          : this.mapProjectInfo.layerTree.sourceNameObject; 
+          : this.mapProjectInfo.nameObject.sourceNameObject;
       this.createEmptyMap();
       this.initMapWithData();               
     },
