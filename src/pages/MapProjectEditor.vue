@@ -4469,7 +4469,7 @@ export default {
       urlBase: { TERRAIN: [], TMS: [], WMTS: [] },
 
       //左侧shp图层树
-      layersNameObject: {}, //检测重复  后端字段为layerTree
+      layersNameObject: {}, //检测重复  后端字段为nameObject
       layersName: [], //加载的图层id集合，用于展示图层按index的排列
       sourceNameObject: {}, //检测source重复
 
@@ -4702,13 +4702,13 @@ export default {
           this.sources = this.mapProjectInfo.sources;
           this.layers = this.mapProjectInfo.layers;
           this.layersNameObject =
-            JSON.stringify(this.mapProjectInfo.layerTree) == "{}"
+            JSON.stringify(this.mapProjectInfo.nameObject) == "{}"
               ? {}
-              : this.mapProjectInfo.layerTree.layersNameObject;
+              : this.mapProjectInfo.nameObject.layersNameObject;
           this.sourceNameObject =
-            JSON.stringify(this.mapProjectInfo.layerTree) == "{}"
+            JSON.stringify(this.mapProjectInfo.nameObject) == "{}"
               ? {}
-              : this.mapProjectInfo.layerTree.sourceNameObject;
+              : this.mapProjectInfo.nameObject.sourceNameObject;
           this.publicBoolean = this.mapProjectInfo.publicBoolean;
           this.createEmptyMap();
           this.initMapWithData();
@@ -4920,7 +4920,7 @@ export default {
           this.mapProjectInfo.sources = this.sources;
           // this.mapProjectInfo.layers = {layers: this.layers}
           this.mapProjectInfo.layers = this.layers;
-          this.mapProjectInfo.layerTree = {
+          this.mapProjectInfo.nameObject = {
             layersNameObject: this.layersNameObject,
             sourceNameObject: this.sourceNameObject,
           };

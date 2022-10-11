@@ -1,12 +1,13 @@
 //准备state——用于存储数据
 const state = {
   layers:[],
-  sources: [],
+  sources:{},
   layersName: [],
   mapProjectInfo:{},
   layersNameObject: {},
   sourceNameObject: {}, 
   nowLayerIndex: 0,
   originStyle:{},
+  layersTree:[]
 }
 export default state;

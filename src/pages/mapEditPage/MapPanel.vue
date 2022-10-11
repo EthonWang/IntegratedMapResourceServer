@@ -20,7 +20,7 @@ export default {
       // 公共参数
       mapProjectInfo: '',
       layers:[],
-      sources:[],
+      sources:{},
       layersName: [],      
       // 项目参数】
       spritePath: '',
@@ -117,18 +117,18 @@ export default {
       // 初始化项目参数
       this.center = this.mapProjectInfo.center.split(",");
       this.zoom = this.mapProjectInfo.zoom;
-      this.sources = this.mapProjectInfo.sources;
+      // this.sources = this.mapProjectInfo.sources;
       // this.layers = this.mapProjectInfo.layers;
       this.glyphsPath = this.mapProjectInfo.glyphs;
       this.spritePath = this.mapProjectInfo.sprite;
       this.layersNameObject =
-        JSON.stringify(this.mapProjectInfo.layerTree) == "{}"
+        JSON.stringify(this.mapProjectInfo.nameObject) == "{}"
           ? {}
-          : this.mapProjectInfo.layerTree.layersNameObject;
+          : this.mapProjectInfo.nameObject.layersNameObject;
       this.sourceNameObject =
-        JSON.stringify(this.mapProjectInfo.layerTree) == "{}"
+        JSON.stringify(this.mapProjectInfo.nameObject) == "{}"
           ? {}
-          : this.mapProjectInfo.layerTree.sourceNameObject; 
+          : this.mapProjectInfo.nameObject.sourceNameObject;
       this.createEmptyMap();
       this.initMapWithData();               
     },
@@ -270,9 +270,14 @@ export default {
             sourceName: i,
             sourceType: this.sources[i].type,
             sourceUrl: this.sources[i].url,
+
           };
+          console.log("aaaa",this.sources)
+          console.log(i)
           this.addSourceToMap(true,newSource);
         }
+        console.log("bbbb",this.sources)
+        console.log("cccc",this.sourcesProp)
         // 添加layer
         for (let i = this.layers.length - 1; i >= 0; i--) {
           this.addLayerToMap(true,this.layers[i]);
@@ -353,11 +358,12 @@ export default {
       this.mapProjectInfo.sprite = this.spritePath;
       this.mapProjectInfo.glyphs = this.glyphsPath;
       this.mapProjectInfo.sources = this.sources;
+      console.log("savessssss",this.sources)
       if(!flag){    // 发布走的接口，否则保存初始的publicBoolean
         this.mapProjectInfo.publicBoolean = true;     // 在按钮组件中publicBoolean已经设置为true
       }
       this.mapProjectInfo.layers = this.layers;
-      this.mapProjectInfo.layerTree = {
+      this.mapProjectInfo.nameObject = {
         layersNameObject: this.layersNameObject,
         sourceNameObject: this.sourceNameObject,
       };

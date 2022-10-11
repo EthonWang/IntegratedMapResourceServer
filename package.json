@@ -13,6 +13,7 @@
     "element-ui": "^2.15.6",
     "font-awesome": "^4.7.0",
     "mapbox-gl": "^2.7.0",
+    "nanoid": "^4.0.0",
     "sortablejs": "^1.15.0",
     "vue": "^2.6.11",
     "vue-router": "^3.5.3",
