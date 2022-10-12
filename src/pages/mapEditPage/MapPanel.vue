@@ -22,7 +22,7 @@ export default {
       layers:[],
       sources:{},
       layersName: [],      
-      // 项目参数】
+      // 项目参数
       spritePath: '',
       glyphsPath: '',
       canvasSrc: '',
@@ -59,22 +59,25 @@ export default {
     // mapbox相关地图操作
     this.$bus.$on("map",(data)=>{
       switch (data.type) {
-        case 'setLayout':            // data:{type:'',layerName:'',key:'',value:''}
+        case 'setLayout':             // data:{type:'',layerName:'',key:'',value:''}
           this.handleLayoutChange(data.layerName,data.key,data.value);
           break;
-        case 'setPaint':           // data:{type:'',layerName:'',key:'',value:''}
+        case 'setPaint':              // data:{type:'',layerName:'',key:'',value:''}
           this.handlePaintChange(data.layerName,data.key,data.value);
           break;
-        case 'addLayer1':           // data:{type:'',layer:{}}    
+        case 'setZoom':               // data:{type:'',layerName:'',min:'',max:''}
+          this.handleZoomChange(data.layerName,data.min,data.max);
+          break;              
+        case 'addLayer1':             // data:{type:'',layer:{}}    
           this.addLayerToMap(true,data.layer);
           break;
-        case 'addLayer2':           // data:{type:'',id:'',layer:{}}  添加在指定图层后
+        case 'addLayer2':             // data:{type:'',id:'',layer:{}}  添加在指定图层后(添加背景,更换指定图层样式)
           this.addLayerToMap(false,data);
           break;
-        case 'addSource1':          // data:{type:'',source:{}}
+        case 'addSource1':            // data:{type:'',source:{}}
           this.addSourceToMap(true,data.source)
           break;
-        case 'addSource2':          // data:{type:'',source:{}}
+        case 'addSource2':            // data:{type:'',source:{}}
           this.addSourceToMap(false,data.source)
           break;
         case 'removeLayer':           // data:{type:'',id:''}
@@ -82,20 +85,25 @@ export default {
           break;
         case 'removeSource':          // data:{type:'',id:''}
           map.removeSource(data.id);
+          break;                
+        case 'setFilter':             // data:{type:'',id:'',filter:{}}
+          this.setFilterToMap(data.id,data.filter);
           break;          
-        case 'save':                // data:{type:''}
+        case 'save':                  // data:{type:''，flag:''}    flag为true是正常保存，false是不弹出提示框（发布走的链接）
           this.saveMap(data.flag);
           break;
-        case 'mapFit':              // data:{type:'',row:{}}
+        case 'mapFit':                // data:{type:'',row:{}}
           this.handleLayerClick(data.row);
           break;
-        case 'loadAndAddImg':      // data:{name:'',url:'',type:''}
+        case 'canvasSrc':             // data:{type:''}   截图地图保存至localstorage
+          this.setCanvasSrc();
+          break;
+        case 'loadAndAddImg':         // data:{type:'',url:'',name:''}
           map.loadImage(data.url, (error, image) => {
             if (error) throw error;
             map.addImage(data.name, image);
           });
-          break;
-      
+          break;     
         default:
           break;
       }
@@ -270,14 +278,9 @@ export default {
             sourceName: i,
             sourceType: this.sources[i].type,
             sourceUrl: this.sources[i].url,
-
           };
-          console.log("aaaa",this.sources)
-          console.log(i)
           this.addSourceToMap(true,newSource);
         }
-        console.log("bbbb",this.sources)
-        console.log("cccc",this.sourcesProp)
         // 添加layer
         for (let i = this.layers.length - 1; i >= 0; i--) {
           this.addLayerToMap(true,this.layers[i]);
@@ -311,9 +314,14 @@ export default {
       }else{                          //value:{index:'',layer:{}}
         console.log("add new layer：", data.layer);
         const id = data.id;
-        map.addLayer(data.layer,id);       //添加在对应图层之后
+        map.addLayer(data.layer,id);       //添加在对应图层之前
       }
     }, 
+    //设置对地图进行筛选
+    setFilterToMap(id, filter) {
+      console.log("set filters：", id, filter);
+      map.setFilter(id, filter);
+    },    
     // 修改layout属性 
     handleLayoutChange(layerName, key, value) {
       console.log("layout:", layerName, key, value);
@@ -324,6 +332,11 @@ export default {
       console.log("paint:", layerName, key, value);
       map.setPaintProperty(layerName, key, value);
     },
+    // 修改zoom显示范围
+    handleZoomChange(layerName, min, max){
+      console.log("zoom:", layerName, min, max);
+      map.setLayerZoomRange(layerName, min, max);
+    },    
 
     // 为item添加同handleLayerEdit相同的方法
     addItemEvent(item, feature, index) {
@@ -335,9 +348,13 @@ export default {
           index:index,
           feature:feature
         }
-        this.$bus.$emit("layerList",data);
+        this.$bus.$emit("mapEdit",data);
       };
-    },         
+    }, 
+    setCanvasSrc(){
+      const canvasSrc = map.getCanvas().toDataURL("image/png");
+      localStorage.setItem("canvasSrc", canvasSrc);
+    },
 
     // #其余组件函数
     // 保存项目
@@ -358,7 +375,6 @@ export default {
       this.mapProjectInfo.sprite = this.spritePath;
       this.mapProjectInfo.glyphs = this.glyphsPath;
       this.mapProjectInfo.sources = this.sources;
-      console.log("savessssss",this.sources)
       if(!flag){    // 发布走的接口，否则保存初始的publicBoolean
         this.mapProjectInfo.publicBoolean = true;     // 在按钮组件中publicBoolean已经设置为true
       }
