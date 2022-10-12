@@ -1634,11 +1634,6 @@
                             cursor: 'pointer',
                           }"
                         >
-                          <!-- <el-checkbox
-                            v-if="isSpriteEdit" class="spriteCheck"
-                            v-model="deleteSelect[index]"
-                            @change="spriteCheckChange($event,key)">
-                          </el-checkbox> -->
                           <div
                             :style="{
                               'background-image': `url(${spritePngSelect})`,
@@ -1651,15 +1646,6 @@
                         </div>
                       </div>
                     </el-row>
-
-                    <!--                      <el-col-->
-                    <!--                        class="cursor"-->
-                    <!--                        v-for="(item, index) in spriteList"-->
-                    <!--                        :key="index"-->
-                    <!--                        @click.native="spriteSelect(item)"-->
-                    <!--                      >-->
-                    <!--                        {{ item }}-->
-                    <!--                      </el-col>-->
                   </el-tab-pane>
                   <el-tab-pane label="自定义">
                     <el-row
@@ -3692,10 +3678,10 @@ export default {
       layers: '',
       nowLayerIndex: 0,
       originStyle: {},
+      spritePath: '',
 
       // 公共参数
       editorShow: "",
-      spritePath: '',
       glyphsPath: '',
       layerSource: '',          // 用于判断当前图层的数据源，依据图层的matadata属性中的'mapbox:type'属性
                                 // 分为mbStyle、mbSource、primary
@@ -3779,7 +3765,9 @@ export default {
     ...mapState({mapProjectInfoProp:'mapProjectInfo',
                  layersNameProp:'layersName',
                  layersProp:'layers',
-                 nowLayerIndexProp:'nowLayerIndex',}),  
+                 spritePathProp:'spritePath',
+                 nowLayerIndexProp:'nowLayerIndex',
+                 }),  
   },  
   mounted(){
     // 等初始组件信息加载完
@@ -3824,8 +3812,8 @@ export default {
         case 'off':                  // data:{type:''}
           this.editorShow = "";
           break;
-        case 'open':                 // data:{type:'',layer:''}
-          this.handleLayerEdit(data.layer);
+        case 'open':                 // data:{type:'',index:'',layer:''}      #需要index是用于将修改后的layer更新到对应的layers中
+          this.handleLayerEdit(data.index,data.layer);
           break;
       }
     })    
@@ -3842,7 +3830,7 @@ export default {
       this.layersName = this.layersNameProp;
       this.layers = this.layersProp;
       this.nowLayerIndex = this.nowLayerIndexProp;      
-      this.spritePath = this.mapProjectInfoProp.sprite;
+      this.spritePath = this.spritePathProp;
       this.glyphsPath = this.mapProjectInfoProp.glyphs;   
       console.log('路径：',this.mapProjectInfo);   
       const end = this.spritePath.lastIndexOf("/");
@@ -3872,23 +3860,13 @@ export default {
       }   
       this.spriteInit();
     },  
-    spriteInit() {
-      requestApi
-        .getSpriteList()
-        .then((res) => {
-          console.log(res);
-          this.spriteClassList = res.data.data;
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
     // #总体函数
     // 打开图层样式编辑面板
-    handleLayerEdit(row) {
+    handleLayerEdit(index,row) {
       console.log("now edit layer: row", row);
       // #信息预处理
       // 判断当前页面数据是否为mbtile,以及是否为osm数据
+      this.UPDATEPARM({parm:'nowLayerIndex',index})
       const datatype = row['metadata']['mapbox:type'];
       switch(datatype){
         case 'mbSource':
@@ -3958,8 +3936,10 @@ export default {
     // 关闭图层样式编辑面板
     handleCloseEditBoard() {
       this.editorShow = "";
-    },    
-    // 获取图标列表
+    },  
+    
+    // #图标
+    // 获取自定义图标列表
     getSymbolList() {
       requestApi
         .getSymbolList({
@@ -3982,7 +3962,12 @@ export default {
         "symbolTableData",
         JSON.stringify(this.symbolTableData)
       );
-    },    
+    },   
+    // 自定义图标
+    handleCurrentChangeSymbol(val) {
+      this.currentPageSymbol = val;
+      this.getSymbolList();
+    },     
     // 获取字体列表
     getFontList() {
       requestApi
@@ -4001,6 +3986,133 @@ export default {
           console.log(error);
         });
     },
+    iconSelect(item) {
+      this.layers[this.nowLayerIndex].layout["icon-image"] = item.originName;
+      this.$refs.iconPopover.doClose();
+
+      this.loadAndAddImg(
+        this.reqUrl + "/symbol/getSymbolById/" + item.id,
+        item.originName
+      );
+      this.handleLayoutChange(
+        this.layers[this.nowLayerIndex]["id"],
+        "icon-image",
+        this.layers[this.nowLayerIndex].layout["icon-image"]
+      );
+      // 更新vuex参数
+      this.UPDATEPARM({parm:'layers',value:this.layers})
+    },
+    spriteChange() {
+      this.$confirm(
+        "切换精灵图必须保存地图项目，且已使用的其他精灵图图标将不可用，是否保存地图并切换精灵图？",
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+        }
+      )
+        .then(() => {
+          if (this.spriteNameSelect != "") {
+            const url =
+              this.reqUrl +
+              "/store/sprites/" +
+              this.spriteNameSelect +
+              "/" +
+              "sprite.json";
+            fetch(url)
+              .then((res) => {
+                return res.json();
+              })
+              .then((json) => {
+                this.spriteJsonSelect = json;
+                console.log("精灵图json", this.spriteJsonSelect);
+              });
+            this.spritePngSelect =
+              this.reqUrl +
+              "/store/sprites/" +
+              this.spriteNameSelect +
+              "/" +
+              "sprite.png";
+          }
+          this.spritePath =
+            "/store/sprites/" + this.spriteNameSelect + "/sprite";
+          // 更新vuex再保存
+          this.UPDATEPARM({parm:'spritePath',value:this.spritePath})
+          this.$bus.$emit("map",{type:'save',flag:false});
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "取消切换",
+          });
+        });
+    },
+    clickSprite(item, key, index) {
+      this.layers[this.nowLayerIndex].layout["icon-image"] = key;
+      this.handleLayoutChange(
+        this.layers[this.nowLayerIndex]["id"],
+        "icon-image",
+        key
+      );
+      console.log("当前点击的精灵图信息", item, key, index);
+      // 更新vuex参数
+      this.UPDATEPARM({parm:'layers',value:this.layers})      
+    },
+    spriteInit() {
+      requestApi
+        .getSpriteList()
+        .then((res) => {
+          console.log(res);
+          this.spriteClassList = res.data.data;
+
+          // this.spriteNameSelect = this.spriteClassList[0];
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    symbolChange(val) {
+      if (val == "icon") {
+        this.symbolColor = ["#43aaf5", "#838da8"];
+        this.isSymbol = true;
+      } else {
+        this.symbolColor = ["#838da8", "#43aaf5"];
+        this.isSymbol = false;
+      }
+    },
+    fieldSelect(row) {
+      this.textField = row.column_name;
+      this.$refs.fieldPopover.doClose();
+      this.layers[this.nowLayerIndex].layout["text-field"] = [
+        "get",
+        this.textField,
+      ];
+      this.handleLayoutChange(
+        this.layers[this.nowLayerIndex]["id"],
+        "text-field",
+        ["get", this.textField]
+      );
+      console.log(
+        "text-field",
+        this.layers[this.nowLayerIndex].layout["text-field"]
+      );
+      // 更新vuex参数
+      this.UPDATEPARM({parm:'layers',value:this.layers})      
+    },
+    fontSelect(row) {
+      this.layers[this.nowLayerIndex].layout["text-font"][0] = row.name;
+      this.$refs.fontPopover.doClose();
+      this.handleLayoutChange(
+        this.layers[this.nowLayerIndex]["id"],
+        "text-font",
+        this.layers[this.nowLayerIndex].layout["text-font"]
+      );
+      // 更新vuex参数
+      this.UPDATEPARM({parm:'layers',value:this.layers})      
+    },
+
+
+
 
     // # 数据编辑相关
     // 切换图层
@@ -4026,6 +4138,108 @@ export default {
       }
       this.handleLayerEdit(this.nowLayerIndex, aimLayer);
       this.UPDATEPARM({parm:'layers',value:this.layers});
+    },    
+    // filter功能
+    filterValueInit(index) {
+      //更新筛选条件的列表
+      this.filterOptionSelectList.splice(
+        index,
+        0,
+        this.filterCondition[index].option
+      );
+      requestApi
+        .getAttrValue({
+          aimAttrName: this.filterCondition[this.nowFilterIndex].option,
+          aimShpTableName: this.layers[this.nowLayerIndex]["source-layer"],
+          page: this.filterSearchPage,
+          pageSize: 10,
+          searchText: this.filterSearch,
+          sort: "asc",
+        })
+        .then((res) => {
+          console.log("filterlist", res);
+          this.filterValue.splice(
+            [this.nowFilterIndex],
+            0,
+            res.data.data.attrValue
+          );
+          this.filterValueSelect = this.filterValue[this.nowFilterIndex];
+          this.totalDataCountFilter = res.data.data.featureCount;
+          console.log("filterValue", this.filterValue);
+          console.log("filtertotal", this.totalDataCountFilter);
+          console.log("filterValueSelect", this.filterValueSelect);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    handleCurrentChangeFilter(val) {
+      this.filterSearchPage = val;
+      requestApi
+        .getAttrValue({
+          aimAttrName: this.filterCondition[this.nowFilterIndex].option,
+          aimShpTableName: this.layers[this.nowLayerIndex]["source-layer"],
+          page: this.filterSearchPage,
+          pageSize: 10,
+          searchText: this.filterSearch,
+          sort: "asc",
+        })
+        .then((res) => {
+          console.log("res", res);
+          this.filterValueSelect = res.data.data.attrValue;
+          this.totalDataCountFilter = res.data.data.featureCount;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    //添加筛选框用户输入的value
+    handleFilterValue(item, index) {
+      console.log("filter", index, item);
+      this.nowFilterIndex = index;
+    },
+    filterRemove(index) {
+      this.filterCondition.splice(index, 1);
+      if (this.filterCondition.length < 1) {
+        const id = this.layers[this.nowLayerIndex].id;
+        this.setFilterToMap(id, null);
+        this.layers[this.nowLayerIndex]["filter"] = ["all"];
+        this.UPDATEPARM({parm:'layers',value:this.layers});
+      }
+    },
+    handleFilter(row) {
+      this.filterCondition[this.nowFilterIndex].value =
+        row[this.filterOptionSelectList[this.nowFilterIndex]];
+    },
+    filterConfirm() {
+      let judge = this.filterWay;
+      const filters = [judge];
+      for (let i = 0; i < this.filterCondition.length; i++) {
+        const filter = [];
+        filter.push(this.filterCondition[i].type);
+        filter.push(["get", this.filterCondition[i].option]);
+        filter.push(this.filterCondition[i].value);
+        if (judge == "none") {
+          filters.push(!filter);
+        } else {
+          filters.push(filter);
+        }
+      }
+      const id = this.layers[this.nowLayerIndex].id;
+      console.log("筛选结果", id, filters);
+      //更改添加上的filter样式
+      this.setFilterToMap(id, filters);
+      //更改自定义的layers中filter样式
+      this.layers[this.nowLayerIndex]["filter"] = filters;
+      this.layers[this.nowLayerIndex].filterValueSet = {
+        filterCondition: this.filterCondition,
+        filterValue: this.filterValue,
+        filterOptionSelectList: this.filterOptionSelectList,
+        filterValueSelect: this.filterValueSelect,
+      };
+      // 更新vuex
+      this.UPDATEPARM({parm:'layers',value:this.layers});
+
     },    
 
     // #对ConditionRender组件的方法通信
@@ -4085,7 +4299,34 @@ export default {
         value:value
       }
       this.$bus.$emit("map",data);
-    },        
+    },  
+    handleZoomChange(layerName, min, max){
+      const data = {
+        type:'setZoom',
+        layerName:layerName, 
+        min:min, 
+        max:max
+      }
+      this.$bus.$emit("map",data);      
+    },     
+    // 设置对地图进行筛选
+    setFilterToMap(id, filter) {
+      const data = {
+        type:'setFilter',
+        id:id,
+        filter:filter
+      }
+      this.$bus.$emit("map",data);
+    },     
+    // 添加图标
+    loadAndAddImg(url,name){
+      const data = {
+        type:'loadAndAddImg',
+        url:url,
+        name:name
+      }
+      this.$bus.$emit(data);
+    },
   }
 }
 </script>
