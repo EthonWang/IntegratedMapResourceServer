@@ -4177,7 +4177,7 @@
             </el-form-item>
           </el-form>
           <el-divider></el-divider>
-          <el-row v-if="layers[nowLayerIndex].metadata['mapbox:type'] == 'mbStyle'">
+          <el-row v-if="layers[nowLayerIndex].metadata['mapbox:type'] != 'mbStyle'">
             <el-row type="flex" justify="space-between" align="middle">
               <h4>过滤条件配置</h4>
               &nbsp;
@@ -5979,6 +5979,7 @@ export default {
     returnOriginStyle() {
       const style = this.originStyle[this.nowLayerIndex];
       const aimLayer = this.layers[this.nowLayerIndex];
+      console.log('style',style,this.nowLayerIndex);   
       aimLayer.paint = JSON.parse(JSON.stringify(style.paint));
       aimLayer.layout = JSON.parse(JSON.stringify(style.layout));
       console.log("应用完图层样式", aimLayer);

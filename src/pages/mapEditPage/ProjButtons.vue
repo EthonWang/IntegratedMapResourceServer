@@ -217,7 +217,8 @@
       @click="addBackground('multiPG', {})"
       >添加背景</el-button
     >
-    <el-button type="primary" @click="test">测试</el-button>
+    <el-button type="primary" @click="test1">测试</el-button>
+    <el-button type="primary" @click="test2">测试2</el-button>
   </div>
 </template>
 <script>
@@ -329,8 +330,11 @@ export default {
 
   },     
   methods: {
-    test(){
+    test1(){
       this.$bus.$emit("mapEdit",{type:'open',layer:this.layers[0]});
+    },
+    test2(){
+      this.$bus.$emit("styleTemp",{type:'open',index:0,layer:this.layers[0]});
     },
     // vuex
     ...mapActions({updateParm:'update'}),        //将 `this.updateParm(data)` 映射为 `this.$store.dispatch('update',data)`
@@ -420,8 +424,6 @@ export default {
       }
       this.$bus.$emit("mapEdit",{type:'off'});
     },
-
-
     async addPgDefaultShp(index, row) {
       console.log("add pgDefault shp row: ", row);
       //判断该shp是否已添加
@@ -538,8 +540,6 @@ export default {
       this.UPDATEPARM({parm:'layersNameObject',value:this.layersNameObject});
 
     },
-
-
     async addPgMultiShp(index, row) {
       console.log("add pgMulti shp row: ", row);
       //判断该shp是否已添加
@@ -665,8 +665,6 @@ export default {
       this.UPDATEPARM({parm:'sourceNameObject',value:this.sourceNameObject});
       this.UPDATEPARM({parm:'layersNameObject',value:this.layersNameObject});      
     },
-
-
     async addDataMbTileShp(index, row) {
       console.log("add mbDate shp row: ", row);
       let name = this.mbTileJsonList[this.mbTileSelectIndex].name;
@@ -850,7 +848,6 @@ export default {
       this.UPDATEPARM({parm:'sourceNameObject',value:this.sourceNameObject});
       this.UPDATEPARM({parm:'layersNameObject',value:this.layersNameObject});      
     },
-
     async addTMS(index, row) {
       console.log("add TMS shp row: ", row);
       //判断该shp是否已添加
@@ -938,7 +935,6 @@ export default {
       this.UPDATEPARM({parm:'sourceNameObject',value:this.sourceNameObject});
       this.UPDATEPARM({parm:'layersNameObject',value:this.layersNameObject});      
     },
-
     addBackground(sourceType, row) {
       const index = this.layers.length;       // 判断是否有图层，有则添加在最后一位，否则直接添加
       const newLayout = layerStyleProperties["background"].layout;
