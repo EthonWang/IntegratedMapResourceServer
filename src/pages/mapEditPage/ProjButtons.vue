@@ -753,6 +753,7 @@ export default {
       this.UPDATEPARM({parm:'sourceNameObject',value:this.sourceNameObject});
       this.UPDATEPARM({parm:'layersNameObject',value:this.layersNameObject});      
     },
+
     async addStyleMbTileShp(index, row) {
       console.log("add mbStyle shp row: ", row);
       let name = this.mbTileJsonList[this.mbTileSelectIndex].name;
@@ -933,7 +934,7 @@ export default {
       this.UPDATEPARM({parm:'layersName',value:this.layersName});
       this.UPDATEPARM({parm:'sourceNameObject',value:this.sourceNameObject});
       this.UPDATEPARM({parm:'layersNameObject',value:this.layersNameObject});      
-    },  
+    },
     addBackground(sourceType, row) {
       const index = this.layers.length;       // 判断是否有图层，有则添加在最后一位，否则直接添加
       const newLayout = layerStyleProperties["background"].layout;
