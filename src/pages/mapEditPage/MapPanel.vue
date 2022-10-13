@@ -78,6 +78,7 @@ export default {
           this.addSourceToMap(false,data.source)
           break;
         case 'removeLayer':           // data:{type:'',id:''}
+          console.log("remove layer",data)
           map.removeLayer(data.id);
           break;
         case 'removeSource':          // data:{type:'',id:''}
@@ -272,12 +273,8 @@ export default {
             sourceUrl: this.sources[i].url,
 
           };
-          console.log("aaaa",this.sources)
-          console.log(i)
           this.addSourceToMap(true,newSource);
         }
-        console.log("bbbb",this.sources)
-        console.log("cccc",this.sourcesProp)
         // 添加layer
         for (let i = this.layers.length - 1; i >= 0; i--) {
           this.addLayerToMap(true,this.layers[i]);
@@ -358,11 +355,12 @@ export default {
       this.mapProjectInfo.sprite = this.spritePath;
       this.mapProjectInfo.glyphs = this.glyphsPath;
       this.mapProjectInfo.sources = this.sources;
-      console.log("savessssss",this.sources)
+      console.log("savessssss",this.$store.state.layers)
       if(!flag){    // 发布走的接口，否则保存初始的publicBoolean
         this.mapProjectInfo.publicBoolean = true;     // 在按钮组件中publicBoolean已经设置为true
       }
-      this.mapProjectInfo.layers = this.layers;
+      // this.mapProjectInfo.layers = this.layers;
+      this.mapProjectInfo.layers = this.layersProp;
       this.mapProjectInfo.nameObject = {
         layersNameObject: this.layersNameObject,
         sourceNameObject: this.sourceNameObject,

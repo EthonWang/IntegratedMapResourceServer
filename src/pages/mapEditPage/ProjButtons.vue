@@ -756,7 +756,6 @@ export default {
       this.UPDATEPARM({parm:'layersNameObject',value:this.layersNameObject});      
     },
 
-
     async addStyleMbTileShp(index, row) {
       console.log("add mbStyle shp row: ", row);
       let name = this.mbTileJsonList[this.mbTileSelectIndex].name;
