@@ -3867,6 +3867,8 @@ export default {
       // #信息预处理
       // 判断当前页面数据是否为mbtile,以及是否为osm数据
       this.UPDATEPARM({parm:'nowLayerIndex',index})
+
+      this.nowLayerIndex = this.index
       const datatype = row['metadata']['mapbox:type'];
       switch(datatype){
         case 'mbSource':
