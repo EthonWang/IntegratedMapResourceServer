@@ -3,8 +3,8 @@ export default {
         "layout": {
             "line-cap": "butt", //One of "butt", "round", "square"
             "line-join": "miter",  //One of "bevel", "round", "miter"
-            "line-miter-limit": 2,
-            "line-round-limit": 1.05,
+            // "line-miter-limit": 2,
+            // "line-round-limit": 1.05,
             "visibility":"visible",
             // "line-sort-key":999
         },
@@ -50,7 +50,7 @@ export default {
             "fill-antialias":true,
             "fill-color":"#000000",
             "fill-opacity":1,
-            "fill-outline-color":"#000000",
+            "fill-outline-color":"#FFFFFF",
             //"fill-pattern":''  //ignore  Optional resolvedImage.
             "fill-translate":[0,0],
             "fill-translate-anchor":"map", // One of "map", "viewport"
@@ -61,7 +61,7 @@ export default {
             "icon-allow-overlap":false,
             "icon-anchor":"center", //One of "center", "left", "right", "top", "bottom", "top-left", "top-right", "bottom-left", "bottom-right".
             "icon-ignore-placement":false,
-            "icon-image":"pe-national-2",
+            "icon-image":"",
             "icon-keep-upright":false,
             "icon-offset":[0,0],
             "icon-optional":false,

@@ -110,6 +110,7 @@
                         <el-select
                           v-model="stylePatch.id"
                           placeholder="选择要添加的样式"
+                          @change="mbTileStyleChange($event)"
                         >
                           <el-option
                             v-for="item in mbTileStyleList"
@@ -4378,6 +4379,7 @@ import initTileJson from "../assets/js/initTileJson";
 // import filedValue from "../assets/js/field_value.js";
 // import colorFormat from "../assets/js/colorFormat.js";
 // import myConfig from "../config";
+import { renderSplit } from "@/serve/JsonToValue";
 
 import Sortable from "sortablejs";
 import ConditionRender from "../components/ConditionRender";
@@ -5675,12 +5677,23 @@ export default {
       const newLayout = JSON.parse(JSON.stringify(layerStyleProperties[row.type].layout));
       if ("layout" in row) {
         for (let key in row.layout) {
-          newLayout[key] = row.layout[key];
+          if(row.layout[key].constructor == Object&&key.includes('width')){
+            newLayout[key] = JSON.parse(JSON.stringify(renderSplit(row.layout[key]).zoomCondition1));
+            console.log('新属性1',newLayout[key],row.id);
+          }else{
+            newLayout[key] = row.layout[key];
+          }
         }
       }
       const newPaint = JSON.parse(JSON.stringify(layerStyleProperties[row.type].paint));
       if ("paint" in row) {
         for (let key in row.paint) {
+          if(row.paint[key].constructor == Object&&key.includes('width')){
+            newPaint[key] = JSON.parse(JSON.stringify(renderSplit(row.paint[key]).zoomCondition1));
+            console.log('新属性2',newPaint[key],row.id);
+          }else{
+            newPaint[key] = row.paint[key];
+          }          
           newPaint[key] = row.paint[key];
         }
       }
