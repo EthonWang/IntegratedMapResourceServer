@@ -4985,8 +4985,8 @@ export default {
     },
     addBackground(sourceType, row) {
       const index = this.layers.length;
-      const newLayout = layerStyleProperties["background"].layout;
-      const newPaint = layerStyleProperties["background"].paint;
+      const newLayout = JSON.parse(JSON.stringify(layerStyleProperties["background"].layout));
+      const newPaint = JSON.parse(JSON.stringify(layerStyleProperties["background"].paint));
       if (sourceType == "mbTile") {
         if ("layout" in row) {
           for (let key in row.layout) {
@@ -5672,13 +5672,13 @@ export default {
         this.sourceNameObject[name] = sourceId;
       }
       // 添加layer styleJson有对应属性,按对应类型添加，并对已有属性进行替换
-      const newLayout = layerStyleProperties[row.type].layout;
+      const newLayout = JSON.parse(JSON.stringify(layerStyleProperties[row.type].layout));
       if ("layout" in row) {
         for (let key in row.layout) {
           newLayout[key] = row.layout[key];
         }
       }
-      const newPaint = layerStyleProperties[row.type].paint;
+      const newPaint = JSON.parse(JSON.stringify(layerStyleProperties[row.type].paint));
       if ("paint" in row) {
         for (let key in row.paint) {
           newPaint[key] = row.paint[key];

@@ -79,9 +79,7 @@
             ></el-button>
             <el-dialog
               :title="
-                this.mbTileInfo.osmMbtilesBoolean
-                  ? 'OSM样式添加'
-                  : '样式添加'
+                this.mbTileInfo.osmMbtilesBoolean ? 'OSM样式添加' : '样式添加'
               "
               :visible.sync="addMbTileStyleShow"
               width="30%"
@@ -112,8 +110,7 @@
                 <span></span>
               </el-row>
               <span slot="footer" class="dialog-footer">
-                <el-button @click="addMbTileStyleShow = false"
-                  >取 消</el-button
+                <el-button @click="addMbTileStyleShow = false">取 消</el-button
                 >&nbsp;
                 <el-button
                   slot="reference"
@@ -157,13 +154,8 @@
           </el-table>
         </el-tab-pane>
         <el-tab-pane label="TMS" name="TMS">
-          <el-table
-            :data="urlBase[dataBaseSelect]"
-            style="width: 100%">
-            <el-table-column
-              prop="name"
-              label="名称">
-            </el-table-column>
+          <el-table :data="urlBase[dataBaseSelect]" style="width: 100%">
+            <el-table-column prop="name" label="名称"> </el-table-column>
             <el-table-column width="80" label="操作">
               <template slot-scope="scope">
                 <el-button
@@ -173,20 +165,18 @@
                   >添加
                 </el-button>
               </template>
-            </el-table-column>                  
+            </el-table-column>
           </el-table>
         </el-tab-pane>
       </el-tabs>
 
-      <el-button
-        type="primary"
-        size="mini"
-        slot="reference"
-        @click="addShpData"
+      <el-button type="primary" size="mini" slot="reference" @click="addShpData"
         >添加数据</el-button
       >
     </el-popover>
-    <el-button type="success" size="mini" @click="saveMap(true)">保存</el-button>
+    <el-button type="success" size="mini" @click="saveMap(true)"
+      >保存</el-button
+    >
     <el-button
       v-if="!publicBoolean"
       type="warning"
@@ -211,10 +201,7 @@
       </el-link>
       <el-tag type="warning" slot="reference"> 已发布 </el-tag>
     </el-popover>
-    <el-button
-      type="danger"
-      size="mini"
-      @click="addBackground('multiPG', {})"
+    <el-button type="danger" size="mini" @click="addBackground('multiPG', {})"
       >添加背景</el-button
     >
     <el-button type="primary" @click="test1">测试</el-button>
@@ -224,43 +211,43 @@
 </template>
 <script>
 import requestApi from "../../api/requestApi";
-import {mapState,mapActions,mapMutations} from 'vuex'
+import { mapState, mapActions, mapMutations } from "vuex";
 import initTileJson from "@/assets/js/initTileJson";
 import layerStyleProperties from "@/assets/js/layerStyleProperties";
-import {renderSplit,filterSplit} from "@/serve/JsonToValue";
+import { renderSplit, filterSplit } from "@/serve/JsonToValue";
 
 export default {
   name: "ProjButtons",
   props: [],
   data() {
-    return{
+    return {
       // 传递的参数
-      sourceNameObject: {},      //检测source重复
-      layersNameObject: {},      //检测重复  后端字段为nameObject
+      sourceNameObject: {}, //检测source重复
+      layersNameObject: {}, //检测重复  后端字段为nameObject
       layers: [],
-      sources:{},
+      sources: {},
       layersName: [],
-      mapProjectId: '',
+      mapProjectId: "",
       originStyle: [],
       // #添加数据
-        // 公用参数
-      dataBaseSelect: 'defaultPG',     //选中的数据源，PG默认为defaultPG
+      // 公用参数
+      dataBaseSelect: "defaultPG", //选中的数据源，PG默认为defaultPG
       dataBaseList: [],
-        // PG服务
+      // PG服务
       PgBaseSelect: "defaultPG",
       pgShpList: [],
-      shpTableData: [],      
+      shpTableData: [],
       currentPageShp: 1,
       pageSizeShp: 5,
-      searchInputShp: "",      
+      searchInputShp: "",
       totalDataCountShp: 0,
-        // OSM服务
-      mbTileSelect: "",     //储存所选mbTile的id
-      dataLayers: [],       //metadata中的vector_layer
+      // OSM服务
+      mbTileSelect: "", //储存所选mbTile的id
+      dataLayers: [], //metadata中的vector_layer
       mbTileJsonList: [],
       mbTileSelectIndex: 0, //  记录选择的数据下标
-      mbTileInfo: {},   // mbTile存在数据库中的信息，tileJsonId记录描述信息
-      mbTileJson: {},   // 通过tileJsonId获取的描述信息
+      mbTileInfo: {}, // mbTile存在数据库中的信息，tileJsonId记录描述信息
+      mbTileJson: {}, // 通过tileJsonId获取的描述信息
       mbJsonSource: {
         mbtiles1: "mbtilesSource1",
         mbtiles2: "mbtilesSource2",
@@ -289,99 +276,84 @@ export default {
         "background",
         "heatmap",
       ],
-      mbsource:{
-                'water_name':'symbol',
-                'transportation_name':'symbol',
-                'aerodrome_label':'circle',
-                'globallandcover':'circle',
-                'mountain_peak':'circle',
-                'housenumber':'circle',
-                'poi':'circle',
-                'place':'circle',
-                'transportation':'line',
-                'boundary':'line',
-                'aeroway':'line',
-                'waterway':'line',
-                'park':'fill',
-                'landuse':'fill',
-                'landcover':'fill',
-                'water':'fill',
-                'building':'fill',
-                },
-        // TMS服务
+      mbsource: {
+        water_name: "symbol",
+        transportation_name: "symbol",
+        aerodrome_label: "circle",
+        globallandcover: "circle",
+        mountain_peak: "circle",
+        housenumber: "circle",
+        poi: "circle",
+        place: "circle",
+        transportation: "line",
+        boundary: "line",
+        aeroway: "line",
+        waterway: "line",
+        park: "fill",
+        landuse: "fill",
+        landcover: "fill",
+        water: "fill",
+        building: "fill",
+      },
+      // TMS服务
       urlBase: { TERRAIN: [], TMS: [], WMTS: [] },
 
       // #发布
       publicBoolean: false,
-
-    }  
+    };
   },
-  computed:{
-    ...mapState({sourceNameObjectProp:'sourceNameObject',
-                 layersNameObjectProp:'layersNameObject',
-                 layersProp:'layers',
-                 layersNameProp:'layersName',
-                 sourcesProp:'sources',
-                 originStyleProp:'originStyle'})
-  },   
+  computed: {
+    ...mapState({
+      sourceNameObjectProp: "sourceNameObject",
+      layersNameObjectProp: "layersNameObject",
+      layersProp: "layers",
+      layersNameProp: "layersName",
+      sourcesProp: "sources",
+      originStyleProp: "originStyle",
+    }),
+  },
   mounted() {
     // 等初始组件信息加载完
-    this.$bus.$on("init",()=>{
+    this.$bus.$on("init", () => {
       this.infoInit();
-    })
-
-  },     
+    });
+  },
   methods: {
-    test1(){
-      this.$bus.$emit("mapEdit",{type:'open',layer:this.layers[0]});
+    test1() {
+      this.$bus.$emit("mapEdit", { type: "open", layer: this.layers[0] });
     },
-    test2(){
-      this.$bus.$emit("styleTemp",{type:'open',index:0,layer:this.layers[0]});
+    test2() {
+      this.$bus.$emit("styleTemp", {
+        type: "open",
+        index: 0,
+        layer: this.layers[0],
+      });
     },
-    test3(){
-      let a = renderSplit(
-        {
-					"base": 1.2,
-					"stops": [
-						[
-							14,
-							0.5
-						],
-						[
-							20,
-							10
-						]
-					]
-				}        
-      )
-      let b = filterSplit(
-        [
-          "all",
-          [
-            "==",
-            "brunnel",
-            "tunnel"
-          ],
-          [
-            "in",
-            "class",
-            "service",
-            "track"
-          ]
-        ]       
-      )
-      console.log("测试",a,b);
+    test3() {
+      let a = renderSplit({
+        base: 1.2,
+        stops: [
+          [14, 0.5],
+          [20, 10],
+        ],
+      });
+      let b = filterSplit([
+        "all",
+        ["==", "brunnel", "tunnel"],
+        ["in", "class", "service", "track"],
+      ]);
+      console.log("测试", a, b);
     },
     // vuex
-    ...mapActions({updateParm:'update'}),        //将 `this.updateParm(data)` 映射为 `this.$store.dispatch('update',data)`
-    ...mapMutations({UPDATEPARM:'UPDATE'}),      //将 `this.UPDATEPARM(data)` 映射为 `this.$store.commit('UPDATE',data)`
+    ...mapActions({ updateParm: "update" }), //将 `this.updateParm(data)` 映射为 `this.$store.dispatch('update',data)`
+    ...mapMutations({ UPDATEPARM: "UPDATE" }), //将 `this.UPDATEPARM(data)` 映射为 `this.$store.commit('UPDATE',data)`
     // 初始化数据
-    infoInit(){
+    infoInit() {
       // 初始化公共参数
-      this.sourceNameObject = this.sourceNameObjectProp;      
-      this.layersNameObject = this.layersNameObjectProp;      
+      this.sourceNameObject = this.sourceNameObjectProp;
+      this.layersNameObject = this.layersNameObjectProp;
       this.layers = this.layersProp;
-      this.layersName = this.layersNameProp;   
+      this.layersName = this.layersNameProp;
       this.sources = this.sourcesProp;
       this.originStyle = this.originStyleProp;
       // 初始化其余参数
@@ -422,14 +394,14 @@ export default {
     dataBaseClick(tab) {
       this.dataBaseSelect = tab.name == "PG" ? "defaultPG" : tab.name;
       console.log("dataBaseSelect", this.dataBaseSelect);
-      switch(tab.name){
+      switch (tab.name) {
         case "TMS":
           this.getOutService();
           break;
       }
-    },  
+    },
 
-    // ·添加各类数据图层    
+    // ·添加各类数据图层
     async handleAddShpLayer(index, row) {
       //分类型进行创建shp的json入库并返回对应id
       console.log(this.dataBaseSelect);
@@ -445,7 +417,7 @@ export default {
           break;
         case "TMS":
           this.addTMS(index, row);
-          break;          
+          break;
         case "mbTile":
           if (!this.isStyle) {
             this.addDataMbTileShp(index, row);
@@ -458,7 +430,7 @@ export default {
           }
           break;
       }
-      this.$bus.$emit("mapEdit",{type:'off'});
+      this.$bus.$emit("mapEdit", { type: "off" });
     },
     async addPgDefaultShp(index, row) {
       console.log("add pgDefault shp row: ", row);
@@ -494,7 +466,7 @@ export default {
           sourceType: "vector",
           sourceUrl: tileJsonUrl,
         };
-        this.addSourceToMap(true,newSourceJson);
+        this.addSourceToMap(true, newSourceJson);
         this.sources[newSourceJson.sourceName] = {
           type: newSourceJson.sourceType,
           url: newSourceJson.sourceUrl,
@@ -534,7 +506,7 @@ export default {
           JSON.stringify(layerStyleProperties[geoType].layout)
         ), //防止同类型图层样式改变间影响
         maxzoom: 22,
-        metadata: {"mapbox:type":"pgDefault"},
+        metadata: { "mapbox:type": "pgDefault" },
         minzoom: 0,
         paint: JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint)),
         source: this.sourceNameObject[row.tableName], //通过记录的source名字与id对应，拿到sourceId
@@ -566,15 +538,20 @@ export default {
         paint: newLayer.paint,
         layout: newLayer.layout,
       });
-      this.addLayerToMap(true,newLayer);
+      this.addLayerToMap(true, newLayer);
       // 更新vuex参数
-      this.UPDATEPARM({parm:'layers',value:this.layers});
-      this.UPDATEPARM({parm:'sources',value:this.sources});
-      this.UPDATEPARM({parm:'layersName',value:this.layersName});
-      this.UPDATEPARM({parm:'originStyle',value:this.originStyle});
-      this.UPDATEPARM({parm:'sourceNameObject',value:this.sourceNameObject});
-      this.UPDATEPARM({parm:'layersNameObject',value:this.layersNameObject});
-
+      this.UPDATEPARM({ parm: "layers", value: this.layers });
+      this.UPDATEPARM({ parm: "sources", value: this.sources });
+      this.UPDATEPARM({ parm: "layersName", value: this.layersName });
+      this.UPDATEPARM({ parm: "originStyle", value: this.originStyle });
+      this.UPDATEPARM({
+        parm: "sourceNameObject",
+        value: this.sourceNameObject,
+      });
+      this.UPDATEPARM({
+        parm: "layersNameObject",
+        value: this.layersNameObject,
+      });
     },
     async addPgMultiShp(index, row) {
       console.log("add pgMulti shp row: ", row);
@@ -619,7 +596,7 @@ export default {
           sourceType: "vector",
           sourceUrl: tileJsonUrl,
         };
-        this.addSourceToMap(true,newSourceJson);
+        this.addSourceToMap(true, newSourceJson);
         this.sources[newSourceJson.sourceName] = {
           type: newSourceJson.sourceType,
           url: newSourceJson.sourceUrl,
@@ -660,7 +637,7 @@ export default {
           JSON.stringify(layerStyleProperties[geoType].layout)
         ),
         maxzoom: 22,
-        metadata: {"mapbox:type":"pgMulti"},
+        metadata: { "mapbox:type": "pgMulti" },
         minzoom: 0,
         paint: JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint)),
         source: this.sourceNameObject[row.id], //添加的sourceId
@@ -692,14 +669,20 @@ export default {
         paint: newLayer.paint,
         layout: newLayer.layout,
       });
-      this.addLayerToMap(true,newLayer);
+      this.addLayerToMap(true, newLayer);
       // 更新vuex参数
-      this.UPDATEPARM({parm:'layers',value:this.layers});
-      this.UPDATEPARM({parm:'sources',value:this.sources});
-      this.UPDATEPARM({parm:'layersName',value:this.layersName});
-      this.UPDATEPARM({parm:'originStyle',value:this.originStyle});
-      this.UPDATEPARM({parm:'sourceNameObject',value:this.sourceNameObject});
-      this.UPDATEPARM({parm:'layersNameObject',value:this.layersNameObject});      
+      this.UPDATEPARM({ parm: "layers", value: this.layers });
+      this.UPDATEPARM({ parm: "sources", value: this.sources });
+      this.UPDATEPARM({ parm: "layersName", value: this.layersName });
+      this.UPDATEPARM({ parm: "originStyle", value: this.originStyle });
+      this.UPDATEPARM({
+        parm: "sourceNameObject",
+        value: this.sourceNameObject,
+      });
+      this.UPDATEPARM({
+        parm: "layersNameObject",
+        value: this.layersNameObject,
+      });
     },
     async addDataMbTileShp(index, row) {
       console.log("add mbDate shp row: ", row);
@@ -712,23 +695,23 @@ export default {
         )
       ) {
         //添加mbTile的shp图层时，相关json已经入库
-            // json写法
+        // json写法
         let sourceId = this.mbTileInfo.tileJsonId;
-        let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceId + ".json";  
+        let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceId + ".json";
         let newSourceJson = {
           sourceName: sourceId,
           sourceType: "vector",
           sourceUrl: tileJsonUrl,
-        };         
-        console.log('请求数据：',newSourceJson);
-        this.addSourceToMap(true,newSourceJson);        
+        };
+        console.log("请求数据：", newSourceJson);
+        this.addSourceToMap(true, newSourceJson);
         this.sources[newSourceJson.sourceName] = {
           type: newSourceJson.sourceType,
           url: newSourceJson.sourceUrl,
         };
         //记录shp图层和对应的id
         this.sourceNameObject[name] = sourceId;
-      }    
+      }
 
       //前八个是自己用的属性
       let geoType = this.mbsource[row.id];
@@ -750,7 +733,11 @@ export default {
           JSON.stringify(layerStyleProperties[geoType].layout)
         ),
         maxzoom: typeof row["maxzoom"] != "undefined" ? row["maxzoom"] : 22,
-        metadata: {"mapbox:type":'mbSource',"mapbox:isOSM":this.mbTileInfo.osmMbtilesBoolean,"mapbox:source":row.id},
+        metadata: {
+          "mapbox:type": "mbSource",
+          "mapbox:isOSM": this.mbTileInfo.osmMbtilesBoolean,
+          "mapbox:source": row.id,
+        },
         minzoom: typeof row["minzoom"] != "undefined" ? row["minzoom"] : 0,
         paint: JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint)),
         source: this.sourceNameObject[name], //通过记录的source名字与id对应，拿到sourceId
@@ -780,14 +767,20 @@ export default {
         paint: newLayer.paint,
         layout: newLayer.layout,
       });
-      this.addLayerToMap(true,newLayer);
+      this.addLayerToMap(true, newLayer);
       // 更新vuex参数
-      this.UPDATEPARM({parm:'layers',value:this.layers});
-      this.UPDATEPARM({parm:'sources',value:this.sources});
-      this.UPDATEPARM({parm:'layersName',value:this.layersName});
-      this.UPDATEPARM({parm:'originStyle',value:this.originStyle});
-      this.UPDATEPARM({parm:'sourceNameObject',value:this.sourceNameObject});
-      this.UPDATEPARM({parm:'layersNameObject',value:this.layersNameObject});      
+      this.UPDATEPARM({ parm: "layers", value: this.layers });
+      this.UPDATEPARM({ parm: "sources", value: this.sources });
+      this.UPDATEPARM({ parm: "layersName", value: this.layersName });
+      this.UPDATEPARM({ parm: "originStyle", value: this.originStyle });
+      this.UPDATEPARM({
+        parm: "sourceNameObject",
+        value: this.sourceNameObject,
+      });
+      this.UPDATEPARM({
+        parm: "layersNameObject",
+        value: this.layersNameObject,
+      });
     },
 
     async addStyleMbTileShp(index, row) {
@@ -801,16 +794,16 @@ export default {
         )
       ) {
         //添加mbTile的shp图层时，相关json已经入库
-            // json写法
+        // json写法
         let sourceId = this.mbTileInfo.tileJsonId;
-        let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceId + ".json";  
+        let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceId + ".json";
         let newSourceJson = {
           sourceName: sourceId,
           sourceType: "vector",
           sourceUrl: tileJsonUrl,
-        };         
-        console.log('请求数据：',newSourceJson);
-        this.addSourceToMap(true,newSourceJson);        
+        };
+        console.log("请求数据：", newSourceJson);
+        this.addSourceToMap(true, newSourceJson);
         this.sources[newSourceJson.sourceName] = {
           type: newSourceJson.sourceType,
           url: newSourceJson.sourceUrl,
@@ -850,7 +843,11 @@ export default {
         filter: typeof row["filter"] != "undefined" ? row["filter"] : ["all"],
         layout: JSON.parse(JSON.stringify(newLayout)),
         maxzoom: typeof row["maxzoom"] != "undefined" ? row["maxzoom"] : 22,
-        metadata: {"mapbox:type":'mbStyle',"mapbox:isOSM":this.mbTileInfo.osmMbtilesBoolean,"mapbox:source":row['source-layer']},
+        metadata: {
+          "mapbox:type": "mbStyle",
+          "mapbox:isOSM": this.mbTileInfo.osmMbtilesBoolean,
+          "mapbox:source": row["source-layer"],
+        },
         minzoom: typeof row["minzoom"] != "undefined" ? row["minzoom"] : 0,
         paint: JSON.parse(JSON.stringify(newPaint)),
         source: this.sourceNameObject[name], //通过记录的source名字与id对应，拿到sourceId
@@ -875,29 +872,30 @@ export default {
         paint: newLayer.paint,
         layout: newLayer.layout,
       });
-      this.addLayerToMap(true,newLayer);
+      this.addLayerToMap(true, newLayer);
       // 更新vuex参数
-      this.UPDATEPARM({parm:'layers',value:this.layers});
-      this.UPDATEPARM({parm:'sources',value:this.sources});
-      this.UPDATEPARM({parm:'layersName',value:this.layersName});
-      this.UPDATEPARM({parm:'originStyle',value:this.originStyle});
-      this.UPDATEPARM({parm:'sourceNameObject',value:this.sourceNameObject});
-      this.UPDATEPARM({parm:'layersNameObject',value:this.layersNameObject});      
+      this.UPDATEPARM({ parm: "layers", value: this.layers });
+      this.UPDATEPARM({ parm: "sources", value: this.sources });
+      this.UPDATEPARM({ parm: "layersName", value: this.layersName });
+      this.UPDATEPARM({ parm: "originStyle", value: this.originStyle });
+      this.UPDATEPARM({
+        parm: "sourceNameObject",
+        value: this.sourceNameObject,
+      });
+      this.UPDATEPARM({
+        parm: "layersNameObject",
+        value: this.layersNameObject,
+      });
     },
     async addTMS(index, row) {
       console.log("add TMS shp row: ", row);
       //判断该shp是否已添加
       if (
-        !Object.prototype.hasOwnProperty.call(
-          this.sourceNameObject,
-          row.id
-        )
+        !Object.prototype.hasOwnProperty.call(this.sourceNameObject, row.id)
       ) {
         let newTileJson = initTileJson;
         newTileJson.name = row.name;
-        newTileJson.tiles = [
-          row.url
-        ];
+        newTileJson.tiles = [row.url];
         let vector_layer = {
           description: "",
           fields: "",
@@ -911,7 +909,7 @@ export default {
           return;
         }
         //添加source
-        let sourceId = res.data.data.tileJsonId;     
+        let sourceId = res.data.data.tileJsonId;
         let tileJsonUrl = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
         let newSourceJson = {
           sourceName: sourceId,
@@ -919,12 +917,12 @@ export default {
           sourceUrl: tileJsonUrl,
         };
         // Raster添加
-        this.addSourceToMap(false,newSourceJson)     
-        // 记录shp图层和对应的id        
+        this.addSourceToMap(false, newSourceJson);
+        // 记录shp图层和对应的id
         this.sources[newSourceJson.sourceName] = {
           type: newSourceJson.sourceType,
           tiles: [newSourceJson.sourceUrl],
-          tileSize: 256
+          tileSize: 256,
         };
         this.sourceNameObject[row.id] = sourceId;
       }
@@ -943,7 +941,7 @@ export default {
         id: row.id,
         type: "raster",
         maxzoom: 22,
-        metadata: {"mapbox:type":"TMS"},
+        metadata: { "mapbox:type": "TMS" },
         minzoom: 0,
         source: this.sourceNameObject[row.id], //通过记录的source名字与id对应，拿到sourceId
       };
@@ -956,23 +954,27 @@ export default {
         this.layersNameObject[newLayer.name] = 1;
       } else {
         this.layersNameObject[newLayer.name] += 1;
-        newLayer.id =
-          row.name + this.layersNameObject[newLayer.name];
-        newLayer.showName =
-          row.name + this.layersNameObject[newLayer.name];
+        newLayer.id = row.name + this.layersNameObject[newLayer.name];
+        newLayer.showName = row.name + this.layersNameObject[newLayer.name];
       }
       this.layers.unshift(newLayer);
       this.layersName.unshift(newLayer.id);
-      this.addLayerToMap(true,newLayer);
+      this.addLayerToMap(true, newLayer);
       // 更新vuex参数
-      this.UPDATEPARM({parm:'layers',value:this.layers});
-      this.UPDATEPARM({parm:'sources',value:this.sources});
-      this.UPDATEPARM({parm:'layersName',value:this.layersName});
-      this.UPDATEPARM({parm:'sourceNameObject',value:this.sourceNameObject});
-      this.UPDATEPARM({parm:'layersNameObject',value:this.layersNameObject});      
+      this.UPDATEPARM({ parm: "layers", value: this.layers });
+      this.UPDATEPARM({ parm: "sources", value: this.sources });
+      this.UPDATEPARM({ parm: "layersName", value: this.layersName });
+      this.UPDATEPARM({
+        parm: "sourceNameObject",
+        value: this.sourceNameObject,
+      });
+      this.UPDATEPARM({
+        parm: "layersNameObject",
+        value: this.layersNameObject,
+      });
     },
     addBackground(sourceType, row) {
-      const index = this.layers.length;       // 判断是否有图层，有则添加在最后一位，否则直接添加
+      const index = this.layers.length; // 判断是否有图层，有则添加在最后一位，否则直接添加
       const newLayout = layerStyleProperties["background"].layout;
       const newPaint = layerStyleProperties["background"].paint;
       // style文件中的background图层
@@ -1003,7 +1005,7 @@ export default {
         paint: newPaint,
         layout: newLayout,
         metadata: {
-          "mapbox:type":"background",
+          "mapbox:type": "background",
         },
       };
       if (sourceType != "mbTile") {
@@ -1025,26 +1027,28 @@ export default {
       this.layers.push(backLayer);
       this.layersName.push(backLayer.id);
       if (!index) {
-        this.addLayerToMap(true,backLayer); //没有图层直接按默认添加
+        this.addLayerToMap(true, backLayer); //没有图层直接按默认添加
       } else {
         const val = {
-          id : this.layers[index - 1].id,
-          layer : backLayer
-        }
-        this.addLayerToMap(false,val)
+          id: this.layers[index - 1].id,
+          layer: backLayer,
+        };
+        this.addLayerToMap(false, val);
         // map.addLayer(backLayer, this.layers[index - 1].id); //有图层则背景添加在最底层
       }
       // 更新vuex参数
-      this.UPDATEPARM({parm:'layers',value:this.layers})          
-      this.UPDATEPARM({parm:'layersName',value:this.layersName})          
-      this.UPDATEPARM({parm:'layersNameObject',value:this.layersNameObject})
-
-    },    
+      this.UPDATEPARM({ parm: "layers", value: this.layers });
+      this.UPDATEPARM({ parm: "layersName", value: this.layersName });
+      this.UPDATEPARM({
+        parm: "layersNameObject",
+        value: this.layersNameObject,
+      });
+    },
     // 保存地图
     saveMap(flag) {
       // 由MapPanel组件执行
-      this.$bus.$emit("map",{type:'save',flag:flag})
-    },    
+      this.$bus.$emit("map", { type: "save", flag: flag });
+    },
     // 发布项目
     publicMap() {
       this.$confirm("确认发布地图, 是否继续?", "提示", {
@@ -1074,7 +1078,7 @@ export default {
         .catch(() => {
           this.$message.info("地图发布失败");
         });
-    },          
+    },
     // 添加所有styleJson图层
     addAllStyles(List) {
       for (let i in List) {
@@ -1098,7 +1102,7 @@ export default {
         this.addDataMbTileShp(i, item);
       }
       console.log("添加所有styleJson图层");
-    }, 
+    },
     //生成tilejson和mbTileJson
     async createTileJson(initTileJson) {
       let data = "";
@@ -1108,7 +1112,7 @@ export default {
         data = await requestApi.createMbTilesJson(initTileJson);
       }
       return data;
-    }, 
+    },
     deleteTileJson(tileJsonId) {
       requestApi
         .deleteTileJson(tileJsonId)
@@ -1118,46 +1122,46 @@ export default {
         .catch((error) => {
           console.log(error);
         });
-    },    
+    },
     //向地图添加数据源source
-    addSourceToMap(flag,newSource) {
-      if(flag){
+    addSourceToMap(flag, newSource) {
+      if (flag) {
         const data = {
-          type:'addSource1',
-          source: newSource
-        }
-        this.$bus.$emit("map",data);
-      }else{
+          type: "addSource1",
+          source: newSource,
+        };
+        this.$bus.$emit("map", data);
+      } else {
         const data = {
-          type:'addSource2',
-          source: newSource
-        }        
-        this.$bus.$emit("map",data);
+          type: "addSource2",
+          source: newSource,
+        };
+        this.$bus.$emit("map", data);
       }
     },
     //向地图添加layer
-    addLayerToMap(flag,val) {
-      if(flag){
+    addLayerToMap(flag, val) {
+      if (flag) {
         const data = {
-          type:'addLayer1',
-          layer: val
-        }
-        this.$bus.$emit("map",data);
-      }else{
+          type: "addLayer1",
+          layer: val,
+        };
+        this.$bus.$emit("map", data);
+      } else {
         // flag=false表示添加在指定图层后
         const data = {
-          type:'addLayer2',
+          type: "addLayer2",
           id: val.id,
-          layer: val.layer
-        }        
-        this.$bus.$emit("map",data);
-      }      
-    },           
+          layer: val.layer,
+        };
+        this.$bus.$emit("map", data);
+      }
+    },
 
     // ·PG服务
     // 选择PG服务
     PgBaseChange(val) {
-      let index = 0;      //val表示选择的value值
+      let index = 0; //val表示选择的value值
       //获取select选择内容的下标
       this.pgShpList.forEach((e, ind) => {
         if (e.id == val) {
@@ -1173,7 +1177,7 @@ export default {
       } else {
         this.addShpData();
       }
-    },    
+    },
     // 获取默认pg的shp列表
     getPgList() {
       requestApi
@@ -1186,7 +1190,7 @@ export default {
         .catch((error) => {
           console.log(error);
         });
-    },    
+    },
     // PG列表切换相关
     handleCurrentChangeShp(val) {
       this.currentPageShp = val;
@@ -1195,8 +1199,8 @@ export default {
       } else {
         this.addShpData();
       }
-    },    
-    
+    },
+
     // ·OSM服务
     getMbtilesList() {
       requestApi.getMbtilesList().then((res) => {
@@ -1211,7 +1215,7 @@ export default {
           console.log("dataLayers", this.dataLayers);
         }
       });
-    },   
+    },
     // 获取mbTile的styleJson列表
     getStyleListById(id, isCallBack) {
       // OSM数据样式
@@ -1226,7 +1230,8 @@ export default {
               this.mbTileStyleSelect = this.mbTileStyleList[0].id;
               this.mbTileStyleJson = this.mbTileStyleList[0];
               this.styleLayers = this.mbTileStyleJson.layers;
-              if (isCallBack) {   // 暂定
+              if (isCallBack) {
+                // 暂定
                 // 等getStyleListById执行完得到mbTileStyleList数据
                 console.log("dataLayers", this.mbTileStyleList);
                 if (this.templateStyleSelect == "") {
@@ -1235,16 +1240,14 @@ export default {
                   this.tempStyleLayers = this.templateStyleJson.layers;
                 }
               }
-            } 
-            else {
+            } else {
               this.mbTileStyleList = [];
             }
           })
           .catch((error) => {
             console.log(error);
           });
-      } 
-      else {
+      } else {
         requestApi
           .getStyleListById(id)
           .then((res) => {
@@ -1255,7 +1258,8 @@ export default {
               this.mbTileStyleSelect = this.mbTileStyleList[0].id;
               this.mbTileStyleJson = this.mbTileStyleList[0];
               this.styleLayers = this.mbTileStyleJson.layers;
-              if (isCallBack) {   // 暂定
+              if (isCallBack) {
+                // 暂定
                 // 等getStyleListById执行完得到mbTileStyleList数据
                 console.log("dataLayers", this.mbTileStyleList);
                 if (this.templateStyleSelect == "") {
@@ -1272,22 +1276,22 @@ export default {
             console.log(error);
           });
       }
-    }, 
+    },
     // 获取对应metadataJson
-    getTileJsonById(id){
+    getTileJsonById(id) {
       requestApi
         .getTileJson(id)
         .then((res) => {
           this.mbTileJson = res.data;
           this.dataLayers = res.data.vector_layers;
-          console.log('tileJson',this.mbTileJson);
+          console.log("tileJson", this.mbTileJson);
         })
         .catch((error) => {
           console.log(error);
         });
-    },       
+    },
 
-      // TMS服务
+    // TMS服务
     getOutService() {
       requestApi
         .getThirdPartSourceList(this.dataBaseSelect)
@@ -1297,16 +1301,14 @@ export default {
           } else {
             console.log(res.data.csg);
           }
-          console.log("urlBase",this.urlBase);
+          console.log("urlBase", this.urlBase);
         })
         .catch((err) => {
           console.log(err);
         });
-    },    
-  }
-}
+    },
+  },
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
