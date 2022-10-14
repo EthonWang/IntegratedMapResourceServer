@@ -26,16 +26,10 @@
         :data="layersTree"
         node-key="id"
         default-expand-all
-        @node-drag-start="handleDragStart"
-        @node-drag-enter="handleDragEnter"
-        @node-drag-leave="handleDragLeave"
-        @node-drag-over="handleDragOver"
-        @node-drag-end="handleDragEnd"
         @node-drop="handleDrop"
         :expand-on-click-node="false"
         draggable
-        :allow-drop="allowDrop"
-        :allow-drag="allowDrag">
+        :allow-drop="allowDrop">
 
       <div class="custom-tree-node" style="width: 330px; display: flex;justify-content: space-between;"
            slot-scope="{ node, data }">
@@ -70,9 +64,9 @@
             <el-input
                 v-model="data.showName"
                 size="mini"
-                @change.stop.native="groupNameChange(data)"
+                @change.stop.native="nowGroupId = -1;"
             ></el-input>
-            <i class="el-icon-check" @click="groupNameChange(data)"></i>
+            <i class="el-icon-check" @click="nowGroupId = -1;"></i>
           </div>
 
         </div>
@@ -93,7 +87,7 @@
 
           <el-popconfirm
               title="确定删除该图层吗？"
-              @confirm="handleLayerDelete(data)"
+              @confirm="deleteLayerFromTree(data,node)"
           >
             <el-button
                 slot="reference"
@@ -123,7 +117,7 @@
         <div v-else>
           <el-popconfirm
               title="确定删除该组吗？"
-              @confirm="handleGroupDelete(data)"
+              @confirm="deleteGroupFromTree(data,node)"
           >
             <el-button
                 slot="reference"
@@ -145,12 +139,12 @@
 </template>
 <script>
 // import requestApi from "../../api/requestApi";
-import {mapState, mapActions, mapMutations} from 'vuex'
+import {mapActions, mapMutations, mapState} from 'vuex'
 import {nanoid} from 'nanoid'
 import requestApi from "../../api/requestApi";
 
 export default {
-  name: "LayersList",
+  name: "ProjLayersNew",
   props: [],
   data() {
     return {
@@ -187,46 +181,28 @@ export default {
   watch:{
     layersProp:function (layersProp){
       this.layers=layersProp
-
-      for (let i = 0; i < layersProp.length; i++) {
-        let layer=layersProp[i]
-        for (let j = 0; j < this.layersTree.length; j++) {
-          let node=this.layersTree[j]
-          if(node.nodeType=="group"){
-            for (let k = 0; k < node.children.length; k++) {
-              if(node.children[k].id==layer.id){
-                node.children=layer
-              }
-            }
-          }else{
-            if(node.id==layer.id){
+      layersProp.forEach((layer)=>{
+        for (let i = 0; i < this.layersTree.length; i++) {
+          let node=this.layersTree[i]
+          if(node.nodeType=="group")
+            for (let k = 0; k < node.children.length; k++)
+              if(node.children[k].id==layer.id)
+                node.children[k]=layer
+          else
+            if(node.id==layer.id)
               node=layer
-            }
-          }
         }
-      }
+      })
       this.UPDATEPARM({parm: 'layersTree', value: this.layersTree});
       console.log("update tree")
-
     },
 
-    layersTreeProp:function (layersTreeProp){
-      this.layersTree=layersTreeProp
-
-      let newLayers = []
-      for (let i = 0; i < this.layersTree.length; i++) {
-        let node = this.layersTree[i]
-        if (node.nodeType == "group") {
-          for (let j = 0; j < node.children.length; j++) {
-            newLayers.push(node.children[j])
-          }
-        } else {
-          newLayers.push(node)
-        }
-      }
-      this.UPDATEPARM({parm: 'layers', value: this.layers});
-      console.log("update layer")
-    }
+    // layersTreeProp:function (layersTreeProp){
+    //   // this.layersTree=layersTreeProp
+    //   this.layers=this.createLayersFromTree()
+    //   this.UPDATEPARM({parm: 'layers', value: this.layers});
+    //   console.log("update layer",layersTreeProp,this.layers)
+    // }
 
   },
   mounted() {
@@ -321,19 +297,28 @@ export default {
     handleLayerShowSwitchChange(val, row) {
       if (val) {
         this.handleLayoutChange(row.id, "visibility", "visible");
-
       } else {
         this.handleLayoutChange(row.id, "visibility", "none");
       }
-      let index = this.getLayerIndexFromTree(row.id)
+      let index = this.getLayerIndex(row.id)
       this.layers[index]["show"] = val
       this.UPDATEPARM({parm: 'layers', value: this.layers});
+    },
+
+    deleteTileJson(tileJsonId) {
+      requestApi
+          .deleteTileJson(tileJsonId)
+          .then((res) => {
+            console.log("delete tileJson: ", res);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
     },
     // 删除单图层
     handleLayerDelete(row) {
       console.log("ready delete layer:", row);
-      this.deleteLayerFromTree(row)
-      let index = this.getLayerIndexFromTree(row["id"])
+      let index = this.getLayerIndex(row["id"])
       // 先关闭图层样式编辑框，防止报错
       this.$bus.$emit("mapEdit", {type: 'off'});
       let aimSource = row.source;
@@ -370,41 +355,24 @@ export default {
       this.UPDATEPARM({parm: 'sourceNameObject', value: this.sourceNameObject});
     },
 
-    deleteTileJson(tileJsonId) {
-      requestApi
-          .deleteTileJson(tileJsonId)
-          .then((res) => {
-            console.log("delete tileJson: ", res);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-    },
-
-    deleteLayerFromTree(aimLayerData) {
-      for (let i = 0; i < this.layersTree.length; i++) {
-        let node = this.layersTree[i]
-        if (node.nodeType == "group") {
-          let children = node.children
-          for (let j = 0; j < children.length; j++) {
-            if (aimLayerData.id == children[j].id) {
-              this.layersTree[i].children.splice(j, 1);
-            }
-          }
-        } else if (aimLayerData.id == node.id) {
-          this.layersTree.splice(i, 1);
-        }
-      }
+    deleteLayerFromTree(aimLayerData,node) {
+      this.handleLayerDelete(aimLayerData)
+      const parent = node.parent;
+      const children = parent.data.children || parent.data;
+      const index = children.findIndex(d => d.id === aimLayerData.id);
+      children.splice(index, 1);
       this.UPDATEPARM({parm: 'layersTree', value: this.layersTree});
     },
 
-    handleGroupDelete(data) {
-      let groupIndex = this.layersTree.indexOf(data)
+    deleteGroupFromTree(data,node) {
       const children = JSON.parse(JSON.stringify(data.children));
       for (let i = 0; i < children.length; i++) {
         this.handleLayerDelete(children[i])
       }
-      this.layersTree.splice(groupIndex, 1);
+      const parent = node.parent;
+      const childrenData = parent.data.children || parent.data;
+      const index = childrenData.findIndex(d => d.id === data.id);
+      childrenData.splice(index, 1);
       this.UPDATEPARM({parm: 'layersTree', value: this.layersTree});
     },
 
@@ -512,6 +480,22 @@ export default {
       }
       this.$bus.$emit("map", data);
     },
+    handleAddLayer(nowLayerIndex,layer){
+      if (nowLayerIndex == 0) {
+        this.$bus.$emit("map", {
+          type: 'addLayer1',
+          drag: true,
+          layer: layer
+        });
+      } else {
+        this.$bus.$emit("map", {
+          type: 'addLayer2',
+          id: this.layers[nowLayerIndex - 1].id,
+          drag: true,
+          layer: layer
+        });
+      }
+    },
     // ##将地图定位到对应范围位置
     handleLayerClick(row) {
       const data = {
@@ -546,108 +530,6 @@ export default {
       this.$bus.$emit("styleTemp", data);
     },
 
-    handleDragStart(node) {
-      console.log('drag start', node);
-    },
-    handleDragEnter(draggingNode, dropNode) {
-      console.log('tree drag enter: ', dropNode.data.showName);
-    },
-    handleDragLeave(draggingNode, dropNode) {
-      console.log('tree drag leave: ', dropNode.data.showName);
-    },
-    handleDragOver(draggingNode, dropNode) {
-      console.log('tree drag over: ', dropNode.data.showName);
-    },
-    handleDragEnd(draggingNode, dropNode, dropType) {
-      console.log('tree drag end: ', dropNode && dropNode.data.showName, dropType);
-    },
-    handleDrop(draggingNode, dropNode, dropType) {
-      console.log('tree drop: ', draggingNode, dropNode, dropType);
-      if (draggingNode.data.nodeType == "layer") {
-        this.handleLayerDrag(draggingNode)
-      } else {
-        this.handleGroupDrag(draggingNode)
-      }
-    },
-
-    handleLayerDrag(draggingNode) {
-      let nowLayerIndex = -1
-      // let newLayers = []
-
-      // for (let i = 0; i < this.layersTree.length; i++) {
-      //   let node = this.layersTree[i]
-      //   if (node.nodeType == "group") {
-      //     for (let j = 0; j < node.children.length; j++) {
-      //       newLayers.push(node.children[j])
-      //       if (node.children[j].id == draggingNode.data.id) {
-      //         nowLayerIndex = newLayers.length - 1
-      //       }
-      //     }
-      //   } else {
-      //     newLayers.push(node)
-      //     if (node.id == draggingNode.data.id) {
-      //       nowLayerIndex = newLayers.length - 1
-      //     }
-      //   }
-      // }
-      //
-      // this.layers = newLayers
-      // this.UPDATEPARM({parm: 'layers', value: this.layers});
-
-      this.handleRemoveLayer(draggingNode.data.id)
-      if (nowLayerIndex == 0) {
-        this.$bus.$emit("map", {
-          type: 'addLayer1',
-          drag: true,
-          layer: draggingNode.data
-        });
-      } else {
-        this.$bus.$emit("map", {
-          type: 'addLayer2',
-          id: this.layers[nowLayerIndex - 1].id,
-          drag: true,
-          layer: draggingNode.data
-        });
-      }
-    },
-
-    handleGroupDrag(draggingNode) {
-      // let newLayers = []
-      // for (let i = 0; i < this.layersTree.length; i++) {
-      //   let node = this.layersTree[i]
-      //   if (node.nodeType == "group") {
-      //     for (let j = 0; j < node.children.length; j++) {
-      //       newLayers.push(node.children[j])
-      //     }
-      //   } else {
-      //     newLayers.push(node)
-      //   }
-      // }
-      // this.layers = newLayers
-      // this.UPDATEPARM({parm: 'layers', value: this.layers});
-
-      let layerNodes = draggingNode.data.children
-      for (let layerNode of layerNodes) {
-        this.handleRemoveLayer(layerNode.id)
-        let nowLayerIndex = this.getLayerIndexFromTree(layerNode.id)
-
-        if (nowLayerIndex == 0) {
-          this.$bus.$emit("map", {
-            type: 'addLayer1',
-            drag: true,
-            layer: layerNode
-          });
-        } else {
-          this.$bus.$emit("map", {
-            type: 'addLayer2',
-            id: this.layers[nowLayerIndex - 1].id,
-            drag: true,
-            layer: layerNode
-          });
-        }
-      }
-    },
-
     allowDrop(draggingNode, dropNode, type) {
       if (dropNode.data.nodeType == "layer" && type == "inner") {
         return false
@@ -660,25 +542,39 @@ export default {
       }
     },
 
-    allowDrag(draggingNode) {
-      draggingNode
-      return true;
-    },
-
-    append(data) {
-      const newChild = {id: data.id++, label: 'test', children: []};
-      if (!data.children) {
-        this.$set(data, 'children', []);
+    handleDrop(draggingNode, dropNode, dropType) {
+      console.log('tree drop: ', draggingNode, dropNode, dropType);
+      if (draggingNode.data.nodeType == "layer") {
+        this.handleLayerDrag(draggingNode)
+      } else {
+        this.handleGroupDrag(draggingNode)
       }
-      data.children.push(newChild);
     },
 
-    remove(node, data) {
-      const parent = node.parent;
-      const children = parent.data.children || parent.data;
-      const index = children.findIndex(d => d.id === data.id);
-      children.splice(index, 1);
+    handleLayerDrag(draggingNode) {
+      this.layers = this.createLayersFromTree()
+      this.UPDATEPARM({parm: 'layers', value: this.layers});
+
+      let nowLayerIndex = -1
+      nowLayerIndex=this.getLayerIndex(draggingNode.data.id)
+      console.log("draggingNode,index",draggingNode,nowLayerIndex)
+
+      this.handleRemoveLayer(draggingNode.data.id)
+      this.handleAddLayer(nowLayerIndex,draggingNode.data)
     },
+
+    handleGroupDrag(draggingNode) {
+      this.layers = this.createLayersFromTree()
+      this.UPDATEPARM({parm: 'layers', value: this.layers});
+
+      for (let i=0;i<draggingNode.data.children.length;i++) {
+        let layer=draggingNode.data.children[i]
+        this.handleRemoveLayer(layer.id)
+        let nowLayerIndex = this.getLayerIndex(layer.id)
+        this.handleAddLayer(nowLayerIndex,layer)
+      }
+    },
+
 
     addGroup() {
       let groupNode = {}
@@ -697,9 +593,20 @@ export default {
           return i
       }
     },
-    groupNameChange(data){
-      data
-      this.nowGroupId = -1;
+
+    createLayersFromTree(){
+      let newLayers=[]
+      for (let i = 0; i < this.layersTree.length; i++) {
+        let node = this.layersTree[i]
+        if (node.nodeType == "group") {
+          for (let j = 0; j < node.children.length; j++) {
+            newLayers.push(node.children[j])
+          }
+        } else {
+          newLayers.push(node)
+        }
+      }
+      return newLayers
     }
 
   }

@@ -67,8 +67,8 @@ export default {
           break;
         case 'setZoom':               // data:{type:'',layerName:'',min:'',max:''}
           this.handleZoomChange(data.layerName,data.min,data.max);
-          break;              
-        case 'addLayer1':             // data:{type:'',layer:{}}    
+          break;
+        case 'addLayer1':             // data:{type:'',layer:{}}
           this.addLayerToMap(true,data.layer);
           break;
         case 'addLayer2':             // data:{type:'',id:'',layer:{}}  添加在指定图层后(添加背景,更换指定图层样式)
@@ -85,10 +85,10 @@ export default {
           break;
         case 'removeSource':          // data:{type:'',id:''}
           map.removeSource(data.id);
-          break;                
+          break;
         case 'setFilter':             // data:{type:'',id:'',filter:{}}
           this.setFilterToMap(data.id,data.filter);
-          break;          
+          break;
         case 'save':                  // data:{type:''，flag:''}    flag为true是正常保存，false是不弹出提示框（发布走的链接）
           this.saveMap(data.flag);
           break;
@@ -103,7 +103,7 @@ export default {
             if (error) throw error;
             map.addImage(data.name, image);
           });
-          break;     
+          break;
         default:
           break;
       }
@@ -321,8 +321,8 @@ export default {
     setFilterToMap(id, filter) {
       console.log("set filters：", id, filter);
       map.setFilter(id, filter);
-    },    
-    // 修改layout属性 
+    },
+    // 修改layout属性
     handleLayoutChange(layerName, key, value) {
       console.log("layout:", layerName, key, value);
       map.setLayoutProperty(layerName, key, value);
@@ -336,7 +336,7 @@ export default {
     handleZoomChange(layerName, min, max){
       console.log("zoom:", layerName, min, max);
       map.setLayerZoomRange(layerName, min, max);
-    },    
+    },
 
     // 为item添加同handleLayerEdit相同的方法
     addItemEvent(item, feature, index) {
@@ -350,7 +350,7 @@ export default {
         }
         this.$bus.$emit("mapEdit",data);
       };
-    }, 
+    },
     setCanvasSrc(){
       const canvasSrc = map.getCanvas().toDataURL("image/png");
       localStorage.setItem("canvasSrc", canvasSrc);
@@ -378,7 +378,8 @@ export default {
       if(!flag){    // 发布走的接口，否则保存初始的publicBoolean
         this.mapProjectInfo.publicBoolean = true;     // 在按钮组件中publicBoolean已经设置为true
       }
-      this.mapProjectInfo.layers = this.layers;
+      // this.mapProjectInfo.layers = this.layers;
+      this.mapProjectInfo.layers = this.layersProp;
       this.mapProjectInfo.nameObject = {
         layersNameObject: this.layersNameObject,
         sourceNameObject: this.sourceNameObject,

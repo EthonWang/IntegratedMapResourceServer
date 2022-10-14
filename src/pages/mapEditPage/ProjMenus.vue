@@ -7,17 +7,17 @@
     </div>
     <!-- 按钮组 -->
     <ProjButtons></ProjButtons>
-    <ProjLayers></ProjLayers>
+    <ProjLayersNew></ProjLayersNew>
   </div>
 </template>
 <script>
 // import requestApi from "@/api/requestApi";
 import { mapState, mapActions, mapMutations } from "vuex";
 import ProjButtons from "./ProjButtons.vue";
-import ProjLayers from "./ProjLayers.vue";
+import ProjLayersNew from "./ProjLayersNew.vue";
 
 export default {
-  components: { ProjButtons,ProjLayers },
+  components: { ProjButtons,ProjLayersNew },
   name: "ProjMenus",
   props: ["", ""],
   data() {
