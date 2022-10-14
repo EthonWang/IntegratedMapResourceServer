@@ -12,6 +12,8 @@ export const filterSplit = (filterList)=>{
   let filterConditon = [];
   let filterWay = filterList[0];     //第一项为条件判断
   let filterOptionSelectList = [];
+  let filterTemp = [filterWay];
+
   filterList.forEach(element => {
     console.log('元素',typeof(element),element);
     if(typeof(element) == 'string'){
@@ -48,8 +50,15 @@ export const filterSplit = (filterList)=>{
         break
     }
     filterOptionSelectList.push(element[1]);
+    let filter = [];
+    let length = filterConditon.length - 1;
+    filter.push(filterConditon[length].type);
+    filter.push(["get", filterConditon[length].option]);
+    filter.push(filterConditon[length].value); 
+    filterTemp.push(filter)   
+
   });
-  return{filterWay:filterWay,filterConditon:filterConditon,filterOptionSelectList:filterOptionSelectList}
+  return{filterWay:filterWay,filterConditon:filterConditon,filterOptionSelectList:filterOptionSelectList,filterTemp:filterTemp}
 }
 
 
@@ -62,24 +71,36 @@ export const renderSplit = (renderObject)=>{
   let rate = [];
   let rateValue = {'exp':1,'bezier':[1,1,1,1]};
   let stops = renderObject['stops'];
+  // 条件渲染
+  let rate1 = [];  
   // 没有base属性则按linear插值，否则为exponential
   if('base' in renderObject){
     rateValue['exp'] = renderObject['base'];
     rate = 'exponential';
+    rate1.push('exponential');
+    rate1.push(rateValue['exp']);
   }else{
-    rate = 'linear'
+    rate = 'linear';
+    rate1.push('linear');
   }
+  let zoomCondition1 = ["interpolate", rate1, ["zoom"]];
+
   stops.forEach(element=>{
     zoomValue.push({
       zoom: element[0],
       value: element[1]
     })
+    let length = zoomValue.length - 1;
+    console.log('测试',length);
+    zoomCondition1.push(zoomValue[length]['zoom']);
+    zoomCondition1.push(zoomValue[length]['value']);
   })
   return({
     rate:rate,
     rateValue:rateValue,
     zoomValue:zoomValue,
-    valueOrigin:stops[0][1]       // 取第一个级别的数据
+    valueOrigin:stops[0][1],       // 取第一个级别的数据
+    zoomCondition1:zoomCondition1
   })
 
   
