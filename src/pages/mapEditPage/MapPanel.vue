@@ -483,7 +483,6 @@ export default {
   margin-left: 330px;
   width: calc(100vw - 330px);
   height: 100vh;
-  background-color: rebeccapurple;
 }
 
 /* popup样式 */

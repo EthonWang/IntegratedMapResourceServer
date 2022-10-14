@@ -219,6 +219,7 @@
     >
     <el-button type="primary" @click="test1">测试</el-button>
     <el-button type="primary" @click="test2">测试2</el-button>
+    <el-button type="primary" @click="test3">测试3</el-button>
   </div>
 </template>
 <script>
@@ -226,6 +227,7 @@ import requestApi from "../../api/requestApi";
 import {mapState,mapActions,mapMutations} from 'vuex'
 import initTileJson from "@/assets/js/initTileJson";
 import layerStyleProperties from "@/assets/js/layerStyleProperties";
+import {renderSplit,filterSplit} from "@/serve/JsonToValue";
 
 export default {
   name: "ProjButtons",
@@ -335,6 +337,40 @@ export default {
     },
     test2(){
       this.$bus.$emit("styleTemp",{type:'open',index:0,layer:this.layers[0]});
+    },
+    test3(){
+      let a = renderSplit(
+        {
+					"base": 1.2,
+					"stops": [
+						[
+							14,
+							0.5
+						],
+						[
+							20,
+							10
+						]
+					]
+				}        
+      )
+      let b = filterSplit(
+        [
+          "all",
+          [
+            "==",
+            "brunnel",
+            "tunnel"
+          ],
+          [
+            "in",
+            "class",
+            "service",
+            "track"
+          ]
+        ]       
+      )
+      console.log("测试",a,b);
     },
     // vuex
     ...mapActions({updateParm:'update'}),        //将 `this.updateParm(data)` 映射为 `this.$store.dispatch('update',data)`

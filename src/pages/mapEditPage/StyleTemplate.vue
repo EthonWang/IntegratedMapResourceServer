@@ -117,11 +117,11 @@
                 >
                   <el-table-column
                     property="id"
-                    width="210"
+                    width="200"
                     show-overflow-tooltip
                     label="style"
                   ></el-table-column>
-                  <el-table-column width="100">
+                  <el-table-column width="120">
                     <template slot-scope="scope">
                       <el-button
                         size="mini"

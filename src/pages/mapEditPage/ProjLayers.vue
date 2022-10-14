@@ -360,7 +360,7 @@ export default {
     },
     
     // #对地图样式编辑框组件的封装
-    handleLayerEdit(index,layerData) {
+    handleLayerEdit(layerData) {
       let index=this.getLayerIndexFromTree(layerData["id"])
       console.log("nowlayer",layerData,index)
       // 预先更新vuex参数给函数调用
