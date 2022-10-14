@@ -2201,12 +2201,12 @@
               style="display: flex; margin-top: 10px"
             >
               <el-input
-                v-model="textField"
+                v-model="layers[nowLayerIndex].layout['text-field']"
                 @change="
                   handleLayoutChange(
                     layers[nowLayerIndex]['id'],
                     'text-field',
-                    ['get', textField]
+                    ['get', layers[nowLayerIndex].layout['text-field']]
                   )
                 "
                 placeholder="something"
@@ -3476,7 +3476,8 @@
           </el-form-item>
         </el-form>
         <el-divider></el-divider>
-        <el-row v-if="layers[nowLayerIndex].metadata['mapbox:type'] != 'mbStyle'">
+        <!-- 筛选 -->
+        <el-row v-if="layers[nowLayerIndex].metadata['mapbox:type'] != 'background'">
           <el-row type="flex" justify="space-between" align="middle">
             <h4>过滤条件配置</h4>
             &nbsp;
@@ -3506,12 +3507,14 @@
               @click="filterRemove(index)"
             ></el-button>
             <el-col :span="6">
+              <!-- 非mbTile -->
               <el-select
+                v-if="!isMbTile"
                 :span="2"
                 v-model="filterCondition[index]['option']"
                 placeholder="请选择"
                 size="small"
-                @change="filterValueInit(index)"
+                @change="filterValueInit($event,index)"
               >
                 <el-option
                   v-for="item in filterOptions"
@@ -3520,6 +3523,41 @@
                   :value="item['column_name']"
                 >
                 </el-option>
+              </el-select>
+              <!-- mbTile -->
+              <el-select
+                v-if="isMbTile"
+                :span="2"
+                v-model="filterCondition[index]['option']"
+                placeholder="请选择"
+                size="small"
+                @change="filterValueInit($event,index)"
+              >
+                <el-option
+                  v-for="item in filterOptions"
+                  :key="item['attribute']"
+                  :label="item['attribute']"
+                  :value="item['attribute']"
+                >
+                  <!-- 属性名 -->
+                  <span style="float: left;margin-right:20px">{{ item.attribute }}</span>                 
+                  <!-- 三种类型补充 -->
+                  <span 
+                    v-if="item.type != 'number' && item.values.length == 0"
+                    style="float: right; color: #8492a6; font-size: 13px"
+                  >Unkonws
+                  </span>
+                  <span 
+                    v-else-if="item.type != 'number' && item.values.length > 0"
+                    style="float: right; color: #8492a6; font-size: 13px"
+                  >{{ item.values.length + " values" }}
+                  </span>
+                  <span 
+                    v-else
+                    style="float: right; color: #8492a6; font-size: 13px"
+                  >{{ item.min + "-" + item.max }}
+                  </span>
+                </el-option>                
               </el-select>
             </el-col>
             <el-col :span="5">
@@ -3539,8 +3577,9 @@
             </el-col>
             <el-col :span="10">
               <el-input
-                placeholder=""
                 v-model="filterCondition[index]['value']"
+                @change="filterChange($event,filterHasValues)"
+                :placeholder="filterHasValues ? '' : '请输入数组'"
                 size="small"
                 clearable
               >
@@ -3549,7 +3588,10 @@
                 </template>
               </el-input>
             </el-col>
-            <el-popover placement="right" width="400" trigger="click">
+            <!-- 占位用 -->
+            <el-col v-if="!filterHasValues" :span="2"></el-col>          
+            <!-- 有筛选值可选 -->
+            <el-popover v-if="filterHasValues" placement="right" width="400" trigger="click">
               <el-button
                 size="mini"
                 type="primary"
@@ -3557,48 +3599,84 @@
                 style="position: absolute; top: 24px; z-index: 100"
                 >筛选
               </el-button>
-              <el-table
-                :data="
-                  filterValueSelect.filter(
-                    (data) =>
-                      !filterSearch ||
-                      data[filterOptionSelectList[index]]
-                        .toLowerCase()
-                        .includes(filterSearch.toLowerCase())
-                  )
-                "
-                @row-click="handleFilter"
-                row-key="id"
-                :highlight-current-row="true"
-                :cell-style="{ textAlign: 'left' }"
-                height="300"
-              >
-                <el-table-column
-                  :prop="filterOptionSelectList[index]"
-                  align="right"
+              <!-- 非mbTiles -->
+              <el-row v-if="!isMbTile">
+                <el-table
+                  :data="
+                    filterValueSelect.filter(
+                      (data) =>
+                        !filterSearch ||
+                        data[filterOptionSelectList[index]]
+                          .toLowerCase()
+                          .includes(filterSearch.toLowerCase())
+                    )
+                  "
+                  @row-click="handleFilter"
+                  row-key="id"
+                  :highlight-current-row="true"
+                  :cell-style="{ textAlign: 'left' }"
+                  max-height="400"
                 >
-                </el-table-column>
-                <el-table-column align="right">
-                  <template slot="header">
-                    <el-input
-                      v-model="filterSearch"
-                      size="mini"
-                      placeholder="搜索"
-                      prefix-icon="el-icon-search"
-                    />
-                  </template>
-                </el-table-column>
-              </el-table>
-              <el-pagination
-                small
-                @current-change="handleCurrentChangeFilter"
-                :current-page="filterSearchPage"
-                :page-size="pageSizeFilter"
-                layout="total, prev, pager, next"
-                :total="totalDataCountFilter"
-                class="flexRowCenter"
-              >
-              </el-pagination>
+                  <el-table-column
+                    :prop="filterOptionSelectList[index]"
+                    align="right"
+                  >
+                  </el-table-column>
+                  <el-table-column align="right">
+                    <template slot="header">
+                      <el-input
+                        v-model="filterSearch"
+                        size="mini"
+                        placeholder="搜索"
+                        prefix-icon="el-icon-search"
+                      />
+                    </template>
+                  </el-table-column>
+                </el-table>
+                <el-pagination
+                  small
+                  @current-change="handleCurrentChangeFilter"
+                  :current-page="filterSearchPage"
+                  :page-size="pageSizeFilter"
+                  layout="total, prev, pager, next"
+                  :total="totalDataCountFilter"
+                  class="flexRowCenter"
+                >
+                </el-pagination>
+              </el-row>
+              <!-- mbTiles -->
+              <el-row v-if="isMbTile">
+                <el-table
+                  :data="
+                    filterValueSelect.filter(
+                      (data) =>
+                        !filterSearch ||
+                        data[filterOptionSelectList[index]]
+                          .toLowerCase()
+                          .includes(filterSearch.toLowerCase())
+                    )
+                  "
+                  @row-click="handleFilter"
+                  row-key="id"
+                  :highlight-current-row="true"
+                  :cell-style="{ textAlign: 'left' }"
+                  max-height="400"
+                >
+                  <!-- <el-table-column type="selection"> </el-table-column> -->
+                  <el-table-column :prop="filterOptionSelectList[index]" label="label">
+                  </el-table-column>
+                  <el-table-column align="right">
+                    <template slot="header">
+                      <el-input
+                        v-model="filterSearch"
+                        size="mini"
+                        placeholder="搜索"
+                        prefix-icon="el-icon-search"
+                      />
+                    </template>
+                  </el-table-column>                  
+                </el-table>
+              </el-row>              
               <el-button
                 type="text"
                 icon="el-icon-circle-plus"
@@ -3665,6 +3743,8 @@ import requestApi from "@/api/requestApi";
 import {mapState,mapActions,mapMutations} from 'vuex'
 import ConditionRender from "../../components/ConditionRender.vue";
 import layerStyleProperties from "@/assets/js/layerStyleProperties";
+import filedValue from "@/assets/js/field_value.js";
+import {filterSplit} from "@/serve/JsonToValue";
 
 export default {
   name: "LayerEditPanel",
@@ -3683,6 +3763,8 @@ export default {
       // 公共参数
       editorShow: "",
       glyphsPath: '',
+      isMbTile: false,
+      mbSourceLayer: '',
       layerSource: '',          // 用于判断当前图层的数据源，依据图层的matadata属性中的'mapbox:type'属性
                                 // 分为mbStyle、mbSource、primary
       menuButtonShowList: {},   // 记录图层编辑框下每个tab的显示情况,如{'circle-color':true}
@@ -3732,9 +3814,10 @@ export default {
           "贝塞尔曲线：使用由给定控制点定义的三次贝塞尔曲线进行插值。",
       },
 
-      //过滤条件配置
+      // #过滤条件配置
       filterWay: "all",
-      // filterCondition: [{ option: "", type: "==", value: 0 }],
+      filterValueShow: '',
+      // filterCondition: [{ option: "", type: "==", value: '' }],
       filterCondition: [],
       filterOptions: [],
       filterOptionSelectList: [],
@@ -3750,15 +3833,18 @@ export default {
         { value: "has", label: "has" },
         { value: "!has", label: "!has" },
       ],
-      filterValue: [],
+      filterValue: [],        // 全部单个筛选值列表的集合
       filterValueSelect: [], //分页信息显示
       // filterValueInput: [""],
       // multipleSelection: [],
       nowFilterIndex: 0,
+      // 非mbTile筛选值列表
       filterSearch: "",
       filterSearchPage: 1,
       pageSizeFilter: 10,
       totalDataCountFilter: 0,
+      // mbTile筛选值列表
+      filterHasValues: true,   // mbTile中筛选属性无筛选值或num太多
     }
   },
   computed:{
@@ -3776,7 +3862,7 @@ export default {
     })    
     this.$bus.$on("show", (data) => {
       //多级渲染显示
-      if (data.param4) {
+      if (data['param4']) {
         switch (data.param4) {
           case "zoom":
             this.menuShowList[data.param1] = "Zoom Range";
@@ -3805,6 +3891,10 @@ export default {
         if (value2) {
           this.attrValueSet[value1] = "primary";
         }
+        this.$nextTick(()=>{
+          this.menuButtonShowList[value1] = value2;
+        })
+        console.log('button修',this.menuButtonShowList,this.layers[this.nowLayerIndex].attrShowList);
       }
     });    
     this.$bus.$on("mapEdit",(data)=>{
@@ -3873,9 +3963,13 @@ export default {
       switch(datatype){
         case 'mbSource':
           this.layerSource = 'mbSource';
+          this.mbSourceLayer = row["metadata"]["mapbox:source"];
+          this.isMbTile = true;
           break;
         case 'mbStyle':
           this.layerSource = 'mbStyle';
+          this.mbSourceLayer = row["metadata"]["mapbox:source"];
+          this.isMbTile = true;
           break;
         case 'TMS':
           this.layerSource = 'TMS';
@@ -3913,15 +4007,24 @@ export default {
         } else {
           this.editorShow = "backgroundEditorShow";
         }
-        this.menuButtonShowList = [];
+        this.menuButtonShowList = [];     // 若不是读取之前保存的项目，menuButtonShowList由ConditionRender组件渲染传送过来
       });
-      this.filterOptions =
-        typeof row["shpAttribute"] != "undefined"
-          ? row["shpAttribute"]
-          : [];
+      // 初始化筛选的属性值列表(mbTile和非mbTile类)
+      if(this.isMbTile){
+        console.log("测试",filedValue,this.mbSourceLayer);
+        let List = filedValue.filter(
+          (data) => data.layer == this.mbSourceLayer
+        );
+        this.filterOptions = List[0].attributes;        
+      }else{
+        this.filterOptions =
+          typeof row["shpAttribute"] != "undefined"
+            ? row["shpAttribute"]
+            : [];
+      }
       //filter赋值
       if (
-        JSON.stringify(row.filterValueSet) != "{}"
+        JSON.stringify(row.filterValueSet) != "{}"      // 已经有保存
       ) {
         this.filterCondition =
           row.filterValueSet["filterCondition"];
@@ -3933,6 +4036,17 @@ export default {
           ];
         this.filterValueSelect =
           row.filterValueSet["filterValueSelect"];
+        this.filterWay =
+          row.filterValueSet["filterWay"];
+      }
+      // filterValueSet为空表示未设置筛选或者采用mbTile的style样式
+      else if(row.filter.length > 1){     // 定位到使用style样式的情况
+        // 使用模板采用filterHasValues = false的形式
+        this.filterHasValues = false;
+        const Object = filterSplit(row.filter);
+        this.filterCondition = Object.filterConditon;
+        this.filterWay = Object.filterWay;
+        this.filterOptionSelectList = Object.filterOptionSelectList;
       }
     },           
     // 关闭图层样式编辑面板
@@ -4083,16 +4197,12 @@ export default {
       }
     },
     fieldSelect(row) {
-      this.textField = row.column_name;
+      this.layers[this.nowLayerIndex].layout["text-field"] = row.column_name;
       this.$refs.fieldPopover.doClose();
-      this.layers[this.nowLayerIndex].layout["text-field"] = [
-        "get",
-        this.textField,
-      ];
       this.handleLayoutChange(
         this.layers[this.nowLayerIndex]["id"],
         "text-field",
-        ["get", this.textField]
+        ["get",row.column_name]
       );
       console.log(
         "text-field",
@@ -4142,38 +4252,91 @@ export default {
       this.UPDATEPARM({parm:'layers',value:this.layers});
     },    
     // filter功能
-    filterValueInit(index) {
+    filterValueInit(val,index) {
       //更新筛选条件的列表
       this.filterOptionSelectList.splice(
         index,
         0,
         this.filterCondition[index].option
       );
-      requestApi
-        .getAttrValue({
-          aimAttrName: this.filterCondition[this.nowFilterIndex].option,
-          aimShpTableName: this.layers[this.nowLayerIndex]["source-layer"],
-          page: this.filterSearchPage,
-          pageSize: 10,
-          searchText: this.filterSearch,
-          sort: "asc",
-        })
-        .then((res) => {
-          console.log("filterlist", res);
-          this.filterValue.splice(
-            [this.nowFilterIndex],
-            0,
-            res.data.data.attrValue
-          );
-          this.filterValueSelect = this.filterValue[this.nowFilterIndex];
-          this.totalDataCountFilter = res.data.data.featureCount;
-          console.log("filterValue", this.filterValue);
-          console.log("filtertotal", this.totalDataCountFilter);
-          console.log("filterValueSelect", this.filterValueSelect);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      // 非mbTile
+      if(!this.isMbTile){
+        requestApi
+          .getAttrValue({
+            aimAttrName: this.filterCondition[this.nowFilterIndex].option,
+            aimShpTableName: this.layers[this.nowLayerIndex]["source-layer"],
+            page: this.filterSearchPage,
+            pageSize: 10,
+            searchText: this.filterSearch,
+            sort: "asc",
+          })
+          .then((res) => {
+            console.log("filterlist", res);
+            this.filterValue.splice(
+              [this.nowFilterIndex],
+              0,
+              res.data.data.attrValue
+            );
+            this.filterValueSelect = this.filterValue[this.nowFilterIndex];
+            this.totalDataCountFilter = res.data.data.featureCount;
+            console.log("filterValue", this.filterValue);
+            console.log("filtertotal", this.totalDataCountFilter);
+            console.log("filterValueSelect", this.filterValueSelect);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }else{
+        console.log("触发了");
+        // mbTile(按照numer和string类型区分)
+        const object = this.filterOptions.filter(data=>data.attribute == val)[0]   // 获取field_value中当前筛选属性的对象(筛选以数组呈现)
+        let length = null;
+        let List = [];
+        let item = {};        
+        switch(object.type){
+          case "number":
+            length = object.max - object.min;
+            if (length < 20) {
+              for (let i = object.min; i <= object.max; i++) {
+                // 按照非mbTiles样式添加
+                item = {};
+                item[val] = i;
+                List.push(item);
+              }
+              this.filterValue.splice(
+                [this.nowFilterIndex],
+                0,
+                List
+              );
+              this.filterValueSelect = this.filterValue[this.nowFilterIndex];               
+              this.filterHasValues = true;
+            } else {
+              this.filterHasValues = false;
+            }
+            break;
+          case "string":
+            length = object.values.length;
+            if (length > 0) {
+              object.values.forEach((data) => {
+                item = {};
+                item[val] = data;
+                List.push(item);
+              });
+              this.filterValue.splice(
+                [this.nowFilterIndex],
+                0,
+                List
+              );              
+              this.filterValueSelect = this.filterValue[this.nowFilterIndex];
+              this.filterHasValues = true;
+            } else {
+              this.filterHasValues = false;
+            }
+            break;
+
+        }   
+        console.log('filterValueSelect',this.filterValueSelect,this.filterOptionSelectList[index]);    
+      }
     },
     handleCurrentChangeFilter(val) {
       this.filterSearchPage = val;
@@ -4210,17 +4373,25 @@ export default {
       }
     },
     handleFilter(row) {
-      this.filterCondition[this.nowFilterIndex].value =
-        row[this.filterOptionSelectList[this.nowFilterIndex]];
+      if(!this.isMbTile){
+        this.filterCondition[this.nowFilterIndex].value = row[this.filterOptionSelectList[this.nowFilterIndex]];
+      }else{
+        this.filterCondition[this.nowFilterIndex].value = row[this.filterOptionSelectList[this.nowFilterIndex]];
+      }
     },
-    filterConfirm() {
+    filterConfirm(list) {
       let judge = this.filterWay;
       const filters = [judge];
       for (let i = 0; i < this.filterCondition.length; i++) {
         const filter = [];
         filter.push(this.filterCondition[i].type);
         filter.push(["get", this.filterCondition[i].option]);
-        filter.push(this.filterCondition[i].value);
+        // 
+        if(this.filterHasValues){
+          filter.push(this.filterCondition[i].value);
+        }else{
+          filter.push(...list);
+        }
         if (judge == "none") {
           filters.push(!filter);
         } else {
@@ -4238,11 +4409,25 @@ export default {
         filterValue: this.filterValue,
         filterOptionSelectList: this.filterOptionSelectList,
         filterValueSelect: this.filterValueSelect,
+        filterWay: this.filterWay
       };
       // 更新vuex
       this.UPDATEPARM({parm:'layers',value:this.layers});
 
-    },    
+    }, 
+    // input框更换filter值
+    filterChange(val,hasValue){
+      // 只有不包含值才触发
+      let list = [];
+      if(!hasValue){
+        if(val.includes(',')){
+          list = val.split(',');
+        }else{
+          list = [val];
+        }
+      }
+      this.filterConfirm(list)
+    },   
 
     // #对ConditionRender组件的方法通信
     callback(layoutOrpaint, attribute, value, parameters) {

@@ -22,6 +22,7 @@
       <!-- data范围popover样式 若两个popover都是用v-popover会出错-->
       <el-popover placement="right" width="400" trigger="click">
         <span>筛选字段</span>
+        <!-- 非mbTile -->
         <el-table
           v-if="!isMbTile"
           :data="
@@ -47,6 +48,7 @@
             </template>
           </el-table-column>
         </el-table>
+        <!-- mbTile -->
         <el-table
           v-if="isMbTile"
           :data="
@@ -116,6 +118,7 @@
       <!-- 属性条件popover样式 -->
       <el-popover placement="right" width="400" trigger="click">
         <span>选择属性</span>
+        <!-- 非mbTile -->
         <el-table
           v-if="!isMbTile"
           :data="
@@ -142,6 +145,7 @@
             </template>
           </el-table-column>
         </el-table>
+        <!-- mbTile -->
         <el-table
           v-if="isMbTile"
           :data="
@@ -154,7 +158,7 @@
           row-key="id"
           :cell-style="{ textAlign: 'left' }"
           @row-click="propOpen"
-          max-height="300"
+          :max-height="300"
           :row-class-name="propTableClassName"
         >
           <el-table-column prop="attribute" align="right">
@@ -289,8 +293,8 @@
             v-for="item in [
               { value: 'linear', label: 'linear' },
               { value: 'step', label: 'step' },
-              { value2: 'exponential', label2: 'exponential' },
-              { value2: 'cubic-bezier', label2: 'cubic-bezier' },
+              { value: 'exponential', label: 'exponential' },
+              { value: 'cubic-bezier', label: 'cubic-bezier' },
             ]"
             :key="item.value"
             :label="item.label"
@@ -298,7 +302,24 @@
           >
           </el-option>
         </el-select>
+        <br><br>
         <el-row>{{ rateContent[zoomRate] }}</el-row>
+        <br>
+        <el-slider
+          v-if="zoomRate == 'exponential'"
+          v-model="rateValue['exp']"
+          :min="0.01" :max="2" :step="0.01"
+          show-input>
+        </el-slider> 
+        <el-row type="flex" v-if="zoomRate == 'cubic-bezier'">
+          <el-col v-for="(item,index) in ['x1','x2','y1','y2']" :key="index">
+            <el-input 
+              v-model="rateValue['bezier'][index]"
+              size="mini" @change="bezierChange($event,index)">
+              <template slot="prepend">{{item+':'}}</template>
+            </el-input>
+          </el-col>
+        </el-row>       
         <span slot="footer" class="dialog-footer">
           <!-- <el-button @click="zoomRateShow = false">取 消</el-button> -->
           <el-button
@@ -838,7 +859,24 @@
           >
           </el-option>
         </el-select>
+        <br><br>
         <el-row>{{ rateContent[dataRate] }}</el-row>
+        <br>
+        <el-slider
+          v-if="dataRate == 'exponential'"
+          v-model="rateValue['exp']"
+          :min="0.01" :max="2" :step="0.01"
+          show-input>
+        </el-slider> 
+        <el-row type="flex" v-if="dataRate == 'cubic-bezier'">
+          <el-col v-for="(item,index) in ['x1','x2','y1','y2']" :key="index">
+            <el-input 
+              v-model="rateValue['bezier'][index]"
+              size="mini" @change="bezierChange($event,index)">
+              <template slot="prepend">{{item+':'}}</template>
+            </el-input>
+          </el-col>
+        </el-row>           
         <span slot="footer" class="dialog-footer">
           <el-button
             type="primary"
@@ -1426,7 +1464,7 @@
                 @selection-change="propFilterChange"
                 :row-key="getRowKey"
                 :cell-style="{ textAlign: 'left' }"
-                height="300"
+                max-height="400"
               >
                 <el-table-column type="selection" width="50"> </el-table-column>
                 <el-table-column :prop="propSelect" align="right">
@@ -1450,7 +1488,7 @@
                 @selection-change="propFilterChange"
                 :row-key="getRowKey"
                 :cell-style="{ textAlign: 'left' }"
-                height="300"
+                max-height="400"
               >
                 <el-table-column type="selection"> </el-table-column>
                 <el-table-column :prop="propSelect" label="label">
@@ -1859,6 +1897,7 @@
 <script>
 import requestApi from "../api/requestApi";
 import filedValue from "../assets/js/field_value.js";
+import {renderSplit} from "@/serve/JsonToValue";
 
 export default {
   name: "ConditionRender",
@@ -2093,7 +2132,12 @@ export default {
       rateContent: {
         linear: "线性：在刚好小于和刚好大于输入的停止点对之间进行线性插值。",
         step: "通过评估由输入和输出值对定义的分段常数函数，产生离散的阶梯式结果。",
+        exponential:'指数：在小于和大于输入的停靠点之间以指数方式插值，值为1时成线性。',
+        'cubic-bezier':'贝塞尔曲线：使用由给定控制点定义的三次贝塞尔曲线进行插值，点区间(0-1)。'
       },
+      rateValue:{'exp':1,'bezier':[1,1,1,1]},
+      expValue: 1,
+      bezierValue: [1,1,1,1],
 
       //默认数据
       predefineColors: [
@@ -2203,8 +2247,23 @@ export default {
           this.layer.attrValueSet[tab] == "primary" ||
           !(this.attribute in this.layer.attrValueSet)
         ) {
-          this.menuButtonShowList[tab] = true;
-          this.layer.attrValueSet[tab] = "primary"; //若之前未有存档，则初始化为primary
+          if(this.layer["paint"][tab].constructor == Object){    // 原始OSM采用{base:...,stops:[]}形式
+            const attrValue = this.layer["paint"][tab];
+            const Object = renderSplit(attrValue);
+            this.menuButtonShowList[tab] = false;
+            this.layer.attrValueSet[tab] = {
+              type:'zoom',
+              value:{
+                zoomValue: Object.zoomValue,
+                zoomRate: Object.rate,
+                zoomValueOrigin: Object.valueOrigin,   
+                rateValue: Object.rateValue             
+              },
+            }
+          }else{
+            this.menuButtonShowList[tab] = true;
+            this.layer.attrValueSet[tab] = "primary"; //若之前未有存档，则初始化为primary
+          }
         } else {
           this.menuButtonShowList[tab] = false;
         }
@@ -2214,8 +2273,23 @@ export default {
           this.layer.attrValueSet[tab] == "primary" ||
           !(this.attribute in this.layer.attrValueSet)
         ) {
-          this.menuButtonShowList[tab] = true;
-          this.layer.attrValueSet[tab] = "primary";
+          if(this.layer["layout"][tab].constructor == Object){    // 原始OSM采用{base:...,stops:[]}形式
+            const attrValue = this.layer["layout"][tab];
+            const Object = renderSplit(attrValue);
+            this.menuButtonShowList[tab] = false;
+            this.layer.attrValueSet[tab] = {
+              type:'zoom',
+              value:{
+                zoomValue: Object.zoomValue,
+                zoomRate: Object.rate,
+                zoomValueOrigin: Object.valueOrigin,   
+                rateValue: Object.rateValue             
+              },
+            }
+          }else{
+            this.menuButtonShowList[tab] = true;
+            this.layer.attrValueSet[tab] = "primary"; //若之前未有存档，则初始化为primary
+          }          
         } else {
           this.menuButtonShowList[tab] = false;
         }
@@ -2252,6 +2326,11 @@ export default {
             this.zoomValueOrigin = JSON.parse(
               JSON.stringify(
                 this.layer.attrValueSet[this.attribute].value.zoomValueOrigin
+              )
+            );
+            this.rateValue = JSON.parse(
+              JSON.stringify(
+                this.layer.attrValueSet[this.attribute].value.rateValue
               )
             );
 
@@ -2296,6 +2375,11 @@ export default {
             this.dataRate = JSON.parse(
               JSON.stringify(
                 this.layer.attrValueSet[this.attribute].value.dataRate
+              )
+            );
+            this.rateValue = JSON.parse(
+              JSON.stringify(
+                this.layer.attrValueSet[this.attribute].value.rateValue
               )
             );
             this.dataValueOrigin = JSON.parse(
@@ -2385,7 +2469,7 @@ export default {
     initMbInfo() {
       //判断编辑图层是否要打开渲染页面
       const type = this.layer["metadata"]["mapbox:type"];
-      if (type == "background" || type == "mbStyle") {
+      if (type == "background") {
         this.conditionShow = false;
         console.log("conditionShow", this.conditionShow);
       }
@@ -2398,7 +2482,6 @@ export default {
       this.mbSourceLayer = this.layer["metadata"]["mapbox:source"];
       // 初始化属性表
       if (this.isMbTile) {
-        console.log("条件：",filedValue,this.mbSourceLayer);
         let List = filedValue.filter(
           (data) => data.layer == this.mbSourceLayer
         );
@@ -2435,10 +2518,10 @@ export default {
       // 内部重置按钮功能
       if (val === "open") {
         console.log("attr", this.menuButtonShowList);
-        //在一个图层中，属性的显示情况和值同时存储
+        //在一个图层中，属性的显示情况和值同时存储，先发送再修改显示值，否则组件关闭没法发送事件
+        this.$bus.$emit("show", { param1: this.attribute, param2: true });
         this.menuButtonShowList[this.attribute] = true;
         this.layer.attrValueSet[this.attribute] = "primary";
-        this.$bus.$emit("show", { param1: this.attribute, param2: true });
         // zoom相关
         if (this.zoomShow) {
           this.zoomShow = false;
@@ -2498,7 +2581,22 @@ export default {
         parameters
       );
     },
-
+    // #插值相关
+    // 贝尔茨
+    bezierChange(val,index){
+      if(val < 0){
+        this.rateValue['bezier'][index] = 0;
+      }else if( val > 1){
+        this.rateValue['bezier'][index] = 1;
+      }else{
+        // 防止出现字面量数字：'1'
+        this.rateValue['bezier'][index] = Number(val);
+      }
+      // 页面input未及时渲染，使用$nextTick进行页面刷新渲染
+      this.$nextTick(()=>{
+        this.rateValue['bezier'] = JSON.parse(JSON.stringify(this.rateValue['bezier']));
+      })
+    },
     //条件渲染相同功能
     handleDialogEdit(row) {
       console.log("row", row);
@@ -2726,10 +2824,21 @@ export default {
     },
     zoomRender() {
       // 设置多级显示
-      let zoomCondition1 = ["interpolate", [this.zoomRate], ["zoom"]];
+      // 设置插值类型值
+      const rateWay = [this.zoomRate];
+      switch(this.zoomRate){
+        case 'exponential':
+          rateWay.push(this.rateValue['exp']);
+          break
+        case 'cubic-bezier':
+          rateWay.push(...this.rateValue['bezier']);
+          break
+      }
+      // 设置模板
+      let zoomCondition1 = ["interpolate", rateWay, ["zoom"]];
       let zoomCondition2 = ["step", ["zoom"]];
       let value = [];
-      if (this.zoomRate == "linear" || this.zoomRate == "exponential") {
+      if (this.zoomRate == "linear" || this.zoomRate == "exponential"|| this.zoomRate == "cubic-bezier") {
         for (let i in this.zoomValue) {
           zoomCondition1.push(Number(this.zoomValue[i]["zoom"]));
           //js默认为string类型
@@ -2751,7 +2860,7 @@ export default {
             );
             let value1 = this.zoomValue[i]["value"][0];
             let value2 = this.zoomValue[i]["value"][1];
-            zoomCondition1.push(["literal", [value1, value2]]);
+            zoomCondition1.push(["literal", [value1, value2]]); 
             value = zoomCondition1;
             console.log("array", value1, value2);
           }
@@ -2842,9 +2951,20 @@ export default {
         }
       }
       // 设置多级显示
+      // 设置插值类型值
+      const rateWay = [this.dataRate];
+      switch(this.dataRate){
+        case 'exponential':
+          rateWay.push(this.rateValue['exp']);
+          break
+        case 'cubic-bezier':
+          rateWay.push(...this.rateValue['bezier']);
+          break
+      }
+      // 设置模板
       let dataCondition1 = [
         "interpolate",
-        [this.dataRate],
+        rateWay,
         ["get", this.dataSelect],
       ];
       let dataCondition2 = ["step", ["get", this.dataSelect]];

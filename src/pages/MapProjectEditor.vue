@@ -2900,15 +2900,15 @@
                 style="display: flex; margin-top: 10px"
               >
                 <el-input
-                  v-model="textField"
-                  @change="
-                    handleLayoutChange(
-                      layers[nowLayerIndex]['id'],
-                      'text-field',
-                      ['get', textField]
-                    )
-                  "
-                  placeholder="something"
+                v-model="layers[nowLayerIndex].layout['text-field']"
+                @change="
+                  handleLayoutChange(
+                    layers[nowLayerIndex]['id'],
+                    'text-field',
+                    ['get', layers[nowLayerIndex].layout['text-field']]
+                  )
+                "
+                placeholder="something"
                 ></el-input>
                 <el-popover
                   ref="fieldPopover"
@@ -4508,7 +4508,6 @@ export default {
       publicBoolean: false,
 
       //图标图层样式
-      textField: "",
       layerIcon: {
         circle: "fa fa-circle",
         line: "fa fa-window-minimize",
@@ -4546,7 +4545,7 @@ export default {
 
       //过滤条件配置
       filterWay: "all",
-      // filterCondition: [{ option: "", type: "==", value: 0 }],
+      // filterCondition: [{ option: "", type: "==", value:[''] }],
       filterCondition: [],
       filterOptions: [],
       filterOptionSelectList: [],
@@ -4986,8 +4985,8 @@ export default {
     },
     addBackground(sourceType, row) {
       const index = this.layers.length;
-      const newLayout = layerStyleProperties["background"].layout;
-      const newPaint = layerStyleProperties["background"].paint;
+      const newLayout = JSON.parse(JSON.stringify(layerStyleProperties["background"].layout));
+      const newPaint = JSON.parse(JSON.stringify(layerStyleProperties["background"].paint));
       if (sourceType == "mbTile") {
         if ("layout" in row) {
           for (let key in row.layout) {
@@ -5407,6 +5406,7 @@ export default {
         newLayer.showName =
           row.originName + this.layersNameObject[newLayer.originName];
       }
+      console.log("加载",this.layersNameObject);
       this.layers.unshift(newLayer);
       this.layersName.unshift(newLayer.id);
       this.originStyle.unshift({
@@ -5672,13 +5672,13 @@ export default {
         this.sourceNameObject[name] = sourceId;
       }
       // 添加layer styleJson有对应属性,按对应类型添加，并对已有属性进行替换
-      const newLayout = layerStyleProperties[row.type].layout;
+      const newLayout = JSON.parse(JSON.stringify(layerStyleProperties[row.type].layout));
       if ("layout" in row) {
         for (let key in row.layout) {
           newLayout[key] = row.layout[key];
         }
       }
-      const newPaint = layerStyleProperties[row.type].paint;
+      const newPaint = JSON.parse(JSON.stringify(layerStyleProperties[row.type].paint));
       if ("paint" in row) {
         for (let key in row.paint) {
           newPaint[key] = row.paint[key];
@@ -5972,6 +5972,8 @@ export default {
           ];
         this.filterValueSelect =
           this.layers[this.nowLayerIndex].filterValueSet["filterValueSelect"];
+        this.filterWay =
+          row.filterValueSet["filterWay"];          
       }
     },
 
@@ -6339,31 +6341,12 @@ export default {
       }
     },
     fieldSelect(row) {
-      this.textField = row.column_name;
+      this.layers[this.nowLayerIndex].layout["text-field"] = row.column_name;
       this.$refs.fieldPopover.doClose();
-      // const tem = [
-      //   "format",
-      //   ["get", "gid"],
-      //   {
-      //     "text-font": ["literal", ["Open Sans Regular"]],
-      //     "text-color": "#FF0000",
-      //     "font-scale": 0.8,
-      //   },
-      // // ];
-      // this.layers[this.nowLayerIndex].layout["text-field"] = tem;
-      // this.handleLayoutChange(
-      //   this.layers[this.nowLayerIndex]["id"],
-      //   "text-field",
-      //   tem
-      // );
-      this.layers[this.nowLayerIndex].layout["text-field"] = [
-        "get",
-        this.textField,
-      ];
       this.handleLayoutChange(
         this.layers[this.nowLayerIndex]["id"],
         "text-field",
-        ["get", this.textField]
+        ["get",row.column_name]
       );
       console.log(
         "text-field",
@@ -6387,33 +6370,32 @@ export default {
 
     handleLayerClick() {
       console.log("layers:", this.layers);
-      console.log("layersName", this.layersName);
       if (this.nowLayerIndex > 0) {
         const source = map.getSource(this.layers[this.nowLayerIndex]["source"]);
         console.log("source:", source);
-      }
-      const style = map.getStyle();
-      console.log("style:", style);
-      const row = this.layers[this.nowLayerIndex];
-      if ("bounds" in row) {
-        const bbox = [
-          [row.bounds[0] + 0, row.bounds[1] + 0],
-          [row.bounds[2] + 0, row.bounds[3] + 0],
-        ];
+        const style = map.getStyle();
+        console.log("style:", style);
+        const row = this.layers[this.nowLayerIndex];
+        if ("bounds" in row) {
+          const bbox = [
+            [row.bounds[0] + 0, row.bounds[1] + 0],
+            [row.bounds[2] + 0, row.bounds[3] + 0],
+          ];
+          // const center = [Number((row.bounds[0]+row.bounds[2])/2),Number((row.bounds[1]+row.bounds[3])/2)]
+          // this.$nextTick(()=>{
+          //   map.setCenter(center);
+          // });
+          map.fitBounds(bbox, {
+            duration: 500,
+            padding: { top: 10, bottom: 25, left: 15, right: 5 },
+          });
+        }
         // const center = [Number((row.bounds[0]+row.bounds[2])/2),Number((row.bounds[1]+row.bounds[3])/2)]
-        // this.$nextTick(()=>{
-        //   map.setCenter(center);
-        // });
-        map.fitBounds(bbox, {
-          duration: 500,
-          padding: { top: 10, bottom: 25, left: 15, right: 5 },
-        });
-      }
-      // const center = [Number((row.bounds[0]+row.bounds[2])/2),Number((row.bounds[1]+row.bounds[3])/2)]
 
-      // map.flyTo({
-      //   center: [113.32948058466824, 23.19862318628209],
-      // });
+        // map.flyTo({
+        //   center: [113.32948058466824, 23.19862318628209],
+        // });
+      }
     },
 
     handleLayerShowSwitchChange(val, row) {
@@ -6620,6 +6602,7 @@ export default {
         filterValue: this.filterValue,
         filterOptionSelectList: this.filterOptionSelectList,
         filterValueSelect: this.filterValueSelect,
+        filterWay: this.filterWay
       };
     },
     callback(layoutOrpaint, attribute, value, parameters) {
