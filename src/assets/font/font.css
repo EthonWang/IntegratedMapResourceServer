@@ -154,3 +154,62 @@
     font-family: 'Roboto Thin Italic';
     src: url("./Roboto-ThinItalic.ttf") format("truetype");
 }
+@font-face {
+    font-family: 'Noto Sans Regular';
+    src: url("./NotoSans-Regular.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: 'Noto Sans Bold';
+    src: url("./NotoSans-Bold.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: 'Noto Sans Italic';
+    src: url("./NotoSans-Italic.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: 'Metropolis Extra Bold Italic';
+    src: url("./metropolis-extra-bold-italic.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: 'Metropolis Light Italic';
+    src: url("./metropolis-light-italic.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: 'Metropolis Light';
+    src: url("./metropolis-light.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: 'Metropolis Medium Italic';
+    src: url("./metropolis-medium-italic.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: 'Metropolis Regular';
+    src: url("./metropolis-regular.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: 'Source Sans Pro Bold';
+    src: url("./source-sans-pro-bold.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: 'Source Sans Pro Italic';
+    src: url("./source-sans-pro-italic.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: 'Source Sans Pro Regular';
+    src: url("./source-sans-pro-regular.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: 'Source Sans Pro SemiBold';
+    src: url("./source-sans-pro-semibold.ttf") format("truetype");
+}
