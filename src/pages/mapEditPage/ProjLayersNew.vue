@@ -12,7 +12,7 @@
         <el-button 
           class="treeBtn"
           type="text" plain
-          icon="fa fa-folder-open" 
+          icon="el-icon-files" 
           title="添加组"
           @click="addGroup">
         </el-button>
@@ -25,7 +25,7 @@
             slot="reference" 
             class="treeBtn"
             type="text" plain
-            icon="el-icon-delete-solid"
+            icon="el-icon-delete"
             size="mini"
             title="一键删除">
           </el-button>
@@ -47,10 +47,10 @@
           @node-click="handleNodeClick"
           :allow-drop="allowDrop">
 
-        <div class="custom-tree-node" style="width: 330px; display: flex;justify-content: space-between;"
+        <div class="custom-tree-node" style="width: 100%; display: flex;justify-content: space-between;"
             slot-scope="{ node, data }">
 
-          <div style="display: flex;">
+          <div style="display: flex;flex:16">
             <!-- 开关 -->
             <el-switch
                 :width="30"
@@ -92,8 +92,11 @@
               <i class="el-icon-check" @click="nowGroupId = -1;"></i>
             </div>
           </div>
-
-          <div v-if="data.nodeType=='layer'">
+          <!-- 图层的按钮 -->
+          <div 
+            v-if="data.nodeType=='layer'"
+            style="flex:4"
+          >
 
             <el-button
                 size="mini"
@@ -136,6 +139,7 @@
             >
             </el-button>
           </div>
+          <!-- 组的按钮 -->
           <div v-else>
             <el-popconfirm
                 title="确定删除该组吗？"
@@ -286,24 +290,24 @@ export default {
     },    
   },
   watch:{
-    // layers:function (layers){
-    //   console.log('更换类型：',layers,this.layersTree);
-    //   layers.forEach((layer)=>{
-    //     const aimLayer = JSON.parse(JSON.stringify(layer));
-    //     for (let i = 0; i < this.layersTree.length; i++) {
-    //       let node=this.layersTree[i]
-    //       if(node.nodeType=="group")
-    //         for (let k = 0; k < node.children.length; k++)
-    //           if(node.children[k].id==aimLayer.id)
-    //             node.children[k]=aimLayer
-    //       else
-    //         if(node.id==aimLayer.id)
-    //           node=aimLayer
-    //     }
-    //   })
-    //   this.UPDATEPARM({parm: 'layersTree', value: this.layersTree});
-    //   console.log("update tree")
-    // },
+    layers:function (layers){
+      console.log('更换类型：',layers,this.layersTree);
+      layers.forEach((layer)=>{
+        const aimLayer = JSON.parse(JSON.stringify(layer));
+        for (let i = 0; i < this.layersTree.length; i++) {
+          let node=this.layersTree[i]
+          if(node.nodeType=="group")
+            for (let k = 0; k < node.children.length; k++)
+              if(node.children[k].id==aimLayer.id)
+                node.children[k]=aimLayer
+          else
+            if(node.id==aimLayer.id)
+              node=aimLayer
+        }
+      })
+      this.UPDATEPARM({parm: 'layersTree', value: this.layersTree});
+      console.log("update tree")
+    },
 
     // layersTree:function (layersTree){
     //   // this.layersTree=layersTree
