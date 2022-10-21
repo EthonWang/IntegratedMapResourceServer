@@ -302,24 +302,32 @@
           >
           </el-option>
         </el-select>
-        <br><br>
+        <br /><br />
         <el-row>{{ rateContent[zoomRate] }}</el-row>
-        <br>
+        <br />
         <el-slider
           v-if="zoomRate == 'exponential'"
           v-model="rateValue['exp']"
-          :min="0.01" :max="2" :step="0.01"
-          show-input>
-        </el-slider> 
+          :min="0.01"
+          :max="2"
+          :step="0.01"
+          show-input
+        >
+        </el-slider>
         <el-row type="flex" v-if="zoomRate == 'cubic-bezier'">
-          <el-col v-for="(item,index) in ['x1','x2','y1','y2']" :key="index">
-            <el-input 
+          <el-col
+            v-for="(item, index) in ['x1', 'x2', 'y1', 'y2']"
+            :key="index"
+          >
+            <el-input
               v-model="rateValue['bezier'][index]"
-              size="mini" @change="bezierChange($event,index)">
-              <template slot="prepend">{{item+':'}}</template>
+              size="mini"
+              @change="bezierChange($event, index)"
+            >
+              <template slot="prepend">{{ item + ":" }}</template>
             </el-input>
           </el-col>
-        </el-row>       
+        </el-row>
         <span slot="footer" class="dialog-footer">
           <!-- <el-button @click="zoomRateShow = false">取 消</el-button> -->
           <el-button
@@ -454,6 +462,7 @@
             <template slot="prepend">color:&nbsp;</template>
           </el-input>
           <el-color-picker
+            show-alpha
             v-model="zoomValue[zoomEditIndex].value"
             :predefine="predefineColors"
           >
@@ -859,24 +868,32 @@
           >
           </el-option>
         </el-select>
-        <br><br>
+        <br /><br />
         <el-row>{{ rateContent[dataRate] }}</el-row>
-        <br>
+        <br />
         <el-slider
           v-if="dataRate == 'exponential'"
           v-model="rateValue['exp']"
-          :min="0.01" :max="2" :step="0.01"
-          show-input>
-        </el-slider> 
+          :min="0.01"
+          :max="2"
+          :step="0.01"
+          show-input
+        >
+        </el-slider>
         <el-row type="flex" v-if="dataRate == 'cubic-bezier'">
-          <el-col v-for="(item,index) in ['x1','x2','y1','y2']" :key="index">
-            <el-input 
+          <el-col
+            v-for="(item, index) in ['x1', 'x2', 'y1', 'y2']"
+            :key="index"
+          >
+            <el-input
               v-model="rateValue['bezier'][index]"
-              size="mini" @change="bezierChange($event,index)">
-              <template slot="prepend">{{item+':'}}</template>
+              size="mini"
+              @change="bezierChange($event, index)"
+            >
+              <template slot="prepend">{{ item + ":" }}</template>
             </el-input>
           </el-col>
-        </el-row>           
+        </el-row>
         <span slot="footer" class="dialog-footer">
           <el-button
             type="primary"
@@ -1000,6 +1017,7 @@
             <template slot="prepend">color:&nbsp;</template>
           </el-input>
           <el-color-picker
+            show-alpha
             v-model="dataValue[dataEditIndex].value"
             :predefine="predefineColors"
           >
@@ -1531,6 +1549,7 @@
             <template slot="prepend">color:&nbsp;</template>
           </el-input>
           <el-color-picker
+            show-alpha
             v-model="propValue[propEditIndex].value"
             :predefine="predefineColors"
           >
@@ -1897,7 +1916,7 @@
 <script>
 import requestApi from "../api/requestApi";
 import filedValue from "../assets/js/field_value.js";
-import {renderSplit} from "@/serve/JsonToValue";
+import { renderSplit } from "@/serve/JsonToValue";
 
 export default {
   name: "ConditionRender",
@@ -1917,7 +1936,7 @@ export default {
       isMbTile: false,
       mbSourceLayer: "", //当前图层绑定的source图层
       propHasValues: true, // 用于mbTile属性无值或值太多
-      propValueSelf: [],      // 用户自己输入的值
+      propValueSelf: [], // 用户自己输入的值
 
       //所用参数
       layer: this.layerSelect,
@@ -1931,7 +1950,7 @@ export default {
       formValueOrigin: [],
       propertyList: [], // 所选图层所有属性名列表
       propNumList: [], // 数字类型属性名列表,现在用propertyList做判断暂不用
-      conditionShow: true,
+      conditionShow: true,   // 用来控制某些属性不显示四个渲染按钮, 显示内部重置按钮
 
       //全局参数
       spriteList: [],
@@ -2132,12 +2151,14 @@ export default {
       rateContent: {
         linear: "线性：在刚好小于和刚好大于输入的停止点对之间进行线性插值。",
         step: "通过评估由输入和输出值对定义的分段常数函数，产生离散的阶梯式结果。",
-        exponential:'指数：在小于和大于输入的停靠点之间以指数方式插值，值为1时成线性。',
-        'cubic-bezier':'贝塞尔曲线：使用由给定控制点定义的三次贝塞尔曲线进行插值，点区间(0-1)。'
+        exponential:
+          "指数：在小于和大于输入的停靠点之间以指数方式插值，值为1时成线性。",
+        "cubic-bezier":
+          "贝塞尔曲线：使用由给定控制点定义的三次贝塞尔曲线进行插值，点区间(0-1)。",
       },
-      rateValue:{'exp':1,'bezier':[1,1,1,1]},
+      rateValue: { exp: 1, bezier: [1, 1, 1, 1] },
       expValue: 1,
-      bezierValue: [1,1,1,1],
+      bezierValue: [1, 1, 1, 1],
 
       //默认数据
       predefineColors: [
@@ -2241,30 +2262,40 @@ export default {
         this.$message("数据layout和paint属性有误");
         console.log("no this attribute：", this.attribute, this.layer.layout);
       }
-      // 初始化tab显示列表
+      // 初始化tab显示列表（也可以对style样式的属性进行转换）
       for (let tab in this.layer["paint"]) {
         if (
           this.layer.attrValueSet[tab] == "primary" ||
-          !(this.attribute in this.layer.attrValueSet)
+          !(this.attribute in this.layer.attrValueSet)      // 不在attrValueSet，表示为刚加载的图层
         ) {
-          if(this.layer["paint"][tab].constructor == Object){    // 原始OSM采用{base:...,stops:[]}形式
-            const attrValue = this.layer["paint"][tab];
-            const Object = renderSplit(attrValue);
-            this.menuButtonShowList[tab] = false;
-            this.layer.attrValueSet[tab] = {
-              type:'zoom',
-              value:{
-                zoomValue: Object.zoomValue,
-                zoomRate: Object.rate,
-                zoomValueOrigin: Object.valueOrigin,   
-                rateValue: Object.rateValue             
-              },
+          if(this.layer["paint"][tab].constructor === Object){    // 一些特殊的渲染方法
+            if ('stops' in this.layer["paint"][tab]) {
+              // 原始OSM采用{base:...,stops:[]}形式
+              const attrValue = this.layer["paint"][tab];
+              const Object = renderSplit(attrValue);
+              this.menuButtonShowList[tab] = false;
+              this.layer.attrValueSet[tab] = {
+                type: "zoom",
+                value: {
+                  zoomValue: Object.zoomValue,
+                  zoomRate: Object.rate,
+                  zoomValueOrigin: Object.valueOrigin,
+                  rateValue: Object.rateValue,
+                },
+              };
             }
-          }else{
-            this.menuButtonShowList[tab] = true;
-            this.layer.attrValueSet[tab] = "primary"; //若之前未有存档，则初始化为primary
+            else if('property' in this.layer["paint"][tab]) { // {"property": "render_min_height","type": "identity"}
+              this.menuButtonShowList[tab] = false;
+              this.conditionShow = false;     // 打开功能面板但，不显示四种条条件按钮
+              this.layer.attrValueSet[tab] = "primary";   //这中条件先默认设为primary
+            }
           }
-        } else {
+          else {
+            this.menuButtonShowList[tab] = true;
+            this.layer.attrValueSet[tab] = "primary";   //若之前未有存档，则初始化为primary
+          }
+        } 
+        else {
           this.menuButtonShowList[tab] = false;
         }
       }
@@ -2273,24 +2304,34 @@ export default {
           this.layer.attrValueSet[tab] == "primary" ||
           !(this.attribute in this.layer.attrValueSet)
         ) {
-          if(this.layer["layout"][tab].constructor == Object){    // 原始OSM采用{base:...,stops:[]}形式
-            const attrValue = this.layer["layout"][tab];
-            const Object = renderSplit(attrValue);
-            this.menuButtonShowList[tab] = false;
-            this.layer.attrValueSet[tab] = {
-              type:'zoom',
-              value:{
-                zoomValue: Object.zoomValue,
-                zoomRate: Object.rate,
-                zoomValueOrigin: Object.valueOrigin,   
-                rateValue: Object.rateValue             
-              },
-            }
-          }else{
+          if(this.layer["layout"][tab].constructor === Object){    // 一些特殊的渲染方法
+            if ('stops' in this.layer["layout"][tab]) {
+              // 原始OSM采用{base:...,stops:[]}形式
+              const attrValue = this.layer["layout"][tab];
+              const Object = renderSplit(attrValue);
+              this.menuButtonShowList[tab] = false;
+              this.layer.attrValueSet[tab] = {
+                type: "zoom",
+                value: {
+                  zoomValue: Object.zoomValue,
+                  zoomRate: Object.rate,
+                  zoomValueOrigin: Object.valueOrigin,
+                  rateValue: Object.rateValue,
+                },
+              };
+            } 
+            else if('property' in this.layer["layout"][tab]) { // {"property": "render_min_height","type": "identity"}
+              this.menuButtonShowList[tab] = false;
+              this.conditionShow = false;     // 打开功能面板但，不显示四种条条件按钮
+              this.layer.attrValueSet[tab] = "primary";   //这中条件先默认设为primary
+            }                       
+          }
+          else {
             this.menuButtonShowList[tab] = true;
             this.layer.attrValueSet[tab] = "primary"; //若之前未有存档，则初始化为primary
-          }          
-        } else {
+          }
+        } 
+        else {
           this.menuButtonShowList[tab] = false;
         }
       }
@@ -2583,19 +2624,21 @@ export default {
     },
     // #插值相关
     // 贝尔茨
-    bezierChange(val,index){
-      if(val < 0){
-        this.rateValue['bezier'][index] = 0;
-      }else if( val > 1){
-        this.rateValue['bezier'][index] = 1;
-      }else{
+    bezierChange(val, index) {
+      if (val < 0) {
+        this.rateValue["bezier"][index] = 0;
+      } else if (val > 1) {
+        this.rateValue["bezier"][index] = 1;
+      } else {
         // 防止出现字面量数字：'1'
-        this.rateValue['bezier'][index] = Number(val);
+        this.rateValue["bezier"][index] = Number(val);
       }
       // 页面input未及时渲染，使用$nextTick进行页面刷新渲染
-      this.$nextTick(()=>{
-        this.rateValue['bezier'] = JSON.parse(JSON.stringify(this.rateValue['bezier']));
-      })
+      this.$nextTick(() => {
+        this.rateValue["bezier"] = JSON.parse(
+          JSON.stringify(this.rateValue["bezier"])
+        );
+      });
     },
     //条件渲染相同功能
     handleDialogEdit(row) {
@@ -2713,7 +2756,7 @@ export default {
       this.propValue[1].value = JSON.parse(JSON.stringify(valueOrigin2));
       this.propValueOrigin = JSON.parse(JSON.stringify(this.propValue));
       // 未含数值的属性，设置初始化值
-      this.propValueSelf = [[],""]
+      this.propValueSelf = [[], ""];
       //先初始化参数，再打开相关编辑面板
       this.menuButtonShowList[this.attribute] = false;
       this.$bus.$emit("show", {
@@ -2826,19 +2869,23 @@ export default {
       // 设置多级显示
       // 设置插值类型值
       const rateWay = [this.zoomRate];
-      switch(this.zoomRate){
-        case 'exponential':
-          rateWay.push(this.rateValue['exp']);
-          break
-        case 'cubic-bezier':
-          rateWay.push(...this.rateValue['bezier']);
-          break
+      switch (this.zoomRate) {
+        case "exponential":
+          rateWay.push(this.rateValue["exp"]);
+          break;
+        case "cubic-bezier":
+          rateWay.push(...this.rateValue["bezier"]);
+          break;
       }
       // 设置模板
       let zoomCondition1 = ["interpolate", rateWay, ["zoom"]];
       let zoomCondition2 = ["step", ["zoom"]];
       let value = [];
-      if (this.zoomRate == "linear" || this.zoomRate == "exponential"|| this.zoomRate == "cubic-bezier") {
+      if (
+        this.zoomRate == "linear" ||
+        this.zoomRate == "exponential" ||
+        this.zoomRate == "cubic-bezier"
+      ) {
         for (let i in this.zoomValue) {
           zoomCondition1.push(Number(this.zoomValue[i]["zoom"]));
           //js默认为string类型
@@ -2860,7 +2907,7 @@ export default {
             );
             let value1 = this.zoomValue[i]["value"][0];
             let value2 = this.zoomValue[i]["value"][1];
-            zoomCondition1.push(["literal", [value1, value2]]); 
+            zoomCondition1.push(["literal", [value1, value2]]);
             value = zoomCondition1;
             console.log("array", value1, value2);
           }
@@ -2953,20 +3000,16 @@ export default {
       // 设置多级显示
       // 设置插值类型值
       const rateWay = [this.dataRate];
-      switch(this.dataRate){
-        case 'exponential':
-          rateWay.push(this.rateValue['exp']);
-          break
-        case 'cubic-bezier':
-          rateWay.push(...this.rateValue['bezier']);
-          break
+      switch (this.dataRate) {
+        case "exponential":
+          rateWay.push(this.rateValue["exp"]);
+          break;
+        case "cubic-bezier":
+          rateWay.push(...this.rateValue["bezier"]);
+          break;
       }
       // 设置模板
-      let dataCondition1 = [
-        "interpolate",
-        rateWay,
-        ["get", this.dataSelect],
-      ];
+      let dataCondition1 = ["interpolate", rateWay, ["get", this.dataSelect]];
       let dataCondition2 = ["step", ["get", this.dataSelect]];
       let value = [];
       if (this.dataRate == "linear" || this.dataRate == "exponential") {
@@ -3239,7 +3282,7 @@ export default {
     },
     propInsert() {
       this.propValue.push({ prop: "" });
-      if(!this.propHasValues){
+      if (!this.propHasValues) {
         this.propValueSelf.push("");
       }
       this.propEditIndex = this.propValue.length - 1;
@@ -3248,7 +3291,7 @@ export default {
     propEditDelete() {
       this.propEditShow = false;
       this.propValue.splice(this.propEditIndex, 1);
-      if(!this.propHasValues){
+      if (!this.propHasValues) {
         this.propValueSelf.splice(this.propEditIndex, 1);
       }
       this.propValueFilter.splice(this.propEditIndex, 1);
@@ -3273,11 +3316,11 @@ export default {
       }
     },
     propEditFirm() {
-      if (this.propHasValues&&this.propEditIndex!=0) {
+      if (this.propHasValues && this.propEditIndex != 0) {
         this.$refs.multiplePropTable.clearSelection();
       }
       this.propEditShow = false;
-      console.log("filter",this.propValueFilter);
+      console.log("filter", this.propValueFilter);
       // let propCondition = ["case",["match",["get",this.propSelect],['坝尾广东省汕头市龙湖区'],true,false,'#00CED1'],this.propValue[0].value];
       //属性条件渲染
       let value = ["case"];
@@ -3289,7 +3332,7 @@ export default {
         let template = ["match", ["get", this.propSelect], [], true, false];
         for (let j in this.propValueFilter[i]) {
           const value1 = this.propValueFilter[i][j][this.propSelect];
-          console.log("value1",value1)
+          console.log("value1", value1);
           template[2].push(value1);
         }
         // 第一步 添加条件
@@ -3380,9 +3423,9 @@ export default {
       // });
       // console.log("this.multipleSelectionAll", this.multipleSelectionAll);
     },
-    updatePropBySelf(val){
+    updatePropBySelf(val) {
       const item = {};
-      item[this.propSelect] = val
+      item[this.propSelect] = val;
       this.propValueFilter[0] = [];
       this.propValueFilter[this.propEditIndex] = [item];
       // 更新视图信息
@@ -3396,8 +3439,8 @@ export default {
           string = string + "," + value;
         }
       }
-      this.propValue[this.propEditIndex].prop = string;      
-      console.log('val',this.propValueFilter);
+      this.propValue[this.propEditIndex].prop = string;
+      console.log("val", this.propValueFilter);
     },
     selectall(selection) {
       console.log("selection:", selection);

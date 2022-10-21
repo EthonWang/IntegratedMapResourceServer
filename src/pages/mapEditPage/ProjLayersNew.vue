@@ -1,140 +1,163 @@
 <template>
-  <div style="width: 97% ">
+  <div style="width: 100% ">
 
-    <div style="width: 90%;  display: flex;justify-content: space-between;    margin-left: 24px;">
+    <div class="treeGroupBtns">
       <el-switch
           :width="30"
           v-model="allLayerShow"
           @change="allLayerShowSwitchChange(allLayerShow)"
       >
       </el-switch>
-
-      <el-button type="primary" size="mini" @click="addGroup">添加组
-      </el-button>
-
-      <el-popconfirm
-          title="确定删除全部图层吗？"
-          @confirm="allLayerDelete()"
-      >
-        <el-button slot="reference" type="info" size="mini">一键删除
+      <div class="treeBtns">
+        <el-button 
+          class="treeBtn"
+          type="text" plain
+          icon="fa fa-folder-open" 
+          title="添加组"
+          @click="addGroup">
         </el-button>
-      </el-popconfirm>
+
+        <el-popconfirm
+            title="确定删除全部图层吗？"
+            @confirm="allLayerDelete()"
+        >
+          <el-button 
+            slot="reference" 
+            class="treeBtn"
+            type="text" plain
+            icon="el-icon-delete-solid"
+            size="mini"
+            title="一键删除">
+          </el-button>
+        </el-popconfirm>
+      </div>
 
     </div>
 
-    <el-tree
-        :data="layersTree"
-        node-key="id"
-        default-expand-all
-        @node-drop="handleDrop"
-        :expand-on-click-node="false"
-        draggable
-        :allow-drop="allowDrop">
+    <div @click.stop class="treeBox">
+      <el-tree
+          :data="layersTree"
+          node-key="id"
+          ref="tree"
+          default-expand-all
+          @node-drop="handleDrop"
+          highlight-current
+          :expand-on-click-node="false"
+          draggable
+          @node-click="handleNodeClick"
+          :allow-drop="allowDrop">
 
-      <div class="custom-tree-node" style="width: 330px; display: flex;justify-content: space-between;"
-           slot-scope="{ node, data }">
+        <div class="custom-tree-node" style="width: 330px; display: flex;justify-content: space-between;"
+            slot-scope="{ node, data }">
 
-        <div style="display: flex;">
-          <el-switch
-              :width="30"
-              style=" margin-top: 5px;  margin-right: 5px;"
-              v-model="data.show"
-              @click.stop.native="()=>{}"
-              @change="showSwitchChange(data.show,data)"
-          >
-          </el-switch>
+          <div style="display: flex;">
+            <!-- 开关 -->
+            <el-switch
+                :width="30"
+                style=" margin-top: 5px;  margin-right: 5px;"
+                v-model="data.show"
+                @click.stop.native="()=>{}"
+                @change="showSwitchChange(data.show,data)"
+            >
+            </el-switch>
+            <!-- 图标 -->
+            <div class="nameLayer" type="flex" align-items="baseline">
+              <i v-if="data.nodeType=='layer'" :class="layerIcon[data.type]" class="iconStyle"></i>
+              <!-- 图层名 -->
+              <div v-if="data.nodeType=='layer'">
+                <h4
+                    style="width: 130px;    text-overflow: ellipsis;    white-space: nowrap;    overflow: hidden;"
+                    :title="data.showName"
+                >
+                  {{ data.showName }}
+                </h4>
+              </div>
+              <!-- 组名 -->
+              <div v-else class="projectTitle" v-show="data.id!=nowGroupId"  >
+                <h4
+                    :title="data.showName"
+                    @click="nowGroupId = data.id">
+                  {{ data.showName }}
+                </h4>
+                <i class="el-icon-edit" @click="nowGroupId = data.id"></i>
+              </div>
+            </div>
+            <!-- 组名编辑 -->
+            <div v-show="data.id==nowGroupId" class="projectTitle">
+              <el-input
+                  v-model="data.showName"
+                  size="mini"
+                  @change.stop.native="nowGroupId = -1;"
+              ></el-input>
+              <i class="el-icon-check" @click="nowGroupId = -1;"></i>
+            </div>
+          </div>
+
           <div v-if="data.nodeType=='layer'">
-            <h4
-                style="width: 130px;    text-overflow: ellipsis;    white-space: nowrap;    overflow: hidden;"
-                :title="data.showName"
-            >
-              {{ data.showName }}
-            </h4>
-          </div>
 
-          <div v-else class="projectTitle" v-show="data.id!=nowGroupId"  >
-            <h4
-                :title="data.showName"
-                @click="nowGroupId = data.id">
-              {{ data.showName }}
-            </h4>
-            <i class="el-icon-edit" @click="nowGroupId = data.id"></i>
-          </div>
-          <div v-show="data.id==nowGroupId" class="projectTitle">
-            <el-input
-                v-model="data.showName"
-                size="mini"
-                @change.stop.native="nowGroupId = -1;"
-            ></el-input>
-            <i class="el-icon-check" @click="nowGroupId = -1;"></i>
-          </div>
-
-        </div>
-
-        <div v-if="data.nodeType=='layer'">
-
-          <el-button
-              size="mini"
-              type="success"
-              @click="handleLayerEdit(data)"
-              icon="el-icon-edit"
-              circle
-              title="编辑图层"
-              style="margin-left: 5px"
-          >
-
-          </el-button>
-
-          <el-popconfirm
-              title="确定删除该图层吗？"
-              @confirm="deleteLayerFromTree(data,node)"
-          >
             <el-button
-                slot="reference"
                 size="mini"
-                type="danger"
-                icon="el-icon-delete"
+                type="success"
+                @click.stop="handleLayerEdit(data)"
+                icon="el-icon-edit"
                 circle
-                title="删除图层"
+                title="编辑图层"
+                style="margin-left: 5px"
+            >
+
+            </el-button>
+
+            <el-popconfirm
+                title="确定删除该图层吗？"
+                @confirm="deleteLayerFromTree(data,node)"
+            >
+              <el-button
+                  slot="reference"
+                  size="mini"
+                  type="danger"
+                  icon="el-icon-delete"
+                  circle @click.stop
+                  title="删除图层"
+                  style="margin-left: 5px"
+              >
+              </el-button>
+            </el-popconfirm>
+
+            <el-button
+                v-if="data.type != 'background'"
+                size="mini"
+                slot="reference"
+                type="primary"
+                @click.stop="openTemplateEdit(data)"
+                icon="el-icon-s-grid"
+                circle
+                :title="'应用' + data.type+ '样式'"
                 style="margin-left: 5px"
             >
             </el-button>
-          </el-popconfirm>
-
-          <el-button
-              v-if="data.type != 'background'"
-              size="mini"
-              slot="reference"
-              type="primary"
-              @click="openTemplateEdit(node,data)"
-              icon="el-icon-s-grid"
-              circle
-              :title="'应用' + data.type+ '样式'"
-              style="margin-left: 5px"
-          >
-          </el-button>
-        </div>
-        <div v-else>
-          <el-popconfirm
-              title="确定删除该组吗？"
-              @confirm="deleteGroupFromTree(data,node)"
-          >
-            <el-button
-                slot="reference"
-                size="mini"
-
-                icon="el-icon-minus"
-                circle
-                title="删除组"
-                style="margin-left: 5px"
+          </div>
+          <div v-else>
+            <el-popconfirm
+                title="确定删除该组吗？"
+                @confirm="deleteGroupFromTree(data,node)"
             >
-            </el-button>
-          </el-popconfirm>
+              <el-button
+                  slot="reference"
+                  size="mini"
 
+                  icon="el-icon-minus"
+                  circle
+                  title="删除组"
+                  style="margin-left: 5px"
+              >
+              </el-button>
+            </el-popconfirm>
+
+          </div>
         </div>
-      </div>
 
-    </el-tree>
+      </el-tree>
+    </div>
   </div>
 </template>
 <script>
@@ -149,59 +172,144 @@ export default {
   data() {
     return {
       // vuex参数
-      mapProjectInfo: '',
-      layersName: '',
-      layers: '',
-      sources: '',
-      nowLayerIndex: 0,
-      originStyle: {},
+      // mapProjectInfo: '',
+      // layersName: '',
+      // layers: '',
+      // sources: '',
+      // nowLayerIndex: 0,
+      // originStyle: {},
+      // layersTree: [],
 
       allLayerShow: true,
 
-      layersTree: [],
 
       groupIds: [],
-      nowGroupId:""
+      nowGroupId:"",
 
+      //图标图层样式
+      layerIcon: {
+        circle: "fa fa-circle",
+        line: "fa fa-window-minimize",
+        fill: "fa fa-square",
+        symbol: "fa fa-font",
+        "fill-extrusion": "fa fa-cube",
+        heatmap: "fa fa-fire",
+        raster: "fa fa-photo",
+        hillshade: "	fa fa-area-chart",
+      },
     }
   },
   computed: {
     ...mapState({
-      mapProjectInfoProp: 'mapProjectInfo',
-      layersNameProp: 'layersName',
-      layersProp: 'layers',
-      nowLayerIndexProp: 'nowLayerIndex',
-      originStyleProp: 'originStyle',
-      sourcesProp: 'sources',
-      layersTreeProp: 'layersTree',
-      sourceNameObjectProp: 'sourceNameObject',
-      layersNameObjectProp: 'layersNameObject'
+      // mapProjectInfoProp: 'mapProjectInfo',
+      // layersNameProp: 'layersName',
+      // layersProp: 'layers',
+      // nowLayerIndexProp: 'nowLayerIndex',
+      // originStyleProp: 'originStyle',
+      // sourcesProp: 'sources',
+      // layersTreeProp: 'layersTree',
+      // sourceNameObjectProp: 'sourceNameObject',
+      // layersNameObjectProp: 'layersNameObject'
     }),
+    // 切换到这种方式用于对computer进行set
+    sourceNameObject:{
+      get(){
+        return this.$store.state.sourceNameObject;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "sourceNameObject", value: val })
+      }      
+    },
+    layersNameObject:{
+      get(){
+        return this.$store.state.layersNameObject;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "layersNameObject", value: val })
+      }      
+    },
+    layers:{
+      get(){
+        return this.$store.state.layers;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "layers", value: val })
+      }      
+    },
+    layersName:{
+      get(){
+        return this.$store.state.layersName;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "layersName", value: val })
+      }      
+    },
+    sources:{
+      get(){
+        return this.$store.state.sources;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "sources", value: val })
+      }      
+    },
+    originStyle:{
+      get(){
+        return this.$store.state.originStyle;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "originStyle", value: val })
+      }      
+    },    
+    layersTree:{
+      get(){
+        return this.$store.state.layersTree;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "layersTree", value: val })
+      }      
+    },    
+    nowLayerIndex:{
+      get(){
+        return this.$store.state.nowLayerIndex;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "nowLayerIndex", value: val })
+      }      
+    },    
+    mapProjectInfo:{
+      get(){
+        return this.$store.state.mapProjectInfo;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "mapProjectInfo", value: val })
+      }      
+    },    
   },
   watch:{
-    layersProp:function (layersProp){
-      this.layers=layersProp
-      layersProp.forEach((layer)=>{
-        for (let i = 0; i < this.layersTree.length; i++) {
-          let node=this.layersTree[i]
-          if(node.nodeType=="group")
-            for (let k = 0; k < node.children.length; k++)
-              if(node.children[k].id==layer.id)
-                node.children[k]=layer
-          else
-            if(node.id==layer.id)
-              node=layer
-        }
-      })
-      this.UPDATEPARM({parm: 'layersTree', value: this.layersTree});
-      console.log("update tree")
-    },
+    // layers:function (layers){
+    //   console.log('更换类型：',layers,this.layersTree);
+    //   layers.forEach((layer)=>{
+    //     const aimLayer = JSON.parse(JSON.stringify(layer));
+    //     for (let i = 0; i < this.layersTree.length; i++) {
+    //       let node=this.layersTree[i]
+    //       if(node.nodeType=="group")
+    //         for (let k = 0; k < node.children.length; k++)
+    //           if(node.children[k].id==aimLayer.id)
+    //             node.children[k]=aimLayer
+    //       else
+    //         if(node.id==aimLayer.id)
+    //           node=aimLayer
+    //     }
+    //   })
+    //   this.UPDATEPARM({parm: 'layersTree', value: this.layersTree});
+    //   console.log("update tree")
+    // },
 
-    // layersTreeProp:function (layersTreeProp){
-    //   // this.layersTree=layersTreeProp
+    // layersTree:function (layersTree){
+    //   // this.layersTree=layersTree
     //   this.layers=this.createLayersFromTree()
     //   this.UPDATEPARM({parm: 'layers', value: this.layers});
-    //   console.log("update layer",layersTreeProp,this.layers)
+    //   console.log("update layer",layersTree,this.layers)
     // }
 
   },
@@ -211,19 +319,31 @@ export default {
       this.infoInit();
     })
 
+    // 当地图组件添加图层时，更新图层树
     this.$bus.$on("map", (data) => {
       switch (data.type) {
         case 'addLayer1':           // data:{type:'',layer:{}}
-          if (data.drag == undefined)
-            this.addLayerToTree(data.layer)
+          if(data.isReplace == undefined){
+            if (data.drag == undefined)
+              this.addLayerToTree(data.layer)
+          }
           break;
         case 'addLayer2':           // data:{type:'',id:'',layer:{}}  添加在指定图层后
-          if (data.drag == undefined)
-            this.addLayerToTree(data.layer)
+          if(data.isReplace == undefined){
+            if (data.drag == undefined)
+              this.addLayerToTree(data.layer)
+          }
           break;
       }
     })
-
+    
+    this.$bus.$on("layerTree", (data) => {
+      switch (data.type) {
+        case 'highLight':              // data:{type:'',id:''}
+          this.highLightNode(data.id);
+          break;
+      }   
+    })
   },
   methods: {
     // vuex
@@ -231,15 +351,15 @@ export default {
     ...mapMutations({UPDATEPARM: 'UPDATE'}),      //将 `this.UPDATEPARM(data)` 映射为 `this.$store.commit('UPDATE',data)`
     infoInit() {
       // 初始化vuex管理参数
-      this.mapProjectInfo = this.mapProjectInfoProp;
-      this.layersName = this.layersNameProp;
-      this.layers = this.layersProp;
-      this.sources = this.sourcesProp;
-      this.nowLayerIndex = this.nowLayerIndexProp;
-      this.originStyle = this.originStyleProp;
-      this.layersTree = this.layersTreeProp
-      this.layersNameObject = this.layersNameObjectProp
-      this.sourceNameObject = this.sourceNameObjectProp
+      // this.mapProjectInfo = this.mapProjectInfoProp;
+      // this.layersName = this.layersNameProp;
+      // this.layers = this.layersProp;
+      // this.sources = this.sourcesProp;
+      // this.nowLayerIndex = this.nowLayerIndexProp;
+      // this.originStyle = this.originStyleProp;
+      // this.layersTree = this.layersTreeProp
+      // this.layersNameObject = this.layersNameObjectProp
+      // this.sourceNameObject = this.sourceNameObjectProp
 
       // for (let i = 0; i < this.layers.length; i++) {
       //   let layer=this.layers[i]
@@ -293,6 +413,7 @@ export default {
       }
     },
 
+    // #单图层操作
     // 单个图层开关
     handleLayerShowSwitchChange(val, row) {
       if (val) {
@@ -497,39 +618,46 @@ export default {
       }
     },
     // ##将地图定位到对应范围位置
-    handleLayerClick(row) {
-      const data = {
-        type: 'mapFit',
-        row: row,        // 点击的图层layer信息
-      };
-      this.$bus.$emit("map", data);
-    },
+    handleNodeClick(data){
+      if(data.nodeType == 'layer'){
+        const value = {
+          type: 'mapFit',
+          row: data,        // 点击的图层layer信息
+        };
+        this.$bus.$emit("map", value);        
+      }
+      console.log(data);
+    },    
 
     // #对地图样式编辑框组件的封装
     handleLayerEdit(layerData) {
       let index = this.getLayerIndex(layerData["id"])
       console.log("nowlayer", layerData, index)
-      // 预先更新vuex参数给函数调用
-      this.UPDATEPARM({parm: 'nowLayerIndex', value: index});
       const data = {
         type: 'open',
         layer: layerData,
-        index:index
+        index: index
       }
       this.$bus.$emit("mapEdit", data);
     },
 
     // 对样式模板组件的封装
-    openTemplateEdit(index, row) {
-      // 预先更新vuex参数给函数调用
+    openTemplateEdit(layerData) {
+      let index = this.getLayerIndex(layerData["id"])
+      console.log("nowlayer", layerData, index)      
       this.UPDATEPARM({parm: 'nowLayerIndex', value: index});
       const data = {
         type: 'open',
-        layer: row,
+        layer: layerData,
+        index: index
       }
       this.$bus.$emit("styleTemp", data);
     },
 
+    // #树组件事件
+    highLightNode(id){
+      this.$refs.tree.setCurrentKey(id);
+    },
     allowDrop(draggingNode, dropNode, type) {
       if (dropNode.data.nodeType == "layer" && type == "inner") {
         return false
@@ -609,11 +737,69 @@ export default {
       return newLayers
     }
 
-  }
+  },
+  beforeDestroy(){
+    this.$bus.$off("init");
+    this.$bus.$off("map");
+  }  
 }
 </script>
 
 <style scoped>
+/* 按钮组 */
+.treeGroupBtns{
+  box-sizing: border-box;
+  width: 100%;  
+  border-bottom: 1px #dcdfe6 solid;
+  display: flex;
+  justify-content: space-between;    
+  align-items: center;
+  padding: 0 5px 10px 24px;
+}
+/* 按钮组（右部） */
+.treeBtns{
+  max-width: calc(100% - 60px);
+  /* min-width: 80px; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-left: 5px;
+  border-left: 1px #dcdfe6 solid;
+}
+/* 按钮组单个按钮（图标） */
+.treeBtn{
+  color: #617889;
+  padding: 2px;
+  font-size: 20px; 
+}
+.treeBtn:hover{
+  color: #2e4e5d;
+}
+/* 图标和图层名 */
+.nameLayer{
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+/* 图标样式 */
+.nameLayer i{
+  font-size: 15px;
+  margin-right: 5px;
+}
+.nameLayer:hover{
+  color: #75b9ff;
+}
+/* 图层树 */
+.treeBox{
+  padding-right: 5px;
+  max-height: calc(100vh - 200px);
+  overflow-y: scroll;
+}
+.treeBox::-webkit-scrollbar{
+  width: 0;
+}
+
+
 /deep/ .el-tree-node__content {
   height: 40px;
 }

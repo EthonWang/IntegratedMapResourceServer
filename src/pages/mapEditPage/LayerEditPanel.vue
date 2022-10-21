@@ -50,6 +50,7 @@
               style="display: flex; margin-top: 10px"
             >
               <el-color-picker
+                show-alpha
                 v-model="layers[nowLayerIndex].paint['circle-color']"
                 @change="
                   handlePaintChange(
@@ -185,6 +186,7 @@
                 placeholder="something"
               ></el-input>
               <el-color-picker
+                show-alpha
                 v-model="layers[nowLayerIndex].paint['circle-stroke-color']"
                 @change="
                   handlePaintChange(
@@ -394,9 +396,7 @@
               style="display: flex; margin-top: 10px"
             >
               <el-select
-                v-model="
-                  layers[nowLayerIndex].paint['circle-translate-anchor']
-                "
+                v-model="layers[nowLayerIndex].paint['circle-translate-anchor']"
                 placeholder="请选择"
                 @change="
                   handlePaintChange(
@@ -433,9 +433,7 @@
               style="display: flex; margin-top: 10px"
             >
               <el-select
-                v-model="
-                  layers[nowLayerIndex].paint['circle-pitch-alignment']
-                "
+                v-model="layers[nowLayerIndex].paint['circle-pitch-alignment']"
                 placeholder="请选择"
                 @change="
                   handlePaintChange(
@@ -517,6 +515,7 @@
               style="display: flex; margin-top: 10px"
             >
               <el-color-picker
+                show-alpha
                 v-model="layers[nowLayerIndex].paint['line-color']"
                 @change="
                   handlePaintChange(
@@ -657,9 +656,7 @@
                 <h4 v-if="index % 2 == 0">实部:</h4>
                 <h4 v-else>虚部:</h4>
                 <el-input-number
-                  v-model="
-                    layers[nowLayerIndex].paint['line-dasharray'][index]
-                  "
+                  v-model="layers[nowLayerIndex].paint['line-dasharray'][index]"
                   @change="
                     handlePaintChange(
                       layers[nowLayerIndex]['id'],
@@ -1000,6 +997,7 @@
               style="display: flex; margin-top: 10px"
             >
               <el-color-picker
+                show-alpha
                 v-model="layers[nowLayerIndex].paint['fill-color']"
                 @change="
                   handlePaintChange(
@@ -1109,6 +1107,7 @@
                 placeholder="something"
               ></el-input>
               <el-color-picker
+                show-alpha
                 v-model="layers[nowLayerIndex].paint['fill-outline-color']"
                 @change="
                   handlePaintChange(
@@ -1262,6 +1261,7 @@
               style="display: flex; margin-top: 10px"
             >
               <el-color-picker
+                show-alpha
                 v-model="layers[nowLayerIndex].paint['fill-extrusion-color']"
                 @change="
                   handlePaintChange(
@@ -1303,9 +1303,7 @@
               style="margin-top: 10px"
             >
               <el-slider
-                v-model="
-                  layers[nowLayerIndex].paint['fill-extrusion-opacity']
-                "
+                v-model="layers[nowLayerIndex].paint['fill-extrusion-opacity']"
                 :min="0"
                 :max="1"
                 :marks="{ 0: '0', 0.5: '0.5', 1: '1' }"
@@ -1321,9 +1319,7 @@
               </el-slider>
               <br />
               <el-input-number
-                v-model="
-                  layers[nowLayerIndex].paint['fill-extrusion-opacity']
-                "
+                v-model="layers[nowLayerIndex].paint['fill-extrusion-opacity']"
                 @change="
                   handlePaintChange(
                     layers[nowLayerIndex]['id'],
@@ -1352,8 +1348,9 @@
             <span v-if="!menuButtonShowList['fill-extrusion-height']">{{
               menuShowList["fill-extrusion-height"]
             }}</span>
+            <!-- Expressions方式渲染 -->
             <el-row
-              v-if="menuButtonShowList['fill-extrusion-height']"
+              v-if="menuButtonShowList['fill-extrusion-height']&&layers[nowLayerIndex].paint['fill-extrusion-height'].constructor !== Object"
               style="display: flex; margin-top: 10px"
             >
               <el-input-number
@@ -1372,6 +1369,72 @@
               >
               </el-input-number>
             </el-row>
+            <!-- Functions方式渲染 -->
+            <el-row
+              v-if="layers[nowLayerIndex].paint['fill-extrusion-height'].constructor === Object"
+              style="margin-top: 10px"
+            >
+              <el-row type="flex" style="align-items:center;    margin-bottom:5px">
+                <el-col :span="8">
+                  <span>渲染属性:</span>
+                </el-col>
+                <el-col :span="16">
+                  <el-select 
+                    v-model="layers[nowLayerIndex].paint['fill-extrusion-height'].property" 
+                    placeholder="请选择渲染属性"
+                    @change="
+                      handlePaintChange(
+                        layers[nowLayerIndex]['id'],
+                        'fill-extrusion-height',
+                        {
+                          property:layers[nowLayerIndex].paint['fill-extrusion-height'].property,
+                          type:layers[nowLayerIndex].paint['fill-extrusion-height'].type
+                        }
+                      )
+                    ">
+                    <el-tooltip class="item" effect="dark" content="渲染高度" placement="right">
+                      <el-option label="render_height" value="render_height"></el-option>
+                    </el-tooltip>  
+                    <el-tooltip class="item" effect="dark" content="最小渲染高度" placement="right">
+                      <el-option label="render_min_height" value="render_min_height"></el-option>
+                    </el-tooltip>                                          
+                  </el-select>
+                </el-col>
+              </el-row>
+              <el-row type="flex" style="align-items:center">
+                <el-col :span="8">
+                  <span>渲染类型:</span>
+                </el-col>
+                <el-col :span="16">
+                  <el-select 
+                    v-model="layers[nowLayerIndex].paint['fill-extrusion-height'].type" 
+                    placeholder="请选择渲染类型"
+                    @change="
+                      handlePaintChange(
+                        layers[nowLayerIndex]['id'],
+                        'fill-extrusion-height',
+                        {
+                          property:layers[nowLayerIndex].paint['fill-extrusion-height'].property,
+                          type:layers[nowLayerIndex].paint['fill-extrusion-height'].type
+                        }                   
+                      )
+                    ">
+                    <el-tooltip class="item" effect="dark" content="一致型（将输入值作为输出值）" placement="right">
+                      <el-option label="identity" value="identity"></el-option>
+                    </el-tooltip>                    
+                    <!-- <el-tooltip class="item" effect="dark" content="指数连续型（在断点之间生成插值）" placement="right">
+                      <el-option label="exponential" value="exponential"></el-option>
+                    </el-tooltip>                    
+                    <el-tooltip class="item" effect="dark" content="间隔型（输出值刚好小于输入值的一系列输出，呈阶梯状）" placement="right">
+                      <el-option label="interval" value="interval"></el-option>
+                    </el-tooltip>                    
+                    <el-tooltip class="item" effect="dark" content="分类型（将和输入值一致的输出）" placement="right">
+                      <el-option label="categorical" value="categorical"></el-option>
+                    </el-tooltip>                     -->
+                  </el-select>
+                </el-col>
+              </el-row>
+            </el-row>
             <el-divider></el-divider>
             <ConditionRender
               :layerSelect="layers[nowLayerIndex]"
@@ -1386,6 +1449,7 @@
             <span v-if="!menuButtonShowList['fill-extrusion-base']">{{
               menuShowList["fill-extrusion-base"]
             }}</span>
+            <!-- Expressions方式渲染 -->
             <el-row
               v-if="menuButtonShowList['fill-extrusion-base']"
               style="display: flex; margin-top: 10px"
@@ -1406,6 +1470,72 @@
               >
               </el-input-number>
             </el-row>
+            <!-- Functions方式渲染 -->
+            <el-row
+              v-if="layers[nowLayerIndex].paint['fill-extrusion-base'].constructor === Object"
+              style="margin-top: 10px"
+            >
+              <el-row type="flex" style="align-items:center;    margin-bottom:5px">
+                <el-col :span="8">
+                  <span>渲染属性:</span>
+                </el-col>
+                <el-col :span="16">
+                  <el-select 
+                    v-model="layers[nowLayerIndex].paint['fill-extrusion-base'].property" 
+                    placeholder="请选择渲染属性"
+                    @change="
+                      handlePaintChange(
+                        layers[nowLayerIndex]['id'],
+                        'fill-extrusion-base',
+                        {
+                          property:layers[nowLayerIndex].paint['fill-extrusion-base'].property,
+                          type:layers[nowLayerIndex].paint['fill-extrusion-base'].type
+                        }
+                      )
+                    ">
+                    <el-tooltip class="item" effect="dark" content="渲染高度" placement="right">
+                      <el-option label="render_height" value="render_height"></el-option>
+                    </el-tooltip>  
+                    <el-tooltip class="item" effect="dark" content="最小渲染高度" placement="right">
+                      <el-option label="render_min_height" value="render_min_height"></el-option>
+                    </el-tooltip>                                          
+                  </el-select>
+                </el-col>
+              </el-row>
+              <el-row type="flex" style="align-items:center">
+                <el-col :span="8">
+                  <span>渲染类型:</span>
+                </el-col>
+                <el-col :span="16">
+                  <el-select 
+                    v-model="layers[nowLayerIndex].paint['fill-extrusion-base'].type" 
+                    placeholder="请选择渲染类型"
+                    @change="
+                      handlePaintChange(
+                        layers[nowLayerIndex]['id'],
+                        'fill-extrusion-base',
+                        {
+                          property:layers[nowLayerIndex].paint['fill-extrusion-base'].property,
+                          type:layers[nowLayerIndex].paint['fill-extrusion-base'].type
+                        }                   
+                      )
+                    ">
+                    <el-tooltip class="item" effect="dark" content="一致型（将输入值作为输出值）" placement="right">
+                      <el-option label="identity" value="identity"></el-option>
+                    </el-tooltip>                    
+                    <!-- <el-tooltip class="item" effect="dark" content="指数连续型（在断点之间生成插值）" placement="right">
+                      <el-option label="exponential" value="exponential"></el-option>
+                    </el-tooltip>                    
+                    <el-tooltip class="item" effect="dark" content="间隔型（输出值刚好小于输入值的一系列输出，呈阶梯状）" placement="right">
+                      <el-option label="interval" value="interval"></el-option>
+                    </el-tooltip>                    
+                    <el-tooltip class="item" effect="dark" content="分类型（将和输入值一致的输出）" placement="right">
+                      <el-option label="categorical" value="categorical"></el-option>
+                    </el-tooltip>                     -->
+                  </el-select>
+                </el-col>
+              </el-row>
+            </el-row>            
             <el-divider></el-divider>
             <ConditionRender
               :layerSelect="layers[nowLayerIndex]"
@@ -1479,9 +1609,7 @@
             >
               <el-select
                 v-model="
-                  layers[nowLayerIndex].paint[
-                    'fill-extrusion-translate-anchor'
-                  ]
+                  layers[nowLayerIndex].paint['fill-extrusion-translate-anchor']
                 "
                 placeholder="请选择"
                 @change="
@@ -1617,9 +1745,7 @@
                         >
                         </el-option> </el-select
                       >&nbsp;
-                      <div
-                        style="width: 400px; display: flex; flex-wrap: wrap"
-                      >
+                      <div style="width: 400px; display: flex; flex-wrap: wrap">
                         <div
                           v-for="(item, key, index) in spriteJsonSelect"
                           :key="index"
@@ -1808,9 +1934,7 @@
               style="margin-top: 10px; display: flex"
             >
               <el-switch
-                v-model="
-                  layers[nowLayerIndex].layout['icon-ignore-placement']
-                "
+                v-model="layers[nowLayerIndex].layout['icon-ignore-placement']"
                 @change="
                   handleLayoutChange(
                     layers[nowLayerIndex]['id'],
@@ -2198,15 +2322,15 @@
             }}</span>
             <el-row
               v-if="menuButtonShowList['text-field']"
-              style="display: flex; margin-top: 10px"
+              style="display: flex; margin: 10px 0"
             >
               <el-input
-                v-model="layers[nowLayerIndex].layout['text-field']"
+                v-model="textField"
                 @change="
-                  handleLayoutChange(
+                  handleTextField(
                     layers[nowLayerIndex]['id'],
                     'text-field',
-                    ['get', layers[nowLayerIndex].layout['text-field']]
+                    $event                    
                   )
                 "
                 placeholder="something"
@@ -2217,7 +2341,9 @@
                 width="400"
                 trigger="click"
               >
+                <!-- 非mbTile -->
                 <el-table
+                  v-if="!isMbTile"
                   :data="
                     filterOptions.filter(
                       (data) =>
@@ -2228,7 +2354,7 @@
                     )
                   "
                   :cell-style="{ textAlign: 'left' }"
-                  height="400"
+                  max-height="400"
                   @row-click="fieldSelect"
                 >
                   <el-table-column prop="column_name" align="right">
@@ -2242,6 +2368,56 @@
                     </template>
                   </el-table-column>
                 </el-table>
+                <!-- mbTile -->
+                <el-table
+                  v-if="isMbTile"
+                  :data="
+                    filterOptions.filter(
+                      (data) =>
+                        !textFieldSearch ||
+                        data['attribute']
+                          .toLowerCase()
+                          .includes(textFieldSearch.toLowerCase())
+                    )
+                  "
+                  :cell-style="{ textAlign: 'left' }"
+                  max-height="400"
+                  @row-click="fieldSelect"
+                >
+                  <el-table-column prop="attribute" align="right">
+                    <template slot="header">
+                      <el-input
+                        v-model="textFieldSearch"
+                        size="mini"
+                        placeholder="搜索"
+                        prefix-icon="el-icon-search"
+                      />
+                    </template>
+                  </el-table-column>
+                  <el-table-column align="right">
+                    <template slot-scope="scope">
+                      <div
+                        v-if="
+                          scope.row.type != 'number' && scope.row.values.length == 0
+                        "
+                        style="color: #d0cece"
+                      >
+                        Unknowns
+                      </div>
+                      <div
+                        v-else-if="
+                          scope.row.type != 'number' && scope.row.values.length > 0
+                        "
+                        style="color: #d0cece"
+                      >
+                        {{ scope.row.values.length + " values" }}
+                      </div>
+                      <div v-else style="color: #d0cece">
+                        {{ scope.row.min + "-" + scope.row.max }}
+                      </div>
+                    </template>
+                  </el-table-column>                  
+                </el-table>
                 <el-button
                   type="text"
                   icon="el-icon-s-unfold"
@@ -2249,6 +2425,8 @@
                 ></el-button>
               </el-popover>
             </el-row>
+            <span v-if="menuButtonShowList['text-field']"
+            >注：多个属性间默认用','连接，若要属性换行显示用'&'连接</span>
             <el-divider></el-divider>
             <ConditionRender
               :layerSelect="layers[nowLayerIndex]"
@@ -2267,6 +2445,7 @@
               style="display: flex; margin-top: 10px"
             >
               <el-color-picker
+                show-alpha
                 v-model="layers[nowLayerIndex].paint['text-color']"
                 @change="
                   handlePaintChange(
@@ -2358,12 +2537,12 @@
               style="display: flex; margin-top: 10px"
             >
               <el-input
-                v-model="layers[nowLayerIndex].layout['text-font'][0]"
+                v-model="textFont"
                 @change="
-                  handleLayoutChange(
+                  handleTextFont(
                     layers[nowLayerIndex]['id'],
                     'text-font',
-                    layers[nowLayerIndex].layout['text-font']
+                    $event                    
                   )
                 "
                 placeholder="something"
@@ -2719,9 +2898,7 @@
               style="margin-top: 10px; display: flex"
             >
               <el-switch
-                v-model="
-                  layers[nowLayerIndex].layout['text-ignore-placement']
-                "
+                v-model="layers[nowLayerIndex].layout['text-ignore-placement']"
                 @change="
                   handleLayoutChange(
                     layers[nowLayerIndex]['id'],
@@ -3056,6 +3233,7 @@
               style="display: flex; margin-top: 10px"
             >
               <el-color-picker
+                show-alpha
                 v-model="layers[nowLayerIndex].paint['text-halo-color']"
                 @change="
                   handlePaintChange(
@@ -3165,6 +3343,7 @@
             &nbsp;
             <el-row style="display: flex; margin-top: 10px">
               <el-color-picker
+                show-alpha
                 v-model="layers[nowLayerIndex].paint['background-color']"
                 @change="
                   handlePaintChange(
@@ -3247,7 +3426,7 @@
               v-if="menuButtonShowList['fill-extrusion-color']"
               style="display: flex; margin-top: 10px"
             >
-              <el-color-picker
+              <el-color-picker show-alpha
                 v-model="layers[nowLayerIndex].paint['fill-extrusion-color']"
                 @change="
                   handlePaintChange(
@@ -3477,7 +3656,9 @@
         </el-form>
         <el-divider></el-divider>
         <!-- 筛选 -->
-        <el-row v-if="layers[nowLayerIndex].metadata['mapbox:type'] != 'background'">
+        <el-row
+          v-if="layers[nowLayerIndex].metadata['mapbox:type'] != 'background'"
+        >
           <el-row type="flex" justify="space-between" align="middle">
             <h4>过滤条件配置</h4>
             &nbsp;
@@ -3510,11 +3691,11 @@
               <!-- 非mbTile -->
               <el-select
                 v-if="!isMbTile"
-                :span="2"
+                :span="2" clearable
                 v-model="filterCondition[index]['option']"
                 placeholder="请选择"
                 size="small"
-                @change="filterValueInit($event,index)"
+                @change="filterValueInit($event, index)"
               >
                 <el-option
                   v-for="item in filterOptions"
@@ -3527,11 +3708,11 @@
               <!-- mbTile -->
               <el-select
                 v-if="isMbTile"
-                :span="2"
+                :span="2" clearable
                 v-model="filterCondition[index]['option']"
                 placeholder="请选择"
                 size="small"
-                @change="filterValueInit($event,index)"
+                @change="filterValueInit($event, index)"
               >
                 <el-option
                   v-for="item in filterOptions"
@@ -3540,24 +3721,26 @@
                   :value="item['attribute']"
                 >
                   <!-- 属性名 -->
-                  <span style="float: left;margin-right:20px">{{ item.attribute }}</span>                 
+                  <span style="float: left; margin-right: 20px">{{
+                    item.attribute
+                  }}</span>
                   <!-- 三种类型补充 -->
-                  <span 
+                  <span
                     v-if="item.type != 'number' && item.values.length == 0"
                     style="float: right; color: #8492a6; font-size: 13px"
-                  >Unkonws
+                    >Unkonws
                   </span>
-                  <span 
+                  <span
                     v-else-if="item.type != 'number' && item.values.length > 0"
                     style="float: right; color: #8492a6; font-size: 13px"
-                  >{{ item.values.length + " values" }}
+                    >{{ item.values.length + " values" }}
                   </span>
-                  <span 
+                  <span
                     v-else
                     style="float: right; color: #8492a6; font-size: 13px"
-                  >{{ item.min + "-" + item.max }}
+                    >{{ item.min + "-" + item.max }}
                   </span>
-                </el-option>                
+                </el-option>
               </el-select>
             </el-col>
             <el-col :span="5">
@@ -3565,6 +3748,7 @@
                 v-model="filterCondition[index]['type']"
                 placeholder="=="
                 size="small"
+                clearable
               >
                 <el-option
                   v-for="item in filterTypes"
@@ -3578,7 +3762,7 @@
             <el-col :span="10">
               <el-input
                 v-model="filterCondition[index]['value']"
-                @change="filterChange($event,filterHasValues)"
+                @change="filterChange($event, filterHasValues)"
                 :placeholder="filterHasValues ? '' : '请输入数组'"
                 size="small"
                 clearable
@@ -3589,9 +3773,14 @@
               </el-input>
             </el-col>
             <!-- 占位用 -->
-            <el-col v-if="!filterHasValues" :span="2"></el-col>          
+            <el-col v-if="!filterHasValues" :span="2"></el-col>
             <!-- 有筛选值可选 -->
-            <el-popover v-if="filterHasValues" placement="right" width="400" trigger="click">
+            <el-popover
+              v-if="filterHasValues"
+              placement="right"
+              width="400"
+              trigger="click"
+            >
               <el-button
                 size="mini"
                 type="primary"
@@ -3663,7 +3852,10 @@
                   max-height="400"
                 >
                   <!-- <el-table-column type="selection"> </el-table-column> -->
-                  <el-table-column :prop="filterOptionSelectList[index]" label="label">
+                  <el-table-column
+                    :prop="filterOptionSelectList[index]"
+                    label="label"
+                  >
                   </el-table-column>
                   <el-table-column align="right">
                     <template slot="header">
@@ -3674,9 +3866,9 @@
                         prefix-icon="el-icon-search"
                       />
                     </template>
-                  </el-table-column>                  
+                  </el-table-column>
                 </el-table>
-              </el-row>              
+              </el-row>
               <el-button
                 type="text"
                 icon="el-icon-circle-plus"
@@ -3740,36 +3932,37 @@
 </template>
 <script>
 import requestApi from "@/api/requestApi";
-import {mapState,mapActions,mapMutations} from 'vuex'
+import { mapState, mapActions, mapMutations } from "vuex";
 import ConditionRender from "../../components/ConditionRender.vue";
 import layerStyleProperties from "@/assets/js/layerStyleProperties";
 import filedValue from "@/assets/js/field_value.js";
-import {filterSplit} from "@/serve/JsonToValue";
+import { filterSplit,textSplit } from "@/serve/JsonToValue";
 
 export default {
   name: "LayerEditPanel",
   components: { ConditionRender },
   props: [],
   data() {
-    return{
+    return {
       // vuex参数
-      mapProjectInfo: '',
-      layersName: '',
-      layers: '',
-      nowLayerIndex: 0,
-      originStyle: {},
-      spritePath: '',
+      // mapProjectInfo: "",
+      // layersName: "",
+      // layers: "",
+      // nowLayerIndex: 0,
+      // originStyle: {},
+      // spritePath: "",
 
       // 公共参数
       editorShow: "",
-      glyphsPath: '',
+      glyphsPath: "",
       isMbTile: false,
-      mbSourceLayer: '',
-      layerSource: '',          // 用于判断当前图层的数据源，依据图层的matadata属性中的'mapbox:type'属性
-                                // 分为mbStyle、mbSource、primary
-      menuButtonShowList: {},   // 记录图层编辑框下每个tab的显示情况,如{'circle-color':true}
-      menuShowList: {},         // 记录图层编辑框下的标签显示，如{'circle-color':zoomRang}标签
-      predefineColors: [        // 颜色选取框
+      mbSourceLayer: "",
+      layerSource: "", // 用于判断当前图层的数据源，依据图层的matadata属性中的'mapbox:type'属性
+      // 分为mbStyle、mbSource、primary
+      menuButtonShowList: {}, // 记录图层编辑框下每个tab的显示情况,如{'circle-color':true}
+      menuShowList: {}, // 记录图层编辑框下的标签显示，如{'circle-color':zoomRang}标签
+      predefineColors: [
+        // 颜色选取框
         "#ff4500",
         "#ff8c00",
         "#ffd700",
@@ -3777,11 +3970,13 @@ export default {
         "#00ced1",
         "#1e90ff",
         "#c71585",
-      ],      
+      ],
+      textField: '',        // 不同于mapbox基于[get,'name'],这里采用{name},textField用于展示name
+      textFont: '',         // 不同于mapbox基于["Roboto Regular", "Open Sans Regular"],这里采用textFont用于展示"Roboto Regular,Open Sans Regular"
 
       // 精灵图
       spriteClassList: [],
-      spriteNameSelect: '',     // 从连接中截取的项目精灵图名
+      spriteNameSelect: "", // 从连接中截取的项目精灵图名
       symbolTableData: [],
       currentPageSymbol: 1,
       pageSizeSymbol: 5,
@@ -3790,7 +3985,7 @@ export default {
       spriteList: [],
       spriteJsonSelect: {},
       spritePngSelect: "",
-      spriteItemList: [],      
+      spriteItemList: [],
 
       // 字体
       fontList: [],
@@ -3816,7 +4011,7 @@ export default {
 
       // #过滤条件配置
       filterWay: "all",
-      filterValueShow: '',
+      filterValueShow: "",
       // filterCondition: [{ option: "", type: "==", value: '' }],
       filterCondition: [],
       filterOptions: [],
@@ -3833,7 +4028,7 @@ export default {
         { value: "has", label: "has" },
         { value: "!has", label: "!has" },
       ],
-      filterValue: [],        // 全部单个筛选值列表的集合
+      filterValue: [], // 全部单个筛选值列表的集合
       filterValueSelect: [], //分页信息显示
       // filterValueInput: [""],
       // multipleSelection: [],
@@ -3844,25 +4039,69 @@ export default {
       pageSizeFilter: 10,
       totalDataCountFilter: 0,
       // mbTile筛选值列表
-      filterHasValues: true,   // mbTile中筛选属性无筛选值或num太多
-    }
+      filterHasValues: true, // mbTile中筛选属性无筛选值或num太多
+    };
   },
-  computed:{
-    ...mapState({mapProjectInfoProp:'mapProjectInfo',
-                 layersNameProp:'layersName',
-                 layersProp:'layers',
-                 spritePathProp:'spritePath',
-                 nowLayerIndexProp:'nowLayerIndex',
-                 }),  
-  },  
-  mounted(){
+  computed: {
+    ...mapState({
+      // mapProjectInfoProp: "mapProjectInfo",
+      // layersNameProp: "layersName",
+      // layersProp: "layers",
+      // spritePathProp: "spritePath",
+      // nowLayerIndexProp: "nowLayerIndex",
+    }),
+
+    // 切换到这种方式用于对computer进行set
+    mapProjectInfo:{
+      get(){
+        return this.$store.state.mapProjectInfo;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "mapProjectInfo", value: val })
+      }      
+    },
+    layers:{
+      get(){
+        return this.$store.state.layers;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "layers", value: val })
+      }      
+    },
+    layersName:{
+      get(){
+        return this.$store.state.layersName;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "layersName", value: val })
+      }      
+    },
+    spritePath:{
+      get(){
+        return this.$store.state.spritePath;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "spritePath", value: val })
+      }      
+    },    
+    nowLayerIndex:{
+      get(){
+        return this.$store.state.nowLayerIndex;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "nowLayerIndex", value: val })
+      }      
+    },    
+  },
+  mounted() {
     // 等初始组件信息加载完
-    this.$bus.$on("init",()=>{
+    this.$bus.$on("init", () => {
       this.infoInit();
-    })    
+    });
+    // 同ConditionRender组件的通信
     this.$bus.$on("show", (data) => {
       //多级渲染显示
-      if (data['param4']) {
+      if (data["param4"]) {
         switch (data.param4) {
           case "zoom":
             this.menuShowList[data.param1] = "Zoom Range";
@@ -3891,38 +4130,38 @@ export default {
         if (value2) {
           this.attrValueSet[value1] = "primary";
         }
-        this.$nextTick(()=>{
+        this.$nextTick(() => {
           this.menuButtonShowList[value1] = value2;
-        })
-        console.log('button修',this.menuButtonShowList,this.layers[this.nowLayerIndex].attrShowList);
+          console.log('测试',value1,this.menuButtonShowList[value1]);
+        });
       }
-    });    
-    this.$bus.$on("mapEdit",(data)=>{
+    });
+    this.$bus.$on("mapEdit", (data) => {
       switch (data.type) {
-        case 'off':                  // data:{type:''}
+        case "off": // data:{type:''}
           this.editorShow = "";
           break;
-        case 'open':                 // data:{type:'',index:'',layer:''}      #需要index是用于将修改后的layer更新到对应的layers中
-          this.handleLayerEdit(data.index,data.layer);
+        case "open": // data:{type:'',index:'',layer:''}      #需要index是用于将修改后的layer更新到对应的layers中
+          this.handleLayerEdit(data.index, data.layer);
           break;
       }
-    })    
+    });
   },
-  methods:{
+  methods: {
     // vuex
-    ...mapActions({updateParm:'update'}),        //将 `this.updateParm(data)` 映射为 `this.$store.dispatch('update',data)`
-    ...mapMutations({UPDATEPARM:'UPDATE'}),      //将 `this.UPDATEPARM(data)` 映射为 `this.$store.commit('UPDATE',data)`
+    ...mapActions({ updateParm: "update" }), //将 `this.updateParm(data)` 映射为 `this.$store.dispatch('update',data)`
+    ...mapMutations({ UPDATEPARM: "UPDATE" }), //将 `this.UPDATEPARM(data)` 映射为 `this.$store.commit('UPDATE',data)`
 
     // 初始化相关参数
-    infoInit(){
+    infoInit() {
       // 初始化vuex管理参数
-      this.mapProjectInfo = this.mapProjectInfoProp;
-      this.layersName = this.layersNameProp;
-      this.layers = this.layersProp;
-      this.nowLayerIndex = this.nowLayerIndexProp;      
-      this.spritePath = this.spritePathProp;
-      this.glyphsPath = this.mapProjectInfoProp.glyphs;   
-      console.log('路径：',this.mapProjectInfo);   
+      // this.mapProjectInfo = this.mapProjectInfoProp;
+      // this.layersName = this.layersNameProp;
+      // this.layers = this.layersProp;
+      // this.nowLayerIndex = this.nowLayerIndexProp;
+      // this.spritePath = this.spritePathProp;
+      this.glyphsPath = this.mapProjectInfo.glyphs;
+      console.log("路径：", this.mapProjectInfo);
       const end = this.spritePath.lastIndexOf("/");
       this.spriteNameSelect = this.spritePath.substring(15, end);
       // 精灵图JSON和png
@@ -3947,42 +4186,42 @@ export default {
           this.spriteNameSelect +
           "/" +
           "sprite.png";
-      }   
+      }
       this.spriteInit();
-    },  
+    },
     // #总体函数
     // 打开图层样式编辑面板
-    handleLayerEdit(index,row) {
+    handleLayerEdit(index, row) {
       console.log("now edit layer: row", row);
       // #信息预处理
       // 判断当前页面数据是否为mbtile,以及是否为osm数据
-      this.UPDATEPARM({parm:'nowLayerIndex',index})
+      this.UPDATEPARM({ parm: "nowLayerIndex", index });
 
-      this.nowLayerIndex = this.index
-      const datatype = row['metadata']['mapbox:type'];
-      switch(datatype){
-        case 'mbSource':
-          this.layerSource = 'mbSource';
+      this.nowLayerIndex = index;
+      const datatype = row["metadata"]["mapbox:type"];
+      switch (datatype) {
+        case "mbSource":
+          this.layerSource = "mbSource";
           this.mbSourceLayer = row["metadata"]["mapbox:source"];
           this.isMbTile = true;
           break;
-        case 'mbStyle':
-          this.layerSource = 'mbStyle';
+        case "mbStyle":
+          this.layerSource = "mbStyle";
           this.mbSourceLayer = row["metadata"]["mapbox:source"];
           this.isMbTile = true;
           break;
-        case 'TMS':
-          this.layerSource = 'TMS';
+        case "TMS":
+          this.layerSource = "TMS";
           break;
         default:
-          this.layerSource = 'primary';
-          break;        
-      } 
+          this.layerSource = "primary";
+          break;
+      }
       // 先关闭模板样式编辑框避免冲突
       const data = {
-        type:'off',
+        type: "off",
       };
-      this.$bus.$emit("styleTemp",data);
+      this.$bus.$emit("styleTemp", data);
       //先关闭，否则组件不会初始化
       this.editorShow = "";
       //设置属性编辑界面的展示情况
@@ -4007,40 +4246,32 @@ export default {
         } else {
           this.editorShow = "backgroundEditorShow";
         }
-        this.menuButtonShowList = [];     // 若不是读取之前保存的项目，menuButtonShowList由ConditionRender组件渲染传送过来
+        this.menuButtonShowList = []; // 若不是读取之前保存的项目，menuButtonShowList由ConditionRender组件渲染传送过来
       });
       // 初始化筛选的属性值列表(mbTile和非mbTile类)
-      if(this.isMbTile){
-        console.log("测试",filedValue,this.mbSourceLayer);
+      if (this.isMbTile) {
         let List = filedValue.filter(
           (data) => data.layer == this.mbSourceLayer
         );
-        this.filterOptions = List[0].attributes;        
-      }else{
+        this.filterOptions = List[0].attributes;
+      } else {
         this.filterOptions =
-          typeof row["shpAttribute"] != "undefined"
-            ? row["shpAttribute"]
-            : [];
+          typeof row["shpAttribute"] != "undefined" ? row["shpAttribute"] : [];
       }
       //filter赋值
       if (
-        JSON.stringify(row.filterValueSet) != "{}"      // 已经有保存
+        JSON.stringify(row.filterValueSet) != "{}" // 已经有保存
       ) {
-        this.filterCondition =
-          row.filterValueSet["filterCondition"];
-        this.filterValue =
-          row.filterValueSet["filterValue"];
+        this.filterCondition = row.filterValueSet["filterCondition"];
+        this.filterValue = row.filterValueSet["filterValue"];
         this.filterOptionSelectList =
-          row.filterValueSet[
-            "filterOptionSelectList"
-          ];
-        this.filterValueSelect =
-          row.filterValueSet["filterValueSelect"];
-        this.filterWay =
-          row.filterValueSet["filterWay"];
+          row.filterValueSet["filterOptionSelectList"];
+        this.filterValueSelect = row.filterValueSet["filterValueSelect"];
+        this.filterWay = row.filterValueSet["filterWay"];
       }
       // filterValueSet为空表示未设置筛选或者采用mbTile的style样式
-      else if(row.filter.length > 1){     // 定位到使用style样式的情况
+      else if (row.filter.length > 1) {
+        // 定位到使用style样式的情况
         // 使用模板采用filterHasValues = false的形式
         this.filterHasValues = false;
         const Object = filterSplit(row.filter);
@@ -4048,12 +4279,25 @@ export default {
         this.filterWay = Object.filterWay;
         this.filterOptionSelectList = Object.filterOptionSelectList;
       }
-    },           
+      // #等图层数据处理完毕再加载相关参数初始化
+      // 字段标注
+      if("text-field" in this.layers[this.nowLayerIndex].layout){
+        const text = JSON.parse(JSON.stringify(this.layers[this.nowLayerIndex].layout["text-field"]));
+        const end = text.lastIndexOf("}");
+        this.textField = this.layers[this.nowLayerIndex].layout["text-field"].substring(1, end);    
+        this.textField = textSplit(text);        
+      }
+      // 字体
+      if("text-field" in this.layers[this.nowLayerIndex].layout){
+        const fonts = JSON.parse(JSON.stringify(this.layers[this.nowLayerIndex].layout['text-font']));
+        this.textFont = fonts.join(',');
+      }
+    },
     // 关闭图层样式编辑面板
     handleCloseEditBoard() {
       this.editorShow = "";
-    },  
-    
+    },
+
     // #图标
     // 获取自定义图标列表
     getSymbolList() {
@@ -4078,12 +4322,49 @@ export default {
         "symbolTableData",
         JSON.stringify(this.symbolTableData)
       );
-    },   
+    },
+    // 设置字体标注字段
+    handleTextField(id,prop,value){
+      // 先更新mapbox再更新本地layers
+      value = value.replaceAll('，',',')                 // 将误输入的中文'，'替换为英文','
+      let result = '';
+      let textList = [];
+      if(value.indexOf(',') > -1){                       // "name:latin,name:nonlatin"=>"{name:latin} {name:nonlatin}"
+        textList = value.split(',');
+        textList.forEach((element,index,arr)=>{
+          arr[index] = '{' + element + '}';
+        })
+        result = textList.join(' ');
+      }
+      else if(value.indexOf('&') > -1){                  // "name:latin&name:nonlatin"=>"{name:latin}&{name:nonlatin}"
+        textList = value.split('&');
+        textList.forEach((element,index,arr)=>{
+          arr[index] = '{' + element + '}';
+        })
+        result = textList.join('\\n');
+      }else{                                             // "name:latin"=>"{name:latin}"
+        result = '{' + value + '}'
+      }
+      this.handleLayoutChange(id,prop,result);
+      this.layers[this.nowLayerIndex].layout['text-field'] = result;
+    },
+    // 设置字体
+    handleTextFont(id,prop,value){
+      // 先更新mapbox再更新本地layers
+      value = value.replaceAll('，',',')                 // 将误输入的中文'，'替换为英文','
+      let result = value.split(',')                      // "Roboto Regular,Open Sans Regular"=>["Roboto Regular", "Open Sans Regular"]
+      result = ['literal',result]
+      this.handleLayoutChange(id,prop,result);
+      this.layers[this.nowLayerIndex].layout['text-field'] = result;
+      console.log('传递结果',result);
+    },
+
+
     // 自定义图标
     handleCurrentChangeSymbol(val) {
       this.currentPageSymbol = val;
       this.getSymbolList();
-    },     
+    },
     // 获取字体列表
     getFontList() {
       requestApi
@@ -4116,7 +4397,7 @@ export default {
         this.layers[this.nowLayerIndex].layout["icon-image"]
       );
       // 更新vuex参数
-      this.UPDATEPARM({parm:'layers',value:this.layers})
+      this.UPDATEPARM({ parm: "layers", value: this.layers });
     },
     spriteChange() {
       this.$confirm(
@@ -4153,8 +4434,8 @@ export default {
           this.spritePath =
             "/store/sprites/" + this.spriteNameSelect + "/sprite";
           // 更新vuex再保存
-          this.UPDATEPARM({parm:'spritePath',value:this.spritePath})
-          this.$bus.$emit("map",{type:'save',flag:false});
+          this.UPDATEPARM({ parm: "spritePath", value: this.spritePath });
+          this.$bus.$emit("map", { type: "save", flag: false });
         })
         .catch(() => {
           this.$message({
@@ -4172,7 +4453,7 @@ export default {
       );
       console.log("当前点击的精灵图信息", item, key, index);
       // 更新vuex参数
-      this.UPDATEPARM({parm:'layers',value:this.layers})      
+      this.UPDATEPARM({ parm: "layers", value: this.layers });
     },
     spriteInit() {
       requestApi
@@ -4197,22 +4478,25 @@ export default {
       }
     },
     fieldSelect(row) {
-      this.layers[this.nowLayerIndex].layout["text-field"] = row.column_name;
+      let type = this.isMbTile ? 'attribute' : 'column_name';
+      this.textField = row[type];
+      this.layers[this.nowLayerIndex].layout["text-field"] = '{' + row[type] + '}';
       this.$refs.fieldPopover.doClose();
       this.handleLayoutChange(
         this.layers[this.nowLayerIndex]["id"],
         "text-field",
-        ["get",row.column_name]
+        this.layers[this.nowLayerIndex].layout["text-field"]
       );
       console.log(
         "text-field",
         this.layers[this.nowLayerIndex].layout["text-field"]
       );
       // 更新vuex参数
-      this.UPDATEPARM({parm:'layers',value:this.layers})      
+      this.UPDATEPARM({ parm: "layers", value: this.layers });
     },
     fontSelect(row) {
-      this.layers[this.nowLayerIndex].layout["text-font"][0] = row.name;
+      this.textFont = row.name;
+      this.layers[this.nowLayerIndex].layout["text-font"] = [row.name];
       this.$refs.fontPopover.doClose();
       this.handleLayoutChange(
         this.layers[this.nowLayerIndex]["id"],
@@ -4220,39 +4504,36 @@ export default {
         this.layers[this.nowLayerIndex].layout["text-font"]
       );
       // 更新vuex参数
-      this.UPDATEPARM({parm:'layers',value:this.layers})      
+      this.UPDATEPARM({ parm: "layers", value: this.layers });
     },
-
-
-
 
     // # 数据编辑相关
     // 切换图层
     layerTypeChange(val) {
       //先改参数再更新图层，打开图层编辑框
       console.log("change layer type to", val);
-      let aimLayer = this.layers[this.nowLayerIndex];
-      aimLayer.paint = JSON.parse(
+      this.layers[this.nowLayerIndex].paint = JSON.parse(
         JSON.stringify(layerStyleProperties[val].paint)
       );
-      aimLayer.layout = JSON.parse(
+      this.layers[this.nowLayerIndex].layout = JSON.parse(
         JSON.stringify(layerStyleProperties[val].layout)
       );
+      let aimLayer = JSON.parse(JSON.stringify(this.layers[this.nowLayerIndex]));
       this.handleRemoveLayer(aimLayer.id);
       if (this.nowLayerIndex === 0) {
-        this.addLayerToMap(true,aimLayer);
+        this.addLayerToMap(true, aimLayer, true);
       } else {
         const data = {
-          id : this.layers[this.nowLayerIndex - 1].id,
-          layer : aimLayer
-        }        
-        this.addLayerToMap(false,data);
+          id: this.layers[this.nowLayerIndex - 1].id,
+          layer: aimLayer,
+        };
+        this.addLayerToMap(false, data, true);
       }
       this.handleLayerEdit(this.nowLayerIndex, aimLayer);
-      this.UPDATEPARM({parm:'layers',value:this.layers});
-    },    
+      this.UPDATEPARM({ parm: "layers", value: this.layers });
+    },
     // filter功能
-    filterValueInit(val,index) {
+    filterValueInit(val, index) {
       //更新筛选条件的列表
       this.filterOptionSelectList.splice(
         index,
@@ -4260,7 +4541,7 @@ export default {
         this.filterCondition[index].option
       );
       // 非mbTile
-      if(!this.isMbTile){
+      if (!this.isMbTile) {
         requestApi
           .getAttrValue({
             aimAttrName: this.filterCondition[this.nowFilterIndex].option,
@@ -4286,14 +4567,16 @@ export default {
           .catch((error) => {
             console.log(error);
           });
-      }else{
+      } else {
         console.log("触发了");
         // mbTile(按照numer和string类型区分)
-        const object = this.filterOptions.filter(data=>data.attribute == val)[0]   // 获取field_value中当前筛选属性的对象(筛选以数组呈现)
+        const object = this.filterOptions.filter(
+          (data) => data.attribute == val
+        )[0]; // 获取field_value中当前筛选属性的对象(筛选以数组呈现)
         let length = null;
         let List = [];
-        let item = {};        
-        switch(object.type){
+        let item = {};
+        switch (object.type) {
           case "number":
             length = object.max - object.min;
             if (length < 20) {
@@ -4303,12 +4586,8 @@ export default {
                 item[val] = i;
                 List.push(item);
               }
-              this.filterValue.splice(
-                [this.nowFilterIndex],
-                0,
-                List
-              );
-              this.filterValueSelect = this.filterValue[this.nowFilterIndex];               
+              this.filterValue.splice([this.nowFilterIndex], 0, List);
+              this.filterValueSelect = this.filterValue[this.nowFilterIndex];
               this.filterHasValues = true;
             } else {
               this.filterHasValues = false;
@@ -4322,20 +4601,19 @@ export default {
                 item[val] = data;
                 List.push(item);
               });
-              this.filterValue.splice(
-                [this.nowFilterIndex],
-                0,
-                List
-              );              
+              this.filterValue.splice([this.nowFilterIndex], 0, List);
               this.filterValueSelect = this.filterValue[this.nowFilterIndex];
               this.filterHasValues = true;
             } else {
               this.filterHasValues = false;
             }
             break;
-
-        }   
-        console.log('filterValueSelect',this.filterValueSelect,this.filterOptionSelectList[index]);    
+        }
+        console.log(
+          "filterValueSelect",
+          this.filterValueSelect,
+          this.filterOptionSelectList[index]
+        );
       }
     },
     handleCurrentChangeFilter(val) {
@@ -4369,14 +4647,16 @@ export default {
         const id = this.layers[this.nowLayerIndex].id;
         this.setFilterToMap(id, null);
         this.layers[this.nowLayerIndex]["filter"] = ["all"];
-        this.UPDATEPARM({parm:'layers',value:this.layers});
+        this.UPDATEPARM({ parm: "layers", value: this.layers });
       }
     },
     handleFilter(row) {
-      if(!this.isMbTile){
-        this.filterCondition[this.nowFilterIndex].value = row[this.filterOptionSelectList[this.nowFilterIndex]];
-      }else{
-        this.filterCondition[this.nowFilterIndex].value = row[this.filterOptionSelectList[this.nowFilterIndex]];
+      if (!this.isMbTile) {
+        this.filterCondition[this.nowFilterIndex].value =
+          row[this.filterOptionSelectList[this.nowFilterIndex]];
+      } else {
+        this.filterCondition[this.nowFilterIndex].value =
+          row[this.filterOptionSelectList[this.nowFilterIndex]];
       }
     },
     filterConfirm(list) {
@@ -4386,10 +4666,10 @@ export default {
         const filter = [];
         filter.push(this.filterCondition[i].type);
         filter.push(["get", this.filterCondition[i].option]);
-        // 
-        if(this.filterHasValues){
+        //
+        if (this.filterHasValues) {
           filter.push(this.filterCondition[i].value);
-        }else{
+        } else {
           filter.push(...list);
         }
         if (judge == "none") {
@@ -4409,25 +4689,24 @@ export default {
         filterValue: this.filterValue,
         filterOptionSelectList: this.filterOptionSelectList,
         filterValueSelect: this.filterValueSelect,
-        filterWay: this.filterWay
+        filterWay: this.filterWay,
       };
       // 更新vuex
-      this.UPDATEPARM({parm:'layers',value:this.layers});
-
-    }, 
+      this.UPDATEPARM({ parm: "layers", value: this.layers });
+    },
     // input框更换filter值
-    filterChange(val,hasValue){
+    filterChange(val, hasValue) {
       // 只有不包含值才触发
       let list = [];
-      if(!hasValue){
-        if(val.includes(',')){
-          list = val.split(',');
-        }else{
+      if (!hasValue) {
+        if (val.includes(",")) {
+          list = val.split(",");
+        } else {
           list = [val];
         }
       }
-      this.filterConfirm(list)
-    },   
+      this.filterConfirm(list);
+    },
 
     // #对ConditionRender组件的方法通信
     callback(layoutOrpaint, attribute, value, parameters) {
@@ -4441,81 +4720,88 @@ export default {
       layoutOrpaint == "paint" && this.handlePaintChange(id, attribute, value);
       this.attrValueSet[attribute] = parameters;
       console.log("parameters1:", this.attrValueSet[attribute]);
-    },    
+    },
 
     // #对map组件的封装
     handleRemoveLayer(layerName) {
       const data = {
-        type:'removeLayer',
-        id:layerName
-      }
-      this.$bus.$emit("map",data);      
-    },    
+        type: "removeLayer",
+        id: layerName,
+      };
+      this.$bus.$emit("map", data);
+    },
     // 向地图添加layer
-    addLayerToMap(flag,val) {
-      if(flag){
+    addLayerToMap(flag, val, isReplace) {
+      if (flag) {
         const data = {
-          type:'addLayer1',
-          layer: val
-        }
-        this.$bus.$emit("map",data);
-      }else{
+          type: "addLayer1",
+          layer: val,
+          isReplace: isReplace        // 当图层时替换时，不需要对图层树进行更改(用isReplace进行判断)
+        };
+        this.$bus.$emit("map", data);
+      } else {
         // flag=false表示添加在指定图层后
         const data = {
-          type:'addLayer2',
+          type: "addLayer2",
           id: val.id,
-          layer: val.layer
-        }        
-        this.$bus.$emit("map",data);
-      }      
-    },  
-    handleLayoutChange(layerName, key, value){
-      const data = {
-        type:'setLayout',
-        layerName:layerName, 
-        key:key, 
-        value:value
+          layer: val.layer,
+          isReplace: isReplace
+        };
+        this.$bus.$emit("map", data);
       }
-      this.$bus.$emit("map",data);
     },
-    handlePaintChange(layerName, key, value){
+    handleLayoutChange(layerName, key, value) {
       const data = {
-        type:'setPaint',
-        layerName:layerName, 
-        key:key, 
-        value:value
-      }
-      this.$bus.$emit("map",data);
-    },  
-    handleZoomChange(layerName, min, max){
+        type: "setLayout",
+        layerName: layerName,
+        key: key,
+        value: value,
+      };
+      this.$bus.$emit("map", data);
+    },
+    handlePaintChange(layerName, key, value) {
       const data = {
-        type:'setZoom',
-        layerName:layerName, 
-        min:min, 
-        max:max
-      }
-      this.$bus.$emit("map",data);      
-    },     
+        type: "setPaint",
+        layerName: layerName,
+        key: key,
+        value: value,
+      };
+      this.$bus.$emit("map", data);
+    },
+    handleZoomChange(layerName, min, max) {
+      const data = {
+        type: "setZoom",
+        layerName: layerName,
+        min: min,
+        max: max,
+      };
+      this.$bus.$emit("map", data);
+    },
     // 设置对地图进行筛选
     setFilterToMap(id, filter) {
       const data = {
-        type:'setFilter',
-        id:id,
-        filter:filter
-      }
-      this.$bus.$emit("map",data);
-    },     
+        type: "setFilter",
+        id: id,
+        filter: filter,
+      };
+      this.$bus.$emit("map", data);
+    },
     // 添加图标
-    loadAndAddImg(url,name){
+    loadAndAddImg(url, name) {
       const data = {
-        type:'loadAndAddImg',
-        url:url,
-        name:name
-      }
+        type: "loadAndAddImg",
+        url: url,
+        name: name,
+      };
       this.$bus.$emit(data);
     },
-  }
-}
+  },
+  beforeDestroy(){
+    this.$bus.$off("init");
+    this.$bus.$off("show");
+    this.$bus.$off("mapEdit");
+  }  
+};
 </script>
 
 <style scoped>
@@ -4525,7 +4811,7 @@ export default {
   height: 100%;
   width: 350px;
   position: absolute;
-  top:0;
+  top: 0;
   margin-left: 330px;
   z-index: 99;
 }

@@ -1673,7 +1673,7 @@ h3 {
 }
 /* fa图标样式 */
 .iconStyle {
-  width: 20px;
-  margin: 0 5px;
-}
+    width: 20px;
+    margin: 0 5px;
+  }
 </style>

@@ -2,7 +2,7 @@
   <div class="menuPanel">
     <!-- 标题 -->
     <div class="menuTitle">
-      <h2>{{ mapProjectInfoProp.name }}</h2>
+      <h2>{{ mapProjectInfo.name }}</h2>
       <el-divider class="divider"></el-divider>
     </div>
     <!-- 按钮组 -->
@@ -24,6 +24,7 @@ export default {
     return {
       // 公共参数
       mapProjectId: "",
+      layers: [],
       // mapProjectInfo: '',
       // layersName: '',
 
@@ -33,11 +34,23 @@ export default {
   },
   computed: {
     ...mapState({
-      mapProjectInfoProp: "mapProjectInfo",
-      layersNameProp: "layersName",
-      layersProp: "layers",
-      sourcesProp: "sources",
+      // mapProjectInfoProp: "mapProjectInfo",
+      // layersNameProp: "layersName",
+      // layersProp: "layers",
+      // sourcesProp: "sources",
     }),
+    // 切换到这种方式用于对computer进行set
+    mapProjectInfo:{
+      get(){
+        return this.$store.state.mapProjectInfo;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "mapProjectInfo", value: val })
+      }      
+    },    
+  },
+  watch:{
+
   },
   mounted() {
     // 等初始组件信息加载完
@@ -51,12 +64,15 @@ export default {
     ...mapMutations({ UPDATEPARM: "UPDATE" }), //将 `this.UPDATEPARM(data)` 映射为 `this.$store.commit('UPDATE',data)`
     infoInit() {
       // 初始化公共参数
-      this.mapProjectInfo = this.mapProjectInfoProp;
-      this.layersName = this.layersNameProp;
-      this.layers = this.layersProp;
-      this.sources = this.sourcesProp;
+      // this.mapProjectInfo = this.mapProjectInfoProp;
+      // this.layersName = this.layersNameProp;
+      // this.layers = this.layersProp;
+      // this.sources = this.sourcesProp;
     },
   },
+  beforeDestroy(){
+    this.$bus.$off("init");
+  }  
 };
 </script>
 

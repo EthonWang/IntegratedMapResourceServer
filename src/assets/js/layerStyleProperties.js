@@ -11,7 +11,7 @@ export default {
         "paint": {
             "line-blur": 0,
             "line-color":"#000000",
-            "line-dasharray": [],
+            "line-dasharray": [1],
             "line-gap-width": 0,
            // "line-gradient":"",  //ignore  Requires source to be "geojson".
             "line-offset": 0,
@@ -50,7 +50,7 @@ export default {
             "fill-antialias":true,
             "fill-color":"#000000",
             "fill-opacity":1,
-            "fill-outline-color":"#FFFFFF",
+            "fill-outline-color":"rgba(255, 255, 255, 0)",
             //"fill-pattern":''  //ignore  Optional resolvedImage.
             "fill-translate":[0,0],
             "fill-translate-anchor":"map", // One of "map", "viewport"

@@ -17,11 +17,12 @@ export default {
   props: ["",""],
   data() {
     return{
-      // 公共参数
-      mapProjectInfo: '',
-      layers:[],
-      sources:{},
-      layersName: [],      
+      // vuex参数
+      // mapProjectInfo: '',
+      // layers:[],
+      // sources:{},
+      // layersName: [],      
+
       // 项目参数
       spritePath: '',
       glyphsPath: '',
@@ -46,10 +47,45 @@ export default {
     }
   },
   computed:{
-    ...mapState({mapProjectInfoProp:'mapProjectInfo',
-                 layersNameProp:'layersName',
-                 layersProp:'layers',
-                 sourcesProp:'sources'}),
+    ...mapState({
+      // mapProjectInfoProp:'mapProjectInfo',
+      // layersNameProp:'layersName',
+      // layersProp:'layers',
+      // sourcesProp:'sources'
+                 }),
+    // 切换到这种方式用于对computer进行set
+    mapProjectInfo:{
+      get(){
+        return this.$store.state.mapProjectInfo;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "mapProjectInfo", value: val })
+      }      
+    },    
+    layers:{
+      get(){
+        return this.$store.state.layers;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "layers", value: val })
+      }      
+    }, 
+    sources:{
+      get(){
+        return this.$store.state.sources;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "sources", value: val })
+      }      
+    },   
+    layersName:{
+      get(){
+        return this.$store.state.layersName;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "layersName", value: val })
+      }      
+    },      
   },  
   mounted(){
     // 等初始组件信息加载完
@@ -68,10 +104,10 @@ export default {
         case 'setZoom':               // data:{type:'',layerName:'',min:'',max:''}
           this.handleZoomChange(data.layerName,data.min,data.max);
           break;
-        case 'addLayer1':             // data:{type:'',layer:{}}
+        case 'addLayer1':             // data:{type:'',layer:{},(isReplace)}        addLayer同时在图层树组件中触发
           this.addLayerToMap(true,data.layer);
           break;
-        case 'addLayer2':             // data:{type:'',id:'',layer:{}}  添加在指定图层后(添加背景,更换指定图层样式)
+        case 'addLayer2':             // data:{type:'',id:'',layer:{},(isReplace)}  添加在指定图层后(添加背景,更换指定图层样式)，isReplace表示替换图层，不对目录树做修改
           this.addLayerToMap(false,data);
           break;
         case 'addSource1':            // data:{type:'',source:{}}
@@ -117,10 +153,10 @@ export default {
     // 初始化参数
     infoInit(){
       // 初始化公共参数
-      this.mapProjectInfo = this.mapProjectInfoProp;
-      this.layersName = this.layersNameProp;
-      this.layers = this.layersProp;
-      this.sources = this.sourcesProp
+      // this.mapProjectInfo = this.mapProjectInfoProp;
+      // this.layersName = this.layersNameProp;
+      // this.layers = this.layersProp;
+      // this.sources = this.sourcesProp
       this.mapProjectId = localStorage.getItem('mapProjectId');
       // 初始化项目参数
       this.center = this.mapProjectInfo.center.split(",");
@@ -212,6 +248,7 @@ export default {
         const selectedFeatures = map.queryRenderedFeatures(bbox, {
           layers: this.layersName,
         });
+        console.log('selectedFeatures',selectedFeatures);
         var container = window.document.createElement("div");
         container.className = "container";
         var nameList = [];
@@ -340,15 +377,17 @@ export default {
 
     // 为item添加同handleLayerEdit相同的方法
     addItemEvent(item, feature, index) {
-      //因为item是html元素，在其事件中this指向该元素无法获取vue的实例属性和方法
+      //因为item是html元素，在其事件中this指向该元素无法获取vue的实例属性和方法\
+      let _this = this;
       item.onclick = function test() {
         // 实现编辑面板的handleLayerEdit(index, feature);
         const data = {
-          type:'layerEditOpen',
+          type:'open',
           index:index,
-          feature:feature
+          layer:feature
         }
-        this.$bus.$emit("mapEdit",data);
+        _this.$bus.$emit("mapEdit",data);
+        _this.$bus.$emit("layerTree",{type:'highLight',id:feature.id});
       };
     },
     setCanvasSrc(){
@@ -378,8 +417,7 @@ export default {
       if(!flag){    // 发布走的接口，否则保存初始的publicBoolean
         this.mapProjectInfo.publicBoolean = true;     // 在按钮组件中publicBoolean已经设置为true
       }
-      // this.mapProjectInfo.layers = this.layers;
-      this.mapProjectInfo.layers = this.layersProp;
+      this.mapProjectInfo.layers = this.layers;
       this.mapProjectInfo.nameObject = {
         layersNameObject: this.layersNameObject,
         sourceNameObject: this.sourceNameObject,
@@ -437,7 +475,8 @@ export default {
     handleLayerClick(row) {
       // 用于控制台信息查看
       console.log("layers:", this.layers);
-      console.log("layersName", this.layersName);
+      // console.log("layersName", this.layersName);
+      console.log("layersTree", this.$store.state.layersTree);
       if (row.type != 'background') {             // 背景没有source
         const source = map.getSource(row["source"]);
         console.log("source:", source);
@@ -464,7 +503,11 @@ export default {
         // });
       }
     },      
-  }
+  },
+  beforeDestroy(){
+    this.$bus.$off("init");
+    this.$bus.$off("map");
+  }  
 }
 </script>
 

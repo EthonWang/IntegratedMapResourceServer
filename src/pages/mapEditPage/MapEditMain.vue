@@ -13,7 +13,7 @@ import MapPanel from "./MapPanel.vue";
 import StyleTemplate from "./StyleTemplate.vue"; 
 import ProjMenus from "./ProjMenus.vue"; 
 import requestApi from "@/api/requestApi";
-import {mapActions,mapMutations} from 'vuex'
+import {mapState,mapActions,mapMutations} from 'vuex'
 export default {
   components: { ProjMenus,MapPanel,LayerEditPanel,StyleTemplate },
   data() {
@@ -46,6 +46,12 @@ export default {
     }
   },
   computed:{
+    ...mapState({
+      // mapProjectInfoProp: "mapProjectInfo",
+      // layersNameProp: "layersName",
+      // layersProp: "layers",
+      // sourcesProp: "sources",
+    }),    
   },
   mounted() {
     this.mapProjectId = this.$route.params.mapProjectId;
