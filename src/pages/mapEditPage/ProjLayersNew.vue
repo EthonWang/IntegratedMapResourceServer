@@ -49,8 +49,8 @@
 
         <div class="custom-tree-node" style="width: 100%; display: flex;justify-content: space-between;"
             slot-scope="{ node, data }">
-
-          <div style="display: flex;flex:16">
+          <!-- 图层的信息显示 -->
+          <div style="display: flex;">
             <!-- 开关 -->
             <el-switch
                 :width="30"
@@ -95,7 +95,7 @@
           <!-- 图层的按钮 -->
           <div 
             v-if="data.nodeType=='layer'"
-            style="flex:4"
+            class="layerBtnGroup"
           >
 
             <el-button
@@ -305,9 +305,10 @@ export default {
               node=aimLayer
         }
       })
-      this.UPDATEPARM({parm: 'layersTree', value: this.layersTree});
+      // this.UPDATEPARM({parm: 'layersTree', value: this.layersTree});
       console.log("update tree")
-    },
+      },
+    
 
     // layersTree:function (layersTree){
     //   // this.layersTree=layersTree
@@ -745,11 +746,22 @@ export default {
   beforeDestroy(){
     this.$bus.$off("init");
     this.$bus.$off("map");
+    this.$bus.$off("layerTree");
   }  
 }
 </script>
 
 <style scoped>
+/* 图层树 */
+.treeBox{
+  position: relative;
+  padding-right: 5px;
+  max-height: calc(100vh - 200px);
+  overflow-y: scroll;
+}
+.treeBox::-webkit-scrollbar{
+  /* width: 0; */
+}
 /* 按钮组 */
 .treeGroupBtns{
   box-sizing: border-box;
@@ -779,6 +791,11 @@ export default {
 .treeBtn:hover{
   color: #2e4e5d;
 }
+/* 图层的按钮组 */
+.layerBtnGroup{
+  position: absolute;     
+  right: 0;               
+}
 /* 图标和图层名 */
 .nameLayer{
   display: flex;
@@ -793,15 +810,7 @@ export default {
 .nameLayer:hover{
   color: #75b9ff;
 }
-/* 图层树 */
-.treeBox{
-  padding-right: 5px;
-  max-height: calc(100vh - 200px);
-  overflow-y: scroll;
-}
-.treeBox::-webkit-scrollbar{
-  width: 0;
-}
+
 
 
 /deep/ .el-tree-node__content {

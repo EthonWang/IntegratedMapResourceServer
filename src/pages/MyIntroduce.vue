@@ -1,9 +1,6 @@
 <template>
-    <div>
-        <div class="background">
-            <el-image :src="imgSrc" style="width: 100%;height: 100%;opacity: 0.8;" fit="fill"></el-image>
-            <!-- <img class="background" :src="imgSrc" width="100%" height="100%" alt="" /> -->
-        </div>
+    <div class="container">
+        <el-image class="background" :src="imgSrc" fit="cover"></el-image>
         <div class="list">
             <el-collapse accordion>
                 <el-collapse-item class="iData" title="数据服务 DataService" name="1">
@@ -59,25 +56,37 @@ export default {
 /* .iProject .el-collapse-item__header {
     font-size: 30px;
 } */
-.list {
-    margin-top: 75px;
+.container{
+    height: calc(100vh - 75px);
     width: 100%;
+    position: relative;
+}
+.list {
+    border-radius: 10px;
+    padding: 20px;
+    width: 80vw;
     position: absolute;
-    top: 0;
+    left: 10vw;
+    right: 10vw;
+    top: 14vh;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
 }
 
 .background {
-    left: 0;
+    position: absolute;
     top: 0;
+    bottom: 0;
     width: 100%;
-    height: calc(100vh - 75px);
     z-index: -1;
-    position: relative;
+    opacity: 1;
     background-repeat: no-repeat;
 }
 
 .el-collapse /deep/ .el-collapse-item__header {
-    background-color: rgba(255, 255, 255, 0);
+    background-color: transparent;
+    /* background-color: rgba(255, 255, 255, 0.1); */
+    border-radius: 5px;
     font-weight: bold;
     font-size: 2vh;
     color: white;
@@ -85,7 +94,7 @@ export default {
 }
 
 .el-collapse /deep/ .el-collapse-item__wrap {
-    background-color: rgba(255, 255, 255, 0);
+    background-color: transparent;
 }
 
 
@@ -97,7 +106,7 @@ export default {
 
 .el-collapse {
     width: 80vw;
-    position: absolute;
+    /* position: absolute; */
     left: 10vw;
     top: 14vh;
 }
