@@ -12,7 +12,7 @@
         <el-button 
           class="treeBtn"
           type="text" plain
-          icon="fa fa-folder-open" 
+          icon="el-icon-files" 
           title="添加组"
           @click="addGroup">
         </el-button>
@@ -25,7 +25,7 @@
             slot="reference" 
             class="treeBtn"
             type="text" plain
-            icon="el-icon-delete-solid"
+            icon="el-icon-delete"
             size="mini"
             title="一键删除">
           </el-button>
@@ -47,9 +47,9 @@
           @node-click="handleNodeClick"
           :allow-drop="allowDrop">
 
-        <div class="custom-tree-node" style="width: 330px; display: flex;justify-content: space-between;"
+        <div class="custom-tree-node" style="width: 100%; display: flex;justify-content: space-between;"
             slot-scope="{ node, data }">
-
+          <!-- 图层的信息显示 -->
           <div style="display: flex;">
             <!-- 开关 -->
             <el-switch
@@ -92,8 +92,11 @@
               <i class="el-icon-check" @click="nowGroupId = -1;"></i>
             </div>
           </div>
-
-          <div v-if="data.nodeType=='layer'">
+          <!-- 图层的按钮 -->
+          <div 
+            v-if="data.nodeType=='layer'"
+            class="layerBtnGroup"
+          >
 
             <el-button
                 size="mini"
@@ -136,6 +139,7 @@
             >
             </el-button>
           </div>
+          <!-- 组的按钮 -->
           <div v-else>
             <el-popconfirm
                 title="确定删除该组吗？"
@@ -286,24 +290,25 @@ export default {
     },    
   },
   watch:{
-    // layers:function (layers){
-    //   console.log('更换类型：',layers,this.layersTree);
-    //   layers.forEach((layer)=>{
-    //     const aimLayer = JSON.parse(JSON.stringify(layer));
-    //     for (let i = 0; i < this.layersTree.length; i++) {
-    //       let node=this.layersTree[i]
-    //       if(node.nodeType=="group")
-    //         for (let k = 0; k < node.children.length; k++)
-    //           if(node.children[k].id==aimLayer.id)
-    //             node.children[k]=aimLayer
-    //       else
-    //         if(node.id==aimLayer.id)
-    //           node=aimLayer
-    //     }
-    //   })
-    //   this.UPDATEPARM({parm: 'layersTree', value: this.layersTree});
-    //   console.log("update tree")
-    // },
+    layers:function (layers){
+      console.log('更换类型：',layers,this.layersTree);
+      layers.forEach((layer)=>{
+        const aimLayer = JSON.parse(JSON.stringify(layer));
+        for (let i = 0; i < this.layersTree.length; i++) {
+          let node=this.layersTree[i]
+          if(node.nodeType=="group")
+            for (let k = 0; k < node.children.length; k++)
+              if(node.children[k].id==aimLayer.id)
+                node.children[k]=aimLayer
+          else
+            if(node.id==aimLayer.id)
+              node=aimLayer
+        }
+      })
+      // this.UPDATEPARM({parm: 'layersTree', value: this.layersTree});
+      console.log("update tree")
+      },
+    
 
     // layersTree:function (layersTree){
     //   // this.layersTree=layersTree
@@ -741,11 +746,22 @@ export default {
   beforeDestroy(){
     this.$bus.$off("init");
     this.$bus.$off("map");
+    this.$bus.$off("layerTree");
   }  
 }
 </script>
 
 <style scoped>
+/* 图层树 */
+.treeBox{
+  position: relative;
+  padding-right: 5px;
+  max-height: calc(100vh - 200px);
+  overflow-y: scroll;
+}
+.treeBox::-webkit-scrollbar{
+  /* width: 0; */
+}
 /* 按钮组 */
 .treeGroupBtns{
   box-sizing: border-box;
@@ -775,6 +791,11 @@ export default {
 .treeBtn:hover{
   color: #2e4e5d;
 }
+/* 图层的按钮组 */
+.layerBtnGroup{
+  position: absolute;     
+  right: 0;               
+}
 /* 图标和图层名 */
 .nameLayer{
   display: flex;
@@ -789,15 +810,7 @@ export default {
 .nameLayer:hover{
   color: #75b9ff;
 }
-/* 图层树 */
-.treeBox{
-  padding-right: 5px;
-  max-height: calc(100vh - 200px);
-  overflow-y: scroll;
-}
-.treeBox::-webkit-scrollbar{
-  width: 0;
-}
+
 
 
 /deep/ .el-tree-node__content {

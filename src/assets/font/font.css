@@ -154,7 +154,7 @@
     font-family: 'Roboto Thin Italic';
     src: url("./Roboto-ThinItalic.ttf") format("truetype");
 }
-@font-face {
+/* @font-face {
     font-family: 'Noto Sans Regular';
     src: url("./NotoSans-Regular.ttf") format("truetype");
 }
@@ -212,4 +212,4 @@
 @font-face {
     font-family: 'Source Sans Pro SemiBold';
     src: url("./source-sans-pro-semibold.ttf") format("truetype");
-}
+} */

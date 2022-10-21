@@ -70,6 +70,14 @@ export default {
         this.UPDATEPARM({ parm: "layers", value: val })
       }      
     }, 
+    layersTree:{
+      get(){
+        return this.$store.state.layersTree;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "layers", value: val })
+      }      
+    }, 
     sources:{
       get(){
         return this.$store.state.sources;
@@ -418,6 +426,7 @@ export default {
         this.mapProjectInfo.publicBoolean = true;     // 在按钮组件中publicBoolean已经设置为true
       }
       this.mapProjectInfo.layers = this.layers;
+      this.mapProjectInfo.layersTree = this.layersTree;
       this.mapProjectInfo.nameObject = {
         layersNameObject: this.layersNameObject,
         sourceNameObject: this.sourceNameObject,
