@@ -11,6 +11,7 @@ import MapboxView from "./components/MapboxView"
 import ConditionRender from "./components/ConditionRender"
 // import TestPage from "./pages/TestPage"
 import LayersTree from "./components/LayersTree.vue"
+import MyIntroduce from "./pages/MyIntroduce"
 
 const mapBaseRoute="/Map";
 
@@ -36,6 +37,10 @@ const route = new VueRouter({
 				{
 					path:mapBaseRoute+"/MyStyle",
 					component:MyStyle
+				},
+				{
+					path:mapBaseRoute+"/MyIntroduce",
+					component:MyIntroduce
 				}
 			]
 		},
