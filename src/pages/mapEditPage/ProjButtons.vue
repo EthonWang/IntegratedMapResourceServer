@@ -1,212 +1,216 @@
 <template>
-  <!-- 工程项目按钮框 -->
-  <div class="flexRowSpaceAround" style="width: 100%">
-    <!-- 添加数据 -->
-    <el-popover placement="right" width="300" trigger="click">
-      <el-tabs value="PG" @tab-click="dataBaseClick">
-        <el-tab-pane label="PG" name="PG">
-          <el-row type="flex" align="middle">
-            <h4>数据库源:&nbsp;</h4>
-            <el-select
-              v-model="PgBaseSelect"
-              placeholder="请选择"
-              style="width: 80%"
-              @change="PgBaseChange($event)"
-            >
-              <el-option
-                v-for="item in dataBaseList"
-                :key="item.name"
-                :label="item.name"
-                :value="item.id"
+  <div style="width:100%">
+    <!-- 工程项目按钮框 -->
+    <div class="flexRowSpaceAround" style="width: 100%">
+      <!-- 添加数据 -->
+      <el-popover placement="right" width="300" trigger="click">
+        <el-tabs value="PG" @tab-click="dataBaseClick">
+          <el-tab-pane label="PG" name="PG">
+            <el-row type="flex" align="middle">
+              <h4>数据库源:&nbsp;</h4>
+              <el-select
+                v-model="PgBaseSelect"
+                placeholder="请选择"
+                style="width: 80%"
+                @change="PgBaseChange($event)"
               >
-              </el-option>
-            </el-select>
-          </el-row>
-          <el-table :data="shpTableData" height="313">
-            <el-table-column
-              property="originName"
-              width="220"
-              show-overflow-tooltip
-              label="名称"
-            ></el-table-column>
-            <el-table-column width="80" label="操作">
-              <template slot-scope="scope">
-                <el-button
-                  size="mini"
-                  type="primary"
-                  @click="handleAddShpLayer(scope.$index, scope.row)"
-                  >添加
-                </el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-          <el-pagination
-            v-if="PgBaseSelect == 'defaultPG'"
-            small
-            @current-change="handleCurrentChangeShp"
-            :current-page="currentPageShp"
-            :page-size="pageSizeShp"
-            layout="total, prev, pager, next"
-            :total="totalDataCountShp"
-            class="flexRowCenter"
-          >
-          </el-pagination>
-        </el-tab-pane>
-        <el-tab-pane label="mbTiles" name="mbTile">
-          <el-row type="flex" align="middle">
-            <h4>数据库源:&nbsp;</h4>
-            <el-select
-              v-model="mbTileSelect"
-              placeholder="请选择"
-              style="width: 73%"
-              @change="mbTileChange($event)"
+                <el-option
+                  v-for="item in dataBaseList"
+                  :key="item.name"
+                  :label="item.name"
+                  :value="item.id"
+                >
+                </el-option>
+              </el-select>
+            </el-row>
+            <el-table :data="shpTableData" height="313">
+              <el-table-column
+                property="originName"
+                width="220"
+                show-overflow-tooltip
+                label="名称"
+              ></el-table-column>
+              <el-table-column width="80" label="操作">
+                <template slot-scope="scope">
+                  <el-button
+                    size="mini"
+                    type="primary"
+                    @click="handleAddShpLayer(scope.$index, scope.row)"
+                    >添加
+                  </el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+            <el-pagination
+              v-if="PgBaseSelect == 'defaultPG'"
+              small
+              @current-change="handleCurrentChangeShp"
+              :current-page="currentPageShp"
+              :page-size="pageSizeShp"
+              layout="total, prev, pager, next"
+              :total="totalDataCountShp"
+              class="flexRowCenter"
             >
-              <el-option
-                v-for="item in mbTileJsonList"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id"
+            </el-pagination>
+          </el-tab-pane>
+          <el-tab-pane label="mbTiles" name="mbTile">
+            <el-row type="flex" align="middle">
+              <h4>数据库源:&nbsp;</h4>
+              <el-select
+                v-model="mbTileSelect"
+                placeholder="请选择"
+                style="width: 73%"
+                @change="mbTileChange($event)"
               >
-              </el-option> </el-select
-            >&nbsp;
-            <el-button
-              type="success"
-              size="mini"
-              circle
-              title="添加样式模板"
-              icon="el-icon-plus"
-              @click="addMbTileStyleShow = true"
-            ></el-button>
-            <el-dialog
-              :title="
-                this.mbTileInfo.osmMbtilesBoolean ? 'OSM样式添加' : '样式添加'
-              "
-              :visible.sync="addMbTileStyleShow"
-              width="30%"
-              :modal="false"
-              center
-            >
-              <el-form
-                label-position="right"
-                label-width="150px"
-                :model="stylePatch"
+                <el-option
+                  v-for="item in mbTileJsonList"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                >
+                </el-option> </el-select
+              >&nbsp;
+              <el-button
+                type="success"
+                size="mini"
+                circle
+                title="添加样式模板"
+                icon="el-icon-plus"
+                @click="addMbTileStyleShow = true"
+              ></el-button>
+              <el-dialog
+                :title="
+                  this.mbTileInfo.osmMbtilesBoolean ? 'OSM样式添加' : '样式添加'
+                "
+                :visible.sync="addMbTileStyleShow"
+                width="30%"
+                :modal="false"
+                center
               >
-                <el-form-item label="样式名称">
-                  <el-select
-                    v-model="stylePatch.id"
-                    placeholder="选择要添加的样式"
-                  >
-                    <el-option
-                      v-for="item in mbTileStyleList"
-                      :key="item.id"
-                      :label="item.name"
-                      :value="item.id"
+                <el-form
+                  label-position="right"
+                  label-width="150px"
+                  :model="stylePatch"
+                >
+                  <el-form-item label="样式名称">
+                    <el-select
+                      v-model="stylePatch.id"
+                      placeholder="选择要添加的样式"
+                      @change="mbTileStyleChange($event)"
                     >
-                    </el-option>
-                  </el-select>
-                </el-form-item>
-              </el-form>
-              <el-row type="flex">
-                <span></span>
-              </el-row>
-              <span slot="footer" class="dialog-footer">
-                <el-button @click="addMbTileStyleShow = false">取 消</el-button
-                >&nbsp;
-                <el-button
-                  slot="reference"
-                  type="warning"
-                  @click="
-                    addAllStyles(styleLayers);
-                    addMbTileStyleShow = false;
-                  "
-                  >全部添加</el-button
-                >
-              </span>
-            </el-dialog>
-          </el-row>
-          <el-table v-if="!isStyle" :data="dataLayers" height="313">
-            <el-table-column
-              property="id"
-              width="200"
-              show-overflow-tooltip
-              label="source"
-            ></el-table-column>
-            <el-table-column width="100">
-              <template slot="header">
-                <el-popconfirm
-                  title="确定添加全部数据样式吗？"
-                  @confirm="addAllSources(dataLayers)"
-                >
-                  <el-button slot="reference" type="warning" size="mini"
+                      <el-option
+                        v-for="item in mbTileStyleList"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id"
+                      >
+                      </el-option>
+                    </el-select>
+                  </el-form-item>
+                </el-form>
+                <el-row type="flex">
+                  <span></span>
+                </el-row>
+                <span slot="footer" class="dialog-footer">
+                  <el-button @click="addMbTileStyleShow = false">取 消</el-button
+                  >&nbsp;
+                  <el-button
+                    slot="reference"
+                    type="warning"
+                    @click="
+                      addAllStyles(styleLayers);
+                      addMbTileStyleShow = false;
+                    "
                     >全部添加</el-button
                   >
-                </el-popconfirm>
-              </template>
-              <template slot-scope="scope">
-                <el-button
-                  size="mini"
-                  type="primary"
-                  @click="handleAddShpLayer(scope.$index, scope.row)"
-                  >添加
-                </el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-        </el-tab-pane>
-        <el-tab-pane label="TMS" name="TMS">
-          <el-table :data="urlBase[dataBaseSelect]" style="width: 100%">
-            <el-table-column prop="name" label="名称"> </el-table-column>
-            <el-table-column width="80" label="操作">
-              <template slot-scope="scope">
-                <el-button
-                  size="mini"
-                  type="primary"
-                  @click="handleAddShpLayer(scope.$index, scope.row)"
-                  >添加
-                </el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-        </el-tab-pane>
-      </el-tabs>
+                </span>
+              </el-dialog>
+            </el-row>
+            <el-table v-if="!isStyle" :data="dataLayers" height="313">
+              <el-table-column
+                property="id"
+                width="200"
+                show-overflow-tooltip
+                label="source"
+              ></el-table-column>
+              <el-table-column width="100">
+                <template slot="header">
+                  <el-popconfirm
+                    title="确定添加全部数据样式吗？"
+                    @confirm="addAllSources(dataLayers)"
+                  >
+                    <el-button slot="reference" type="warning" size="mini"
+                      >全部添加</el-button
+                    >
+                  </el-popconfirm>
+                </template>
+                <template slot-scope="scope">
+                  <el-button
+                    size="mini"
+                    type="primary"
+                    @click="handleAddShpLayer(scope.$index, scope.row)"
+                    >添加
+                  </el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-tab-pane>
+          <el-tab-pane label="TMS" name="TMS">
+            <el-table :data="urlBase[dataBaseSelect]" style="width: 100%">
+              <el-table-column prop="name" label="名称"> </el-table-column>
+              <el-table-column width="80" label="操作">
+                <template slot-scope="scope">
+                  <el-button
+                    size="mini"
+                    type="primary"
+                    @click="handleAddShpLayer(scope.$index, scope.row)"
+                    >添加
+                  </el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-tab-pane>
+        </el-tabs>
 
-      <el-button type="primary" size="mini" slot="reference" @click="addShpData"
-        >添加数据</el-button
+        <el-button type="primary" size="mini" slot="reference" @click="addShpData"
+          >添加数据</el-button
+        >
+      </el-popover>
+      <el-button type="success" size="mini" @click="saveMap(true)"
+        >保存</el-button
       >
-    </el-popover>
-    <el-button type="success" size="mini" @click="saveMap(true)"
-      >保存</el-button
-    >
-    <el-button
-      v-if="!publicBoolean"
-      type="warning"
-      size="mini"
-      @click="publicMap"
-      >发布</el-button
-    >
-    <el-popover
-      v-else
-      placement="right"
-      title="链接地址"
-      width="200"
-      trigger="hover"
-    >
-      <el-link
-        type="primary"
-        target="_blank"
-        :underline="false"
-        :href="reqUrl + '/mapProject/getPublishedMap/' + mapProjectId"
+      <el-button
+        v-if="!publicBoolean"
+        type="warning"
+        size="mini"
+        @click="publicMap"
+        >发布</el-button
       >
-        {{ reqUrl + "/mapProject/getPublishedMap/" + mapProjectId }}
-      </el-link>
-      <el-tag type="warning" slot="reference"> 已发布 </el-tag>
-    </el-popover>
-    <el-button type="danger" size="mini" @click="addBackground('multiPG', {})"
-      >添加背景</el-button
-    >
-    <el-button type="primary" @click="test1">测试</el-button>
-    <el-button type="primary" @click="test2">测试2</el-button>
-    <el-button type="primary" @click="test3">测试3</el-button>
+      <el-popover
+        v-else
+        placement="right"
+        title="链接地址"
+        width="200"
+        trigger="hover"
+      >
+        <el-link
+          type="primary"
+          target="_blank"
+          :underline="false"
+          :href="reqUrl + '/mapProject/getPublishedMap/' + mapProjectId"
+        >
+          {{ reqUrl + "/mapProject/getPublishedMap/" + mapProjectId }}
+        </el-link>
+        <el-tag type="warning" slot="reference"> 已发布 </el-tag>
+      </el-popover>
+      <el-button type="danger" size="mini" @click="addBackground('multiPG', {})"
+        >添加背景</el-button
+      >
+      <!-- <el-button type="primary" @click="test1">测试</el-button>
+      <el-button type="primary" @click="test2">测试2</el-button>
+      <el-button type="primary" @click="test3">测试3</el-button> -->
+    </div>
+    <el-divider class="divider">图层</el-divider>
   </div>
 </template>
 <script>
@@ -214,7 +218,7 @@ import requestApi from "../../api/requestApi";
 import { mapState, mapActions, mapMutations } from "vuex";
 import initTileJson from "@/assets/js/initTileJson";
 import layerStyleProperties from "@/assets/js/layerStyleProperties";
-import { renderSplit, filterSplit } from "@/serve/JsonToValue";
+import { renderSplit, filterSplit, textSplit } from "@/serve/JsonToValue";
 
 export default {
   name: "ProjButtons",
@@ -222,13 +226,13 @@ export default {
   data() {
     return {
       // 传递的参数
-      sourceNameObject: {}, //检测source重复
-      layersNameObject: {}, //检测重复  后端字段为nameObject
-      layers: [],
-      sources: {},
-      layersName: [],
-      mapProjectId: "",
-      originStyle: [],
+      // sourceNameObject: {}, //检测source重复
+      // layersNameObject: {}, //检测重复  后端字段为nameObject
+      // layers: [],
+      // sources: {},
+      // layersName: [],
+      // mapProjectId: "",
+      // originStyle: [],
       // #添加数据
       // 公用参数
       dataBaseSelect: "defaultPG", //选中的数据源，PG默认为defaultPG
@@ -304,13 +308,63 @@ export default {
   },
   computed: {
     ...mapState({
-      sourceNameObjectProp: "sourceNameObject",
-      layersNameObjectProp: "layersNameObject",
-      layersProp: "layers",
-      layersNameProp: "layersName",
-      sourcesProp: "sources",
-      originStyleProp: "originStyle",
+    //   sourceNameObjectProp: "sourceNameObject",
+    //   layersNameObjectProp: "layersNameObject",
+    //   layersProp: "layers",
+    //   layersNameProp: "layersName",
+    //   sourcesProp: "sources",
+    //   originStyleProp: "originStyle",
     }),
+
+    // 切换到这种方式用于对computer进行set
+    sourceNameObject:{
+      get(){
+        return this.$store.state.sourceNameObject;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "sourceNameObject", value: val })
+      }      
+    },
+    layersNameObject:{
+      get(){
+        return this.$store.state.layersNameObject;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "layersNameObject", value: val })
+      }      
+    },
+    layers:{
+      get(){
+        return this.$store.state.layers;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "layers", value: val })
+      }      
+    },
+    layersName:{
+      get(){
+        return this.$store.state.layersName;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "layersName", value: val })
+      }      
+    },
+    sources:{
+      get(){
+        return this.$store.state.sources;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "sources", value: val })
+      }      
+    },
+    originStyle:{
+      get(){
+        return this.$store.state.originStyle;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "originStyle", value: val })
+      }      
+    }
   },
   mounted() {
     // 等初始组件信息加载完
@@ -320,7 +374,7 @@ export default {
   },
   methods: {
     test1() {
-      this.$bus.$emit("mapEdit", { type: "open", layer: this.layers[0] });
+      this.$bus.$emit("mapEdit", { type: "open", layer: this.layersProp[0],index:0 });
     },
     test2() {
       this.$bus.$emit("styleTemp", {
@@ -342,7 +396,8 @@ export default {
         ["==", "brunnel", "tunnel"],
         ["in", "class", "service", "track"],
       ]);
-      console.log("测试", a, b);
+      let c = textSplit("{name:latin} {name:nonlatin}");
+      console.log("测试", a,'\n', b,'\n', c);
     },
     // vuex
     ...mapActions({ updateParm: "update" }), //将 `this.updateParm(data)` 映射为 `this.$store.dispatch('update',data)`
@@ -350,12 +405,12 @@ export default {
     // 初始化数据
     infoInit() {
       // 初始化公共参数
-      this.sourceNameObject = this.sourceNameObjectProp;
-      this.layersNameObject = this.layersNameObjectProp;
-      this.layers = this.layersProp;
-      this.layersName = this.layersNameProp;
-      this.sources = this.sourcesProp;
-      this.originStyle = this.originStyleProp;
+      // this.sourceNameObject = this.sourceNameObjectProp;
+      // this.layersNameObject = this.layersNameObjectProp;
+      // this.layers = this.layersProp;
+      // this.layersName = this.layersNameProp;
+      // this.sources = this.sourcesProp;
+      // this.originStyle = this.originStyleProp;
       // 初始化其余参数
       this.mapProjectId = localStorage.getItem("mapProjectId");
     },
@@ -812,15 +867,24 @@ export default {
         this.sourceNameObject[name] = sourceId;
       }
       // 添加layer styleJson有对应属性,按对应类型添加，并对已有属性进行替换
-      const newLayout = layerStyleProperties[row.type].layout;
+      const newLayout = JSON.parse(JSON.stringify(layerStyleProperties[row.type].layout));
       if ("layout" in row) {
         for (let key in row.layout) {
-          newLayout[key] = row.layout[key];
+          if(row.layout[key].constructor == Object&&key.includes('width')){
+            newLayout[key] = JSON.parse(JSON.stringify(renderSplit(row.layout[key]).zoomCondition1));
+          }else{
+            newLayout[key] = row.layout[key];
+          }
         }
       }
-      const newPaint = layerStyleProperties[row.type].paint;
+      const newPaint = JSON.parse(JSON.stringify(layerStyleProperties[row.type].paint));
       if ("paint" in row) {
         for (let key in row.paint) {
+          if(row.paint[key].constructor == Object&&key.includes('width')){
+            newPaint[key] = JSON.parse(JSON.stringify(renderSplit(row.paint[key]).zoomCondition1));
+          }else{
+            newPaint[key] = row.paint[key];
+          }          
           newPaint[key] = row.paint[key];
         }
       }
@@ -1000,6 +1064,7 @@ export default {
         attrValueSet: {},
         attrShowList: {},
         filterValueSet: {},
+        nodeType: "layer", //组和图层区分
         id: "背景",
         type: "background",
         paint: newPaint,
@@ -1201,6 +1266,33 @@ export default {
       }
     },
 
+    // #mbTile
+    async mbTileChange(val) {
+      let index = 0;
+      this.mbTileJsonList.forEach((e, ind) => {
+        if (e.id == val) {
+          index = ind;
+          this.mbTileSelectIndex = ind;
+        }
+      });
+      this.mbTileInfo = this.mbTileJsonList[index];
+      this.mbTileSelect = this.mbTileJsonList[index].id;
+      this.getTileJsonById(this.mbTileInfo.tileJsonId);
+      await this.getStyleListById(this.mbTileSelect, false);
+    },
+    //获取选定的styleJson和对应layers
+    mbTileStyleChange(val) {
+      let index = 0;
+      this.mbTileStyleList.forEach((e, ind) => {
+        if (e.id == val) {
+          index = ind;
+          this.mbTileStyleSelectIndex = ind;
+        }
+      });
+      this.mbTileStyleJson = this.mbTileStyleList[index];
+      this.styleLayers = this.mbTileStyleJson.layers;
+    },    
+
     // ·OSM服务
     getMbtilesList() {
       requestApi.getMbtilesList().then((res) => {
@@ -1308,6 +1400,9 @@ export default {
         });
     },
   },
+  beforeDestroy(){
+    this.$bus.$off("init");
+  }
 };
 </script>
 

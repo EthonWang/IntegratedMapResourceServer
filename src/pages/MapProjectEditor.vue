@@ -328,14 +328,9 @@
                   </el-table-column>
                 </el-table> -->
               </el-tab-pane>
-               <el-tab-pane label="TMS" name="TMS">
-                <el-table
-                  :data="urlBase[dataBaseSelect]"
-                  style="width: 100%">
-                  <el-table-column
-                    prop="name"
-                    label="名称">
-                  </el-table-column>
+              <el-tab-pane label="TMS" name="TMS">
+                <el-table :data="urlBase[dataBaseSelect]" style="width: 100%">
+                  <el-table-column prop="name" label="名称"> </el-table-column>
                   <el-table-column width="80" label="操作">
                     <template slot-scope="scope">
                       <el-button
@@ -345,9 +340,9 @@
                         >添加
                       </el-button>
                     </template>
-                  </el-table-column>                  
+                  </el-table-column>
                 </el-table>
-               </el-tab-pane>
+              </el-tab-pane>
             </el-tabs>
 
             <el-button
@@ -650,7 +645,9 @@
                   v-if="layerSource == 'mbSource'"
                   :data="
                     tempStyleLayers.filter(
-                      (data) => data['source-layer'] == layers[nowLayerIndex]['originName']
+                      (data) =>
+                        data['source-layer'] ==
+                        layers[nowLayerIndex]['originName']
                     )
                   "
                   height="600"
@@ -731,6 +728,7 @@
                 style="display: flex; margin-top: 10px"
               >
                 <el-color-picker
+                  show-alpha
                   v-model="layers[nowLayerIndex].paint['circle-color']"
                   @change="
                     handlePaintChange(
@@ -866,6 +864,7 @@
                   placeholder="something"
                 ></el-input>
                 <el-color-picker
+                  show-alpha
                   v-model="layers[nowLayerIndex].paint['circle-stroke-color']"
                   @change="
                     handlePaintChange(
@@ -1199,6 +1198,7 @@
                 style="display: flex; margin-top: 10px"
               >
                 <el-color-picker
+                  show-alpha
                   v-model="layers[nowLayerIndex].paint['line-color']"
                   @change="
                     handlePaintChange(
@@ -1683,6 +1683,7 @@
                 style="display: flex; margin-top: 10px"
               >
                 <el-color-picker
+                  show-alpha
                   v-model="layers[nowLayerIndex].paint['fill-color']"
                   @change="
                     handlePaintChange(
@@ -1792,6 +1793,7 @@
                   placeholder="something"
                 ></el-input>
                 <el-color-picker
+                  show-alpha
                   v-model="layers[nowLayerIndex].paint['fill-outline-color']"
                   @change="
                     handlePaintChange(
@@ -1946,6 +1948,7 @@
                 style="display: flex; margin-top: 10px"
               >
                 <el-color-picker
+                  show-alpha
                   v-model="layers[nowLayerIndex].paint['fill-extrusion-color']"
                   @change="
                     handlePaintChange(
@@ -2221,8 +2224,8 @@
                     )
                   "
                 >
-                </el-switch>
-              </el-row>leaveTab
+                </el-switch> </el-row
+              >leaveTab
               <el-divider></el-divider>
               <ConditionRender
                 :layerSelect="layers[nowLayerIndex]"
@@ -2901,15 +2904,15 @@
                 style="display: flex; margin-top: 10px"
               >
                 <el-input
-                v-model="layers[nowLayerIndex].layout['text-field']"
-                @change="
-                  handleLayoutChange(
-                    layers[nowLayerIndex]['id'],
-                    'text-field',
-                    ['get', layers[nowLayerIndex].layout['text-field']]
-                  )
-                "
-                placeholder="something"
+                  v-model="layers[nowLayerIndex].layout['text-field']"
+                  @change="
+                    handleLayoutChange(
+                      layers[nowLayerIndex]['id'],
+                      'text-field',
+                      ['get', layers[nowLayerIndex].layout['text-field']]
+                    )
+                  "
+                  placeholder="something"
                 ></el-input>
                 <el-popover
                   ref="fieldPopover"
@@ -2967,6 +2970,7 @@
                 style="display: flex; margin-top: 10px"
               >
                 <el-color-picker
+                  show-alpha
                   v-model="layers[nowLayerIndex].paint['text-color']"
                   @change="
                     handlePaintChange(
@@ -3756,6 +3760,7 @@
                 style="display: flex; margin-top: 10px"
               >
                 <el-color-picker
+                  show-alpha
                   v-model="layers[nowLayerIndex].paint['text-halo-color']"
                   @change="
                     handlePaintChange(
@@ -3866,6 +3871,7 @@
               &nbsp;
               <el-row style="display: flex; margin-top: 10px">
                 <el-color-picker
+                  show-alpha
                   v-model="layers[nowLayerIndex].paint['background-color']"
                   @change="
                     handlePaintChange(
@@ -3949,7 +3955,7 @@
                 v-if="menuButtonShowList['fill-extrusion-color']"
                 style="display: flex; margin-top: 10px"
               >
-                <el-color-picker
+                <el-color-picker show-alpha
                   v-model="layers[nowLayerIndex].paint['fill-extrusion-color']"
                   @change="
                     handlePaintChange(
@@ -4178,7 +4184,9 @@
             </el-form-item>
           </el-form>
           <el-divider></el-divider>
-          <el-row v-if="layers[nowLayerIndex].metadata['mapbox:type'] != 'mbStyle'">
+          <el-row
+            v-if="layers[nowLayerIndex].metadata['mapbox:type'] != 'mbStyle'"
+          >
             <el-row type="flex" justify="space-between" align="middle">
               <h4>过滤条件配置</h4>
               &nbsp;
@@ -4415,8 +4423,8 @@ export default {
       mbTileJsonList: [],
       mbTileSelect: "", //储存所选mbTile的id数据
       mbTileSelectIndex: 0, //  记录选择的数据下标
-      mbTileInfo: {},   // mbTile存在数据库中的信息，tileJsonId记录描述信息
-      mbTileJson: {},   // 通过tileJsonId获取的描述信息
+      mbTileInfo: {}, // mbTile存在数据库中的信息，tileJsonId记录描述信息
+      mbTileJson: {}, // 通过tileJsonId获取的描述信息
       mbJsonSource: {
         mbtiles1: "mbtilesSource1",
         mbtiles2: "mbtilesSource2",
@@ -4445,26 +4453,26 @@ export default {
         "background",
         "heatmap",
       ],
-         
-      mbsource:{
-                'water_name':'symbol',
-                'transportation_name':'symbol',
-                'aerodrome_label':'circle',
-                'globallandcover':'circle',
-                'mountain_peak':'circle',
-                'housenumber':'circle',
-                'poi':'circle',
-                'place':'circle',
-                'transportation':'line',
-                'boundary':'line',
-                'aeroway':'line',
-                'waterway':'line',
-                'park':'fill',
-                'landuse':'fill',
-                'landcover':'fill',
-                'water':'fill',
-                'building':'fill',
-                },
+
+      mbsource: {
+        water_name: "symbol",
+        transportation_name: "symbol",
+        aerodrome_label: "circle",
+        globallandcover: "circle",
+        mountain_peak: "circle",
+        housenumber: "circle",
+        poi: "circle",
+        place: "circle",
+        transportation: "line",
+        boundary: "line",
+        aeroway: "line",
+        waterway: "line",
+        park: "fill",
+        landuse: "fill",
+        landcover: "fill",
+        water: "fill",
+        building: "fill",
+      },
 
       // TMS服务
       // tmsList: [],
@@ -4492,8 +4500,7 @@ export default {
       templateStyleJson: {},
       templateStyleSelectIndex: 0, //  记录选择的数据下标
       tempStyleLayers: [],
-      layerSource: '',      // 用于判断当前图层的数据源，依据图层的matadata属性中的'mapbox:type'属性，有primary,osm,mbCustom
-
+      layerSource: "", // 用于判断当前图层的数据源，依据图层的matadata属性中的'mapbox:type'属性，有primary,osm,mbCustom
 
       //mapbox地图
       mapProjectInfo: {},
@@ -4987,8 +4994,12 @@ export default {
     },
     addBackground(sourceType, row) {
       const index = this.layers.length;
-      const newLayout = JSON.parse(JSON.stringify(layerStyleProperties["background"].layout));
-      const newPaint = JSON.parse(JSON.stringify(layerStyleProperties["background"].paint));
+      const newLayout = JSON.parse(
+        JSON.stringify(layerStyleProperties["background"].layout)
+      );
+      const newPaint = JSON.parse(
+        JSON.stringify(layerStyleProperties["background"].paint)
+      );
       if (sourceType == "mbTile") {
         if ("layout" in row) {
           for (let key in row.layout) {
@@ -5017,7 +5028,7 @@ export default {
         paint: newPaint,
         layout: newLayout,
         metadata: {
-          "mapbox:type":"background",
+          "mapbox:type": "background",
         },
       };
       if (sourceType != "mbTile") {
@@ -5044,7 +5055,6 @@ export default {
         map.addLayer(backLayer, this.layers[index - 1].id); //有图层则背景添加在最底层
       }
     },
-
 
     async addMbTileData() {
       // 阻止发生默认行为
@@ -5073,7 +5083,6 @@ export default {
       await this.getStyleListById(this.mbTileSelect, false); //加载数据后更新styleList，注：但现在没触发
     },
 
-
     // 获取不同类型来源的tileJson列表
     getTileJsonList(type) {
       requestApi
@@ -5100,7 +5109,6 @@ export default {
           console.log(error);
         });
     },
-
 
     //获取osm数据和非osm数据的mbTiles列表
     getOsmMbList() {
@@ -5241,9 +5249,6 @@ export default {
       }
     },
 
-
-
-
     initSort() {
       const tbody = this.$refs.shpLayerTable.$el.querySelectorAll(
         ".el-table__body-wrapper > table > tbody"
@@ -5295,7 +5300,7 @@ export default {
           break;
         case "TMS":
           this.addTMS(index, row);
-          break;          
+          break;
         case "mbTile":
           if (!this.isStyle) {
             this.addDataMbTileShp(index, row);
@@ -5382,7 +5387,7 @@ export default {
           JSON.stringify(layerStyleProperties[geoType].layout)
         ), //防止同类型图层样式改变间影响
         maxzoom: 22,
-        metadata: {"mapbox:type":"pgDefault"},
+        metadata: { "mapbox:type": "pgDefault" },
         minzoom: 0,
         paint: JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint)),
         source: this.sourceNameObject[row.tableName], //通过记录的source名字与id对应，拿到sourceId
@@ -5408,7 +5413,7 @@ export default {
         newLayer.showName =
           row.originName + this.layersNameObject[newLayer.originName];
       }
-      console.log("加载",this.layersNameObject);
+      console.log("加载", this.layersNameObject);
       this.layers.unshift(newLayer);
       this.layersName.unshift(newLayer.id);
       this.originStyle.unshift({
@@ -5499,7 +5504,7 @@ export default {
           JSON.stringify(layerStyleProperties[geoType].layout)
         ),
         maxzoom: 22,
-        metadata: {"mapbox:type":"pgMulti"},
+        metadata: { "mapbox:type": "pgMulti" },
         minzoom: 0,
         paint: JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint)),
         source: this.sourceNameObject[row.id], //添加的sourceId
@@ -5543,17 +5548,17 @@ export default {
         )
       ) {
         //添加mbTile的shp图层时，相关json已经入库
-            // json写法
+        // json写法
         let sourceId = this.mbTileInfo.tileJsonId;
-        let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceId + ".json";  
+        let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceId + ".json";
         let newSourceJson = {
           sourceName: sourceId,
           sourceType: "vector",
           sourceUrl: tileJsonUrl,
-        };         
-        console.log('请求数据：',newSourceJson);
-        this.addSourceToMap(newSourceJson);        
-            //  直接请求pbf
+        };
+        console.log("请求数据：", newSourceJson);
+        this.addSourceToMap(newSourceJson);
+        //  直接请求pbf
         // let tileJsonUrl =
         //   this.reqUrl +
         //   "/" +
@@ -5576,7 +5581,7 @@ export default {
         };
         //记录shp图层和对应的id
         this.sourceNameObject[name] = sourceId;
-      }    
+      }
 
       //前八个是自己用的属性
       let geoType = this.mbsource[row.id];
@@ -5597,7 +5602,11 @@ export default {
           JSON.stringify(layerStyleProperties[geoType].layout)
         ),
         maxzoom: typeof row["maxzoom"] != "undefined" ? row["maxzoom"] : 22,
-        metadata: {"mapbox:type":'mbSource',"mapbox:isOSM":this.mbTileInfo.osmMbtilesBoolean,"mapbox:source":row.id},
+        metadata: {
+          "mapbox:type": "mbSource",
+          "mapbox:isOSM": this.mbTileInfo.osmMbtilesBoolean,
+          "mapbox:source": row.id,
+        },
         minzoom: typeof row["minzoom"] != "undefined" ? row["minzoom"] : 0,
         paint: JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint)),
         source: this.sourceNameObject[name], //通过记录的source名字与id对应，拿到sourceId
@@ -5639,17 +5648,17 @@ export default {
         )
       ) {
         //添加mbTile的shp图层时，相关json已经入库
-            // json写法
+        // json写法
         let sourceId = this.mbTileInfo.tileJsonId;
-        let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceId + ".json";  
+        let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceId + ".json";
         let newSourceJson = {
           sourceName: sourceId,
           sourceType: "vector",
           sourceUrl: tileJsonUrl,
-        };         
-        console.log('请求数据：',newSourceJson);
-        this.addSourceToMap(newSourceJson);        
-            //  直接请求pbf        
+        };
+        console.log("请求数据：", newSourceJson);
+        this.addSourceToMap(newSourceJson);
+        //  直接请求pbf
         // let tileJsonUrl =
         //   this.reqUrl +
         //   "/" +
@@ -5674,26 +5683,34 @@ export default {
         this.sourceNameObject[name] = sourceId;
       }
       // 添加layer styleJson有对应属性,按对应类型添加，并对已有属性进行替换
-      const newLayout = JSON.parse(JSON.stringify(layerStyleProperties[row.type].layout));
+      const newLayout = JSON.parse(
+        JSON.stringify(layerStyleProperties[row.type].layout)
+      );
       if ("layout" in row) {
         for (let key in row.layout) {
-          if(row.layout[key].constructor == Object&&key.includes('width')){
-            newLayout[key] = JSON.parse(JSON.stringify(renderSplit(row.layout[key]).zoomCondition1));
-            console.log('新属性1',newLayout[key],row.id);
-          }else{
+          if (row.layout[key].constructor == Object && key.includes("width")) {
+            newLayout[key] = JSON.parse(
+              JSON.stringify(renderSplit(row.layout[key]).zoomCondition1)
+            );
+            console.log("新属性1", newLayout[key], row.id);
+          } else {
             newLayout[key] = row.layout[key];
           }
         }
       }
-      const newPaint = JSON.parse(JSON.stringify(layerStyleProperties[row.type].paint));
+      const newPaint = JSON.parse(
+        JSON.stringify(layerStyleProperties[row.type].paint)
+      );
       if ("paint" in row) {
         for (let key in row.paint) {
-          if(row.paint[key].constructor == Object&&key.includes('width')){
-            newPaint[key] = JSON.parse(JSON.stringify(renderSplit(row.paint[key]).zoomCondition1));
-            console.log('新属性2',newPaint[key],row.id);
-          }else{
+          if (row.paint[key].constructor == Object && key.includes("width")) {
+            newPaint[key] = JSON.parse(
+              JSON.stringify(renderSplit(row.paint[key]).zoomCondition1)
+            );
+            console.log("新属性2", newPaint[key], row.id);
+          } else {
             newPaint[key] = row.paint[key];
-          }          
+          }
           newPaint[key] = row.paint[key];
         }
       }
@@ -5715,7 +5732,11 @@ export default {
         filter: typeof row["filter"] != "undefined" ? row["filter"] : ["all"],
         layout: JSON.parse(JSON.stringify(newLayout)),
         maxzoom: typeof row["maxzoom"] != "undefined" ? row["maxzoom"] : 22,
-        metadata: {"mapbox:type":'mbStyle',"mapbox:isOSM":this.mbTileInfo.osmMbtilesBoolean,"mapbox:source":row['source-layer']},
+        metadata: {
+          "mapbox:type": "mbStyle",
+          "mapbox:isOSM": this.mbTileInfo.osmMbtilesBoolean,
+          "mapbox:source": row["source-layer"],
+        },
         minzoom: typeof row["minzoom"] != "undefined" ? row["minzoom"] : 0,
         paint: JSON.parse(JSON.stringify(newPaint)),
         source: this.sourceNameObject[name], //通过记录的source名字与id对应，拿到sourceId
@@ -5745,16 +5766,11 @@ export default {
     async addTMS(index, row) {
       //判断该shp是否已添加
       if (
-        !Object.prototype.hasOwnProperty.call(
-          this.sourceNameObject,
-          row.id
-        )
+        !Object.prototype.hasOwnProperty.call(this.sourceNameObject, row.id)
       ) {
         let newTileJson = initTileJson;
         newTileJson.name = row.name;
-        newTileJson.tiles = [
-          row.url
-        ];
+        newTileJson.tiles = [row.url];
         let vector_layer = {
           description: "",
           fields: "",
@@ -5781,9 +5797,8 @@ export default {
         //   tileSize: 256
         // });
         // this.addSourceToMap(newSourceJson);
-            //  直接请求pbf        
-        let tileJsonUrl = 	
-"https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+        //  直接请求pbf
+        let tileJsonUrl = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
         let newSourceJson = {
           sourceName: sourceId,
           sourceType: "raster",
@@ -5792,15 +5807,14 @@ export default {
         map.addSource(newSourceJson.sourceName, {
           type: newSourceJson.sourceType,
           tiles: [newSourceJson.sourceUrl],
-          tileSize: 256
-        });        
-        // 记录shp图层和对应的id        
+          tileSize: 256,
+        });
+        // 记录shp图层和对应的id
         this.sources[newSourceJson.sourceName] = {
           type: newSourceJson.sourceType,
           tiles: [newSourceJson.sourceUrl],
-          tileSize: 256
+          tileSize: 256,
         };
-
 
         this.sourceNameObject[row.id] = sourceId;
       }
@@ -5818,7 +5832,7 @@ export default {
         id: row.id,
         type: "raster",
         maxzoom: 22,
-        metadata: {"mapbox:type":"TMS"},
+        metadata: { "mapbox:type": "TMS" },
         minzoom: 0,
         source: this.sourceNameObject[row.id], //通过记录的source名字与id对应，拿到sourceId
       };
@@ -5831,15 +5845,13 @@ export default {
         this.layersNameObject[newLayer.name] = 1;
       } else {
         this.layersNameObject[newLayer.name] += 1;
-        newLayer.id =
-          row.name + this.layersNameObject[newLayer.name];
-        newLayer.showName =
-          row.name + this.layersNameObject[newLayer.name];
+        newLayer.id = row.name + this.layersNameObject[newLayer.name];
+        newLayer.showName = row.name + this.layersNameObject[newLayer.name];
       }
       this.layers.unshift(newLayer);
       this.layersName.unshift(newLayer.id);
       this.addLayerToMap(newLayer);
-    },    
+    },
     //添加所有styleJson图层
     addAllStyles(List) {
       for (let i in List) {
@@ -5931,18 +5943,19 @@ export default {
       //先关闭，否则组件不会初始化
       this.editorShow = "";
       // 判断当前页面数据是否为mbtile,以及是否为osm数据
-      const datatype = this.layers[this.nowLayerIndex]['metadata']['mapbox:type'];
-      switch(datatype){
-        case 'primary':
-          this.layerSource = 'primary';
+      const datatype =
+        this.layers[this.nowLayerIndex]["metadata"]["mapbox:type"];
+      switch (datatype) {
+        case "primary":
+          this.layerSource = "primary";
           break;
-        case 'mbSource':
-          this.layerSource = 'mbSource';
+        case "mbSource":
+          this.layerSource = "mbSource";
           break;
-        case 'mbStyle':
-          this.layerSource = 'mbStyle';
+        case "mbStyle":
+          this.layerSource = "mbStyle";
           break;
-      }      
+      }
       //设置属性编辑界面的展示情况
       this.menuButtonShowList = this.layers[this.nowLayerIndex].attrShowList;
       this.menuShowList = JSON.parse(JSON.stringify(this.menuButtonShowList)); //先获取包含各个tab的列表
@@ -5985,8 +5998,7 @@ export default {
           ];
         this.filterValueSelect =
           this.layers[this.nowLayerIndex].filterValueSet["filterValueSelect"];
-        this.filterWay =
-          row.filterValueSet["filterWay"];          
+        this.filterWay = row.filterValueSet["filterWay"];
       }
     },
 
@@ -5994,7 +6006,7 @@ export default {
     returnOriginStyle() {
       const style = this.originStyle[this.nowLayerIndex];
       const aimLayer = this.layers[this.nowLayerIndex];
-      console.log('style',style,this.nowLayerIndex);   
+      console.log("style", style, this.nowLayerIndex);
       aimLayer.paint = JSON.parse(JSON.stringify(style.paint));
       aimLayer.layout = JSON.parse(JSON.stringify(style.layout));
       console.log("应用完图层样式", aimLayer);
@@ -6010,16 +6022,17 @@ export default {
       this.editorShow = false;
       this.nowLayerIndex = index;
       // 判断当前页面数据是否为mbtile,以及是否为osm数据
-      const datatype = this.layers[this.nowLayerIndex]['metadata']['mapbox:type'];
-      switch(datatype){
-        case 'primary':
-          this.layerSource = 'primary';
+      const datatype =
+        this.layers[this.nowLayerIndex]["metadata"]["mapbox:type"];
+      switch (datatype) {
+        case "primary":
+          this.layerSource = "primary";
           break;
-        case 'mbSource':
-          this.layerSource = 'mbSource';
+        case "mbSource":
+          this.layerSource = "mbSource";
           break;
-        case 'mbStyle':
-          this.layerSource = 'mbStyle';
+        case "mbStyle":
+          this.layerSource = "mbStyle";
           break;
       }
 
@@ -6359,7 +6372,7 @@ export default {
       this.handleLayoutChange(
         this.layers[this.nowLayerIndex]["id"],
         "text-field",
-        ["get",row.column_name]
+        ["get", row.column_name]
       );
       console.log(
         "text-field",
@@ -6615,7 +6628,7 @@ export default {
         filterValue: this.filterValue,
         filterOptionSelectList: this.filterOptionSelectList,
         filterValueSelect: this.filterValueSelect,
-        filterWay: this.filterWay
+        filterWay: this.filterWay,
       };
     },
     callback(layoutOrpaint, attribute, value, parameters) {
@@ -6635,14 +6648,14 @@ export default {
       console.log("oldActiveName", oldActiveName, this.menuButtonShowList);
     },
     // test1(val) {
-      // const features = map.querySourceFeatures("62fb9590abf4b6e7a4f6d517",{sourceLayer:"place"});
-      // console.log("features",features);
-      // if(val){
-      //   this.dataLayers = streets.vector_layers;
-      // }else{
-        // this.styleLayers = style.layers;
-        // this.addAllStyles(style.layers)
-      // }
+    // const features = map.querySourceFeatures("62fb9590abf4b6e7a4f6d517",{sourceLayer:"place"});
+    // console.log("features",features);
+    // if(val){
+    //   this.dataLayers = streets.vector_layers;
+    // }else{
+    // this.styleLayers = style.layers;
+    // this.addAllStyles(style.layers)
+    // }
     // },
     // 待删除
     //添加数据库相关
@@ -6674,19 +6687,19 @@ export default {
           });
       }
       this.getPgList();
-    }, 
-    getTileJsonById(id){
+    },
+    getTileJsonById(id) {
       requestApi
         .getTileJson(id)
         .then((res) => {
           this.mbTileJson = res.data;
           this.dataLayers = res.data.vector_layers;
-          console.log('tileJson',this.mbTileJson);
+          console.log("tileJson", this.mbTileJson);
         })
         .catch((error) => {
           console.log(error);
         });
-    },    
+    },
     getPgList() {
       requestApi
         .getPgList()
@@ -6698,7 +6711,7 @@ export default {
         .catch((error) => {
           console.log(error);
         });
-    }, 
+    },
     handleCurrentChangeShp(val) {
       this.currentPageShp = val;
       if (this.PgBaseSelect != "defaultPG") {
@@ -6726,7 +6739,7 @@ export default {
       } else {
         this.addShpData();
       }
-    },           
+    },
     getMbtilesList() {
       requestApi.getMbtilesList().then((res) => {
         console.log(res);
@@ -6741,11 +6754,11 @@ export default {
           console.log("dataLayers", this.dataLayers);
         }
       });
-    },       
+    },
     dataBaseClick(tab) {
       this.dataBaseSelect = tab.name == "PG" ? "defaultPG" : tab.name;
       console.log("dataBaseSelect", this.dataBaseSelect);
-      switch(tab.name){
+      switch (tab.name) {
         case "TMS":
           this.getOutService();
           break;
@@ -6761,12 +6774,12 @@ export default {
           } else {
             console.log(res.data.csg);
           }
-          console.log("urlBase",this.urlBase);
+          console.log("urlBase", this.urlBase);
         })
         .catch((err) => {
           console.log(err);
         });
-    },    
+    },
   },
 };
 </script>

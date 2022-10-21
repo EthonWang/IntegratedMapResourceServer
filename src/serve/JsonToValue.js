@@ -1,11 +1,5 @@
 /**
  * 筛选filter对象
- * @param {List} layer 筛选条件
- */  
-
-
-/**
- * 筛选filter对象
  * @param {List} filterList 筛选条件
  */  
 export const filterSplit = (filterList)=>{
@@ -15,7 +9,6 @@ export const filterSplit = (filterList)=>{
   let filterTemp = [filterWay];
 
   filterList.forEach(element => {
-    console.log('元素',typeof(element),element);
     if(typeof(element) == 'string'){
       return true;
     } 
@@ -91,7 +84,6 @@ export const renderSplit = (renderObject)=>{
       value: element[1]
     })
     let length = zoomValue.length - 1;
-    console.log('测试',length);
     zoomCondition1.push(zoomValue[length]['zoom']);
     zoomCondition1.push(zoomValue[length]['value']);
   })
@@ -102,7 +94,39 @@ export const renderSplit = (renderObject)=>{
     valueOrigin:stops[0][1],       // 取第一个级别的数据
     zoomCondition1:zoomCondition1
   })
-
-  
-
 }
+
+/**
+ * 识别标注字段(text-field)
+ * @param {String} textField 筛选条件
+ */  
+export const textSplit = (textField)=>{
+  textField = textField.replaceAll('\n','&');           // 将\n转为&便于识别
+  let result = '';
+  while(textField.indexOf('{') > -1){
+    let start = textField.indexOf('{');
+    let end =  textField.indexOf('}');
+    let copy = textField;
+    if(result.length == 0){
+      result = textField.substring(start+1,end);
+    }
+    else{
+      if(copy.includes('&')){
+        result = result + '&' + textField.substring(start+1,end);
+      }
+      else{
+        result = result + ',' + textField.substring(start+1,end);
+      }
+    }
+    textField =  textField.substring(end+1);
+  }
+  return result;
+}
+
+/**
+ * 识别标注字段(text-font)
+ * @param {List} textFont 筛选条件
+ */  
+// export const fontSplit = (textFont)=>{
+
+// }

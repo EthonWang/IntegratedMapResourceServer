@@ -38,7 +38,7 @@
               :key="index"
               class="templateCard cursor"
               shadow="hover"
-              @click.native="addTypeStyle(item)"
+              @click.stop.native="addTypeStyle(item)"
             >
               <el-popconfirm
                 title="确定删除吗？"
@@ -47,6 +47,7 @@
                 <i
                   class="el-icon-remove-outline tempDeleBtn"
                   slot="reference"
+                  @click.stop
                 ></i>
               </el-popconfirm>
               <el-image
@@ -105,9 +106,9 @@
                     </el-option>
                   </el-select>
                 </el-row>
-                <!-- 非mbSource样式 -->
+                <!-- 非mbTile样式 -->
                 <el-table
-                  v-if="layerSource != 'mbSource'"
+                  v-if="layerSource != 'mbSource'&&layerSource != 'mbStyle'"
                   :data="
                     tempStyleLayers.filter(
                       (data) => data.type == styleTypeSelect
@@ -159,6 +160,32 @@
                     </template>
                   </el-table-column>
                 </el-table>
+                <el-table
+                  v-if="layerSource == 'mbStyle'"
+                  :data="
+                    tempStyleLayers.filter(
+                      (data) => data['source-layer'] == layers[nowLayerIndex]['source-layer']
+                    )
+                  "
+                  height="600"
+                >
+                  <el-table-column
+                    property="id"
+                    width="210"
+                    show-overflow-tooltip
+                    label="style"
+                  ></el-table-column>
+                  <el-table-column width="100">
+                    <template slot-scope="scope">
+                      <el-button
+                        size="mini"
+                        type="primary"
+                        @click="addMbTileToSelf(scope.row)"
+                        >应用样式
+                      </el-button>
+                    </template>
+                  </el-table-column>
+                </el-table>
               </el-row>
             </el-collapse-item>
           </el-collapse>
@@ -176,11 +203,11 @@ export default {
   data() {
     return{
       // vuex参数
-      mapProjectInfo: '',
-      layersName: '',
-      layers: '',
-      nowLayerIndex: 0,
-      originStyle: {},          //图层初始样式，用于应用类型样式后还原样式，注意图层顺序改变时及时更改
+      // mapProjectInfo: '',
+      // layersName: '',
+      // layers: '',
+      // nowLayerIndex: 0,
+      // originStyle: {},          //图层初始样式，用于应用类型样式后还原样式，注意图层顺序改变时及时更改
 
       // 公共参数
       stylesBoxShow: false,
@@ -238,11 +265,55 @@ export default {
     }
   },
   computed:{
-    ...mapState({mapProjectInfoProp:'mapProjectInfo',
-                 layersNameProp:'layersName',
-                 layersProp:'layers',
-                 nowLayerIndexProp:'nowLayerIndex',
-                 originStyleProp:'originStyle',}),  
+    ...mapState({
+      // mapProjectInfoProp:'mapProjectInfo',
+      // layersNameProp:'layersName',
+      // layersProp:'layers',
+      // nowLayerIndexProp:'nowLayerIndex',
+      // originStyleProp:'originStyle',
+    }),  
+
+    // 切换到这种方式用于对computer进行set
+    mapProjectInfo:{
+      get(){
+        return this.$store.state.mapProjectInfo;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "mapProjectInfo", value: val })
+      }      
+    },
+    layers:{
+      get(){
+        return this.$store.state.layers;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "layers", value: val })
+      }      
+    },
+    layersName:{
+      get(){
+        return this.$store.state.layersName;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "layersName", value: val })
+      }      
+    },
+    nowLayerIndex:{
+      get(){
+        return this.$store.state.nowLayerIndex;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "nowLayerIndex", value: val })
+      }      
+    },    
+    originStyle:{
+      get(){
+        return this.$store.state.originStyle;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "originStyle", value: val })
+      }      
+    },     
   },  
   mounted(){   
     // 等初始组件信息加载完
@@ -268,11 +339,12 @@ export default {
     // 初始化相关参数
     infoInit(){
       // 初始化vuex管理参数
-      this.mapProjectInfo = this.mapProjectInfoProp;
-      this.layersName = this.layersNameProp;
-      this.layers = this.layersProp;
-      this.nowLayerIndex = this.nowLayerIndexProp;
-      this.originStyle = this.originStyleProp;
+      // this.mapProjectInfo = this.mapProjectInfoProp;
+      // this.layersName = this.layersNameProp;
+      // this.layers = this.layersProp;
+      // this.nowLayerIndex = this.nowLayerIndexProp;
+      // this.originStyle = this.originStyleProp;
+
     },  
     openTemplateEdit(index,layer) {
       // 先关闭图层编辑框避免冲突
@@ -296,7 +368,6 @@ export default {
           break;   
       }
       this.styleTypeSelect = layer.type;
-      console.log('type',);
       const type = layer.type;              // 点线面等类型
       this.getTypeStyleList(type);
       this.getOsmMbList();
@@ -397,15 +468,15 @@ export default {
       console.log("应用完图层样式", aimLayer);
       this.handleRemoveLayer(aimLayer.id);
       if (this.nowLayerIndex === 0) {
-        this.addLayerToMap(true,aimLayer);
+        this.addLayerToMap(true,aimLayer,true);
       } else {
-        this.addLayerToMap(false,aimLayer,{id:this.layers[this.nowLayerIndex - 1].id,layer:aimLayer});
+        this.addLayerToMap(false,{id:this.layers[this.nowLayerIndex - 1].id,layer:aimLayer},true);
       }
       this.UPDATEPARM({parm:'layers',value:this.layers});
     },
     //添加选中图层至样式库
     createTypeStyle(layer) {
-      console.log("layer", layer);
+      console.log("layer", this.layers,this.nowLayerIndex);
       this.$bus.$emit("map",{type:'canvasSrc'});
       setTimeout(() => {
         // const canvasSrc = map.getCanvas().toDataURL("image/png");
@@ -475,9 +546,9 @@ export default {
       console.log("应用完图层样式", aimLayer);
       this.handleRemoveLayer(aimLayer.id);
       if (this.nowLayerIndex === 0) {
-        this.addLayerToMap(true,aimLayer);
+        this.addLayerToMap(true,aimLayer,true);
       } else {
-        this.addLayerToMap(false,aimLayer,{id:this.layers[this.nowLayerIndex - 1].id,layer:aimLayer});
+        this.addLayerToMap(false,{id:this.layers[this.nowLayerIndex - 1].id,layer:aimLayer},true);
       }
       // 更新vuex
       this.UPDATEPARM({parm:'layers',value:this.layers});
@@ -515,9 +586,9 @@ export default {
       console.log("应用完Mbtile图层样式", aimLayer);
       this.handleRemoveLayer(aimLayer.id);
       if (this.nowLayerIndex === 0) {
-        this.addLayerToMap(true,aimLayer);
+        this.addLayerToMap(true,aimLayer,true);
       } else {
-        this.addLayerToMap(false,aimLayer,{id:this.layers[this.nowLayerIndex - 1].id,layer:aimLayer});
+        this.addLayerToMap(false,{id:this.layers[this.nowLayerIndex - 1].id,layer:aimLayer},true);
       }
       //更新图层编辑框样式
       this.$bus.$emit("mapEdit",{type:'open',index:this.nowLayerIndex,layer:aimLayer});
@@ -537,26 +608,32 @@ export default {
       this.$bus.$emit("map",data);      
     },  
     //向地图添加layer
-    addLayerToMap(flag,val) {
-      if(flag){
+    addLayerToMap(flag, val, isReplace) {
+      if (flag) {
         const data = {
-          type:'addLayer1',
-          layer: val
-        }
-        this.$bus.$emit("map",data);
-      }else{
+          type: "addLayer1",
+          layer: val,
+          isReplace: isReplace        // 当图层时替换时，不需要对图层树进行更改(用isReplace进行判断)
+        };
+        this.$bus.$emit("map", data);
+      } else {
         // flag=false表示添加在指定图层后
         const data = {
-          type:'addLayer2',
+          type: "addLayer2",
           id: val.id,
-          layer: val.layer
-        }        
-        this.$bus.$emit("map",data);
-      }      
-    },          
+          layer: val.layer,
+          isReplace: isReplace
+        };
+        this.$bus.$emit("map", data);
+      }
+    },             
 
          
-  }
+  },
+  beforeDestroy(){
+    this.$bus.$off("init");
+    this.$bus.$off("styleTemp");
+  }  
 }
 </script>
 
@@ -578,6 +655,9 @@ export default {
   height: 40px;
   border-bottom: 1px #dcdfe6;
   /* background-color: ; */
+}
+.stylesBoxTitle .iconBtn{
+  font-size: 20px;
 }
 /* 模板折叠框样式 */
 .templateCol .el-collapse-item__wrap:nth-child(1) {
