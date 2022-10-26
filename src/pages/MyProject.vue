@@ -72,8 +72,8 @@
           <div class="bts">
             <el-button size="mini" type="success" icon="el-icon-edit-outline" circle title="编辑"
                        @click="editMapProject1(item)"></el-button>
-            <el-button size="mini" type="success" icon="el-icon-edit-outline" circle title="编辑"
-                       @click="editMapProject(item)"></el-button>
+            <!-- <el-button size="mini" type="success" icon="el-icon-edit-outline" circle title="编辑"
+                       @click="editMapProject(item)"></el-button> -->
             <el-button size="mini" type="info" icon="el-icon-document-copy" circle title="复制"
                        @click="copyMapProject(item)"></el-button>
             <el-button v-if="item.publicBoolean" size="mini" type="primary" plain icon="el-icon-close" circle title="取消发布"
