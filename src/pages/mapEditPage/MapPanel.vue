@@ -24,7 +24,6 @@ export default {
       // layersName: [],      
 
       // 项目参数
-      spritePath: '',
       glyphsPath: '',
       canvasSrc: '',
 
@@ -92,6 +91,14 @@ export default {
       },
       set(val) {
         this.UPDATEPARM({ parm: "layersName", value: val })
+      }      
+    },      
+    spritePath:{
+      get(){
+        return this.$store.state.spritePath;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "spritePath", value: val })
       }      
     },      
   },  

@@ -755,12 +755,15 @@ export default {
 /* 图层树 */
 .treeBox{
   position: relative;
-  padding-right: 5px;
+  /* padding-right: 5px; */
   max-height: calc(100vh - 200px);
   overflow-y: scroll;
 }
 .treeBox::-webkit-scrollbar{
   /* width: 0; */
+}
+.custom-tree-node{
+  padding-right: 5px;
 }
 /* 按钮组 */
 .treeGroupBtns{
@@ -794,7 +797,7 @@ export default {
 /* 图层的按钮组 */
 .layerBtnGroup{
   position: absolute;     
-  right: 0;               
+  right: 5px;               
 }
 /* 图标和图层名 */
 .nameLayer{

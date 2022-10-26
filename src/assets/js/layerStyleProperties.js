@@ -69,7 +69,7 @@ export default {
             "icon-pitch-alignment":"auto", //One of "map", "viewport", "auto"
             "icon-rotate":0,
             "icon-rotation-alignment":"auto", //"map", "viewport", "auto"
-            "icon-size":0.5,
+            "icon-size":1,
 
             "symbol-placement":"point",  //One of "point", "line", "line-center"
             // "symbol-sort-key":0,
@@ -106,7 +106,7 @@ export default {
             "icon-opacity":1,
             "icon-translate":[0,0],
             "icon-translate-anchor":"map", //One of "map", "viewport"
-            "text-color":"#f56c6c",
+            "text-color":"#000000",
             "text-halo-blur":0,
             "text-halo-color":"rgba(0, 0, 0, 0)",
             "text-halo-width":0,
