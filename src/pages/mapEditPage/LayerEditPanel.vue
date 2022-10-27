@@ -685,7 +685,7 @@
               </div>
               <el-button
                 type="primary"
-                round
+                round size="mini"
                 @click="layers[nowLayerIndex].paint['line-dasharray'].push(0)"
                 >添加虚线设置
               </el-button>
