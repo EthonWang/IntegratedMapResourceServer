@@ -5,7 +5,7 @@ import Vue from "vue";
 const instance= axios.create({
     // baseURL: config.requestUrl,
     // baseURL:Vue.prototype.reqUrl,
-    timeout: 1000,
+    timeout: 10000,
 });
 
 // axios.interceptors.request.use = instance_Mapbox.interceptors.request.use

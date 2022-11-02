@@ -5605,7 +5605,6 @@ export default {
         metadata: {
           "mapbox:type": "mbSource",
           "mapbox:isOSM": this.mbTileInfo.osmMbtilesBoolean,
-          "mapbox:source": row.id,
         },
         minzoom: typeof row["minzoom"] != "undefined" ? row["minzoom"] : 0,
         paint: JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint)),
@@ -5735,7 +5734,6 @@ export default {
         metadata: {
           "mapbox:type": "mbStyle",
           "mapbox:isOSM": this.mbTileInfo.osmMbtilesBoolean,
-          "mapbox:source": row["source-layer"],
         },
         minzoom: typeof row["minzoom"] != "undefined" ? row["minzoom"] : 0,
         paint: JSON.parse(JSON.stringify(newPaint)),

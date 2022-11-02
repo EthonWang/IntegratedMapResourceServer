@@ -2520,7 +2520,7 @@ export default {
         this.isMbTile = true;
       }
       // 初始化相关参数
-      this.mbSourceLayer = this.layer["metadata"]["mapbox:source"];
+      this.mbSourceLayer = this.layer["source-layer"];
       // 初始化属性表
       if (this.isMbTile) {
         let List = filedValue.filter(

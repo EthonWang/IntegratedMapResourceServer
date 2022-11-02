@@ -10,28 +10,29 @@
 <script>
 import mapboxgl from "mapbox-gl";
 import requestApi from "@/api/requestApi";
-import {mapState,mapActions,mapMutations} from 'vuex'
+import { mapState, mapActions, mapMutations } from "vuex";
 var map = null;
 export default {
   name: "MapPanel",
-  props: ["",""],
+  props: ["", ""],
   data() {
-    return{
+    return {
       // vuex参数
       // mapProjectInfo: '',
       // layers:[],
       // sources:{},
-      // layersName: [],      
+      // layersName: [],
 
       // 项目参数
-      glyphsPath: '',
-      canvasSrc: '',
+      glyphsPath: "",
+      canvasSrc: "",
+      layerIdList: [],
 
       // 地图参数
       zoom: 6,
       center: "119,32",
-      showCenter: '',
-        // popup样式
+      showCenter: "",
+      // popup样式
       layerIcon: {
         circle: "fa fa-circle",
         line: "fa fa-window-minimize",
@@ -41,115 +42,135 @@ export default {
         heatmap: "fa fa-fire",
         raster: "fa fa-photo",
         hillshade: "	fa fa-area-chart",
-      },      
-
-    }
+      },
+    };
   },
-  computed:{
+  computed: {
     ...mapState({
       // mapProjectInfoProp:'mapProjectInfo',
       // layersNameProp:'layersName',
       // layersProp:'layers',
       // sourcesProp:'sources'
-                 }),
+    }),
     // 切换到这种方式用于对computer进行set
-    mapProjectInfo:{
-      get(){
+    mapProjectInfo: {
+      get() {
         return this.$store.state.mapProjectInfo;
       },
       set(val) {
-        this.UPDATEPARM({ parm: "mapProjectInfo", value: val })
-      }      
-    },    
-    layers:{
-      get(){
+        this.UPDATEPARM({ parm: "mapProjectInfo", value: val });
+      },
+    },
+    layers: {
+      get() {
         return this.$store.state.layers;
       },
       set(val) {
-        this.UPDATEPARM({ parm: "layers", value: val })
-      }      
-    }, 
-    layersTree:{
-      get(){
+        this.UPDATEPARM({ parm: "layers", value: val });
+      },
+    },
+    layersTree: {
+      get() {
         return this.$store.state.layersTree;
       },
       set(val) {
-        this.UPDATEPARM({ parm: "layers", value: val })
-      }      
-    }, 
-    sources:{
-      get(){
+        this.UPDATEPARM({ parm: "layers", value: val });
+      },
+    },
+    sources: {
+      get() {
         return this.$store.state.sources;
       },
       set(val) {
-        this.UPDATEPARM({ parm: "sources", value: val })
-      }      
-    },   
-    layersName:{
-      get(){
+        this.UPDATEPARM({ parm: "sources", value: val });
+      },
+    },
+    layersName: {
+      get() {
         return this.$store.state.layersName;
       },
       set(val) {
-        this.UPDATEPARM({ parm: "layersName", value: val })
-      }      
-    },      
-    spritePath:{
-      get(){
+        this.UPDATEPARM({ parm: "layersName", value: val });
+      },
+    },
+    spritePath: {
+      get() {
         return this.$store.state.spritePath;
       },
       set(val) {
-        this.UPDATEPARM({ parm: "spritePath", value: val })
-      }      
-    },      
-  },  
-  mounted(){
+        this.UPDATEPARM({ parm: "spritePath", value: val });
+      },
+    },
+    tileJsonList: {
+      get() {
+        return this.$store.state.tileJsonList;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "tileJsonList", value: val });
+      },
+    },
+
+  },
+  watch: {
+    // 组件自用
+    layers: function(val){
+      let List = [];
+      val.forEach(element => {
+        List.push(element.id);
+      });    
+      this.layerIdList = List;
+      // 响应图层的地图事件
+      this.mapClick();
+    }
+  },
+  mounted() {
     // 等初始组件信息加载完
-    this.$bus.$on("init",()=>{
+    this.$bus.$on("init", () => {
       this.infoInit();
-    })    
+    });
     // mapbox相关地图操作
-    this.$bus.$on("map",(data)=>{
+    this.$bus.$on("map", (data) => {
       switch (data.type) {
-        case 'setLayout':             // data:{type:'',layerName:'',key:'',value:''}
-          this.handleLayoutChange(data.layerName,data.key,data.value);
+        case "setLayout": // data:{type:'',layerName:'',key:'',value:''}
+          this.handleLayoutChange(data.layerName, data.key, data.value);
           break;
-        case 'setPaint':              // data:{type:'',layerName:'',key:'',value:''}
-          this.handlePaintChange(data.layerName,data.key,data.value);
+        case "setPaint": // data:{type:'',layerName:'',key:'',value:''}
+          this.handlePaintChange(data.layerName, data.key, data.value);
           break;
-        case 'setZoom':               // data:{type:'',layerName:'',min:'',max:''}
-          this.handleZoomChange(data.layerName,data.min,data.max);
+        case "setZoom": // data:{type:'',layerName:'',min:'',max:''}
+          this.handleZoomChange(data.layerName, data.min, data.max);
           break;
-        case 'addLayer1':             // data:{type:'',layer:{},(isReplace)}        addLayer同时在图层树组件中触发
-          this.addLayerToMap(true,data.layer);
+        case "addLayer1": // data:{type:'',layer:{},(isReplace)}        addLayer同时在图层树组件中触发
+          this.addLayerToMap(true, data.layer);
           break;
-        case 'addLayer2':             // data:{type:'',id:'',layer:{},(isReplace)}  添加在指定图层后(添加背景,更换指定图层样式)，isReplace表示替换图层，不对目录树做修改
-          this.addLayerToMap(false,data);
+        case "addLayer2": // data:{type:'',id:'',layer:{},(isReplace)}  添加在指定图层后(添加背景,更换指定图层样式)，isReplace表示替换图层，不对目录树做修改
+          this.addLayerToMap(false, data);
           break;
-        case 'addSource1':            // data:{type:'',source:{}}
-          this.addSourceToMap(true,data.source)
+        case "addSource1": // data:{type:'',source:{}}  tileJson写法
+          this.addSourceToMap(true, data.source);
           break;
-        case 'addSource2':            // data:{type:'',source:{}}
-          this.addSourceToMap(false,data.source)
+        case "addSource2": // data:{type:'',source:{}}  Raster写法
+          this.addSourceToMap(false, data.source);
           break;
-        case 'removeLayer':           // data:{type:'',id:''}
+        case "removeLayer": // data:{type:'',id:''}
           map.removeLayer(data.id);
           break;
-        case 'removeSource':          // data:{type:'',id:''}
+        case "removeSource": // data:{type:'',id:''}
           map.removeSource(data.id);
           break;
-        case 'setFilter':             // data:{type:'',id:'',filter:{}}
-          this.setFilterToMap(data.id,data.filter);
+        case "setFilter": // data:{type:'',id:'',filter:{}}
+          this.setFilterToMap(data.id, data.filter);
           break;
-        case 'save':                  // data:{type:''，flag:''}    flag为true是正常保存，false是不弹出提示框（发布走的链接）
+        case "save": // data:{type:''，flag:''}    flag为true是正常保存，false是不弹出提示框（发布走的链接）
           this.saveMap(data.flag);
           break;
-        case 'mapFit':                // data:{type:'',row:{}}
+        case "mapFit": // data:{type:'',row:{}}
           this.handleLayerClick(data.row);
           break;
-        case 'canvasSrc':             // data:{type:''}   截图地图保存至localstorage
+        case "canvasSrc": // data:{type:''}   截图地图保存至localstorage
           this.setCanvasSrc();
           break;
-        case 'loadAndAddImg':         // data:{type:'',url:'',name:''}
+        case "loadAndAddImg": // data:{type:'',url:'',name:''}
           map.loadImage(data.url, (error, image) => {
             if (error) throw error;
             map.addImage(data.name, image);
@@ -158,21 +179,21 @@ export default {
         default:
           break;
       }
-    })
+    });
   },
-  methods:{
+  methods: {
     // vuex
-    ...mapActions({updateParm:'update'}),        //将 `this.updateParm(data)` 映射为 `this.$store.dispatch('update',data)`
-    ...mapMutations({UPDATEPARM:'UPDATE'}),      //将 `this.UPDATEPARM(data)` 映射为 `this.$store.commit('UPDATE',data)`
+    ...mapActions({ updateParm: "update" }), //将 `this.updateParm(data)` 映射为 `this.$store.dispatch('update',data)`
+    ...mapMutations({ UPDATEPARM: "UPDATE" }), //将 `this.UPDATEPARM(data)` 映射为 `this.$store.commit('UPDATE',data)`
 
     // 初始化参数
-    infoInit(){
+    infoInit() {
       // 初始化公共参数
       // this.mapProjectInfo = this.mapProjectInfoProp;
       // this.layersName = this.layersNameProp;
       // this.layers = this.layersProp;
       // this.sources = this.sourcesProp
-      this.mapProjectId = localStorage.getItem('mapProjectId');
+      this.mapProjectId = localStorage.getItem("mapProjectId");
       // 初始化项目参数
       this.center = this.mapProjectInfo.center.split(",");
       this.zoom = this.mapProjectInfo.zoom;
@@ -189,7 +210,7 @@ export default {
           ? {}
           : this.mapProjectInfo.nameObject.sourceNameObject;
       this.createEmptyMap();
-      this.initMapWithData();               
+      this.initMapWithData();
     },
 
     // 创建空地图
@@ -233,7 +254,6 @@ export default {
 
       //center
       map.on("mousemove", (e) => {
-        map.getCanvas().style.cursor = "pointer";
         this.showCenter =
           "(" +
           String(e.lngLat.lng.toFixed(5)) +
@@ -241,19 +261,23 @@ export default {
           String(e.lngLat.lat.toFixed(5)) +
           ")";
       });
-
       //选中某元素
-      // map.on('mouseenter',this.layersName,  function (e) {
+      // map.on('mouseenter',layerIdList,  function (e) {
       // console.log("eeeeeeeeee gid:", e);
       // });
-
+    },
+    // 对图层进行事件添加（受layerIdList进行响应）
+    mapClick(){
+      //center
+      map.on("mousemove", this.layerIdList,() => {
+        map.getCanvas().style.cursor = "pointer";
+      });      
       // Change it back to a pointer when it leaves.
-      map.on("mouseleave", this.layersName, function () {
+      map.on("mouseleave", this.layerIdList, function () {
         map.getCanvas().style.cursor = "";
-      });
-
-      //点击元素事件
-      map.on("click", this.layersName, (e) => {
+      });      
+      // 点击事件
+      map.on("click",this.layerIdList, (e) => {
         //点击范围
         const bbox = [
           [e.point.x - 5, e.point.y - 5],
@@ -261,9 +285,9 @@ export default {
         ];
         // Find features intersecting the bounding box.
         const selectedFeatures = map.queryRenderedFeatures(bbox, {
-          layers: this.layersName,
+          layers: this.layerIdList,
         });
-        console.log('selectedFeatures',selectedFeatures);
+        console.log("selectedFeatures", selectedFeatures);
         var container = window.document.createElement("div");
         container.className = "container";
         var nameList = [];
@@ -286,7 +310,7 @@ export default {
             iconItem.className = this.layerIcon[feature.layer.type];
           }
 
-          var index = this.layersName.indexOf(feature.layer["id"]);
+          var index = this.layerIdList.indexOf(feature.layer["id"]);
           container.appendChild(item).className = "item";
           item.appendChild(iconBox).className = "iconBox";
           item.appendChild(colorBox).className = "colorBox";
@@ -308,15 +332,15 @@ export default {
           .setDOMContent(container)
           .addTo(map);
       });
-    },    
+    },
     // 数据回来后初始化地图
     initMapWithData() {
       let initStyle = {
         version: 8,
         sources: {},
         layers: [],
-        sprite: this.reqUrl + this.spritePath,      // 设置精灵图访问接口，mapbox会自动请求json和png
-        glyphs: this.reqUrl + this.glyphsPath,      // 设置字体访问接口，mapbox会自动请求
+        sprite: this.reqUrl + this.spritePath, // 设置精灵图访问接口，mapbox会自动请求json和png
+        glyphs: this.reqUrl + this.glyphsPath, // 设置字体访问接口，mapbox会自动请求
       };
       console.log("initstyle", initStyle);
       map.setStyle(initStyle).on("load", () => {
@@ -331,44 +355,58 @@ export default {
             sourceType: this.sources[i].type,
             sourceUrl: this.sources[i].url,
           };
-          this.addSourceToMap(true,newSource);
+          this.addSourceToMap(true, newSource);
         }
         // 添加layer
         for (let i = this.layers.length - 1; i >= 0; i--) {
-          this.addLayerToMap(true,this.layers[i]);
+          this.addLayerToMap(true, this.layers[i]);
         }
       });
-    },   
+    },
+    deleteTileJson(){
+      this.tileJsonList.forEach(element=>{
+        requestApi
+            .deleteTileJson(element)
+            .then((res) => {
+              console.log("delete tileJson: ", res);
+            })
+            .catch((error) => {
+              console.log(error);
+            });        
+      })
+      this.tileJsonList = [];
+    },
     // #地图api
     //向地图添加数据源source
-    addSourceToMap(flag,newSource) {
+    addSourceToMap(flag, newSource) {
       console.log("add new source：", newSource);
-      if(flag){
+      if (flag) {
         //tileJson写法
         map.addSource(newSource.sourceName, {
           type: newSource.sourceType,
           url: newSource.sourceUrl,
         });
-      }else{
+      } else {
         // Raster添加方法
         map.addSource(newSource.sourceName, {
           type: newSource.sourceType,
           tiles: [newSource.sourceUrl],
-          tileSize: 256
-        });           
+          tileSize: 256,
+        });
       }
     },
     // 向地图添加layer
-    addLayerToMap(flag,data) {
-      if(flag){
+    addLayerToMap(flag, data) {
+      if (flag) {
         console.log("add new layer：", data);
-        map.addLayer(data);          //默认添加
-      }else{                          //value:{index:'',layer:{}}
+        map.addLayer(data); //默认添加
+      } else {
+        //value:{index:'',layer:{}}
         console.log("add new layer：", data.layer);
         const id = data.id;
-        map.addLayer(data.layer,id);       //添加在对应图层之前
+        map.addLayer(data.layer, id); //添加在对应图层之前
       }
-    }, 
+    },
     //设置对地图进行筛选
     setFilterToMap(id, filter) {
       console.log("set filters：", id, filter);
@@ -385,7 +423,7 @@ export default {
       map.setPaintProperty(layerName, key, value);
     },
     // 修改zoom显示范围
-    handleZoomChange(layerName, min, max){
+    handleZoomChange(layerName, min, max) {
       console.log("zoom:", layerName, min, max);
       map.setLayerZoomRange(layerName, min, max);
     },
@@ -397,15 +435,15 @@ export default {
       item.onclick = function test() {
         // 实现编辑面板的handleLayerEdit(index, feature);
         const data = {
-          type:'open',
-          index:index,
-          layer:feature
-        }
-        _this.$bus.$emit("mapEdit",data);
-        _this.$bus.$emit("layerTree",{type:'highLight',id:feature.id});
+          type: "open",
+          index: index,
+          layer: feature,
+        };
+        _this.$bus.$emit("mapEdit", data);
+        _this.$bus.$emit("layerTree", { type: "highLight", id: feature.id });
       };
     },
-    setCanvasSrc(){
+    setCanvasSrc() {
       const canvasSrc = map.getCanvas().toDataURL("image/png");
       localStorage.setItem("canvasSrc", canvasSrc);
     },
@@ -429,8 +467,9 @@ export default {
       this.mapProjectInfo.sprite = this.spritePath;
       this.mapProjectInfo.glyphs = this.glyphsPath;
       this.mapProjectInfo.sources = this.sources;
-      if(!flag){    // 发布走的接口，否则保存初始的publicBoolean
-        this.mapProjectInfo.publicBoolean = true;     // 在按钮组件中publicBoolean已经设置为true
+      if (!flag) {
+        // 发布走的接口，否则保存初始的publicBoolean
+        this.mapProjectInfo.publicBoolean = true; // 在按钮组件中publicBoolean已经设置为true
       }
       this.mapProjectInfo.layers = this.layers;
       this.mapProjectInfo.layersTree = this.layersTree;
@@ -438,7 +477,7 @@ export default {
         layersNameObject: this.layersNameObject,
         sourceNameObject: this.sourceNameObject,
       };
-      if(flag){
+      if (flag) {
         this.$confirm("是否保存地图?", "提示", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
@@ -459,6 +498,7 @@ export default {
                   .catch((error) => {
                     console.log(error);
                   });
+                this.deleteTileJson();
               })
               .catch((error) => {
                 console.log(error);
@@ -467,7 +507,8 @@ export default {
           .catch(() => {
             this.$message.info("取消保存");
           });
-      }else{  // 发布链接走的接口，不需要提示
+      } else {
+        // 发布链接走的接口，不需要提示
         requestApi
           .updateMapProject(JSON.stringify(this.mapProjectInfo))
           .then(() => {
@@ -481,19 +522,21 @@ export default {
               .catch((error) => {
                 console.log(error);
               });
+            this.deleteTileJson();
           })
           .catch((error) => {
             console.log(error);
           });
       }
-    },     
+    },
     // 原先table行(按钮)点击事件
     handleLayerClick(row) {
       // 用于控制台信息查看
       console.log("layers:", this.layers);
       // console.log("layersName", this.layersName);
       console.log("layersTree", this.$store.state.layersTree);
-      if (row.type != 'background') {             // 背景没有source
+      if (row.type != "background") {
+        // 背景没有source
         const source = map.getSource(row["source"]);
         console.log("source:", source);
       }
@@ -509,7 +552,7 @@ export default {
         map.fitBounds(bbox, {
           duration: 500,
           padding: { top: 10, bottom: 25, left: 15, right: 5 },
-        });        
+        });
         // const center = [Number((row.bounds[0]+row.bounds[2])/2),Number((row.bounds[1]+row.bounds[3])/2)]
         // this.$nextTick(()=>{
         //   map.setCenter(center);
@@ -518,13 +561,13 @@ export default {
         //   center: [113.32948058466824, 23.19862318628209],
         // });
       }
-    },      
+    },
   },
-  beforeDestroy(){
+  beforeDestroy() {
     this.$bus.$off("init");
     this.$bus.$off("map");
-  }  
-}
+  },
+};
 </script>
 
 <style scoped>
@@ -537,7 +580,7 @@ export default {
   background-color: #ffffff !important;
   font-size: 13px;
 }
-.mapStyle{
+.mapStyle {
   position: absolute;
   top: 0;
   margin-left: 330px;
@@ -547,12 +590,12 @@ export default {
 
 /* popup样式 */
 .container {
-  width: 150px;
+  width: 200px;
   /* height: 30px; */
 }
 .item {
   display: flex;
-  margin: 1px 0;
+  margin: 2px 0;
   justify-content: left;
   align-items: center;
   color: black;
@@ -580,7 +623,7 @@ export default {
 }
 .item_name {
   /* margin-left: 30px; */
-  max-width: 100px;
+  max-width: 150px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
