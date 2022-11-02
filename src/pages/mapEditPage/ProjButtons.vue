@@ -35,7 +35,7 @@
                   <el-button
                     size="mini"
                     type="primary"
-                    @click="handleAddShpLayer(scope.$index, scope.row)"
+                    @click="handleAddShpLayer(scope.row)"
                     >添加
                   </el-button>
                 </template>
@@ -148,7 +148,7 @@
                   <el-button
                     size="mini"
                     type="primary"
-                    @click="handleAddShpLayer(scope.$index, scope.row)"
+                    @click="handleAddShpLayer(scope.row)"
                     >添加
                   </el-button>
                 </template>
@@ -163,7 +163,7 @@
                   <el-button
                     size="mini"
                     type="primary"
-                    @click="handleAddShpLayer(scope.$index, scope.row)"
+                    @click="handleAddShpLayer(scope.row)"
                     >添加
                   </el-button>
                 </template>
@@ -219,6 +219,8 @@ import { mapState, mapActions, mapMutations } from "vuex";
 import initTileJson from "@/assets/js/initTileJson";
 import layerStyleProperties from "@/assets/js/layerStyleProperties";
 import { renderSplit, filterSplit, textSplit } from "@/serve/JsonToValue";
+import { nameIndex } from "@/serve/interpolation";
+import { nanoid } from 'nanoid';
 
 export default {
   name: "ProjButtons",
@@ -377,11 +379,13 @@ export default {
       this.$bus.$emit("mapEdit", { type: "open", layer: this.layersProp[0],index:0 });
     },
     test2() {
-      this.$bus.$emit("styleTemp", {
-        type: "open",
-        index: 0,
-        layer: this.layers[0],
-      });
+      // this.$bus.$emit("styleTemp", {
+      //   type: "open",
+      //   index: 0,
+      //   layer: this.layers[0],
+      // });
+      let c = nameIndex(['a'],'place',{'place1':0})
+      console.log("测试",c);      
     },
     test3() {
       let a = renderSplit({
@@ -457,28 +461,27 @@ export default {
     },
 
     // ·添加各类数据图层
-    async handleAddShpLayer(index, row) {
+    async handleAddShpLayer(row) {
       //分类型进行创建shp的json入库并返回对应id
-      console.log(this.dataBaseSelect);
       switch (this.dataBaseSelect) {
         case "defaultPG":
-          this.addPgDefaultShp(index, row);
+          this.addPgDefaultShp(row);
           break;
         case "multiPG":
-          this.addPgMultiShp(index, row);
+          this.addPgMultiShp(row);
           break;
         case "cacheTile":
-          this.addCacheShp(index, row);
+          this.addCacheShp(row);
           break;
         case "TMS":
-          this.addTMS(index, row);
+          this.addTMS(row);
           break;
         case "mbTile":
           if (!this.isStyle) {
-            this.addDataMbTileShp(index, row);
+            this.addDataMbTileShp(row);
           } else {
             if (row.type != "background") {
-              this.addStyleMbTileShp(index, row);
+              this.addStyleMbTileShp(row,this.mbTileStyleJson.name);
             } else {
               this.addBackground("mbTile", row);
             }
@@ -487,24 +490,31 @@ export default {
       }
       this.$bus.$emit("mapEdit", { type: "off" });
     },
-    async addPgDefaultShp(index, row) {
+    /**各类添加说明
+     * sourceId: 展示对应图层源的id,pg采用tableName,mbStyle采用id+_{styleJson}name,mbSource采用id+_meta
+     * layersNameObject都以sourceId为属性名，sourceNameObject除了mbTile数据(用{metaJson}name_meta)其他用sourceId
+     * layerId：原始图层名+nanoid(5)
+     * sourceId = layer.source
+     * layer['source-layer'] = vector_layer.id  对于非mbTiels数据，没有一个source数据就一个图层(默认选sourceId)
+     */ 
+    async addPgDefaultShp(row) {
       console.log("add pgDefault shp row: ", row);
       //判断该shp是否已添加
       if (
         !Object.prototype.hasOwnProperty.call(
           this.sourceNameObject,
-          row.tableName
+          row.tableName                 // 使用tableName是防止有同名的pg数据图层（应该不可能有）; tableName = originName + id
         )
       ) {
         let newTileJson = initTileJson;
-        newTileJson.name = row.tableName;
+        newTileJson.name = row.originName;
         newTileJson.tiles = [
           this.reqUrl + "/mvt/" + row.tableName + "/{z}/{x}/{y}.pbf",
         ];
         let vector_layer = {
           description: "",
           fields: row.attrInfo,
-          id: row.tableName,
+          id: row.tableName,       // 对应原始的图层(originName<方便得到数据源>和tableName都可)，与layer中的source-layer对应
         };
         newTileJson.vector_layers = [vector_layer];
         newTileJson.tileJsonType = this.dataBaseSelect;
@@ -514,10 +524,10 @@ export default {
           return;
         }
         //添加source
-        let sourceId = res.data.data.tileJsonId;
-        let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceId + ".json";
+        let sourceJsonId = res.data.data.tileJsonId;    // source的url链接json
+        let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceJsonId + ".json";
         let newSourceJson = {
-          sourceName: sourceId,
+          sourceName: row.tableName,       
           sourceType: "vector",
           sourceUrl: tileJsonUrl,
         };
@@ -527,8 +537,9 @@ export default {
           url: newSourceJson.sourceUrl,
         };
         //记录shp图层和对应的id
-        this.sourceNameObject[row.tableName] = sourceId;
+        this.sourceNameObject[row.tableName] = sourceJsonId;
       }
+      
       //添加layer
       let geoType = row.geoType;
       if (row.geoType.indexOf("LINE") !== -1) {
@@ -540,21 +551,22 @@ export default {
       } else {
         geoType = "symbol";
       }
-
+      // 检查是否添加过同源layer 返回[showName,layersNameObject]
+      let result = JSON.parse(JSON.stringify(nameIndex(this.layers,row.tableName,row.originName,this.layersNameObject)));   
+      this.layersNameObject = result.object;
       //前八个是自己用的属性
       let newLayer = {
-        index: index,
         sourceType: "pgDefault", //记录数据来源类型，用于区别mbTlie的添加和删除
         show: true,
-        originName: row.originName,
-        showName: row.originName, //用于展示图层名字
+        // originName: row.originName,    // 可在source-layer中展示
+        showName: result.show, //用于展示图层名字
         bounds: row.bounds,
         shpAttribute: typeof row.attrInfo != "undefined" ? row.attrInfo : [],
         attrValueSet: {},
         attrShowList: {},
         filterValueSet: {},
         nodeType: "layer", //组和图层区分
-        id: row.originName,
+        id: row.originName+'_'+nanoid(5),     
         type: geoType,
         filter: ["all"],
         layout: JSON.parse(
@@ -564,57 +576,30 @@ export default {
         metadata: { "mapbox:type": "pgDefault" },
         minzoom: 0,
         paint: JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint)),
-        source: this.sourceNameObject[row.tableName], //通过记录的source名字与id对应，拿到sourceId
+        source: row.tableName, //通过记录的source名字与id对应，拿到sourceId
         "source-layer": row.tableName,
       };
-
+      // 设置随机色
       if (geoType !== "symbol") {
         newLayer.paint[geoType + "-color"] =
           "#" + Math.random().toString(16).substr(2, 6);
       }
-
-      if (
-        !Object.prototype.hasOwnProperty.call(
-          this.layersNameObject,
-          newLayer.originName
-        )
-      ) {
-        this.layersNameObject[newLayer.originName] = 1;
-      } else {
-        this.layersNameObject[newLayer.originName] += 1;
-        newLayer.id =
-          row.originName + this.layersNameObject[newLayer.originName];
-        newLayer.showName =
-          row.originName + this.layersNameObject[newLayer.originName];
-      }
+      // 图层信息更新
       this.layers.unshift(newLayer);
-      this.layersName.unshift(newLayer.id);
       this.originStyle.unshift({
         paint: newLayer.paint,
         layout: newLayer.layout,
       });
       this.addLayerToMap(true, newLayer);
-      // 更新vuex参数
-      this.UPDATEPARM({ parm: "layers", value: this.layers });
-      this.UPDATEPARM({ parm: "sources", value: this.sources });
-      this.UPDATEPARM({ parm: "layersName", value: this.layersName });
-      this.UPDATEPARM({ parm: "originStyle", value: this.originStyle });
-      this.UPDATEPARM({
-        parm: "sourceNameObject",
-        value: this.sourceNameObject,
-      });
-      this.UPDATEPARM({
-        parm: "layersNameObject",
-        value: this.layersNameObject,
-      });
+      // console.log('添加:',this.layers,this.layersNameObject,this.sourceNameObject)
     },
-    async addPgMultiShp(index, row) {
+    async addPgMultiShp(row) {
       console.log("add pgMulti shp row: ", row);
       //判断该shp是否已添加
       if (
         !Object.prototype.hasOwnProperty.call(
           this.sourceNameObject,
-          row.originName
+          row.originName      //
         )
       ) {
         let newTileJson = initTileJson;
@@ -673,7 +658,6 @@ export default {
       console.log("originname:", row.originName);
       //前九个是自己用的属性
       let newLayer = {
-        index: index,
         sourceType: "pgMulti", //记录数据来源类型，用于区别mbTlie的添加和删除
         show: true,
         originName: row.originName,
@@ -685,7 +669,7 @@ export default {
         attrShowList: {},
         filterValueSet: {},
         nodeType: "layer", //组和图层区分
-        id: row.originName,
+        id: row.originName+'_'+nanoid(5),
         type: geoType,
         filter: ["all"],
         layout: JSON.parse(
@@ -739,9 +723,10 @@ export default {
         value: this.layersNameObject,
       });
     },
-    async addDataMbTileShp(index, row) {
+    async addDataMbTileShp(row) {
       console.log("add mbDate shp row: ", row);
-      let name = this.mbTileJsonList[this.mbTileSelectIndex].name;
+      let name = this.mbTileJsonList[this.mbTileSelectIndex].name + '_meta';    // 同一个mbTile数据源的标识符
+      let layerName = row.id + '_meta';     // 图层间的标识符作为sourceId
       //判断该shp是否已添加
       if (
         !Object.prototype.hasOwnProperty.call(
@@ -751,10 +736,10 @@ export default {
       ) {
         //添加mbTile的shp图层时，相关json已经入库
         // json写法
-        let sourceId = this.mbTileInfo.tileJsonId;
-        let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceId + ".json";
+        let sourceJsonId = this.mbTileInfo.tileJsonId;
+        let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceJsonId + ".json";
         let newSourceJson = {
-          sourceName: sourceId,
+          sourceName: name,
           sourceType: "vector",
           sourceUrl: tileJsonUrl,
         };
@@ -765,82 +750,59 @@ export default {
           url: newSourceJson.sourceUrl,
         };
         //记录shp图层和对应的id
-        this.sourceNameObject[name] = sourceId;
+        this.sourceNameObject[name] = sourceJsonId;
       }
 
-      //前八个是自己用的属性
+      // 添加layer
       let geoType = this.mbsource[row.id];
+      // 检查是否添加过同源layer 返回[showName,layersNameObject]
+      let result = JSON.parse(JSON.stringify(nameIndex(this.layers,layerName,row.id,this.layersNameObject)));   
+      this.layersNameObject = result.object;      
+      //前八个是自己用的属性
       let newLayer = {
-        index: index,
         sourceType: "mbTile", //记录数据来源类型，用于区别mbTlie的添加和删除
-        show: true,
-        originName: row.id,
-        showName: row.id, //用于展示图层名字
+        show: true,       // 用于记录图层的开关
+        // originName: row.id,
+        showName: result.show, //用于展示图层名字
         shpAttribute: [],
         attrValueSet: {},
         attrShowList: {},
         filterValueSet: {},
         nodeType: "layer", //组和图层区分
-        id: row.id,
+        id: row.id+'_'+nanoid(5),
         type: geoType,
         filter: ["all"],
         layout: JSON.parse(
           JSON.stringify(layerStyleProperties[geoType].layout)
         ),
         maxzoom: typeof row["maxzoom"] != "undefined" ? row["maxzoom"] : 22,
-        metadata: {
+        metadata: {                       // metadata会被mapbox识别，保存到layers信息中
           "mapbox:type": "mbSource",
           "mapbox:isOSM": this.mbTileInfo.osmMbtilesBoolean,
-          "mapbox:source": row.id,
         },
         minzoom: typeof row["minzoom"] != "undefined" ? row["minzoom"] : 0,
         paint: JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint)),
-        source: this.sourceNameObject[name], //通过记录的source名字与id对应，拿到sourceId
+        source: name, //通过记录的source名字与id对应，拿到sourceId
         "source-layer": row.id,
       };
-
+      // 设置随机色
       if (geoType !== "symbol") {
         newLayer.paint[geoType + "-color"] =
           "#" + Math.random().toString(16).substr(2, 6);
       }
-
-      if (
-        !Object.prototype.hasOwnProperty.call(
-          this.layersNameObject,
-          newLayer.originName
-        )
-      ) {
-        this.layersNameObject[newLayer.originName] = 1;
-      } else {
-        this.layersNameObject[newLayer.originName] += 1;
-        newLayer.id = row.id + this.layersNameObject[newLayer.originName];
-        newLayer.showName = row.id + this.layersNameObject[newLayer.originName];
-      }
+      // 图层信息更新
       this.layers.unshift(newLayer);
-      this.layersName.unshift(newLayer.id);
       this.originStyle.unshift({
         paint: newLayer.paint,
         layout: newLayer.layout,
       });
       this.addLayerToMap(true, newLayer);
-      // 更新vuex参数
-      this.UPDATEPARM({ parm: "layers", value: this.layers });
-      this.UPDATEPARM({ parm: "sources", value: this.sources });
-      this.UPDATEPARM({ parm: "layersName", value: this.layersName });
-      this.UPDATEPARM({ parm: "originStyle", value: this.originStyle });
-      this.UPDATEPARM({
-        parm: "sourceNameObject",
-        value: this.sourceNameObject,
-      });
-      this.UPDATEPARM({
-        parm: "layersNameObject",
-        value: this.layersNameObject,
-      });
     },
 
-    async addStyleMbTileShp(index, row) {
+    async addStyleMbTileShp(row,JsonName) {
       console.log("add mbStyle shp row: ", row);
-      let name = this.mbTileJsonList[this.mbTileSelectIndex].name;
+      let name = this.mbTileJsonList[this.mbTileSelectIndex].name + '_meta';    // 同一个mbTile数据源的标识符
+      let layerName = row.id + `_${JsonName}`;     // 图层间的标识符添加_name作为sourceId   
       //判断该shp是否已添加
       if (
         !Object.prototype.hasOwnProperty.call(
@@ -850,10 +812,10 @@ export default {
       ) {
         //添加mbTile的shp图层时，相关json已经入库
         // json写法
-        let sourceId = this.mbTileInfo.tileJsonId;
-        let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceId + ".json";
+        let sourceJsonId = this.mbTileInfo.tileJsonId;
+        let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceJsonId + ".json";
         let newSourceJson = {
-          sourceName: sourceId,
+          sourceName: name,
           sourceType: "vector",
           sourceUrl: tileJsonUrl,
         };
@@ -864,7 +826,7 @@ export default {
           url: newSourceJson.sourceUrl,
         };
         //记录shp图层和对应的id
-        this.sourceNameObject[name] = sourceId;
+        this.sourceNameObject[name] = sourceJsonId;
       }
       // 添加layer styleJson有对应属性,按对应类型添加，并对已有属性进行替换
       const newLayout = JSON.parse(JSON.stringify(layerStyleProperties[row.type].layout));
@@ -888,21 +850,21 @@ export default {
           newPaint[key] = row.paint[key];
         }
       }
-
-      //前八个是自己用的属性
+      // styleJson图层按理只需添加一次
+      this.layersNameObject[layerName] += 1;
       let geoType = row.type;
+      //前八个是自己用的属性
       let newLayer = {
-        index: index,
         sourceType: "mbTile", //记录数据来源类型，用于区别是否为mbTlie，mbtile图层sourceJson不删除
         show: true,
-        originName: row.id,
-        showName: row.id, //用于展示图层名字
+        // originName: row.id,
+        showName: row.id, //用于展示图层名字，使用json文件即可
         shpAttribute: [],
         attrValueSet: {},
         attrShowList: {},
         filterValueSet: {},
         nodeType: "layer", //组和图层区分
-        id: row.id,
+        id: row.id+'_'+nanoid(5),
         type: geoType,
         filter: typeof row["filter"] != "undefined" ? row["filter"] : ["all"],
         layout: JSON.parse(JSON.stringify(newLayout)),
@@ -910,48 +872,21 @@ export default {
         metadata: {
           "mapbox:type": "mbStyle",
           "mapbox:isOSM": this.mbTileInfo.osmMbtilesBoolean,
-          "mapbox:source": row["source-layer"],
         },
         minzoom: typeof row["minzoom"] != "undefined" ? row["minzoom"] : 0,
         paint: JSON.parse(JSON.stringify(newPaint)),
-        source: this.sourceNameObject[name], //通过记录的source名字与id对应，拿到sourceId
+        source: name, //通过记录的source名字与id对应，拿到sourceId
         "source-layer": row["source-layer"],
       };
-
-      if (
-        !Object.prototype.hasOwnProperty.call(
-          this.layersNameObject,
-          newLayer.originName
-        )
-      ) {
-        this.layersNameObject[newLayer.originName] = 1;
-      } else {
-        this.layersNameObject[newLayer.originName] += 1;
-        newLayer.id = row.id + this.layersNameObject[newLayer.originName];
-        newLayer.showName = row.id + this.layersNameObject[newLayer.originName];
-      }
+      // 图层信息更新
       this.layers.unshift(newLayer);
-      this.layersName.unshift(newLayer.id);
       this.originStyle.unshift({
         paint: newLayer.paint,
         layout: newLayer.layout,
       });
       this.addLayerToMap(true, newLayer);
-      // 更新vuex参数
-      this.UPDATEPARM({ parm: "layers", value: this.layers });
-      this.UPDATEPARM({ parm: "sources", value: this.sources });
-      this.UPDATEPARM({ parm: "layersName", value: this.layersName });
-      this.UPDATEPARM({ parm: "originStyle", value: this.originStyle });
-      this.UPDATEPARM({
-        parm: "sourceNameObject",
-        value: this.sourceNameObject,
-      });
-      this.UPDATEPARM({
-        parm: "layersNameObject",
-        value: this.layersNameObject,
-      });
     },
-    async addTMS(index, row) {
+    async addTMS(row) {
       console.log("add TMS shp row: ", row);
       //判断该shp是否已添加
       if (
@@ -993,7 +928,6 @@ export default {
       //添加layer
       //前八个是自己用的属性
       let newLayer = {
-        index: index,
         sourceType: "TMS", //记录数据来源类型，用于区别mbTlie的添加和删除
         show: true,
         originName: "",
@@ -1054,18 +988,20 @@ export default {
           }
         }
       }
+      // 检查是否添加过同源layer 返回[showName,layersNameObject]
+      let result = JSON.parse(JSON.stringify(nameIndex(this.layers,'background','背景',this.layersNameObject)));   
+      this.layersNameObject = result.object;      
       const backLayer = {
-        index: index,
         sourceType: sourceType, //记录数据来源类型，用于区别mbTlie的添加和删除
         show: true,
-        originName: "background",
-        showName: "背景", //用于展示图层名字
+        // originName: "background",
+        showName: result.show, //用于展示图层名字
         shpAttribute: [],
         attrValueSet: {},
         attrShowList: {},
         filterValueSet: {},
         nodeType: "layer", //组和图层区分
-        id: "背景",
+        id: "背景"+nanoid(5),
         type: "background",
         paint: newPaint,
         layout: newLayout,
@@ -1077,20 +1013,7 @@ export default {
         backLayer.paint["background-color"] =
           "#" + Math.random().toString(16).substr(2, 6);
       }
-      if (
-        !Object.prototype.hasOwnProperty.call(
-          this.layersNameObject,
-          "background"
-        )
-      ) {
-        this.layersNameObject["background"] = 1;
-      } else {
-        this.layersNameObject["background"] += 1;
-        backLayer.id = "背景" + this.layersNameObject["background"];
-        backLayer.showName = "背景" + this.layersNameObject["background"];
-      }
       this.layers.push(backLayer);
-      this.layersName.push(backLayer.id);
       if (!index) {
         this.addLayerToMap(true, backLayer); //没有图层直接按默认添加
       } else {
@@ -1101,13 +1024,6 @@ export default {
         this.addLayerToMap(false, val);
         // map.addLayer(backLayer, this.layers[index - 1].id); //有图层则背景添加在最底层
       }
-      // 更新vuex参数
-      this.UPDATEPARM({ parm: "layers", value: this.layers });
-      this.UPDATEPARM({ parm: "layersName", value: this.layersName });
-      this.UPDATEPARM({
-        parm: "layersNameObject",
-        value: this.layersNameObject,
-      });
     },
     // 保存地图
     saveMap(flag) {
@@ -1154,7 +1070,7 @@ export default {
           item["type"] != "raster" &&
           item["type"] != "background"
         ) {
-          this.addStyleMbTileShp(i, item);
+          this.addStyleMbTileShp(item,this.mbTileStyleJson.name);
         } else if (item["type"] == "background") {
           this.addBackground("mbTile", item);
         }
@@ -1164,7 +1080,7 @@ export default {
     addAllSources(List) {
       for (let i in List) {
         let item = List[i];
-        this.addDataMbTileShp(i, item);
+        this.addDataMbTileShp(item);
       }
       console.log("添加所有styleJson图层");
     },

@@ -26,6 +26,7 @@ export default {
       // 项目参数
       glyphsPath: "",
       canvasSrc: "",
+      layerIdList: [],
 
       // 地图参数
       zoom: 6,
@@ -100,6 +101,27 @@ export default {
         this.UPDATEPARM({ parm: "spritePath", value: val });
       },
     },
+    tileJsonList: {
+      get() {
+        return this.$store.state.tileJsonList;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "tileJsonList", value: val });
+      },
+    },
+
+  },
+  watch: {
+    // 组件自用
+    layers: function(val){
+      let List = [];
+      val.forEach(element => {
+        List.push(element.id);
+      });    
+      this.layerIdList = List;
+      // 响应图层的地图事件
+      this.mapClick();
+    }
   },
   mounted() {
     // 等初始组件信息加载完
@@ -124,10 +146,10 @@ export default {
         case "addLayer2": // data:{type:'',id:'',layer:{},(isReplace)}  添加在指定图层后(添加背景,更换指定图层样式)，isReplace表示替换图层，不对目录树做修改
           this.addLayerToMap(false, data);
           break;
-        case "addSource1": // data:{type:'',source:{}}
+        case "addSource1": // data:{type:'',source:{}}  tileJson写法
           this.addSourceToMap(true, data.source);
           break;
-        case "addSource2": // data:{type:'',source:{}}
+        case "addSource2": // data:{type:'',source:{}}  Raster写法
           this.addSourceToMap(false, data.source);
           break;
         case "removeLayer": // data:{type:'',id:''}
@@ -232,7 +254,6 @@ export default {
 
       //center
       map.on("mousemove", (e) => {
-        map.getCanvas().style.cursor = "pointer";
         this.showCenter =
           "(" +
           String(e.lngLat.lng.toFixed(5)) +
@@ -240,19 +261,23 @@ export default {
           String(e.lngLat.lat.toFixed(5)) +
           ")";
       });
-
       //选中某元素
-      // map.on('mouseenter',this.layersName,  function (e) {
+      // map.on('mouseenter',layerIdList,  function (e) {
       // console.log("eeeeeeeeee gid:", e);
       // });
-
+    },
+    // 对图层进行事件添加（受layerIdList进行响应）
+    mapClick(){
+      //center
+      map.on("mousemove", this.layerIdList,() => {
+        map.getCanvas().style.cursor = "pointer";
+      });      
       // Change it back to a pointer when it leaves.
-      map.on("mouseleave", this.layersName, function () {
+      map.on("mouseleave", this.layerIdList, function () {
         map.getCanvas().style.cursor = "";
-      });
-
-      //点击元素事件
-      map.on("click", this.layersName, (e) => {
+      });      
+      // 点击事件
+      map.on("click",this.layerIdList, (e) => {
         //点击范围
         const bbox = [
           [e.point.x - 5, e.point.y - 5],
@@ -260,7 +285,7 @@ export default {
         ];
         // Find features intersecting the bounding box.
         const selectedFeatures = map.queryRenderedFeatures(bbox, {
-          layers: this.layersName,
+          layers: this.layerIdList,
         });
         console.log("selectedFeatures", selectedFeatures);
         var container = window.document.createElement("div");
@@ -285,7 +310,7 @@ export default {
             iconItem.className = this.layerIcon[feature.layer.type];
           }
 
-          var index = this.layersName.indexOf(feature.layer["id"]);
+          var index = this.layerIdList.indexOf(feature.layer["id"]);
           container.appendChild(item).className = "item";
           item.appendChild(iconBox).className = "iconBox";
           item.appendChild(colorBox).className = "colorBox";
@@ -337,6 +362,19 @@ export default {
           this.addLayerToMap(true, this.layers[i]);
         }
       });
+    },
+    deleteTileJson(){
+      this.tileJsonList.forEach(element=>{
+        requestApi
+            .deleteTileJson(element)
+            .then((res) => {
+              console.log("delete tileJson: ", res);
+            })
+            .catch((error) => {
+              console.log(error);
+            });        
+      })
+      this.tileJsonList = [];
     },
     // #地图api
     //向地图添加数据源source
@@ -460,6 +498,7 @@ export default {
                   .catch((error) => {
                     console.log(error);
                   });
+                this.deleteTileJson();
               })
               .catch((error) => {
                 console.log(error);
@@ -483,6 +522,7 @@ export default {
               .catch((error) => {
                 console.log(error);
               });
+            this.deleteTileJson();
           })
           .catch((error) => {
             console.log(error);

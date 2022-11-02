@@ -288,10 +288,17 @@ export default {
         this.UPDATEPARM({ parm: "mapProjectInfo", value: val })
       }      
     },    
+    tileJsonList:{
+      get(){
+        return this.$store.state.tileJsonList;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "tileJsonList", value: val })
+      }      
+    },    
   },
   watch:{
     layers:function (layers){
-      console.log('更换类型：',layers,this.layersTree);
       layers.forEach((layer)=>{
         const aimLayer = JSON.parse(JSON.stringify(layer));
         for (let i = 0; i < this.layersTree.length; i++) {
@@ -448,37 +455,26 @@ export default {
       // 先关闭图层样式编辑框，防止报错
       this.$bus.$emit("mapEdit", {type: 'off'});
       let aimSource = row.source;
-      let layerOriginName = row.originName;
       let layerid = row.id;
       this.layers.splice(index, 1);
-      this.layersName.splice(index, 1);
       this.originStyle.splice(index, 1);
-      this.layersNameObject[layerOriginName] -= 1;
+      this.layersNameObject[aimSource] -= 1;
       this.handleRemoveLayer(layerid);
       //如果没有layer使用source，则删除source
-      if (this.layersNameObject[layerOriginName] === 0) {
-        delete this.layersNameObject[layerOriginName];
+      if (this.layersNameObject[aimSource] === 0) {
+        delete this.layersNameObject[aimSource];
         //mbTile不删除source，背景没有source
-        if (row.sourceType != "mbTile" && row.type != "background") {
+        if (row.metadata['mapbox:type'] != "mbSource" && row.metadata['mapbox:type'] != "mbStyle" && row.type != "background") {
+          let sourceJsonId = JSON.parse(JSON.stringify(this.sourceNameObject[aimSource]));
           this.handleRemoveSource(aimSource);
           delete this.sources[aimSource];
-          for (let key in this.sourceNameObject) {
-            if (this.sourceNameObject[key] === aimSource) {
-              delete this.sourceNameObject[key];
-              break;
-            }
-          }
+          delete this.sourceNameObject[aimSource];
           //source没有再使用时,删除后台的tileJson
-          this.deleteTileJson(row.source);
+          // this.deleteTileJson(row.source);
+          this.tileJsonList.push(sourceJsonId);
         }
       }
-      // vuex更新参数状态
-      this.UPDATEPARM({parm: 'layers', value: this.layers});
-      this.UPDATEPARM({parm: 'sources', value: this.sources});
-      this.UPDATEPARM({parm: 'layersName', value: this.layersName});
-      this.UPDATEPARM({parm: 'originStyle', value: this.originStyle});
-      this.UPDATEPARM({parm: 'layersNameObject', value: this.layersNameObject});
-      this.UPDATEPARM({parm: 'sourceNameObject', value: this.sourceNameObject});
+      console.log('删除:',this.layers,this.layersNameObject,this.sourceNameObject,this.tileJsonList)
     },
 
     deleteLayerFromTree(aimLayerData,node) {
@@ -535,42 +531,29 @@ export default {
       for (let i in this.layers) {
         let item = JSON.parse(JSON.stringify(this.layers[i]));
         let aimSource = item.source;
-        let layerOriginName = item.originName;
         let layerid = item.id;
-        this.layersNameObject[layerOriginName] -= 1;
+        this.layersNameObject[aimSource] -= 1;
         this.handleRemoveLayer(layerid);
         //如果没有layer使用source，则删除source
-        if (this.layersNameObject[layerOriginName] === 0) {
-          delete this.layersNameObject[layerOriginName];
+        if (this.layersNameObject[aimSource] === 0) {
+          delete this.layersNameObject[aimSource];
           //mbTile不删除source，背景没有source
-          if (item.sourceType != "mbTile" && item.type != "background") {
+          if (item.metadata['mapbox:type'] != "mbSource" && item.metadata['mapbox:type'] != "mbStyle" && item.type != "background") {
+            let sourceJsonId = JSON.parse(JSON.stringify(this.sourceNameObject[aimSource]));
             this.handleRemoveSource(aimSource);
             delete this.sources[aimSource];
-            for (let key in this.sourceNameObject) {
-              if (this.sourceNameObject[key] === aimSource) {
-                delete this.sourceNameObject[key];
-                break;
-              }
-            }
-            //source没有再使用时,删除后台的tileJson
-            this.deleteTileJson(item.source);
+            delete this.sourceNameObject[aimSource];
+            //source没有再使用时,删除后台的tileJson(防止未保存，将删除Json的步骤放到保存中执行)
+            // this.deleteTileJson(item.source);
+            this.tileJsonList.push(sourceJsonId);
           }
         }
       }
       // 循环完再进行视图数据初始化,避免循环中渲染。
       this.layers = [];
-      this.layersName = [];
       this.originStyle = [];
       this.layersTree = []
-
-      // vuex更新参数状态
-      this.UPDATEPARM({parm: 'layers', value: this.layers});
-      this.UPDATEPARM({parm: 'sources', value: this.sources});
-      this.UPDATEPARM({parm: 'layersName', value: this.layersName});
-      this.UPDATEPARM({parm: 'originStyle', value: this.originStyle});
-      this.UPDATEPARM({parm: 'layersNameObject', value: this.layersNameObject});
-      this.UPDATEPARM({parm: 'sourceNameObject', value: this.sourceNameObject});
-      this.UPDATEPARM({parm: 'layersTree', value: this.layersTree});
+      // console.log('一键删除:',this.layers,this.layersNameObject,this.sourceNameObject,this.tileJsonList)
     },
 
     // #对map组件方法的封装

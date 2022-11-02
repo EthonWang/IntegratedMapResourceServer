@@ -10,11 +10,12 @@
       editorShow == 'backgroundEditorShow' ||
       editorShow == 'heatMapEditorShow'
     "
+    :key="componentKey"
   >
     <div
       v-show="nameEdit === false"
       class="editBoardTitle"
-      @click="nameEdit = true"
+      @click="nameEditOpen"
     >
       <div :title="layers[nowLayerIndex]['showName']">
         {{ layers[nowLayerIndex]["showName"] }}
@@ -25,9 +26,20 @@
       <el-input
         v-model="layers[nowLayerIndex]['showName']"
         size="mini"
-        @change="nameEdit = false"
-      ></el-input>
-      <i class="el-icon-check" @click="nameEdit = false"></i>
+        @change="nameConfirm"
+        @input="nameCheck"
+        :class="isRepeate ? 'test' : ''"
+        :style="{'border-color': isRepeate ? 'red' : {},color:'red',width:'200px'}"
+      >
+        <i 
+          v-if="isRepeate"
+          slot="suffix" 
+          class="el-icon-warning" 
+          title="名称重复" 
+          style="color:red;font-size:15px">
+        </i>
+      </el-input>
+      <i class="el-icon-check" @click="nameConfirm"></i>
     </div>
 
     <el-tabs value="first">
@@ -3946,13 +3958,13 @@ export default {
     return {
       // vuex参数
       // mapProjectInfo: "",
-      // layersName: "",
       // layers: "",
       // nowLayerIndex: 0,
       // originStyle: {},
       // spritePath: "",
 
       // 公共参数
+      componentKey: 0,    // 组件的key，用于组件重新渲染
       editorShow: "",
       glyphsPath: "",
       isMbTile: false,
@@ -3996,6 +4008,9 @@ export default {
       isSymbol: true,
       nameEdit: false,
       symbolColor: ["#43aaf5", "#838da8"],
+      nameElse: [],       // 除了在编辑图层的其余图层名列表
+      nameOrigin: '',     // 图层编辑前的名称，用于命名重复时更换回初始值
+      isRepeate: false,
 
       //插值类型
       value: "",
@@ -4045,7 +4060,6 @@ export default {
   computed: {
     ...mapState({
       // mapProjectInfoProp: "mapProjectInfo",
-      // layersNameProp: "layersName",
       // layersProp: "layers",
       // spritePathProp: "spritePath",
       // nowLayerIndexProp: "nowLayerIndex",
@@ -4068,14 +4082,6 @@ export default {
         this.UPDATEPARM({ parm: "layers", value: val })
       }      
     },
-    layersName:{
-      get(){
-        return this.$store.state.layersName;
-      },
-      set(val) {
-        this.UPDATEPARM({ parm: "layersName", value: val })
-      }      
-    },
     spritePath:{
       get(){
         return this.$store.state.spritePath;
@@ -4091,6 +4097,14 @@ export default {
       set(val) {
         this.UPDATEPARM({ parm: "nowLayerIndex", value: val })
       }      
+    },    
+    // 本组件内需要的属性
+    layersName:function(){
+        let List = [];
+        this.layers.forEach(item => {
+          List.push(item.showName);
+        })
+        return List;
     },    
   },
   mounted() {
@@ -4193,6 +4207,7 @@ export default {
     // 打开图层样式编辑面板
     handleLayerEdit(index, row) {
       console.log("now edit layer: row", row);
+      this.componentKey += 1;
       // #信息预处理
       // 判断当前页面数据是否为mbtile,以及是否为osm数据
       this.UPDATEPARM({ parm: "nowLayerIndex", index });
@@ -4202,12 +4217,12 @@ export default {
       switch (datatype) {
         case "mbSource":
           this.layerSource = "mbSource";
-          this.mbSourceLayer = row["metadata"]["mapbox:source"];
+          this.mbSourceLayer = row["source-layer"];
           this.isMbTile = true;
           break;
         case "mbStyle":
           this.layerSource = "mbStyle";
-          this.mbSourceLayer = row["metadata"]["mapbox:source"];
+          this.mbSourceLayer = row["source-layer"];
           this.isMbTile = true;
           break;
         case "TMS":
@@ -4296,6 +4311,32 @@ export default {
     // 关闭图层样式编辑面板
     handleCloseEditBoard() {
       this.editorShow = "";
+    },
+
+    // #图层编辑相关
+    nameEditOpen(){
+      this.nameElse = this.layersName.filter(data=>
+        data != this.layers[this.nowLayerIndex]['showName']
+      )
+      this.nameOrigin = JSON.parse(JSON.stringify(this.layers[this.nowLayerIndex]['showName']));
+      this.nameEdit = true
+    },
+    // 核对图层名是否正确
+    nameCheck(val){
+      if(this.nameElse.indexOf(val) != -1){         // 有重复
+        this.isRepeate = true;
+      }else{
+        this.isRepeate = false;
+      }
+    },
+    nameConfirm(){
+      if(this.isRepeate){
+        this.layers[this.nowLayerIndex]['showName'] = this.nameOrigin;
+        this.isRepeate = false;
+        this.nameEdit = false;
+      }else{
+        this.nameEdit = false;
+      }
     },
 
     // #图标
@@ -4916,5 +4957,8 @@ export default {
   width: 209px;
   height: calc(100vh - 82px);
   overflow-y: scroll;
+}
+.test{
+  border-color: red !important; 
 }
 </style>
