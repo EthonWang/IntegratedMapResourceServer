@@ -21,30 +21,38 @@
       >
       <!-- data范围popover样式 若两个popover都是用v-popover会出错-->
       <el-popover placement="right" width="400" trigger="click">
-        <span>筛选字段</span>
+        <!-- <span>筛选字段</span> -->
+        <h4>筛选字段</h4>
         <!-- 非mbTile -->
+        <el-input
+          v-model="dataSearch"
+          size="mini"
+          placeholder="搜索"
+          prefix-icon="el-icon-search"
+        />
         <el-table
           v-if="!isMbTile"
           :data="
             propertyList.filter(
               (data) =>
-                !search ||
-                data.column_name.toLowerCase().includes(search.toLowerCase())
+                !dataSearch ||
+                data.column_name.toLowerCase().includes(dataSearch.toLowerCase())
             )
           "
           row-key="id"
           :cell-style="{ textAlign: 'left' }"
           @row-click="dataOpen"
           max-height="300"
+          :show-header="false"
         >
           <el-table-column prop="column_name" align="right">
             <template slot="header">
-              <el-input
+              <!-- <el-input
                 v-model="dataSearch"
                 size="mini"
                 placeholder="搜索"
                 prefix-icon="el-icon-search"
-              />
+              /> -->
             </template>
           </el-table-column>
         </el-table>
@@ -54,8 +62,8 @@
           :data="
             propertyList.filter(
               (data) =>
-                !search ||
-                data.attribute.toLowerCase().includes(search.toLowerCase())
+                !dataSearch ||
+                data.attribute.toLowerCase().includes(dataSearch.toLowerCase())
             )
           "
           row-key="id"
@@ -63,15 +71,16 @@
           @row-click="dataOpen"
           max-height="300"
           :row-class-name="dataTableClassName"
+          :show-header="false"
         >
           <el-table-column prop="attribute" align="right">
             <template slot="header">
-              <el-input
+              <!-- <el-input
                 v-model="dataSearch"
                 size="mini"
                 placeholder="搜索"
                 prefix-icon="el-icon-search"
-              />
+              /> -->
             </template>
           </el-table-column>
           <el-table-column align="right">
@@ -117,8 +126,14 @@
       </el-popover>
       <!-- 属性条件popover样式 -->
       <el-popover placement="right" width="400" trigger="click">
-        <span>选择属性</span>
+        <h4>选择属性</h4>
         <!-- 非mbTile -->
+        <el-input
+                v-model="search"
+                size="mini"
+                placeholder="搜索"
+                prefix-icon="el-icon-search"
+              />
         <el-table
           v-if="!isMbTile"
           :data="
@@ -133,15 +148,16 @@
           class="attList"
           @row-click="propOpen"
           max-height="300"
+          :show-header="false"
         >
           <el-table-column prop="column_name" align="right">
             <template slot="header">
-              <el-input
+              <!-- <el-input
                 v-model="search"
                 size="mini"
                 placeholder="搜索"
                 prefix-icon="el-icon-search"
-              />
+              /> -->
             </template>
           </el-table-column>
         </el-table>
@@ -160,15 +176,16 @@
           @row-click="propOpen"
           :max-height="300"
           :row-class-name="propTableClassName"
+          :show-header="false"
         >
           <el-table-column prop="attribute" align="right">
             <template slot="header">
-              <el-input
+              <!-- <el-input
                 v-model="dataSearch"
                 size="mini"
                 placeholder="搜索"
                 prefix-icon="el-icon-search"
-              />
+              /> -->
             </template>
           </el-table-column>
           <el-table-column align="right">
