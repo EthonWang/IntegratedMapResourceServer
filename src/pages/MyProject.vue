@@ -17,7 +17,7 @@
 
     <div class="projectsBox">
       <el-card class="project-item" v-for="(item,index) in mapProjectData" :key="item.date" shadow="hover">
-        <el-image @click="editMapProject(item)" class="project-item-image"  style="cursor: pointer"
+        <el-image @click="editMapProject1(item)" class="project-item-image"  style="cursor: pointer"
                   fit="contain" :src="item.mapImgUrl.mapImgUrl ? item.mapImgUrl.mapImgUrl : imgDefault"></el-image>
         <div>
 

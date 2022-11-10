@@ -21,30 +21,38 @@
       >
       <!-- data范围popover样式 若两个popover都是用v-popover会出错-->
       <el-popover placement="right" width="400" trigger="click">
-        <span>筛选字段</span>
+        <!-- <span>筛选字段</span> -->
+        <h4>筛选字段</h4>
         <!-- 非mbTile -->
+        <el-input
+          v-model="dataSearch"
+          size="mini"
+          placeholder="搜索"
+          prefix-icon="el-icon-search"
+        />
         <el-table
           v-if="!isMbTile"
           :data="
             propertyList.filter(
               (data) =>
-                !search ||
-                data.column_name.toLowerCase().includes(search.toLowerCase())
+                !dataSearch ||
+                data.column_name.toLowerCase().includes(dataSearch.toLowerCase())
             )
           "
           row-key="id"
           :cell-style="{ textAlign: 'left' }"
           @row-click="dataOpen"
           max-height="300"
+          :show-header="false"
         >
           <el-table-column prop="column_name" align="right">
             <template slot="header">
-              <el-input
+              <!-- <el-input
                 v-model="dataSearch"
                 size="mini"
                 placeholder="搜索"
                 prefix-icon="el-icon-search"
-              />
+              /> -->
             </template>
           </el-table-column>
         </el-table>
@@ -54,8 +62,8 @@
           :data="
             propertyList.filter(
               (data) =>
-                !search ||
-                data.attribute.toLowerCase().includes(search.toLowerCase())
+                !dataSearch ||
+                data.attribute.toLowerCase().includes(dataSearch.toLowerCase())
             )
           "
           row-key="id"
@@ -63,15 +71,16 @@
           @row-click="dataOpen"
           max-height="300"
           :row-class-name="dataTableClassName"
+          :show-header="false"
         >
           <el-table-column prop="attribute" align="right">
             <template slot="header">
-              <el-input
+              <!-- <el-input
                 v-model="dataSearch"
                 size="mini"
                 placeholder="搜索"
                 prefix-icon="el-icon-search"
-              />
+              /> -->
             </template>
           </el-table-column>
           <el-table-column align="right">
@@ -117,8 +126,14 @@
       </el-popover>
       <!-- 属性条件popover样式 -->
       <el-popover placement="right" width="400" trigger="click">
-        <span>选择属性</span>
+        <h4>选择属性</h4>
         <!-- 非mbTile -->
+        <el-input
+                v-model="search"
+                size="mini"
+                placeholder="搜索"
+                prefix-icon="el-icon-search"
+              />
         <el-table
           v-if="!isMbTile"
           :data="
@@ -133,15 +148,16 @@
           class="attList"
           @row-click="propOpen"
           max-height="300"
+          :show-header="false"
         >
           <el-table-column prop="column_name" align="right">
             <template slot="header">
-              <el-input
+              <!-- <el-input
                 v-model="search"
                 size="mini"
                 placeholder="搜索"
                 prefix-icon="el-icon-search"
-              />
+              /> -->
             </template>
           </el-table-column>
         </el-table>
@@ -160,15 +176,16 @@
           @row-click="propOpen"
           :max-height="300"
           :row-class-name="propTableClassName"
+          :show-header="false"
         >
           <el-table-column prop="attribute" align="right">
             <template slot="header">
-              <el-input
+              <!-- <el-input
                 v-model="dataSearch"
                 size="mini"
                 placeholder="搜索"
                 prefix-icon="el-icon-search"
-              />
+              /> -->
             </template>
           </el-table-column>
           <el-table-column align="right">
@@ -1950,7 +1967,7 @@ export default {
       formValueOrigin: [],
       propertyList: [], // 所选图层所有属性名列表
       propNumList: [], // 数字类型属性名列表,现在用propertyList做判断暂不用
-      conditionShow: true,   // 用来控制某些属性不显示四个渲染按钮, 显示内部重置按钮
+      conditionShow: true, // 用来控制某些属性不显示四个渲染按钮, 显示内部重置按钮
 
       //全局参数
       spriteList: [],
@@ -2266,10 +2283,11 @@ export default {
       for (let tab in this.layer["paint"]) {
         if (
           this.layer.attrValueSet[tab] == "primary" ||
-          !(this.attribute in this.layer.attrValueSet)      // 不在attrValueSet，表示为刚加载的图层
+          !(this.attribute in this.layer.attrValueSet) // 不在attrValueSet，表示为刚加载的图层
         ) {
-          if(this.layer["paint"][tab].constructor === Object){    // 一些特殊的渲染方法
-            if ('stops' in this.layer["paint"][tab]) {
+          if (this.layer["paint"][tab].constructor === Object) {
+            // 一些特殊的渲染方法
+            if ("stops" in this.layer["paint"][tab]) {
               // 原始OSM采用{base:...,stops:[]}形式
               const attrValue = this.layer["paint"][tab];
               const Object = renderSplit(attrValue);
@@ -2283,19 +2301,17 @@ export default {
                   rateValue: Object.rateValue,
                 },
               };
-            }
-            else if('property' in this.layer["paint"][tab]) { // {"property": "render_min_height","type": "identity"}
+            } else if ("property" in this.layer["paint"][tab]) {
+              // {"property": "render_min_height","type": "identity"}
               this.menuButtonShowList[tab] = false;
-              this.conditionShow = false;     // 打开功能面板但，不显示四种条条件按钮
-              this.layer.attrValueSet[tab] = "primary";   //这中条件先默认设为primary
+              this.conditionShow = false; // 打开功能面板但，不显示四种条条件按钮
+              this.layer.attrValueSet[tab] = "primary"; //这中条件先默认设为primary
             }
-          }
-          else {
+          } else {
             this.menuButtonShowList[tab] = true;
-            this.layer.attrValueSet[tab] = "primary";   //若之前未有存档，则初始化为primary
+            this.layer.attrValueSet[tab] = "primary"; //若之前未有存档，则初始化为primary
           }
-        } 
-        else {
+        } else {
           this.menuButtonShowList[tab] = false;
         }
       }
@@ -2304,8 +2320,9 @@ export default {
           this.layer.attrValueSet[tab] == "primary" ||
           !(this.attribute in this.layer.attrValueSet)
         ) {
-          if(this.layer["layout"][tab].constructor === Object){    // 一些特殊的渲染方法
-            if ('stops' in this.layer["layout"][tab]) {
+          if (this.layer["layout"][tab].constructor === Object) {
+            // 一些特殊的渲染方法
+            if ("stops" in this.layer["layout"][tab]) {
               // 原始OSM采用{base:...,stops:[]}形式
               const attrValue = this.layer["layout"][tab];
               const Object = renderSplit(attrValue);
@@ -2319,19 +2336,17 @@ export default {
                   rateValue: Object.rateValue,
                 },
               };
-            } 
-            else if('property' in this.layer["layout"][tab]) { // {"property": "render_min_height","type": "identity"}
+            } else if ("property" in this.layer["layout"][tab]) {
+              // {"property": "render_min_height","type": "identity"}
               this.menuButtonShowList[tab] = false;
-              this.conditionShow = false;     // 打开功能面板但，不显示四种条条件按钮
-              this.layer.attrValueSet[tab] = "primary";   //这中条件先默认设为primary
-            }                       
-          }
-          else {
+              this.conditionShow = false; // 打开功能面板但，不显示四种条条件按钮
+              this.layer.attrValueSet[tab] = "primary"; //这中条件先默认设为primary
+            }
+          } else {
             this.menuButtonShowList[tab] = true;
             this.layer.attrValueSet[tab] = "primary"; //若之前未有存档，则初始化为primary
           }
-        } 
-        else {
+        } else {
           this.menuButtonShowList[tab] = false;
         }
       }
