@@ -51,3 +51,36 @@ export const nameIndex = (a1,a2,a3,a4)=>{
   return {show:showName,object:layersNameObject};
 }
 
+
+/**
+ * 对项目信息进行本地文件替换
+ * @param {List}     sources 数据源图层 [{ name: name, type: type, sourceId: item, itemInfo: "", newType: type, newSourceId: "" }]
+ * @param {file}     uploadFile 上传的文件信息
+ */  
+ export const fileImport = (a1,a2)=>{
+  let sources = a1;
+  let uploadFile = JSON.parse(JSON.stringify(a2));
+  sources.forEach(item=>{
+    switch (item.newType) {
+      case 'defaultPG':
+        uploadFile = replacePG(item)
+        break;
+    
+      default:
+        break;
+    }
+  })
+  let test = JSON.stringify(uploadFile);
+  let _test = test.replace(/"ChinaProvince_632039ffc8a4a6c3edffb5f4#pg"/g, '"aaaaaaaaa"');
+  let data = JSON.parse(_test);
+  console.log('测试','\n',sources,'\n',data);
+ }
+
+ export const replacePG = (a1,a2)=>{
+  let item = a1;
+  let sourceId_new = item.newSourceId;
+  let uploadFile = JSON.parse(JSON.stringify(a2));
+  let file_update = JSON.stringify(uploadFile);
+  file_update = file_update.replace(/item.sourceId/g, sourceId_new);
+  let data = JSON.parse(_test);  
+ } 

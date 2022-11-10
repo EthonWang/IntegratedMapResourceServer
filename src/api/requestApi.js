@@ -196,6 +196,10 @@ export default {
     createMapImg(data){
         return instance.post(Vue.prototype.reqUrl+"/mapProject/createMapImg",data)
     },    
+    importProject(data){
+        return instance.post(Vue.prototype.reqUrl+"/mapProject/importProject",data)
+    },    
+
 
     //地图发布相关
     //获取发布的地图样式

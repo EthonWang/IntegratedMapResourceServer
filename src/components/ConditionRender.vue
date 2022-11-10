@@ -1950,7 +1950,7 @@ export default {
       formValueOrigin: [],
       propertyList: [], // 所选图层所有属性名列表
       propNumList: [], // 数字类型属性名列表,现在用propertyList做判断暂不用
-      conditionShow: true,   // 用来控制某些属性不显示四个渲染按钮, 显示内部重置按钮
+      conditionShow: true, // 用来控制某些属性不显示四个渲染按钮, 显示内部重置按钮
 
       //全局参数
       spriteList: [],
@@ -2266,10 +2266,11 @@ export default {
       for (let tab in this.layer["paint"]) {
         if (
           this.layer.attrValueSet[tab] == "primary" ||
-          !(this.attribute in this.layer.attrValueSet)      // 不在attrValueSet，表示为刚加载的图层
+          !(this.attribute in this.layer.attrValueSet) // 不在attrValueSet，表示为刚加载的图层
         ) {
-          if(this.layer["paint"][tab].constructor === Object){    // 一些特殊的渲染方法
-            if ('stops' in this.layer["paint"][tab]) {
+          if (this.layer["paint"][tab].constructor === Object) {
+            // 一些特殊的渲染方法
+            if ("stops" in this.layer["paint"][tab]) {
               // 原始OSM采用{base:...,stops:[]}形式
               const attrValue = this.layer["paint"][tab];
               const Object = renderSplit(attrValue);
@@ -2283,19 +2284,17 @@ export default {
                   rateValue: Object.rateValue,
                 },
               };
-            }
-            else if('property' in this.layer["paint"][tab]) { // {"property": "render_min_height","type": "identity"}
+            } else if ("property" in this.layer["paint"][tab]) {
+              // {"property": "render_min_height","type": "identity"}
               this.menuButtonShowList[tab] = false;
-              this.conditionShow = false;     // 打开功能面板但，不显示四种条条件按钮
-              this.layer.attrValueSet[tab] = "primary";   //这中条件先默认设为primary
+              this.conditionShow = false; // 打开功能面板但，不显示四种条条件按钮
+              this.layer.attrValueSet[tab] = "primary"; //这中条件先默认设为primary
             }
-          }
-          else {
+          } else {
             this.menuButtonShowList[tab] = true;
-            this.layer.attrValueSet[tab] = "primary";   //若之前未有存档，则初始化为primary
+            this.layer.attrValueSet[tab] = "primary"; //若之前未有存档，则初始化为primary
           }
-        } 
-        else {
+        } else {
           this.menuButtonShowList[tab] = false;
         }
       }
@@ -2304,8 +2303,9 @@ export default {
           this.layer.attrValueSet[tab] == "primary" ||
           !(this.attribute in this.layer.attrValueSet)
         ) {
-          if(this.layer["layout"][tab].constructor === Object){    // 一些特殊的渲染方法
-            if ('stops' in this.layer["layout"][tab]) {
+          if (this.layer["layout"][tab].constructor === Object) {
+            // 一些特殊的渲染方法
+            if ("stops" in this.layer["layout"][tab]) {
               // 原始OSM采用{base:...,stops:[]}形式
               const attrValue = this.layer["layout"][tab];
               const Object = renderSplit(attrValue);
@@ -2319,19 +2319,17 @@ export default {
                   rateValue: Object.rateValue,
                 },
               };
-            } 
-            else if('property' in this.layer["layout"][tab]) { // {"property": "render_min_height","type": "identity"}
+            } else if ("property" in this.layer["layout"][tab]) {
+              // {"property": "render_min_height","type": "identity"}
               this.menuButtonShowList[tab] = false;
-              this.conditionShow = false;     // 打开功能面板但，不显示四种条条件按钮
-              this.layer.attrValueSet[tab] = "primary";   //这中条件先默认设为primary
-            }                       
-          }
-          else {
+              this.conditionShow = false; // 打开功能面板但，不显示四种条条件按钮
+              this.layer.attrValueSet[tab] = "primary"; //这中条件先默认设为primary
+            }
+          } else {
             this.menuButtonShowList[tab] = true;
             this.layer.attrValueSet[tab] = "primary"; //若之前未有存档，则初始化为primary
           }
-        } 
-        else {
+        } else {
           this.menuButtonShowList[tab] = false;
         }
       }
@@ -3095,7 +3093,7 @@ export default {
       );
     },
     getDataRange(row) {
-      if (this.layer.sourceType == "pgDefault") {
+      if (this.layer.sourceType == "defaultPG") {
         requestApi
           .getMaxMinAttrValue({
             attrName: this.dataSelect,
@@ -3114,7 +3112,7 @@ export default {
           .catch((err) => {
             console.log("err", err);
           });
-      } else if (this.layer.sourceType == "pgMulti") {
+      } else if (this.layer.sourceType == "multiPG") {
         requestApi
           .getMaxMinAttrMultiPg(
             this.layer.mutiPgInfo.ip,
@@ -3195,7 +3193,7 @@ export default {
       console.log("propValue:", this.propValueFilter);
     },
     propValueListInit(row) {
-      if (this.layer.sourceType == "pgDefault") {
+      if (this.layer.sourceType == "defaultPG") {
         requestApi
           .getAttrValue({
             aimAttrName: this.propSelect,
@@ -3218,7 +3216,7 @@ export default {
           .catch((error) => {
             console.log(error);
           });
-      } else if (this.layer.sourceType == "pgMulti") {
+      } else if (this.layer.sourceType == "multiPG") {
         requestApi
           .getAttrValueMultiPg(
             this.layer.mutiPgInfo.ip,

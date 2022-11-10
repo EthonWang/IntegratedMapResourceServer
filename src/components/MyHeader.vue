@@ -1,6 +1,6 @@
 <template>
   <header>
-    <a href="#" class="logo"><h2>Mapbox管理台</h2></a>
+    <a href="#" class="logo"><h1>泛在地理信息聚合服务平台</h1></a>
     <ul class="navigation">
       <li>
         <router-link to="/Map/MyData"><h2>数据服务</h2></router-link>

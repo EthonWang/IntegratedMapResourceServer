@@ -5290,10 +5290,10 @@ export default {
       //分类型进行创建shp的json入库并返回对应id
       switch (this.dataBaseSelect) {
         case "defaultPG":
-          this.addPgDefaultShp(index, row);
+          this.adddefaultPGShp(index, row);
           break;
         case "multiPG":
-          this.addPgMultiShp(index, row);
+          this.addmultiPGShp(index, row);
           break;
         case "cacheTile":
           this.addCacheShp(index, row);
@@ -5315,7 +5315,7 @@ export default {
       }
       this.editorShow = "";
     },
-    async addPgDefaultShp(index, row) {
+    async adddefaultPGShp(index, row) {
       //判断该shp是否已添加
       if (
         !Object.prototype.hasOwnProperty.call(
@@ -5371,7 +5371,7 @@ export default {
       //前八个是自己用的属性
       let newLayer = {
         index: index,
-        sourceType: "pgDefault", //记录数据来源类型，用于区别mbTlie的添加和删除
+        sourceType: "defaultPG", //记录数据来源类型，用于区别mbTlie的添加和删除
         show: true,
         originName: row.originName,
         showName: row.originName, //用于展示图层名字
@@ -5387,7 +5387,7 @@ export default {
           JSON.stringify(layerStyleProperties[geoType].layout)
         ), //防止同类型图层样式改变间影响
         maxzoom: 22,
-        metadata: { "mapbox:type": "pgDefault" },
+        metadata: { "mapbox:type": "defaultPG" },
         minzoom: 0,
         paint: JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint)),
         source: this.sourceNameObject[row.tableName], //通过记录的source名字与id对应，拿到sourceId
@@ -5422,7 +5422,7 @@ export default {
       });
       this.addLayerToMap(newLayer);
     },
-    async addPgMultiShp(index, row) {
+    async addmultiPGShp(index, row) {
       //判断该shp是否已添加
       if (
         !Object.prototype.hasOwnProperty.call(
@@ -5487,7 +5487,7 @@ export default {
       //前九个是自己用的属性
       let newLayer = {
         index: index,
-        sourceType: "pgMulti", //记录数据来源类型，用于区别mbTlie的添加和删除
+        sourceType: "multiPG", //记录数据来源类型，用于区别mbTlie的添加和删除
         show: true,
         originName: row.originName,
         showName: row.originName, //用于展示图层名字
@@ -5504,7 +5504,7 @@ export default {
           JSON.stringify(layerStyleProperties[geoType].layout)
         ),
         maxzoom: 22,
-        metadata: { "mapbox:type": "pgMulti" },
+        metadata: { "mapbox:type": "multiPG" },
         minzoom: 0,
         paint: JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint)),
         source: this.sourceNameObject[row.id], //添加的sourceId

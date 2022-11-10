@@ -460,19 +460,19 @@ export default {
       this.originStyle.splice(index, 1);
       this.layersNameObject[aimSource] -= 1;
       this.handleRemoveLayer(layerid);
-      //如果没有layer使用source，则删除source
+      //如果没有layer使用source，则删除source记录
       if (this.layersNameObject[aimSource] === 0) {
         delete this.layersNameObject[aimSource];
-        //mbTile不删除source，背景没有source
-        if (row.metadata['mapbox:type'] != "mbSource" && row.metadata['mapbox:type'] != "mbStyle" && row.type != "background") {
+        delete this.sources[aimSource];
+        //只有multiPG删除source的tileJson，背景没有source
+        if (row.metadata['mapbox:type'] == "multiPG") {          
           let sourceJsonId = JSON.parse(JSON.stringify(this.sourceNameObject[aimSource]));
           this.handleRemoveSource(aimSource);
-          delete this.sources[aimSource];
-          delete this.sourceNameObject[aimSource];
           //source没有再使用时,删除后台的tileJson
           // this.deleteTileJson(row.source);
           this.tileJsonList.push(sourceJsonId);
         }
+        delete this.sourceNameObject[aimSource];
       }
       console.log('删除:',this.layers,this.layersNameObject,this.sourceNameObject,this.tileJsonList)
     },
@@ -530,22 +530,26 @@ export default {
       this.$bus.$emit("mapEdit", {type: 'off'});
       for (let i in this.layers) {
         let item = JSON.parse(JSON.stringify(this.layers[i]));
-        let aimSource = item.source;
+        let layerKey = item.manageInfo.layerKey;
+        let sourceKey = item.manageInfo.sourceKey
         let layerid = item.id;
-        this.layersNameObject[aimSource] -= 1;
+        this.layersNameObject[layerKey] -= 1;
         this.handleRemoveLayer(layerid);
         //如果没有layer使用source，则删除source
-        if (this.layersNameObject[aimSource] === 0) {
-          delete this.layersNameObject[aimSource];
-          //mbTile不删除source，背景没有source
-          if (item.metadata['mapbox:type'] != "mbSource" && item.metadata['mapbox:type'] != "mbStyle" && item.type != "background") {
-            let sourceJsonId = JSON.parse(JSON.stringify(this.sourceNameObject[aimSource]));
-            this.handleRemoveSource(aimSource);
-            delete this.sources[aimSource];
-            delete this.sourceNameObject[aimSource];
-            //source没有再使用时,删除后台的tileJson(防止未保存，将删除Json的步骤放到保存中执行)
-            // this.deleteTileJson(item.source);
-            this.tileJsonList.push(sourceJsonId);
+        if (this.layersNameObject[layerKey] === 0) {
+          delete this.layersNameObject[layerKey];
+          // 背景没有source
+          if(item.metadata['mapbox:type'] != "background"){
+            delete this.sources[sourceKey];
+            //只有multiPG删除source的tileJson
+            if (item.metadata['mapbox:type'] == "multiPG") {
+              let sourceJsonId = JSON.parse(JSON.stringify(this.sourceNameObject[sourceKey]));
+              this.handleRemoveSource(sourceKey);
+              //source没有再使用时,删除后台的tileJson(防止未保存，将删除Json的步骤放到保存中执行)
+              // this.deleteTileJson(item.source);
+              this.tileJsonList.push(sourceJsonId);
+            }
+            delete this.sourceNameObject[sourceKey];
           }
         }
       }
@@ -553,7 +557,7 @@ export default {
       this.layers = [];
       this.originStyle = [];
       this.layersTree = []
-      // console.log('一键删除:',this.layers,this.layersNameObject,this.sourceNameObject,this.tileJsonList)
+      console.log('一键删除:',this.layers,'\n',this.layersNameObject,'\n',this.sourceNameObject,'\n',this.tileJsonList)
     },
 
     // #对map组件方法的封装
@@ -620,7 +624,7 @@ export default {
     // #对地图样式编辑框组件的封装
     handleLayerEdit(layerData) {
       let index = this.getLayerIndex(layerData["id"])
-      console.log("nowlayer", layerData, index)
+      console.log("nowlayer", layerData, this.layers[index])
       const data = {
         type: 'open',
         layer: layerData,

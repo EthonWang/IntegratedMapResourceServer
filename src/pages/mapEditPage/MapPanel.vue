@@ -120,7 +120,7 @@ export default {
       });    
       this.layerIdList = List;
       // 响应图层的地图事件
-      this.mapClick();
+      this.mapLayerEvent();
     }
   },
   mounted() {
@@ -267,7 +267,12 @@ export default {
       // });
     },
     // 对图层进行事件添加（受layerIdList进行响应）
-    mapClick(){
+    mapLayerEvent(){
+      // console.log('出发了');
+      // map.on('moveend', () => {
+      //     const features = map.queryRenderedFeatures({ layers: ['water_V3GNe'] }); 
+      //     console.log('筛选',features);
+      // })     
       //center
       map.on("mousemove", this.layerIdList,() => {
         map.getCanvas().style.cursor = "pointer";
