@@ -66,7 +66,7 @@
               v-if="scope.row.newType != 'multiPG'"
               v-model="scope.row.jsonId"
               clearable
-              @change="selectPG(scope.row.jsonId,scope.row.newType,scope.$index)"
+              @change="selectPG(dataList[scope.row.newType],scope.row.jsonId,scope.row.newType,scope.$index)"
               :placeholder="typeContent[scope.row.newType][2]"
             >
               <el-option
@@ -81,7 +81,7 @@
             <el-select
               v-if="scope.row.newType == 'multiPG'"
               v-model="scope.row.dataBase"
-              @change="dataBaseSelect"
+              @change="dataBaseSelect(scope.$index,$event)"
               clearable
               :placeholder="typeContent[scope.row.newType][2]"
             >
@@ -122,11 +122,12 @@
               :disabled="scope.row.dataBase === ''"
               v-model="scope.row.jsonId"
               clearable
+              @change="selectPG(multiDataBase[scope.$index],scope.row.jsonId,scope.row.newType,scope.$index)"
               value-key="originName"
               placeholder="请选择远程PG数据"
             >
               <el-option
-                v-for="item in multiDataBase"
+                v-for="item in multiDataBase[scope.$index]"
                 :key="item.originName"
                 :label="item.originName"
                 :value="item"
@@ -317,8 +318,10 @@
 <script>
 import requestApi from "../api/requestApi";
 import FileSaver from "file-saver";
-import jsonInfo from "../assets/js/project";
+// import jsonInfo from "../assets/js/project";
 import { fileImport } from "@/serve/interpolation";
+import initTileJson from "@/assets/js/initTileJson";
+
 // import initProjectJson from "../assets/js/initMapProjectJson";
 // import config from "../config";
 
@@ -333,8 +336,8 @@ export default {
 
       // 导入项目
       importEditorShow: false,
-      // uploadFile: null,
-      uploadFile: jsonInfo,
+      uploadFile: null,
+      // uploadFile: jsonInfo,
       sources: [],          // [{name:'',type:'',sourceId:'',jsonId:'',newType:'', newSourceInfo(sourceId,source-layer):[]}],用于替换为本地source
       typeContent: {        // 记录各个类型要展示的信息
         defaultPG: ["primary","本地PG","请选择本地PG数据","originName","tilejsonId"],
@@ -342,7 +345,7 @@ export default {
         mbTile: ["warning","mbTile","请选择mbTile数据","name","tileJsonId"],
         TMS: ["info","TMS","请选择TMS数据","name","url"],
       },
-      multiDataBase: [],
+      multiDataBase: [],    // 所选远程PG的
       dataList: { defaultPG: [], multiPG: [], mbTile: [], TMS: [] },
       uploadFileUrl: {},
 
@@ -356,7 +359,7 @@ export default {
   mounted() {
     document.title = "地图项目";
     this.getMapProjectList();
-    this.importInfoInit();
+    // this.importInfoInit();
   },
   methods: {
     getMapProjectList() {
@@ -721,19 +724,20 @@ export default {
       return List;
     },
     // 远程PG数据库选择
-    dataBaseSelect(index){
-      if(index !== ''){
-        this.multiDataBase = this.dataList['multiPG'][index]['dataInfo'];
+    dataBaseSelect(rowIndex,optionIndex){
+      if(optionIndex !== ''){
+        this.multiDataBase[rowIndex] = this.dataList['multiPG'][optionIndex]['dataInfo'];
       }
     },
     // 更换PG数据
-    selectPG(val,type,index){
+    selectPG(dataList,val,type,index){
       // 只有PG数据需要修改sourceId和source-layer
       if(type.includes('PG')){
         if(val !== ''){
-          let List = this.dataList[type].filter(item => 
-            item[this.typeContent[type][4]] == val
+          let List = dataList.filter(item => 
+            item[this.typeContent[type][4]] == val||item == val
           )
+          // 使用newSourceInfo管理sourceid和source-layer
           switch(type){
             case 'defaultPG':
               this.sources[index].newSourceInfo = [`${List[0].tableName}#defaultPG`,List[0].tableName];
@@ -744,7 +748,7 @@ export default {
           }
         }
       }
-      console.log("PG",this.sources[index].newSourceInfo);
+      console.log("PG",this.sources[index],this.dataList['multiPG'][this.sources[index]['dataBase']]);
     },
     // PG类型切换
     changePG(type,index){
@@ -755,21 +759,50 @@ export default {
     },
     // 替换为本地信息，进行本地项目构建
     async importConfirm() {
-      let name = fileImport(this.sources,this.uploadFile);
-      console.log('name',name);
-      // this.sources.forEach((item) => {
-      //   this.uploadFile.sources[
-      //     item.sourceId
-      //   ].url = `${this.reqUrl}/getTileJson/${item.jsonId}.json`;
-      // });
-      // requestApi.importProject(this.uploadFile).then((res) => {
+      this.sources.forEach(item =>{
+        if(item.newType == 'multiPG'){
+          let newTileJson = initTileJson;
+          newTileJson.name = item.jsonId.originName;
+          let mutiPgInfo = this.dataList['multiPG'][item['dataBase']];
+          newTileJson.tiles = [
+            this.reqUrl +
+              "/multiPgSource/" +
+              mutiPgInfo.ip +
+              "/" +
+              mutiPgInfo.port +
+              "/" +
+              mutiPgInfo.name +
+              "/" +
+              item.jsonId.originName +
+              "/{z}/{x}/{y}.pbf",
+          ];
+          let vector_layer = {
+            description: "",
+            fields: item.jsonId.attrInfo,
+            id: item.jsonId.originName,
+          };
+          newTileJson.vector_layers = [vector_layer];
+          newTileJson.tileJsonType = 'multiPG';
+          requestApi.createTileJson(initTileJson)
+            .then(res=>{
+              if (res.data.code !== 0) {
+                console.log("添加source失败");
+              }else{
+                item.jsonId = res.data.data.tileJsonId;
+              }
+            });
+        }
+      })
+      let file = await fileImport(this.sources,this.uploadFile);
+      console.log('file',file);
+      // requestApi.importProject(file).then((res) => {
       //   console.log(res);
       //   if (res.data.msg == "Success") {
       //     this.$message.success(res.data.data);
       //     this.importEditorShow = false;
       //     this.getMapProjectList();
       //   } else {
-      //     this.$message.success(res.data.msg);
+      //     this.$message.danger(res.data.msg);
       //   }
       // });
     },

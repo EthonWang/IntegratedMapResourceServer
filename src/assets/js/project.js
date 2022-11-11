@@ -31,7 +31,7 @@ export default
     "layers": [
         {
             "metadata": {
-                "mapbox:type": "defaultPG"
+                "mapbox:type": "multiPG"
             },
             "showName": "ChinaProvince",
             "filterValueSet": {},
@@ -47,7 +47,7 @@ export default
                 ],
                 "fill-translate-anchor": "map"
             },
-            "source": "ChinaProvince_632039ffc8a4a6c3edffb5f4#pg",
+            "source": "ChinaProvince_632039ffc8a4a6c3edffb5f4#multiPG",
             "source-layer": "ChinaProvince_632039ffc8a4a6c3edffb5f4",
             "nodeType": "layer",
             "type": "fill",
@@ -83,7 +83,7 @@ export default
             "layout": {
                 "visibility": "visible"
             },
-            "sourceType": "defaultPG",
+            "sourceType": "multiPG",
             "maxzoom": 22,
             "bounds": [
                 73.44696042500004,
@@ -119,7 +119,7 @@ export default
                 "line-translate-anchor": "map",
                 "line-width": 1
             },
-            "source": "map_lines_63203a08c8a4a6c3edffb5fb#pg",
+            "source": "map_lines_63203a08c8a4a6c3edffb5fb#defaultPG",
             "source-layer": "map_lines_63203a08c8a4a6c3edffb5fb",
             "nodeType": "layer",
             "type": "line",
@@ -192,7 +192,7 @@ export default
         },
         {
             "metadata": {
-                "mapbox:type": "defaultPG"
+                "mapbox:type": "mbSource"
             },
             "showName": "re",
             "filterValueSet": {},
@@ -213,7 +213,7 @@ export default
                 ],
                 "circle-translate-anchor": "map"
             },
-            "source": "re_63203a0ac8a4a6c3edffb5fd#pg",
+            "source": "re_63203a0ac8a4a6c3edffb5fd#mbSource",
             "source-layer": "re_63203a0ac8a4a6c3edffb5fd",
             "nodeType": "layer",
             "type": "circle",
@@ -285,7 +285,7 @@ export default
             "layout": {
                 "visibility": "visible"
             },
-            "sourceType": "defaultPG",
+            "sourceType": "mbSource",
             "maxzoom": 22,
             "bounds": [
                 108.21231944444445,

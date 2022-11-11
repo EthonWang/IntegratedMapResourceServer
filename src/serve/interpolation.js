@@ -54,33 +54,62 @@ export const nameIndex = (a1,a2,a3,a4)=>{
 
 /**
  * 对项目信息进行本地文件替换
- * @param {List}     sources 数据源图层 [{ name: name, type: type, sourceId: item, itemInfo: "", newType: type, newSourceId: "" }]
+ * @param {List}     sources 数据源图层 [{ name: name, type: type, sourceId: item, itemInfo: "", newType: type, newSourceInfo: [(sourceId),(source-layer)] }]
  * @param {file}     uploadFile 上传的文件信息
  */  
- export const fileImport = (a1,a2)=>{
+export const fileImport = (a1,a2)=>{
   let sources = a1;
   let uploadFile = JSON.parse(JSON.stringify(a2));
   sources.forEach(item=>{
     switch (item.newType) {
       case 'defaultPG':
-        uploadFile = replacePG(item)
+      case 'multiPG':
+        uploadFile = replacePG(item,uploadFile)
         break;
-    
       default:
+        uploadFile = replaceElse(item,uploadFile)
         break;
     }
   })
-  let test = JSON.stringify(uploadFile);
-  let _test = test.replace(/"ChinaProvince_632039ffc8a4a6c3edffb5f4#pg"/g, '"aaaaaaaaa"');
-  let data = JSON.parse(_test);
-  console.log('测试','\n',sources,'\n',data);
- }
+  return uploadFile
+}
 
- export const replacePG = (a1,a2)=>{
+export const replacePG = (a1,a2)=>{
   let item = a1;
-  let sourceId_new = item.newSourceId;
+  let sourceId_new = item.newSourceInfo[0];
+  let sourceId_old = item.sourceId;
+  let source_layer_new = item.newSourceInfo[1];
+  let index = sourceId_old.indexOf('#');
+  // defaultPG: '#' ; multiPG: '_#'
+  let source_layer_old = item.type == 'defaultPG' ? item.sourceId.slice(0,index) : item.sourceId.slice(0,index-1);
   let uploadFile = JSON.parse(JSON.stringify(a2));
-  let file_update = JSON.stringify(uploadFile);
-  file_update = file_update.replace(/item.sourceId/g, sourceId_new);
-  let data = JSON.parse(_test);  
- } 
+  // 先转换source的url
+  uploadFile.sources[
+    item.sourceId
+  ].url = `${this.reqUrl}/getTileJson/${item.jsonId}.json`;   
+  // 选择本地文件时更改了样式,修改类型
+  if(item.newType != item.type){
+    uploadFile.layers.every(data =>{
+      if(data.source == sourceId_old){
+        data.sourceType = item.newType;
+        data.metadata['mapbox:type'] = item.newType;
+      }
+    })
+  }
+  let file_update = JSON.stringify(uploadFile); 
+  // 替换sourceId
+  file_update = file_update.replaceAll(sourceId_old, sourceId_new);
+  // 替换source-layer
+  file_update = file_update.replaceAll(source_layer_old, source_layer_new);  
+  let file_final = JSON.parse(file_update);  
+  return file_final
+} 
+export const replaceElse = (a1,a2)=>{
+  let item = a1;
+  let uploadFile = JSON.parse(JSON.stringify(a2));
+  // 先转换source的url
+  uploadFile.sources[
+    item.sourceId
+  ].url = `${this.reqUrl}/getTileJson/${item.jsonId}.json`;   
+  return uploadFile
+} 
