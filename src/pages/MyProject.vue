@@ -30,12 +30,10 @@
         style="margin: 0 20px"
       >
       </el-input>
-      <el-button
-        type="success"
-        icon="el-icon-search"
-        @click="getMapProjectList()"
-        >搜索</el-button
-      >
+      &nbsp;&nbsp;
+      <el-button type="success" icon="el-icon-search" @click="getMapProjectList()">搜索</el-button>
+      <el-button type="primary" title="刷新数据源ip" @click="updateIp()">更新数据源</el-button>
+
     </div>
     <el-dialog
       title="项目导入"
@@ -572,6 +570,25 @@ export default {
       FileSaver.saveAs(blob, `${item.name}.json`);
     },
 
+    //刷新数据源ip
+    updateIp(){
+      this.$confirm('确认更新数据源IP, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        requestApi.updateDataIp()
+          .then((res) => {
+            console.log(res);
+            this.$message.success("更新成功")
+          }).catch((err) => {
+            console.log(err);
+          })
+      }).catch(() => {
+        this.$message.info("取消更新")
+      })
+    },
+    
     handleSizeChange(val) {
       this.pageSize = val;
       this.getMapProjectList();

@@ -65,7 +65,10 @@ export default {
     },
     getThirdPartSourceList(classification){
         return instance.post(Vue.prototype.reqUrl+"/dataSource/getThirdPartSourceList/"+classification)
-    },      
+    }, 
+    deleteThirdPartSourceById(id){
+        return instance.get(Vue.prototype.reqUrl+"/dataSource/deleteThirdPartSourceById/" + id)
+    },       
 
 
 
@@ -217,7 +220,11 @@ export default {
     //更换发布地图项目的链接
     changeMapLink(mapProjectId){
         return instance.get(Vue.prototype.reqUrl+"/mapProject/changeMapLink/"+mapProjectId)
-    },       
+    }, 
+    //更新数据源ip 
+    updateDataIp(){
+        return instance.get(Vue.prototype.reqUrl+"/mapProject/updateDataIp")
+    },      
 
     //地图数据与样式
     //tilejson

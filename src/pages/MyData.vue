@@ -835,6 +835,33 @@
           <el-table-column prop="url" label="外部服务链接">
           </el-table-column>
           <el-table-column label="操作" show-overflow-tooltip width="400">
+            <template slot-scope="scope">
+              <!-- <el-button
+                type="primary"
+                style="margin: 0px"
+                circle
+                size="mini"
+                class="el-icon-view"
+                title="查看数据信息"
+                @click="handleOutview(scope.row)"
+              >
+              </el-button> -->
+              <el-popconfirm
+                title="确定删除吗？"
+                @confirm="deleteThirdPartSource(scope.row)"
+              >
+                <el-button
+                  slot="reference"
+                  style="margin: 0 5px"
+                  size="mini"
+                  class="el-icon-delete"
+                  type="danger"
+                  title="删除第三方数据源"
+                  circle
+                >
+                </el-button>
+              </el-popconfirm>
+            </template>
 <!--            <template slot-scope="scope">-->
 <!--              <el-popconfirm-->
 <!--                title="确定删除吗？"-->
@@ -1474,6 +1501,25 @@ export default {
           console.log(err);
         });
     },
+
+    //删除外部数据源
+    deleteThirdPartSource(row) {
+      requestApi
+        .deleteThirdPartSourceById(row.id)
+        .then((res) => {
+          if (res.data.code == 0) {
+            this.$message.success("删除数据源：" + row.name);
+            this.getThirdSourceList(this.outUrlItem);
+          } else {
+            this.$message.info("删除数据源失败！");
+          }
+        })
+        .catch((err) => {
+          this.$message.info("删除数据源失败！");
+          console.log(err);
+        });
+    },
+
     deleteStyleJson(row) {
       requestApi
         .deleteStyleJson(row.id)
@@ -1502,6 +1548,25 @@ export default {
             JSON.parse(JSON.stringify(this.mbTileSelect["tileJsonInfo"])),
           ];
           console.log("mbList", this.mbtilesTableData);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+
+    //获取第三方数据源信息
+    getThirdSourceList(classification) {
+      requestApi
+        .getThirdPartSourceList(classification)
+        .then((res) => {
+          this.urlBase[classification] = res.data.data;
+          // this.mbTileSelect = JSON.parse(
+          //   JSON.stringify(this.mbtilesTableData[0])
+          // );
+          // this.mbTileJsonList = [
+          //   JSON.parse(JSON.stringify(this.mbTileSelect["tileJsonInfo"])),
+          // ];
+          console.log("thirdList", this.urlBase[classification]);
         })
         .catch((error) => {
           console.log(error);
