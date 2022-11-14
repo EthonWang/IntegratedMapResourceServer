@@ -109,7 +109,22 @@ export default {
         this.UPDATEPARM({ parm: "tileJsonList", value: val });
       },
     },
-
+    layersNameObject: {
+      get() {
+        return this.$store.state.layersNameObject;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "layersNameObject", value: val });
+      },
+    },
+    sourceNameObject: {
+      get() {
+        return this.$store.state.sourceNameObject;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "sourceNameObject", value: val });
+      },
+    },
   },
   watch: {
     // 组件自用

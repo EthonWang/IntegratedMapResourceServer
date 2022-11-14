@@ -4292,12 +4292,12 @@ export default {
         this.UPDATEPARM({ parm: "nowLayerIndex", value: val });
       },
     },
-    sourceNameObject: {
+    tileJsonList: {
       get() {
-        return this.$store.state.sourceNameObject;
+        return this.$store.state.tileJsonList;
       },
       set(val) {
-        this.UPDATEPARM({ parm: "sourceNameObject", value: val });
+        this.UPDATEPARM({ parm: "tileJsonList", value: val });
       },
     },
     layersNameObject: {
@@ -4308,12 +4308,12 @@ export default {
         this.UPDATEPARM({ parm: "layersNameObject", value: val });
       },
     },
-    tileJsonList: {
+    sourceNameObject: {
       get() {
-        return this.$store.state.tileJsonList;
+        return this.$store.state.sourceNameObject;
       },
       set(val) {
-        this.UPDATEPARM({ parm: "tileJsonList", value: val });
+        this.UPDATEPARM({ parm: "sourceNameObject", value: val });
       },
     },
     // 本组件内需要的属性
@@ -4324,6 +4324,26 @@ export default {
       });
       return List;
     },
+    // sourceNameObject: function () {
+    //   let List = {};
+    //   for(let item in this.sources){
+    //     let start = this.sources[item].url.lastIndexOf('/');
+    //     let end = this.sources[item].url.lastIndexOf('.');
+    //     let id = this.sources[item].url.slice(start+1,end);
+    //     List[item] = id;
+    //   }
+    //   return List;
+    // }, 
+    // layersNameObject: function () {
+    //   let List = {};
+    //   for(let item in this.layers){
+    //     let start = this.sources[item].url.lastIndexOf('/');
+    //     let end = this.sources[item].url.lastIndexOf('.');
+    //     let id = this.sources[item].url.slice(start+1,end);
+    //     List[item] = id;
+    //   }
+    //   return List;
+    // }, 
   },
   mounted() {
     // 等初始组件信息加载完
@@ -4982,6 +5002,8 @@ export default {
     // #数据源设置相关
     sourceInit(layer){
       // 初始化参数
+      console.log('sourceNameObject',this.sourceNameObject);
+
       this.sourceObject = {options:[],option:{},sourceId_old:'',sourceId_new:'',name:'',tileJsonId:'',type:''};
       let type =  layer['metadata']['mapbox:type'];
       let dataName = ('mutiPgInfo' in layer) ? layer['mutiPgInfo']['name']: '';

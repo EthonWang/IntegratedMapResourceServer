@@ -22,7 +22,7 @@
 <!--      </li>-->
     </ul>
 
-    <a href="#" style="visibility:hidden;" class="logo"><h2>Mapbox管理台</h2></a>
+    <a href="#" style="visibility:hidden;" class="logo"><h2>泛在地理信息聚合服务平台</h2></a>
 
   </header>
 </template> 
