@@ -601,9 +601,7 @@ export default {
       for (let item in this.uploadFile.sources) {
         let name = item.slice(0, item.lastIndexOf("_"));
         let type = item.slice(item.indexOf("#") + 1);
-        if (["mbSource", "mbStyle"].indexOf(type) != -1) {
-          type = "mbTile";
-        }
+        type = type == "meta" ? "mbTile" : type;
         typeList.push(type);
         let object = { name: name, type: type, sourceId: item, jsonId: "", newType: type, newSourceInfo: [] };
         if(type.includes('PG')){     // 远程PG要先选数据库，之后本地和远程shp可能交叉使用，故本地pg也添加dataBase字段
@@ -760,6 +758,7 @@ export default {
     // 替换为本地信息，进行本地项目构建
     async importConfirm() {
       this.sources.forEach(item =>{
+        // multiPG需要生成tileJson
         if(item.newType == 'multiPG'){
           let newTileJson = initTileJson;
           newTileJson.name = item.jsonId.originName;
@@ -795,16 +794,16 @@ export default {
       })
       let file = await fileImport(this.sources,this.uploadFile);
       console.log('file',file);
-      // requestApi.importProject(file).then((res) => {
-      //   console.log(res);
-      //   if (res.data.msg == "Success") {
-      //     this.$message.success(res.data.data);
-      //     this.importEditorShow = false;
-      //     this.getMapProjectList();
-      //   } else {
-      //     this.$message.danger(res.data.msg);
-      //   }
-      // });
+      requestApi.importProject(file).then((res) => {
+        console.log(res);
+        if (res.data.msg == "Success") {
+          this.$message.success(res.data.data);
+          this.importEditorShow = false;
+          this.getMapProjectList();
+        } else {
+          this.$message.danger(res.data.msg);
+        }
+      });
     },
     // 上传本地数据
     async handleMultiShpUpSuccess(res) {

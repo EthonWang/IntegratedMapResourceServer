@@ -15,11 +15,11 @@ export default
             "type": "vector",
             "url": "http://172.21.212.14:8899/getTileJson/6363d2598cb83b36b41d553a.json"
         },
-        "map_lines_63203a08c8a4a6c3edffb5fb#mbStyle": {
+        "map_lines_63203a08c8a4a6c3edffb5fb#meta": {
             "type": "vector",
             "url": "http://172.21.212.14:8899/getTileJson/6363d2588cb83b36b41d5537.json"
         },
-        "re_63203a08c8a4a6c3edffb5fb#mbSource": {
+        "re_63203a08c8a4a6c3edffb5fb#meta": {
             "type": "vector",
             "url": "http://172.21.212.14:8899/getTileJson/6363d2588cb83b36b41d5537.json"
         },

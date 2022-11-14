@@ -246,7 +246,6 @@ export default {
       dataBaseList: [],
       // PG服务
       PgBaseSelect: "defaultPG",
-      pgShpList: [],
       shpTableData: [],
       currentPageShp: 1,
       pageSizeShp: 5,
@@ -371,7 +370,7 @@ export default {
       set(val) {
         this.UPDATEPARM({ parm: "originStyle", value: val });
       },
-    },
+    },     
   },
   mounted() {
     // 等初始组件信息加载完
@@ -511,19 +510,20 @@ export default {
      */
     async addDefaultPGShp(row) {
       console.log("add defaultPG shp row: ", row);
-      //判断该shp是否已添加
+      let sourceId = `${row.tableName}#defaultPG`;
+      //判断该shp是否已添加(没有添加source同时sourceid不在待删除名单)
       if (
         !Object.prototype.hasOwnProperty.call(
           this.sourceNameObject,
-          row.tableName // 使用tableName是防止有同名的pg数据图层（应该不可能有）; tableName = originName + id
+          sourceId // 使用tableName是防止有同名的pg数据图层（应该不可能有）; tableName = originName + id
         )
       ) {
         //添加source
-        let sourceJsonId = row.tileJsonId; // defaultPG在上传shp的同时生成json，并把id记录在shp表中
+        let sourceJsonId = row.tilejsonId; // defaultPG在上传shp的同时生成json，并把id记录在shp表中
         let tileJsonUrl =
           this.reqUrl + "/getTileJson/" + sourceJsonId + ".json";
         let newSourceJson = {
-          sourceName: row.tableName + "#defaultPG",
+          sourceName: sourceId,
           sourceType: "vector",
           sourceUrl: tileJsonUrl,
         };
@@ -533,7 +533,7 @@ export default {
           url: newSourceJson.sourceUrl,
         };
         //记录shp图层和对应的id
-        this.sourceNameObject[row.tableName] = sourceJsonId;
+        this.sourceNameObject[sourceId] = sourceJsonId;
       }
 
       //添加layer
@@ -552,7 +552,7 @@ export default {
         JSON.stringify(
           nameIndex(
             this.layers,
-            row.tableName,
+            sourceId,
             row.originName,
             this.layersNameObject
           )
@@ -565,7 +565,7 @@ export default {
         show: true,
         // originName: row.originName,    // 可在source-layer中展示
         showName: result.show, //用于展示图层名字
-        manageInfo: {layerKey:row.tableName,sourceKey:row.tableName},  // 记录layersNameObject和sourceNameObject的key
+        manageInfo: {layerKey:sourceId,sourceKey:sourceId},  // 记录layersNameObject和sourceNameObject的key
         bounds: row.bounds,
         shpAttribute: typeof row.attrInfo != "undefined" ? row.attrInfo : [],
         attrValueSet: {},
@@ -582,7 +582,7 @@ export default {
         metadata: { "mapbox:type": "defaultPG" },
         minzoom: 0,
         paint: JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint)),
-        source: row.tableName + "#defaultPG", //通过记录的source名字与id对应，拿到sourceId
+        source: sourceId, //通过记录的source名字与id对应，拿到sourceId
         "source-layer": row.tableName,
       };
       // 设置随机色
@@ -942,7 +942,7 @@ export default {
         show: true,
         originName: "",
         showName: row.name, //用于展示图层名字
-        manageInfo: {layerKey:row.id,sourceKey:this.sourceNameObject[row.id]},  // 记录layersNameObject和sourceNameObject的key
+        manageInfo: {layerKey:row.id,sourceKey:row.id},  // 记录layersNameObject和sourceNameObject的key
         attrValueSet: {},
         attrShowList: {},
         filterValueSet: {},
@@ -1091,6 +1091,7 @@ export default {
           this.addBackground("mbTile", item);
         }
       }
+      this.$bus.$emit('layerTree',{type:'style',layersTree:this.mbTileStyleJson.layersTree});
       console.log("添加所有styleJson图层");
     },
     addAllSources(List) {
@@ -1160,7 +1161,7 @@ export default {
     PgBaseChange(val) {
       let index = 0; //val表示选择的value值
       //获取select选择内容的下标
-      this.pgShpList.forEach((e, ind) => {
+      this.dataBaseList.forEach((e, ind) => {
         if (e.id == val) {
           index = ind;
         }
@@ -1169,8 +1170,8 @@ export default {
       this.dataBaseSelect =
         this.PgBaseSelect == "defaultPG" ? "defaultPG" : "multiPG";
       if (this.PgBaseSelect != "defaultPG") {
-        this.shpTableData = this.pgShpList[index].dataInfo;
-        this.mutiPgInfo = this.pgShpList[index]; //用于展示IP、端口信息
+        this.shpTableData = this.dataBaseList[index].dataInfo;
+        this.mutiPgInfo = this.dataBaseList[index]; //用于展示IP、端口信息
       } else {
         this.addShpData();
       }

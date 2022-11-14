@@ -78,7 +78,10 @@ export default {
 
 <style scoped>
 .menuPanel {
+  box-sizing: border-box;
   width: 330px;
+  height: 100vh;
+  border-right: 1px solid #dcdfe6;
   display: flex;
   flex-direction: column;
   align-items: center;

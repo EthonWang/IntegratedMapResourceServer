@@ -83,10 +83,11 @@ export const replacePG = (a1,a2)=>{
   // defaultPG: '#' ; multiPG: '_#'
   let source_layer_old = item.type == 'defaultPG' ? item.sourceId.slice(0,index) : item.sourceId.slice(0,index-1);
   let uploadFile = JSON.parse(JSON.stringify(a2));
+  let reqUrl = "http://"+window.IPConfig.baseIP+":8899";
   // 先转换source的url
   uploadFile.sources[
     item.sourceId
-  ].url = `${this.reqUrl}/getTileJson/${item.jsonId}.json`;   
+  ].url = `${reqUrl}/getTileJson/${item.jsonId}.json`;   
   // 选择本地文件时更改了样式,修改类型
   if(item.newType != item.type){
     uploadFile.layers.every(data =>{
@@ -105,11 +106,12 @@ export const replacePG = (a1,a2)=>{
   return file_final
 } 
 export const replaceElse = (a1,a2)=>{
+  let reqUrl = "http://"+window.IPConfig.baseIP+":8899";
   let item = a1;
   let uploadFile = JSON.parse(JSON.stringify(a2));
   // 先转换source的url
   uploadFile.sources[
     item.sourceId
-  ].url = `${this.reqUrl}/getTileJson/${item.jsonId}.json`;   
+  ].url = `${reqUrl}/getTileJson/${item.jsonId}.json`;   
   return uploadFile
 } 

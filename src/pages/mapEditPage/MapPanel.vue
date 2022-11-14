@@ -113,14 +113,17 @@ export default {
   },
   watch: {
     // 组件自用
-    layers: function(val){
-      let List = [];
-      val.forEach(element => {
-        List.push(element.id);
-      });    
-      this.layerIdList = List;
-      // 响应图层的地图事件
-      this.mapLayerEvent();
+    layers:{ 
+      deep:true,
+      handler:function(val){
+        let List = [];
+        val.forEach(element => {
+          List.push(element.id);
+        });    
+        this.layerIdList = List;
+        // 响应图层的地图事件
+        this.mapLayerEvent();
+      }
     }
   },
   mounted() {
@@ -370,6 +373,7 @@ export default {
     },
     deleteTileJson(){
       this.tileJsonList.forEach(element=>{
+        console.log('删除的图层id：',element);
         requestApi
             .deleteTileJson(element)
             .then((res) => {
@@ -489,21 +493,22 @@ export default {
           type: "warning",
         })
           .then(() => {
+            console.log('保存的信息',this.mapProjectInfo);
             requestApi
               .updateMapProject(JSON.stringify(this.mapProjectInfo))
               .then(() => {
                 this.$message.success("保存成功!");
                 //保存截图到工程字段
-                requestApi
-                  .createMapImg({
+                requestApi.createMapImg({
                     imgUrl: this.canvasSrc,
                     mapProjectId: this.mapProjectId,
                   })
-                  .then(() => {})
+                  .then(() => {
+                    this.deleteTileJson();
+                  })
                   .catch((error) => {
                     console.log(error);
                   });
-                this.deleteTileJson();
               })
               .catch((error) => {
                 console.log(error);
@@ -523,11 +528,12 @@ export default {
                 imgUrl: this.canvasSrc,
                 mapProjectId: this.mapProjectId,
               })
-              .then(() => {})
+              .then(() => {
+                this.deleteTileJson();
+              })
               .catch((error) => {
                 console.log(error);
               });
-            this.deleteTileJson();
           })
           .catch((error) => {
             console.log(error);
