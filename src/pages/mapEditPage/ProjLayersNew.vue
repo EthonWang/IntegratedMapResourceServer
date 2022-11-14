@@ -16,7 +16,13 @@
           title="添加组"
           @click="addGroup">
         </el-button>
-
+        <!-- <el-button 
+          class="treeBtn"
+          type="text" plain
+          icon="el-icon-document-copy" 
+          title="复制图层"
+          @click="copyLayer">
+        </el-button> -->
         <el-popconfirm
             title="确定删除全部图层吗？"
             @confirm="allLayerDelete()"
@@ -298,23 +304,26 @@ export default {
     },    
   },
   watch:{
-    layers:function (layers){
-      layers.forEach((layer)=>{
-        const aimLayer = JSON.parse(JSON.stringify(layer));
-        for (let i = 0; i < this.layersTree.length; i++) {
-          let node=this.layersTree[i]
-          if(node.nodeType=="group")
-            for (let k = 0; k < node.children.length; k++)
-              if(node.children[k].id==aimLayer.id)
-                node.children[k]=aimLayer
-          else
-            if(node.id==aimLayer.id)
-              node=aimLayer
-        }
-      })
-      // this.UPDATEPARM({parm: 'layersTree', value: this.layersTree});
-      console.log("update tree")
-      },
+    layers:{
+      deep:true,
+      handler:function (layers){
+        layers.forEach((layer)=>{
+          const aimLayer = JSON.parse(JSON.stringify(layer));
+          for (let i = 0; i < this.layersTree.length; i++) {
+            let node=this.layersTree[i]
+            if(node.nodeType=="group")
+              for (let k = 0; k < node.children.length; k++)
+                if(node.children[k].id==aimLayer.id)
+                  node.children[k]=aimLayer
+            else
+              if(node.id==aimLayer.id)
+                node=aimLayer
+          }
+        })
+        // this.UPDATEPARM({parm: 'layersTree', value: this.layersTree});
+        console.log("update tree")
+      }
+    },
     
 
     // layersTree:function (layersTree){
@@ -354,6 +363,8 @@ export default {
         case 'highLight':              // data:{type:'',id:''}
           this.highLightNode(data.id);
           break;
+        case 'style':                  // data:{type:'',layersTree}
+          this.addTemplate(data)
       }   
     })
   },
@@ -405,6 +416,7 @@ export default {
     },
 
     addLayerToTree(layerData) {
+      console.log('layerTree刷新了',this.layersTree);
       this.layersTree.unshift(layerData)
       this.UPDATEPARM({parm: 'layersTree', value: this.layersTree});
     },
@@ -454,24 +466,28 @@ export default {
       let index = this.getLayerIndex(row["id"])
       // 先关闭图层样式编辑框，防止报错
       this.$bus.$emit("mapEdit", {type: 'off'});
-      let aimSource = row.source;
+      let layerKey = row.manageInfo.layerKey;
+      let sourceKey = row.manageInfo.sourceKey      
       let layerid = row.id;
       this.layers.splice(index, 1);
       this.originStyle.splice(index, 1);
-      this.layersNameObject[aimSource] -= 1;
+      this.layersNameObject[layerKey] -= 1;
       this.handleRemoveLayer(layerid);
-      //如果没有layer使用source，则删除source
-      if (this.layersNameObject[aimSource] === 0) {
-        delete this.layersNameObject[aimSource];
-        //mbTile不删除source，背景没有source
-        if (row.metadata['mapbox:type'] != "mbSource" && row.metadata['mapbox:type'] != "mbStyle" && row.type != "background") {
-          let sourceJsonId = JSON.parse(JSON.stringify(this.sourceNameObject[aimSource]));
-          this.handleRemoveSource(aimSource);
-          delete this.sources[aimSource];
-          delete this.sourceNameObject[aimSource];
-          //source没有再使用时,删除后台的tileJson
-          // this.deleteTileJson(row.source);
-          this.tileJsonList.push(sourceJsonId);
+      //如果没有layer使用source，则删除source记录
+      if (this.layersNameObject[layerKey] === 0) {
+        delete this.layersNameObject[layerKey];
+        // 背景没有source
+        if(row.metadata['mapbox:type'] != "background"){
+          delete this.sources[sourceKey];
+          this.handleRemoveSource(row.source);
+          //只有multiPG删除source的tileJson
+          if (row.metadata['mapbox:type'] == "multiPG") {          
+            let sourceJsonId = JSON.parse(JSON.stringify(this.sourceNameObject[sourceKey]));
+            //source没有再使用时,删除后台的tileJson
+            // this.deleteTileJson(row.source);
+            this.tileJsonList.push(sourceJsonId);
+          }
+          delete this.sourceNameObject[sourceKey];
         }
       }
       console.log('删除:',this.layers,this.layersNameObject,this.sourceNameObject,this.tileJsonList)
@@ -530,22 +546,26 @@ export default {
       this.$bus.$emit("mapEdit", {type: 'off'});
       for (let i in this.layers) {
         let item = JSON.parse(JSON.stringify(this.layers[i]));
-        let aimSource = item.source;
+        let layerKey = item.manageInfo.layerKey;
+        let sourceKey = item.manageInfo.sourceKey
         let layerid = item.id;
-        this.layersNameObject[aimSource] -= 1;
+        this.layersNameObject[layerKey] -= 1;
         this.handleRemoveLayer(layerid);
         //如果没有layer使用source，则删除source
-        if (this.layersNameObject[aimSource] === 0) {
-          delete this.layersNameObject[aimSource];
-          //mbTile不删除source，背景没有source
-          if (item.metadata['mapbox:type'] != "mbSource" && item.metadata['mapbox:type'] != "mbStyle" && item.type != "background") {
-            let sourceJsonId = JSON.parse(JSON.stringify(this.sourceNameObject[aimSource]));
-            this.handleRemoveSource(aimSource);
-            delete this.sources[aimSource];
-            delete this.sourceNameObject[aimSource];
-            //source没有再使用时,删除后台的tileJson(防止未保存，将删除Json的步骤放到保存中执行)
-            // this.deleteTileJson(item.source);
-            this.tileJsonList.push(sourceJsonId);
+        if (this.layersNameObject[layerKey] === 0) {
+          delete this.layersNameObject[layerKey];
+          // 背景没有source
+          if(item.metadata['mapbox:type'] != "background"){
+            delete this.sources[sourceKey];
+            this.handleRemoveSource(item.source);
+            //只有multiPG删除source的tileJson
+            if (item.metadata['mapbox:type'] == "multiPG") {
+              let sourceJsonId = JSON.parse(JSON.stringify(this.sourceNameObject[sourceKey]));
+              //source没有再使用时,删除后台的tileJson(防止未保存，将删除Json的步骤放到保存中执行)
+              // this.deleteTileJson(item.source);
+              this.tileJsonList.push(sourceJsonId);
+            }
+            delete this.sourceNameObject[sourceKey];
           }
         }
       }
@@ -553,7 +573,7 @@ export default {
       this.layers = [];
       this.originStyle = [];
       this.layersTree = []
-      // console.log('一键删除:',this.layers,this.layersNameObject,this.sourceNameObject,this.tileJsonList)
+      console.log('一键删除:',this.layers,'\n',this.layersNameObject,'\n',this.sourceNameObject,'\n',this.tileJsonList)
     },
 
     // #对map组件方法的封装
@@ -620,7 +640,7 @@ export default {
     // #对地图样式编辑框组件的封装
     handleLayerEdit(layerData) {
       let index = this.getLayerIndex(layerData["id"])
-      console.log("nowlayer", layerData, index)
+      console.log("nowlayer", layerData, this.layers[index])
       const data = {
         type: 'open',
         layer: layerData,
@@ -646,6 +666,12 @@ export default {
     highLightNode(id){
       this.$refs.tree.setCurrentKey(id);
     },
+    // 添加style的模板
+    addTemplate(data){
+      this.layersTree = JSON.parse(JSON.stringify(data));
+      console.log('添加模板',data);
+    },
+
     allowDrop(draggingNode, dropNode, type) {
       if (dropNode.data.nodeType == "layer" && type == "inner") {
         return false
@@ -770,6 +796,7 @@ export default {
 }
 /* 按钮组单个按钮（图标） */
 .treeBtn{
+  margin: 0;
   color: #617889;
   padding: 2px;
   font-size: 20px; 

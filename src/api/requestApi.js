@@ -5,7 +5,7 @@ import Vue from "vue";
 const instance= axios.create({
     // baseURL: config.requestUrl,
     // baseURL:Vue.prototype.reqUrl,
-    timeout: 10000,
+    timeout: 4000,
 });
 
 // axios.interceptors.request.use = instance_Mapbox.interceptors.request.use
@@ -199,6 +199,10 @@ export default {
     createMapImg(data){
         return instance.post(Vue.prototype.reqUrl+"/mapProject/createMapImg",data)
     },    
+    importProject(data){
+        return instance.post(Vue.prototype.reqUrl+"/mapProject/importProject",data)
+    },    
+
 
     //地图发布相关
     //获取发布的地图样式

@@ -29,14 +29,19 @@
         @change="nameConfirm"
         @input="nameCheck"
         :class="isRepeate ? 'test' : ''"
-        :style="{'border-color': isRepeate ? 'red' : {},color:'red',width:'200px'}"
+        :style="{
+          'border-color': isRepeate ? 'red' : {},
+          color: 'red',
+          width: '200px',
+        }"
       >
-        <i 
+        <i
           v-if="isRepeate"
-          slot="suffix" 
-          class="el-icon-warning" 
-          title="名称重复" 
-          style="color:red;font-size:15px">
+          slot="suffix"
+          class="el-icon-warning"
+          title="名称重复"
+          style="color: red; font-size: 15px"
+        >
         </i>
       </el-input>
       <i class="el-icon-check" @click="nameConfirm"></i>
@@ -697,7 +702,8 @@
               </div>
               <el-button
                 type="primary"
-                round size="mini"
+                round
+                size="mini"
                 @click="layers[nowLayerIndex].paint['line-dasharray'].push(0)"
                 >添加虚线设置
               </el-button>
@@ -1362,7 +1368,11 @@
             }}</span>
             <!-- Expressions方式渲染 -->
             <el-row
-              v-if="menuButtonShowList['fill-extrusion-height']&&layers[nowLayerIndex].paint['fill-extrusion-height'].constructor !== Object"
+              v-if="
+                menuButtonShowList['fill-extrusion-height'] &&
+                layers[nowLayerIndex].paint['fill-extrusion-height']
+                  .constructor !== Object
+              "
               style="display: flex; margin-top: 10px"
             >
               <el-input-number
@@ -1383,57 +1393,99 @@
             </el-row>
             <!-- Functions方式渲染 -->
             <el-row
-              v-if="layers[nowLayerIndex].paint['fill-extrusion-height'].constructor === Object"
+              v-if="
+                layers[nowLayerIndex].paint['fill-extrusion-height']
+                  .constructor === Object
+              "
               style="margin-top: 10px"
             >
-              <el-row type="flex" style="align-items:center;    margin-bottom:5px">
+              <el-row
+                type="flex"
+                style="align-items: center; margin-bottom: 5px"
+              >
                 <el-col :span="8">
                   <span>渲染属性:</span>
                 </el-col>
                 <el-col :span="16">
-                  <el-select 
-                    v-model="layers[nowLayerIndex].paint['fill-extrusion-height'].property" 
+                  <el-select
+                    v-model="
+                      layers[nowLayerIndex].paint['fill-extrusion-height']
+                        .property
+                    "
                     placeholder="请选择渲染属性"
                     @change="
                       handlePaintChange(
                         layers[nowLayerIndex]['id'],
                         'fill-extrusion-height',
                         {
-                          property:layers[nowLayerIndex].paint['fill-extrusion-height'].property,
-                          type:layers[nowLayerIndex].paint['fill-extrusion-height'].type
+                          property:
+                            layers[nowLayerIndex].paint['fill-extrusion-height']
+                              .property,
+                          type: layers[nowLayerIndex].paint[
+                            'fill-extrusion-height'
+                          ].type,
                         }
                       )
-                    ">
-                    <el-tooltip class="item" effect="dark" content="渲染高度" placement="right">
-                      <el-option label="render_height" value="render_height"></el-option>
-                    </el-tooltip>  
-                    <el-tooltip class="item" effect="dark" content="最小渲染高度" placement="right">
-                      <el-option label="render_min_height" value="render_min_height"></el-option>
-                    </el-tooltip>                                          
+                    "
+                  >
+                    <el-tooltip
+                      class="item"
+                      effect="dark"
+                      content="渲染高度"
+                      placement="right"
+                    >
+                      <el-option
+                        label="render_height"
+                        value="render_height"
+                      ></el-option>
+                    </el-tooltip>
+                    <el-tooltip
+                      class="item"
+                      effect="dark"
+                      content="最小渲染高度"
+                      placement="right"
+                    >
+                      <el-option
+                        label="render_min_height"
+                        value="render_min_height"
+                      ></el-option>
+                    </el-tooltip>
                   </el-select>
                 </el-col>
               </el-row>
-              <el-row type="flex" style="align-items:center">
+              <el-row type="flex" style="align-items: center">
                 <el-col :span="8">
                   <span>渲染类型:</span>
                 </el-col>
                 <el-col :span="16">
-                  <el-select 
-                    v-model="layers[nowLayerIndex].paint['fill-extrusion-height'].type" 
+                  <el-select
+                    v-model="
+                      layers[nowLayerIndex].paint['fill-extrusion-height'].type
+                    "
                     placeholder="请选择渲染类型"
                     @change="
                       handlePaintChange(
                         layers[nowLayerIndex]['id'],
                         'fill-extrusion-height',
                         {
-                          property:layers[nowLayerIndex].paint['fill-extrusion-height'].property,
-                          type:layers[nowLayerIndex].paint['fill-extrusion-height'].type
-                        }                   
+                          property:
+                            layers[nowLayerIndex].paint['fill-extrusion-height']
+                              .property,
+                          type: layers[nowLayerIndex].paint[
+                            'fill-extrusion-height'
+                          ].type,
+                        }
                       )
-                    ">
-                    <el-tooltip class="item" effect="dark" content="一致型（将输入值作为输出值）" placement="right">
+                    "
+                  >
+                    <el-tooltip
+                      class="item"
+                      effect="dark"
+                      content="一致型（将输入值作为输出值）"
+                      placement="right"
+                    >
                       <el-option label="identity" value="identity"></el-option>
-                    </el-tooltip>                    
+                    </el-tooltip>
                     <!-- <el-tooltip class="item" effect="dark" content="指数连续型（在断点之间生成插值）" placement="right">
                       <el-option label="exponential" value="exponential"></el-option>
                     </el-tooltip>                    
@@ -1484,57 +1536,99 @@
             </el-row>
             <!-- Functions方式渲染 -->
             <el-row
-              v-if="layers[nowLayerIndex].paint['fill-extrusion-base'].constructor === Object"
+              v-if="
+                layers[nowLayerIndex].paint['fill-extrusion-base']
+                  .constructor === Object
+              "
               style="margin-top: 10px"
             >
-              <el-row type="flex" style="align-items:center;    margin-bottom:5px">
+              <el-row
+                type="flex"
+                style="align-items: center; margin-bottom: 5px"
+              >
                 <el-col :span="8">
                   <span>渲染属性:</span>
                 </el-col>
                 <el-col :span="16">
-                  <el-select 
-                    v-model="layers[nowLayerIndex].paint['fill-extrusion-base'].property" 
+                  <el-select
+                    v-model="
+                      layers[nowLayerIndex].paint['fill-extrusion-base']
+                        .property
+                    "
                     placeholder="请选择渲染属性"
                     @change="
                       handlePaintChange(
                         layers[nowLayerIndex]['id'],
                         'fill-extrusion-base',
                         {
-                          property:layers[nowLayerIndex].paint['fill-extrusion-base'].property,
-                          type:layers[nowLayerIndex].paint['fill-extrusion-base'].type
+                          property:
+                            layers[nowLayerIndex].paint['fill-extrusion-base']
+                              .property,
+                          type: layers[nowLayerIndex].paint[
+                            'fill-extrusion-base'
+                          ].type,
                         }
                       )
-                    ">
-                    <el-tooltip class="item" effect="dark" content="渲染高度" placement="right">
-                      <el-option label="render_height" value="render_height"></el-option>
-                    </el-tooltip>  
-                    <el-tooltip class="item" effect="dark" content="最小渲染高度" placement="right">
-                      <el-option label="render_min_height" value="render_min_height"></el-option>
-                    </el-tooltip>                                          
+                    "
+                  >
+                    <el-tooltip
+                      class="item"
+                      effect="dark"
+                      content="渲染高度"
+                      placement="right"
+                    >
+                      <el-option
+                        label="render_height"
+                        value="render_height"
+                      ></el-option>
+                    </el-tooltip>
+                    <el-tooltip
+                      class="item"
+                      effect="dark"
+                      content="最小渲染高度"
+                      placement="right"
+                    >
+                      <el-option
+                        label="render_min_height"
+                        value="render_min_height"
+                      ></el-option>
+                    </el-tooltip>
                   </el-select>
                 </el-col>
               </el-row>
-              <el-row type="flex" style="align-items:center">
+              <el-row type="flex" style="align-items: center">
                 <el-col :span="8">
                   <span>渲染类型:</span>
                 </el-col>
                 <el-col :span="16">
-                  <el-select 
-                    v-model="layers[nowLayerIndex].paint['fill-extrusion-base'].type" 
+                  <el-select
+                    v-model="
+                      layers[nowLayerIndex].paint['fill-extrusion-base'].type
+                    "
                     placeholder="请选择渲染类型"
                     @change="
                       handlePaintChange(
                         layers[nowLayerIndex]['id'],
                         'fill-extrusion-base',
                         {
-                          property:layers[nowLayerIndex].paint['fill-extrusion-base'].property,
-                          type:layers[nowLayerIndex].paint['fill-extrusion-base'].type
-                        }                   
+                          property:
+                            layers[nowLayerIndex].paint['fill-extrusion-base']
+                              .property,
+                          type: layers[nowLayerIndex].paint[
+                            'fill-extrusion-base'
+                          ].type,
+                        }
                       )
-                    ">
-                    <el-tooltip class="item" effect="dark" content="一致型（将输入值作为输出值）" placement="right">
+                    "
+                  >
+                    <el-tooltip
+                      class="item"
+                      effect="dark"
+                      content="一致型（将输入值作为输出值）"
+                      placement="right"
+                    >
                       <el-option label="identity" value="identity"></el-option>
-                    </el-tooltip>                    
+                    </el-tooltip>
                     <!-- <el-tooltip class="item" effect="dark" content="指数连续型（在断点之间生成插值）" placement="right">
                       <el-option label="exponential" value="exponential"></el-option>
                     </el-tooltip>                    
@@ -1547,7 +1641,7 @@
                   </el-select>
                 </el-col>
               </el-row>
-            </el-row>            
+            </el-row>
             <el-divider></el-divider>
             <ConditionRender
               :layerSelect="layers[nowLayerIndex]"
@@ -2342,7 +2436,7 @@
                   handleTextField(
                     layers[nowLayerIndex]['id'],
                     'text-field',
-                    $event                    
+                    $event
                   )
                 "
                 placeholder="something"
@@ -2353,6 +2447,12 @@
                 width="400"
                 trigger="click"
               >
+                <el-input
+                  v-model="textFieldSearch"
+                  size="mini"
+                  placeholder="搜索"
+                  prefix-icon="el-icon-search"
+                />
                 <!-- 非mbTile -->
                 <el-table
                   v-if="!isMbTile"
@@ -2368,15 +2468,16 @@
                   :cell-style="{ textAlign: 'left' }"
                   max-height="400"
                   @row-click="fieldSelect"
+                  :show-header="false"
                 >
                   <el-table-column prop="column_name" align="right">
                     <template slot="header">
-                      <el-input
+                      <!-- <el-input
                         v-model="textFieldSearch"
                         size="mini"
                         placeholder="搜索"
                         prefix-icon="el-icon-search"
-                      />
+                      /> -->
                     </template>
                   </el-table-column>
                 </el-table>
@@ -2395,22 +2496,24 @@
                   :cell-style="{ textAlign: 'left' }"
                   max-height="400"
                   @row-click="fieldSelect"
+                  :show-header="false"
                 >
                   <el-table-column prop="attribute" align="right">
                     <template slot="header">
-                      <el-input
+                      <!-- <el-input
                         v-model="textFieldSearch"
                         size="mini"
                         placeholder="搜索"
                         prefix-icon="el-icon-search"
-                      />
+                      /> -->
                     </template>
                   </el-table-column>
                   <el-table-column align="right">
                     <template slot-scope="scope">
                       <div
                         v-if="
-                          scope.row.type != 'number' && scope.row.values.length == 0
+                          scope.row.type != 'number' &&
+                          scope.row.values.length == 0
                         "
                         style="color: #d0cece"
                       >
@@ -2418,7 +2521,8 @@
                       </div>
                       <div
                         v-else-if="
-                          scope.row.type != 'number' && scope.row.values.length > 0
+                          scope.row.type != 'number' &&
+                          scope.row.values.length > 0
                         "
                         style="color: #d0cece"
                       >
@@ -2428,7 +2532,7 @@
                         {{ scope.row.min + "-" + scope.row.max }}
                       </div>
                     </template>
-                  </el-table-column>                  
+                  </el-table-column>
                 </el-table>
                 <el-button
                   type="text"
@@ -2438,7 +2542,8 @@
               </el-popover>
             </el-row>
             <span v-if="menuButtonShowList['text-field']"
-            >注：多个属性间默认用','连接，若要属性换行显示用'&'连接</span>
+              >注：多个属性间默认用','连接，若要属性换行显示用'&'连接</span
+            >
             <el-divider></el-divider>
             <ConditionRender
               :layerSelect="layers[nowLayerIndex]"
@@ -2554,7 +2659,7 @@
                   handleTextFont(
                     layers[nowLayerIndex]['id'],
                     'text-font',
-                    $event                    
+                    $event
                   )
                 "
                 placeholder="something"
@@ -2565,6 +2670,13 @@
                 width="400"
                 trigger="click"
               >
+                <el-input
+                  v-model="fontSearch"
+                  size="mini"
+                  placeholder="搜索"
+                  prefix-icon="el-icon-search"
+                >
+                </el-input>
                 <el-table
                   :data="
                     fontList.filter(
@@ -2579,6 +2691,7 @@
                   :cell-style="{ textAlign: 'left' }"
                   height="400"
                   @row-click="fontSelect"
+                  :show-header="false"
                 >
                   <el-table-column prop="name">
                     <template slot-scope="scope">
@@ -2592,13 +2705,13 @@
                     </template>
 
                     <template slot="header">
-                      <el-input
+                      <!-- <el-input
                         v-model="fontSearch"
                         size="mini"
                         placeholder="搜索"
                         prefix-icon="el-icon-search"
                       >
-                      </el-input>
+                      </el-input> -->
                     </template>
                   </el-table-column>
                 </el-table>
@@ -3630,14 +3743,70 @@
       >
         <h4>数据源配置</h4>
         <el-form label-position="right" label-width="100px">
-          <el-form-item label="数据源">
-            <span>{{ layers[nowLayerIndex]["source"] }}</span>
+          <el-form-item v-if="layers[nowLayerIndex]['metadata']['mapbox:type'].includes('PG')" label="数据源类型">
+            <span>{{ layers[nowLayerIndex]["metadata"]['mapbox:type'] == 'multiPG' ? '远程PG' : '本地PG' }}</span>
           </el-form-item>
-          <el-form-item label="数据源图层">
+          <el-form-item v-if="layers[nowLayerIndex]['metadata']['mapbox:type'] == 'multiPG'" label="数据库">
+            <span>{{ layers[nowLayerIndex]["mutiPgInfo"].name }}</span>
+          </el-form-item>
+          <!-- mbTile数据要更换的数据源 -->
+          <el-form-item v-if="!layers[nowLayerIndex]['metadata']['mapbox:type'].includes('PG')" label="数据源类型">
+            <span
+              v-if="!isSourceEdit"
+            >{{ layers[nowLayerIndex]["source"].slice(0,layers[nowLayerIndex]["source"].lastIndexOf('_'))+'(mbTile)' }}</span>
+            <el-select 
+              v-if="isSourceEdit"
+              @change="sourceSelect($event,layers[nowLayerIndex]['metadata']['mapbox:type'])"
+              v-model="sourceObject['tileJsonId']" size="mini">
+              <el-option
+                v-for="item in sourceObject['option']"
+                :key="item.id"
+                :label="item.name"
+                :value="item.tileJsonId">
+              </el-option>
+            </el-select>            
+            <el-button v-if="!isSourceEdit" type="text" icon="el-icon-setting" style="margin-left:5px" @click="sourceInit(layers[nowLayerIndex])"></el-button>
+            <el-button v-if="isSourceEdit" type="text" icon="el-icon-check" style="margin-left:5px" @click="sourceChange(layers[nowLayerIndex])"></el-button>
+          </el-form-item>
+          <el-form-item v-if="layers[nowLayerIndex]['metadata']['mapbox:type'] == 'mbStyle'" label="样式文件">
+            <span>{{ layers[nowLayerIndex]['manageInfo']['layerKey'].slice(layers[nowLayerIndex]['manageInfo']['layerKey'].lastIndexOf('_')+1,layers[nowLayerIndex]['manageInfo']['layerKey'].indexOf('#')) }}</span>
+          </el-form-item>          
+          <el-form-item v-if="!layers[nowLayerIndex]['metadata']['mapbox:type'].includes('PG')" label="数据图层">
             <span>{{ layers[nowLayerIndex]["source-layer"] }}</span>
           </el-form-item>
-          <el-form-item label="图层名称">
-            <span>{{ layers[nowLayerIndex]["originName"] }}</span>
+          <!-- PG数据要更换的数据源 -->
+          <el-form-item v-if="layers[nowLayerIndex]['metadata']['mapbox:type'].includes('PG')" label="数据图层">
+            <span
+              v-if="!isSourceEdit"
+            >{{ layers[nowLayerIndex]["source"].slice(0,layers[nowLayerIndex]["source"].lastIndexOf('_')) }}</span>
+            <!-- 本地PG -->
+            <el-select 
+              v-if="isSourceEdit&&layers[nowLayerIndex]['metadata']['mapbox:type']=='defaultPG'"
+              v-model="sourceObject['tileJsonId']" size="mini"
+              @change="sourceSelect($event,layers[nowLayerIndex]['metadata']['mapbox:type'])">
+              <el-option
+                v-for="item in sourceObject['option']"
+                :key="item.id"
+                :label="item.originName"
+                :value="item.tilejsonId">
+              </el-option>
+            </el-select>  
+            <!-- 远程PG -->
+            <el-select 
+              v-if="isSourceEdit&&layers[nowLayerIndex]['metadata']['mapbox:type']!='defaultPG'"
+              v-model="sourceObject['tileJsonId']" size="mini"
+              value-key="originName"
+              @change="sourceSelect($event,layers[nowLayerIndex]['metadata']['mapbox:type'])"              
+              >
+              <el-option
+                v-for="item in sourceObject['option']"
+                :key="item.originName"
+                :label="item.originName"
+                :value="item">
+              </el-option>
+            </el-select>                          
+            <el-button v-if="!isSourceEdit" type="text" icon="el-icon-setting" style="margin-left:5px" @click="sourceInit(layers[nowLayerIndex])"></el-button>
+            <el-button v-if="isSourceEdit" type="text" icon="el-icon-check" style="margin-left:5px" @click="sourceChange(layers[nowLayerIndex])"></el-button>
           </el-form-item>
           <el-form-item label="图层类型">
             <el-select
@@ -3703,7 +3872,8 @@
               <!-- 非mbTile -->
               <el-select
                 v-if="!isMbTile"
-                :span="2" clearable
+                :span="2"
+                clearable
                 v-model="filterCondition[index]['option']"
                 placeholder="请选择"
                 size="small"
@@ -3720,7 +3890,8 @@
               <!-- mbTile -->
               <el-select
                 v-if="isMbTile"
-                :span="2" clearable
+                :span="2"
+                clearable
                 v-model="filterCondition[index]['option']"
                 placeholder="请选择"
                 size="small"
@@ -3948,7 +4119,10 @@ import { mapState, mapActions, mapMutations } from "vuex";
 import ConditionRender from "../../components/ConditionRender.vue";
 import layerStyleProperties from "@/assets/js/layerStyleProperties";
 import filedValue from "@/assets/js/field_value.js";
-import { filterSplit,textSplit } from "@/serve/JsonToValue";
+import { filterSplit, textSplit } from "@/serve/JsonToValue";
+import { nameIndex } from "@/serve/interpolation";
+import initTileJson from "@/assets/js/initTileJson";
+import { nanoid } from 'nanoid';
 
 export default {
   name: "LayerEditPanel",
@@ -3964,7 +4138,7 @@ export default {
       // spritePath: "",
 
       // 公共参数
-      componentKey: 0,    // 组件的key，用于组件重新渲染
+      componentKey: 0, // 组件的key，用于组件重新渲染
       editorShow: "",
       glyphsPath: "",
       isMbTile: false,
@@ -3983,8 +4157,8 @@ export default {
         "#1e90ff",
         "#c71585",
       ],
-      textField: '',        // 不同于mapbox基于[get,'name'],这里采用{name},textField用于展示name
-      textFont: '',         // 不同于mapbox基于["Roboto Regular", "Open Sans Regular"],这里采用textFont用于展示"Roboto Regular,Open Sans Regular"
+      textField: "", // 不同于mapbox基于[get,'name'],这里采用{name},textField用于展示name
+      textFont: "", // 不同于mapbox基于["Roboto Regular", "Open Sans Regular"],这里采用textFont用于展示"Roboto Regular,Open Sans Regular"
 
       // 精灵图
       spriteClassList: [],
@@ -4008,8 +4182,8 @@ export default {
       isSymbol: true,
       nameEdit: false,
       symbolColor: ["#43aaf5", "#838da8"],
-      nameElse: [],       // 除了在编辑图层的其余图层名列表
-      nameOrigin: '',     // 图层编辑前的名称，用于命名重复时更换回初始值
+      nameElse: [], // 除了在编辑图层的其余图层名列表
+      nameOrigin: "", // 图层编辑前的名称，用于命名重复时更换回初始值
       isRepeate: false,
 
       //插值类型
@@ -4023,6 +4197,18 @@ export default {
         "cubic-bezier":
           "贝塞尔曲线：使用由给定控制点定义的三次贝塞尔曲线进行插值。",
       },
+
+      // #数据源配置
+      isSourceEdit: false,
+      sourceObject: {options:[],option:{},sourceId_old:'',sourceId_new:'',name:'',tileJsonId:'',type:''},    // 将需要更换source的操作数据进行统一管理
+      geoTypeChange: {circle:'POINT',line:'LINE',fill:'POLYGON',symbol:'SYMBOL'},
+      typeContent: {        // 记录各个类型要展示的信息
+        defaultPG: ["originName","tilejsonId"],
+        multiPG: ["originName","geoType"],
+        mbSource: ["name","tileJsonId"],
+        mbStyle: ["name","tileJsonId"],
+        TMS: ["name","url"],
+      },      
 
       // #过滤条件配置
       filterWay: "all",
@@ -4066,46 +4252,98 @@ export default {
     }),
 
     // 切换到这种方式用于对computer进行set
-    mapProjectInfo:{
-      get(){
+    mapProjectInfo: {
+      get() {
         return this.$store.state.mapProjectInfo;
       },
       set(val) {
-        this.UPDATEPARM({ parm: "mapProjectInfo", value: val })
-      }      
+        this.UPDATEPARM({ parm: "mapProjectInfo", value: val });
+      },
     },
-    layers:{
-      get(){
+    layers: {
+      get() {
         return this.$store.state.layers;
       },
       set(val) {
-        this.UPDATEPARM({ parm: "layers", value: val })
-      }      
+        this.UPDATEPARM({ parm: "layers", value: val });
+      },
     },
-    spritePath:{
-      get(){
+    sources: {
+      get() {
+        return this.$store.state.sources;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "sources", value: val });
+      },
+    },
+    spritePath: {
+      get() {
         return this.$store.state.spritePath;
       },
       set(val) {
-        this.UPDATEPARM({ parm: "spritePath", value: val })
-      }      
-    },    
-    nowLayerIndex:{
-      get(){
+        this.UPDATEPARM({ parm: "spritePath", value: val });
+      },
+    },
+    nowLayerIndex: {
+      get() {
         return this.$store.state.nowLayerIndex;
       },
       set(val) {
-        this.UPDATEPARM({ parm: "nowLayerIndex", value: val })
-      }      
-    },    
+        this.UPDATEPARM({ parm: "nowLayerIndex", value: val });
+      },
+    },
+    tileJsonList: {
+      get() {
+        return this.$store.state.tileJsonList;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "tileJsonList", value: val });
+      },
+    },
+    layersNameObject: {
+      get() {
+        return this.$store.state.layersNameObject;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "layersNameObject", value: val });
+      },
+    },
+    sourceNameObject: {
+      get() {
+        return this.$store.state.sourceNameObject;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "sourceNameObject", value: val });
+      },
+    },
     // 本组件内需要的属性
-    layersName:function(){
-        let List = [];
-        this.layers.forEach(item => {
-          List.push(item.showName);
-        })
-        return List;
-    },    
+    layersName: function () {
+      let List = [];
+      this.layers.forEach((item) => {
+        List.push(item.showName);
+      });
+      return List;
+    },
+    // sourceNameObject: function () {
+    //   let List = {};
+    //   for(let item in this.sources){
+    //     let start = this.sources[item].url.lastIndexOf('/');
+    //     let end = this.sources[item].url.lastIndexOf('.');
+    //     let id = this.sources[item].url.slice(start+1,end);
+    //     List[item] = id;
+    //   }
+    //   return List;
+    // }, 
+    // layersNameObject: function () {
+    //   let List = {};
+    //   for(let item in this.layers){
+    //     let start = this.sources[item].url.lastIndexOf('/');
+    //     let end = this.sources[item].url.lastIndexOf('.');
+    //     let id = this.sources[item].url.slice(start+1,end);
+    //     List[item] = id;
+    //   }
+    //   return List;
+    // }, 
   },
   mounted() {
     // 等初始组件信息加载完
@@ -4146,7 +4384,7 @@ export default {
         }
         this.$nextTick(() => {
           this.menuButtonShowList[value1] = value2;
-          console.log('测试',value1,this.menuButtonShowList[value1]);
+          console.log("测试", value1, this.menuButtonShowList[value1]);
         });
       }
     });
@@ -4173,9 +4411,8 @@ export default {
       // this.layersName = this.layersNameProp;
       // this.layers = this.layersProp;
       // this.nowLayerIndex = this.nowLayerIndexProp;
-      // this.spritePath = this.spritePathProp;
+      this.spritePath = this.mapProjectInfo.sprite;
       this.glyphsPath = this.mapProjectInfo.glyphs;
-      console.log("路径：", this.mapProjectInfo);
       const end = this.spritePath.lastIndexOf("/");
       this.spriteNameSelect = this.spritePath.substring(15, end);
       // 精灵图JSON和png
@@ -4296,16 +4533,22 @@ export default {
       }
       // #等图层数据处理完毕再加载相关参数初始化
       // 字段标注
-      if("text-field" in this.layers[this.nowLayerIndex].layout){
-        const text = JSON.parse(JSON.stringify(this.layers[this.nowLayerIndex].layout["text-field"]));
+      if ("text-field" in this.layers[this.nowLayerIndex].layout) {
+        const text = JSON.parse(
+          JSON.stringify(this.layers[this.nowLayerIndex].layout["text-field"])
+        );
         const end = text.lastIndexOf("}");
-        this.textField = this.layers[this.nowLayerIndex].layout["text-field"].substring(1, end);    
-        this.textField = textSplit(text);        
+        this.textField = this.layers[this.nowLayerIndex].layout[
+          "text-field"
+        ].substring(1, end);
+        this.textField = textSplit(text);
       }
       // 字体
-      if("text-field" in this.layers[this.nowLayerIndex].layout){
-        const fonts = JSON.parse(JSON.stringify(this.layers[this.nowLayerIndex].layout['text-font']));
-        this.textFont = fonts.join(',');
+      if ("text-field" in this.layers[this.nowLayerIndex].layout) {
+        const fonts = JSON.parse(
+          JSON.stringify(this.layers[this.nowLayerIndex].layout["text-font"])
+        );
+        this.textFont = fonts.join(",");
       }
     },
     // 关闭图层样式编辑面板
@@ -4314,27 +4557,30 @@ export default {
     },
 
     // #图层编辑相关
-    nameEditOpen(){
-      this.nameElse = this.layersName.filter(data=>
-        data != this.layers[this.nowLayerIndex]['showName']
-      )
-      this.nameOrigin = JSON.parse(JSON.stringify(this.layers[this.nowLayerIndex]['showName']));
-      this.nameEdit = true
+    nameEditOpen() {
+      this.nameElse = this.layersName.filter(
+        (data) => data != this.layers[this.nowLayerIndex]["showName"]
+      );
+      this.nameOrigin = JSON.parse(
+        JSON.stringify(this.layers[this.nowLayerIndex]["showName"])
+      );
+      this.nameEdit = true;
     },
     // 核对图层名是否正确
-    nameCheck(val){
-      if(this.nameElse.indexOf(val) != -1){         // 有重复
+    nameCheck(val) {
+      if (this.nameElse.indexOf(val) != -1) {
+        // 有重复
         this.isRepeate = true;
-      }else{
+      } else {
         this.isRepeate = false;
       }
     },
-    nameConfirm(){
-      if(this.isRepeate){
-        this.layers[this.nowLayerIndex]['showName'] = this.nameOrigin;
+    nameConfirm() {
+      if (this.isRepeate) {
+        this.layers[this.nowLayerIndex]["showName"] = this.nameOrigin;
         this.isRepeate = false;
         this.nameEdit = false;
-      }else{
+      } else {
         this.nameEdit = false;
       }
     },
@@ -4365,41 +4611,42 @@ export default {
       );
     },
     // 设置字体标注字段
-    handleTextField(id,prop,value){
+    handleTextField(id, prop, value) {
       // 先更新mapbox再更新本地layers
-      value = value.replaceAll('，',',')                 // 将误输入的中文'，'替换为英文','
-      let result = '';
+      value = value.replaceAll("，", ","); // 将误输入的中文'，'替换为英文','
+      let result = "";
       let textList = [];
-      if(value.indexOf(',') > -1){                       // "name:latin,name:nonlatin"=>"{name:latin} {name:nonlatin}"
-        textList = value.split(',');
-        textList.forEach((element,index,arr)=>{
-          arr[index] = '{' + element + '}';
-        })
-        result = textList.join(' ');
+      if (value.indexOf(",") > -1) {
+        // "name:latin,name:nonlatin"=>"{name:latin} {name:nonlatin}"
+        textList = value.split(",");
+        textList.forEach((element, index, arr) => {
+          arr[index] = "{" + element + "}";
+        });
+        result = textList.join(" ");
+      } else if (value.indexOf("&") > -1) {
+        // "name:latin&name:nonlatin"=>"{name:latin}&{name:nonlatin}"
+        textList = value.split("&");
+        textList.forEach((element, index, arr) => {
+          arr[index] = "{" + element + "}";
+        });
+        result = textList.join("\\n");
+      } else {
+        // "name:latin"=>"{name:latin}"
+        result = "{" + value + "}";
       }
-      else if(value.indexOf('&') > -1){                  // "name:latin&name:nonlatin"=>"{name:latin}&{name:nonlatin}"
-        textList = value.split('&');
-        textList.forEach((element,index,arr)=>{
-          arr[index] = '{' + element + '}';
-        })
-        result = textList.join('\\n');
-      }else{                                             // "name:latin"=>"{name:latin}"
-        result = '{' + value + '}'
-      }
-      this.handleLayoutChange(id,prop,result);
-      this.layers[this.nowLayerIndex].layout['text-field'] = result;
+      this.handleLayoutChange(id, prop, result);
+      this.layers[this.nowLayerIndex].layout["text-field"] = result;
     },
     // 设置字体
-    handleTextFont(id,prop,value){
+    handleTextFont(id, prop, value) {
       // 先更新mapbox再更新本地layers
-      value = value.replaceAll('，',',')                 // 将误输入的中文'，'替换为英文','
-      let result = value.split(',')                      // "Roboto Regular,Open Sans Regular"=>["Roboto Regular", "Open Sans Regular"]
-      result = ['literal',result]
-      this.handleLayoutChange(id,prop,result);
-      this.layers[this.nowLayerIndex].layout['text-field'] = result;
-      console.log('传递结果',result);
+      value = value.replaceAll("，", ","); // 将误输入的中文'，'替换为英文','
+      let result = value.split(","); // "Roboto Regular,Open Sans Regular"=>["Roboto Regular", "Open Sans Regular"]
+      result = ["literal", result];
+      this.handleLayoutChange(id, prop, result);
+      this.layers[this.nowLayerIndex].layout["text-field"] = result;
+      console.log("传递结果", result);
     },
-
 
     // 自定义图标
     handleCurrentChangeSymbol(val) {
@@ -4500,7 +4747,7 @@ export default {
       requestApi
         .getSpriteList()
         .then((res) => {
-          console.log(res);
+          console.log('精灵图：',res.data.data);
           this.spriteClassList = res.data.data;
 
           // this.spriteNameSelect = this.spriteClassList[0];
@@ -4519,9 +4766,10 @@ export default {
       }
     },
     fieldSelect(row) {
-      let type = this.isMbTile ? 'attribute' : 'column_name';
+      let type = this.isMbTile ? "attribute" : "column_name";
       this.textField = row[type];
-      this.layers[this.nowLayerIndex].layout["text-field"] = '{' + row[type] + '}';
+      this.layers[this.nowLayerIndex].layout["text-field"] =
+        "{" + row[type] + "}";
       this.$refs.fieldPopover.doClose();
       this.handleLayoutChange(
         this.layers[this.nowLayerIndex]["id"],
@@ -4559,7 +4807,9 @@ export default {
       this.layers[this.nowLayerIndex].layout = JSON.parse(
         JSON.stringify(layerStyleProperties[val].layout)
       );
-      let aimLayer = JSON.parse(JSON.stringify(this.layers[this.nowLayerIndex]));
+      let aimLayer = JSON.parse(
+        JSON.stringify(this.layers[this.nowLayerIndex])
+      );
       this.handleRemoveLayer(aimLayer.id);
       if (this.nowLayerIndex === 0) {
         this.addLayerToMap(true, aimLayer, true);
@@ -4749,6 +4999,225 @@ export default {
       this.filterConfirm(list);
     },
 
+    // #数据源设置相关
+    sourceInit(layer){
+      // 初始化参数
+      console.log('sourceNameObject',this.sourceNameObject);
+
+      this.sourceObject = {options:[],option:{},sourceId_old:'',sourceId_new:'',name:'',tileJsonId:'',type:''};
+      let type =  layer['metadata']['mapbox:type'];
+      let dataName = ('mutiPgInfo' in layer) ? layer['mutiPgInfo']['name']: '';
+      let layerType = this.geoTypeChange[layer.type];       // 点线面类型
+      // 对sourceObject内容进行赋值
+      this.sourceObject['tileJsonId'] = type == 'multiPG' ? 
+      JSON.parse(JSON.stringify(layer.source.slice(0,layer.source.lastIndexOf('_')))) : 
+      JSON.parse(JSON.stringify(this.sourceNameObject[layer.source]));      // select组件会自动识别是否为列表的value值，然后显示label
+
+      this.sourceObject['sourceId_old'] = JSON.parse(JSON.stringify(layer.source));      
+      this.sourceObject['name'] = JSON.parse(JSON.stringify(layer.source.slice(0,layer.source.lastIndexOf('_'))));
+      this.sourceObject['type'] = JSON.parse(JSON.stringify(layer.metadata['mapbox:type']));
+      if(type == 'defaultPG'){
+        requestApi.getShpList({
+          asc: false,
+          page: 1,
+          shpPageSize: 10,
+          searchText: "",
+          sortField: "createTime",
+        })
+        .then((res) => {
+          console.log("shpDataList", res.data,layerType);
+          this.sourceObject['option'] = res.data.data.content.filter(
+            data => data.geoType.indexOf(layerType) != -1
+          );
+        })
+        .catch((error) => {
+          console.log("查询shp失败", error);
+        });
+      }
+      else if(type == 'multiPG'){
+        requestApi.getPgList()
+        .then((res) => {
+          console.log("数据库源:", res,layerType);
+          let List = res.data.data.filter(
+            data => data.name == dataName
+          );
+          this.sourceObject['option'] = List[0].dataInfo.filter(
+            data => data.geoType.indexOf(layerType) != -1
+          );
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      }
+      else if(type.includes('mb')){
+        requestApi.getMbtilesList()
+        .then((res) => {
+          console.log("mbtile数据:", res);
+          this.sourceObject['option'] = res.data.data;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      }
+      else if(type == 'TMS'){
+        requestApi.getThirdPartSourceList("TMS")
+        .then((res) => {
+          if (res.data.code == 0) {
+            this.sourceObject['option'] = res.data.data;
+
+          } else {
+            console.log(res.data.csg);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      }
+      this.isSourceEdit = true;
+    },
+    sourceSelect(val,type){
+      // 筛选出所选的图层
+      let List = this.sourceObject.option.filter(data=>
+        data[this.typeContent[type][1]] == val || data == val
+      )
+      switch (type){
+        case 'defaultPG':
+          this.sourceObject['sourceId_new'] = `${List[0].tableName}#defaultPG`;
+          this.sourceObject['option'] = List[0];
+          break
+        case 'multiPG':
+          this.sourceObject['sourceId_new'] = `${List[0].originName}_#multiPG`;
+          this.sourceObject['option'] = List[0];
+          break
+        case 'mbSource':
+        case 'mbStyle':
+          this.sourceObject['sourceId_new'] = `${List[0].name}_#meta`;
+          this.sourceObject['option'] = List[0];
+          break
+      }
+      this.sourceObject['name'] = JSON.parse(JSON.stringify(List[0][this.typeContent[type][0]]));
+    },
+    async sourceChange(layer){
+      let originName = JSON.parse(JSON.stringify(layer.source.slice(0,layer.source.lastIndexOf('_'))));
+      // 只有source变化才执行替换操作
+      if(this.sourceObject.name != originName){
+        await this.sourceReplace();
+        this.isSourceEdit=false;
+        this.sourceObject = {options:[],option:{},sourceId_old:'',sourceId_new:'',name:'',tileJsonId:'',type:''};   // 将需要更换source的操作数据进行统一管理
+      }else{
+        this.isSourceEdit=false;
+        this.sourceObject = {options:[],option:{},sourceId_old:'',sourceId_new:'',name:'',tileJsonId:'',type:''};   // 将需要更换source的操作数据进行统一管理
+      }
+    },
+    async sourceReplace(){
+      let item = JSON.parse(JSON.stringify(this.sourceObject));
+      let layer = JSON.parse(JSON.stringify(this.layers[this.nowLayerIndex]));
+      // 先删除mapbox中的图层，才能对source进行更改（本地layers进行更新不进行删除）
+      this.handleRemoveLayer(layer.id)
+      // 添加source
+      if(!(item.sourceId_new in this.sourceObject)){
+        // 准备source信息
+        if(item.type == 'multiPG'){
+          let newTileJson = initTileJson;
+          newTileJson.name = item.tileJsonId.originName;
+          let mutiPgInfo = layer.mutiPgInfo;   // 替换的是同一个数据库中的图层，故数据库信息一致 
+          newTileJson.tiles = [
+            this.reqUrl +
+              "/multiPgSource/" +
+              mutiPgInfo.ip +
+              "/" +
+              mutiPgInfo.port +
+              "/" +
+              mutiPgInfo.name +
+              "/" +
+              item.tileJsonId.originName +
+              "/{z}/{x}/{y}.pbf",
+          ];
+          let vector_layer = {
+            description: "",
+            fields: item.tileJsonId.attrInfo,
+            id: item.tileJsonId.originName,
+          };
+          newTileJson.vector_layers = [vector_layer];
+          newTileJson.tileJsonType = 'multiPG';
+          requestApi.createTileJson(initTileJson)
+            .then(res=>{
+              if (res.data.code !== 0) {
+                console.log("添加source失败");
+              }else{
+                item.tileJsonId = res.data.data.tileJsonId;
+              }
+            });          
+        }        
+        // 添加source
+        let sourceJsonId = item.tileJsonId; // defaultPG在上传shp的同时生成json，并把id记录在shp表中
+        let tileJsonUrl =
+          this.reqUrl + "/getTileJson/" + sourceJsonId + ".json";
+        let newSourceJson = {
+          sourceName: item.sourceId_new,
+          sourceType: "vector",
+          sourceUrl: tileJsonUrl,
+        };
+        this.sources[newSourceJson.sourceName] = {
+          type: newSourceJson.sourceType,
+          url: newSourceJson.sourceUrl,
+        };
+        //记录shp图层和对应的id
+        this.sourceNameObject[item['sourceId_new']] = sourceJsonId;
+        await this.addSourceToMap(true, newSourceJson);
+      }
+      // 删除旧source
+      let layerKey = layer.manageInfo.layerKey;
+      let sourceKey = layer.manageInfo.sourceKey;
+      // 没有其余图层使用该source
+      if(this.layersNameObject[layerKey] == 1){
+        delete this.sources[sourceKey];
+        await this.handleRemoveSource(layer.source);
+        //只有multiPG删除source的tileJson
+        if (layer.metadata['mapbox:type'] == "multiPG") {
+          let sourceJsonId = JSON.parse(JSON.stringify(this.sourceNameObject[sourceKey]));
+          //source没有再使用时,删除后台的tileJson(防止未保存，将删除Json的步骤放到保存中执行)
+          // this.deleteTileJson(layer.source);
+          this.tileJsonList.push(sourceJsonId);
+        }
+        delete this.sourceNameObject[sourceKey];                
+      }
+      // 替换layer信息    
+      let result = JSON.parse(
+        JSON.stringify(
+          nameIndex(this.layers, layerKey, item.name, this.layersNameObject)
+        )
+      );
+      this.layersNameObject = result.object;
+      this.layers[this.nowLayerIndex].showName = result.show;
+      this.layers[this.nowLayerIndex].source = item['sourceId_new'];
+      if(item.type == 'defaultPG'){
+        let name = item['sourceId_new'].slice(0,item['sourceId_new'].indexOf('#'));
+        this.layers[this.nowLayerIndex]['source-layer'] = name;         // `${row.tableName}#defaultPG`
+        this.layers[this.nowLayerIndex]['shpAttribute'] = typeof item.option.attrInfo != "undefined" ? item.option.attrInfo : [];         // `${row.tableName}#defaultPG`
+        this.layers[this.nowLayerIndex]['bounds'] = item.option.bounds;
+        this.layers[this.nowLayerIndex]['id'] = item.name + "_" + nanoid(5);
+      }
+      else if(item.type == 'multiPG'){
+        let name = item['sourceId_new'].slice(0,item['sourceId_new'].indexOf('_#'));     // row.originName + "_#multiPG"
+        this.layers[this.nowLayerIndex]['source-layer'] = name;
+        this.layers[this.nowLayerIndex]['shpAttribute'] = typeof item.option.attrInfo != "undefined" ? item.option.attrInfo : [];         // `${row.tableName}#defaultPG`
+        this.layers[this.nowLayerIndex]['bounds'] = item.option.bounds;
+        this.layers[this.nowLayerIndex]['id'] = item.name + "_" + nanoid(5);        
+      }
+      // mbTile数据的
+      if (this.nowLayerIndex === 0) {
+        this.addLayerToMap(true, this.layers[this.nowLayerIndex], true);
+      } else {
+        const data = {
+          id: this.layers[this.nowLayerIndex - 1].id,
+          layer: this.layers[this.nowLayerIndex],
+        };
+        this.addLayerToMap(false, data, true);
+      }
+    }, 
+
+
     // #对ConditionRender组件的方法通信
     callback(layoutOrpaint, attribute, value, parameters) {
       console.log("layoutOrpaint1:", layoutOrpaint);
@@ -4777,7 +5246,7 @@ export default {
         const data = {
           type: "addLayer1",
           layer: val,
-          isReplace: isReplace        // 当图层时替换时，不需要对图层树进行更改(用isReplace进行判断)
+          isReplace: isReplace, // 当图层替换时，不需要对图层树进行更改(用isReplace进行判断)
         };
         this.$bus.$emit("map", data);
       } else {
@@ -4786,11 +5255,34 @@ export default {
           type: "addLayer2",
           id: val.id,
           layer: val.layer,
-          isReplace: isReplace
+          isReplace: isReplace,
         };
         this.$bus.$emit("map", data);
       }
     },
+    //向地图添加数据源source
+    addSourceToMap(flag, newSource) {
+      if (flag) {
+        const data = {
+          type: "addSource1",
+          source: newSource,
+        };
+        this.$bus.$emit("map", data);
+      } else {
+        const data = {
+          type: "addSource2",
+          source: newSource,
+        };
+        this.$bus.$emit("map", data);
+      }
+    },  
+    handleRemoveSource(sourceName) {
+      const data = {
+        type: 'removeSource',
+        id: sourceName
+      }
+      this.$bus.$emit("map", data);
+    },      
     handleLayoutChange(layerName, key, value) {
       const data = {
         type: "setLayout",
@@ -4837,11 +5329,11 @@ export default {
       this.$bus.$emit(data);
     },
   },
-  beforeDestroy(){
+  beforeDestroy() {
     this.$bus.$off("init");
     this.$bus.$off("show");
     this.$bus.$off("mapEdit");
-  }  
+  },
 };
 </script>
 
@@ -4958,7 +5450,7 @@ export default {
   height: calc(100vh - 82px);
   overflow-y: scroll;
 }
-.test{
-  border-color: red !important; 
+.test {
+  border-color: red !important;
 }
 </style>

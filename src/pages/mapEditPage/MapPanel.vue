@@ -109,18 +109,36 @@ export default {
         this.UPDATEPARM({ parm: "tileJsonList", value: val });
       },
     },
-
+    layersNameObject: {
+      get() {
+        return this.$store.state.layersNameObject;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "layersNameObject", value: val });
+      },
+    },
+    sourceNameObject: {
+      get() {
+        return this.$store.state.sourceNameObject;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "sourceNameObject", value: val });
+      },
+    },
   },
   watch: {
     // 组件自用
-    layers: function(val){
-      let List = [];
-      val.forEach(element => {
-        List.push(element.id);
-      });    
-      this.layerIdList = List;
-      // 响应图层的地图事件
-      this.mapClick();
+    layers:{ 
+      deep:true,
+      handler:function(val){
+        let List = [];
+        val.forEach(element => {
+          List.push(element.id);
+        });    
+        this.layerIdList = List;
+        // 响应图层的地图事件
+        this.mapLayerEvent();
+      }
     }
   },
   mounted() {
@@ -267,7 +285,12 @@ export default {
       // });
     },
     // 对图层进行事件添加（受layerIdList进行响应）
-    mapClick(){
+    mapLayerEvent(){
+      // console.log('出发了');
+      // map.on('moveend', () => {
+      //     const features = map.queryRenderedFeatures({ layers: ['water_V3GNe'] }); 
+      //     console.log('筛选',features);
+      // })     
       //center
       map.on("mousemove", this.layerIdList,() => {
         map.getCanvas().style.cursor = "pointer";
@@ -365,6 +388,7 @@ export default {
     },
     deleteTileJson(){
       this.tileJsonList.forEach(element=>{
+        console.log('删除的图层id：',element);
         requestApi
             .deleteTileJson(element)
             .then((res) => {
@@ -484,21 +508,22 @@ export default {
           type: "warning",
         })
           .then(() => {
+            console.log('保存的信息',this.mapProjectInfo);
             requestApi
               .updateMapProject(JSON.stringify(this.mapProjectInfo))
               .then(() => {
                 this.$message.success("保存成功!");
                 //保存截图到工程字段
-                requestApi
-                  .createMapImg({
+                requestApi.createMapImg({
                     imgUrl: this.canvasSrc,
                     mapProjectId: this.mapProjectId,
                   })
-                  .then(() => {})
+                  .then(() => {
+                    this.deleteTileJson();
+                  })
                   .catch((error) => {
                     console.log(error);
                   });
-                this.deleteTileJson();
               })
               .catch((error) => {
                 console.log(error);
@@ -518,11 +543,12 @@ export default {
                 imgUrl: this.canvasSrc,
                 mapProjectId: this.mapProjectId,
               })
-              .then(() => {})
+              .then(() => {
+                this.deleteTileJson();
+              })
               .catch((error) => {
                 console.log(error);
               });
-            this.deleteTileJson();
           })
           .catch((error) => {
             console.log(error);

@@ -1,5 +1,5 @@
 <template>
-  <div style="width:100%">
+  <div style="width: 100%">
     <!-- 工程项目按钮框 -->
     <div class="flexRowSpaceAround" style="width: 100%">
       <!-- 添加数据 -->
@@ -112,7 +112,8 @@
                   <span></span>
                 </el-row>
                 <span slot="footer" class="dialog-footer">
-                  <el-button @click="addMbTileStyleShow = false">取 消</el-button
+                  <el-button @click="addMbTileStyleShow = false"
+                    >取 消</el-button
                   >&nbsp;
                   <el-button
                     slot="reference"
@@ -172,7 +173,11 @@
           </el-tab-pane>
         </el-tabs>
 
-        <el-button type="primary" size="mini" slot="reference" @click="addShpData"
+        <el-button
+          type="primary"
+          size="mini"
+          slot="reference"
+          @click="addShpData"
           >添加数据</el-button
         >
       </el-popover>
@@ -220,7 +225,7 @@ import initTileJson from "@/assets/js/initTileJson";
 import layerStyleProperties from "@/assets/js/layerStyleProperties";
 import { renderSplit, filterSplit, textSplit } from "@/serve/JsonToValue";
 import { nameIndex } from "@/serve/interpolation";
-import { nanoid } from 'nanoid';
+import { nanoid } from "nanoid";
 
 export default {
   name: "ProjButtons",
@@ -237,11 +242,10 @@ export default {
       // originStyle: [],
       // #添加数据
       // 公用参数
-      dataBaseSelect: "defaultPG", //选中的数据源，PG默认为defaultPG
+      dataBaseSelect: "defaultPG", //选中的数据源，PG默认为defaultPG 总共：defaultPG、multiPG、cacheTile、mbTile(作为添加tileJson的tileJsonType)
       dataBaseList: [],
       // PG服务
       PgBaseSelect: "defaultPG",
-      pgShpList: [],
       shpTableData: [],
       currentPageShp: 1,
       pageSizeShp: 5,
@@ -310,63 +314,63 @@ export default {
   },
   computed: {
     ...mapState({
-    //   sourceNameObjectProp: "sourceNameObject",
-    //   layersNameObjectProp: "layersNameObject",
-    //   layersProp: "layers",
-    //   layersNameProp: "layersName",
-    //   sourcesProp: "sources",
-    //   originStyleProp: "originStyle",
+      //   sourceNameObjectProp: "sourceNameObject",
+      //   layersNameObjectProp: "layersNameObject",
+      //   layersProp: "layers",
+      //   layersNameProp: "layersName",
+      //   sourcesProp: "sources",
+      //   originStyleProp: "originStyle",
     }),
 
     // 切换到这种方式用于对computer进行set
-    sourceNameObject:{
-      get(){
+    sourceNameObject: {
+      get() {
         return this.$store.state.sourceNameObject;
       },
       set(val) {
-        this.UPDATEPARM({ parm: "sourceNameObject", value: val })
-      }      
+        this.UPDATEPARM({ parm: "sourceNameObject", value: val });
+      },
     },
-    layersNameObject:{
-      get(){
+    layersNameObject: {
+      get() {
         return this.$store.state.layersNameObject;
       },
       set(val) {
-        this.UPDATEPARM({ parm: "layersNameObject", value: val })
-      }      
+        this.UPDATEPARM({ parm: "layersNameObject", value: val });
+      },
     },
-    layers:{
-      get(){
+    layers: {
+      get() {
         return this.$store.state.layers;
       },
       set(val) {
-        this.UPDATEPARM({ parm: "layers", value: val })
-      }      
+        this.UPDATEPARM({ parm: "layers", value: val });
+      },
     },
-    layersName:{
-      get(){
+    layersName: {
+      get() {
         return this.$store.state.layersName;
       },
       set(val) {
-        this.UPDATEPARM({ parm: "layersName", value: val })
-      }      
+        this.UPDATEPARM({ parm: "layersName", value: val });
+      },
     },
-    sources:{
-      get(){
+    sources: {
+      get() {
         return this.$store.state.sources;
       },
       set(val) {
-        this.UPDATEPARM({ parm: "sources", value: val })
-      }      
+        this.UPDATEPARM({ parm: "sources", value: val });
+      },
     },
-    originStyle:{
-      get(){
+    originStyle: {
+      get() {
         return this.$store.state.originStyle;
       },
       set(val) {
-        this.UPDATEPARM({ parm: "originStyle", value: val })
-      }      
-    }
+        this.UPDATEPARM({ parm: "originStyle", value: val });
+      },
+    },     
   },
   mounted() {
     // 等初始组件信息加载完
@@ -376,7 +380,11 @@ export default {
   },
   methods: {
     test1() {
-      this.$bus.$emit("mapEdit", { type: "open", layer: this.layersProp[0],index:0 });
+      this.$bus.$emit("mapEdit", {
+        type: "open",
+        layer: this.layersProp[0],
+        index: 0,
+      });
     },
     test2() {
       // this.$bus.$emit("styleTemp", {
@@ -384,8 +392,8 @@ export default {
       //   index: 0,
       //   layer: this.layers[0],
       // });
-      let c = nameIndex(['a'],'place',{'place1':0})
-      console.log("测试",c);      
+      let c = nameIndex(["a"], "place", { place1: 0 });
+      console.log("测试", c);
     },
     test3() {
       let a = renderSplit({
@@ -401,7 +409,7 @@ export default {
         ["in", "class", "service", "track"],
       ]);
       let c = textSplit("{name:latin} {name:nonlatin}");
-      console.log("测试", a,'\n', b,'\n', c);
+      console.log("测试", a, "\n", b, "\n", c);
     },
     // vuex
     ...mapActions({ updateParm: "update" }), //将 `this.updateParm(data)` 映射为 `this.$store.dispatch('update',data)`
@@ -465,10 +473,10 @@ export default {
       //分类型进行创建shp的json入库并返回对应id
       switch (this.dataBaseSelect) {
         case "defaultPG":
-          this.addPgDefaultShp(row);
+          this.addDefaultPGShp(row);
           break;
         case "multiPG":
-          this.addPgMultiShp(row);
+          this.addMultiPGShp(row);
           break;
         case "cacheTile":
           this.addCacheShp(row);
@@ -481,7 +489,7 @@ export default {
             this.addDataMbTileShp(row);
           } else {
             if (row.type != "background") {
-              this.addStyleMbTileShp(row,this.mbTileStyleJson.name);
+              this.addStyleMbTileShp(row, this.mbTileStyleJson.name);
             } else {
               this.addBackground("mbTile", row);
             }
@@ -491,43 +499,31 @@ export default {
       this.$bus.$emit("mapEdit", { type: "off" });
     },
     /**各类添加说明
-     * sourceId: 展示对应图层源的id,pg采用tableName,mbStyle采用id+_{styleJson}name,mbSource采用id+_meta
-     * layersNameObject都以sourceId为属性名，sourceNameObject除了mbTile数据(用{metaJson}name_meta)其他用sourceId
+     * sourceId: 展示对应图层源的id,pg采用tableName#defaultPG和originName_#multiPG,mbStyle采用id+_#{styleJson}name,mbSource采用id+_#meta
+     * layersNameObject都以sourceId为属性名，
+     * sourceNameObject除了mbTile数据(用{metaJson}name_meta)其他用sourceId
      * layerId：原始图层名+nanoid(5)
      * sourceId = layer.source
      * layer['source-layer'] = vector_layer.id  对于非mbTiels数据，没有一个source数据就一个图层(默认选sourceId)
-     */ 
-    async addPgDefaultShp(row) {
-      console.log("add pgDefault shp row: ", row);
-      //判断该shp是否已添加
+     * pg数据['source-layer']也因和tileJson中tile的row.tableName一致
+     * 尾缀符号介绍：'_'前为name(re_123456#defaultPG) ,'#'后为类型(landcover_grass_#mbStyle)
+     */
+    async addDefaultPGShp(row) {
+      console.log("add defaultPG shp row: ", row);
+      let sourceId = `${row.tableName}#defaultPG`;
+      //判断该shp是否已添加(没有添加source同时sourceid不在待删除名单)
       if (
         !Object.prototype.hasOwnProperty.call(
           this.sourceNameObject,
-          row.tableName                 // 使用tableName是防止有同名的pg数据图层（应该不可能有）; tableName = originName + id
+          sourceId // 使用tableName是防止有同名的pg数据图层（应该不可能有）; tableName = originName + id
         )
       ) {
-        let newTileJson = initTileJson;
-        newTileJson.name = row.originName;
-        newTileJson.tiles = [
-          this.reqUrl + "/mvt/" + row.tableName + "/{z}/{x}/{y}.pbf",
-        ];
-        let vector_layer = {
-          description: "",
-          fields: row.attrInfo,
-          id: row.tableName,       // 对应原始的图层(originName<方便得到数据源>和tableName都可)，与layer中的source-layer对应
-        };
-        newTileJson.vector_layers = [vector_layer];
-        newTileJson.tileJsonType = this.dataBaseSelect;
-        let res = await this.createTileJson(newTileJson);
-        if (res.data.code !== 0) {
-          console.log("添加source失败");
-          return;
-        }
         //添加source
-        let sourceJsonId = res.data.data.tileJsonId;    // source的url链接json
-        let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceJsonId + ".json";
+        let sourceJsonId = row.tilejsonId; // defaultPG在上传shp的同时生成json，并把id记录在shp表中
+        let tileJsonUrl =
+          this.reqUrl + "/getTileJson/" + sourceJsonId + ".json";
         let newSourceJson = {
-          sourceName: row.tableName,       
+          sourceName: sourceId,
           sourceType: "vector",
           sourceUrl: tileJsonUrl,
         };
@@ -537,9 +533,9 @@ export default {
           url: newSourceJson.sourceUrl,
         };
         //记录shp图层和对应的id
-        this.sourceNameObject[row.tableName] = sourceJsonId;
+        this.sourceNameObject[sourceId] = sourceJsonId;
       }
-      
+
       //添加layer
       let geoType = row.geoType;
       if (row.geoType.indexOf("LINE") !== -1) {
@@ -552,31 +548,41 @@ export default {
         geoType = "symbol";
       }
       // 检查是否添加过同源layer 返回[showName,layersNameObject]
-      let result = JSON.parse(JSON.stringify(nameIndex(this.layers,row.tableName,row.originName,this.layersNameObject)));   
+      let result = JSON.parse(
+        JSON.stringify(
+          nameIndex(
+            this.layers,
+            sourceId,
+            row.originName,
+            this.layersNameObject
+          )
+        )
+      );
       this.layersNameObject = result.object;
       //前八个是自己用的属性
       let newLayer = {
-        sourceType: "pgDefault", //记录数据来源类型，用于区别mbTlie的添加和删除
+        sourceType: "defaultPG", //记录数据来源类型，用于区别mbTlie的添加和删除
         show: true,
         // originName: row.originName,    // 可在source-layer中展示
         showName: result.show, //用于展示图层名字
+        manageInfo: {layerKey:sourceId,sourceKey:sourceId},  // 记录layersNameObject和sourceNameObject的key
         bounds: row.bounds,
         shpAttribute: typeof row.attrInfo != "undefined" ? row.attrInfo : [],
         attrValueSet: {},
         attrShowList: {},
         filterValueSet: {},
         nodeType: "layer", //组和图层区分
-        id: row.originName+'_'+nanoid(5),     
+        id: row.originName + "_" + nanoid(5),
         type: geoType,
         filter: ["all"],
         layout: JSON.parse(
           JSON.stringify(layerStyleProperties[geoType].layout)
         ), //防止同类型图层样式改变间影响
         maxzoom: 22,
-        metadata: { "mapbox:type": "pgDefault" },
+        metadata: { "mapbox:type": "defaultPG" },
         minzoom: 0,
         paint: JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint)),
-        source: row.tableName, //通过记录的source名字与id对应，拿到sourceId
+        source: sourceId, //通过记录的source名字与id对应，拿到sourceId
         "source-layer": row.tableName,
       };
       // 设置随机色
@@ -593,15 +599,17 @@ export default {
       this.addLayerToMap(true, newLayer);
       // console.log('添加:',this.layers,this.layersNameObject,this.sourceNameObject)
     },
-    async addPgMultiShp(row) {
-      console.log("add pgMulti shp row: ", row);
+    async addMultiPGShp(row) {
+      console.log("add multiPG shp row: ", row);
+      let sourceId = row.originName + "_#multiPG";
       //判断该shp是否已添加
       if (
         !Object.prototype.hasOwnProperty.call(
           this.sourceNameObject,
-          row.originName      //
+          sourceId 
         )
       ) {
+        // 远程pg无法在上传时生成tileJson，故在添加时生成
         let newTileJson = initTileJson;
         newTileJson.name = row.originName;
         newTileJson.tiles = [
@@ -622,15 +630,16 @@ export default {
           id: row.originName,
         };
         newTileJson.vector_layers = [vector_layer];
-        newTileJson.tileJsonType = this.dataBaseSelect;
+        newTileJson.tileJsonType = 'multiPG';
         let res = await this.createTileJson(newTileJson);
         if (res.data.code !== 0) {
           console.log("添加source失败");
           return;
         }
         //添加source
-        let sourceId = res.data.data.tileJsonId;
-        let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceId + ".json";
+        let sourceJsonId = res.data.data.tileJsonId;
+        let tileJsonUrl =
+          this.reqUrl + "/getTileJson/" + sourceJsonId + ".json";
         let newSourceJson = {
           sourceName: sourceId,
           sourceType: "vector",
@@ -642,7 +651,7 @@ export default {
           url: newSourceJson.sourceUrl,
         };
         //记录shp图层和对应的id
-        this.sourceNameObject[row.id] = sourceId;
+        this.sourceNameObject[sourceId] = sourceJsonId;
       }
       //添加layer
       let geoType = row.geoType;
@@ -655,13 +664,25 @@ export default {
       } else {
         geoType = "symbol";
       }
-      console.log("originname:", row.originName);
+      // 检查是否添加过同源layer 返回[showName,layersNameObject]
+      let result = JSON.parse(
+        JSON.stringify(
+          nameIndex(
+            this.layers,
+            sourceId,
+            row.originName,
+            this.layersNameObject
+          )
+        )
+      );
+      this.layersNameObject = result.object;
       //前九个是自己用的属性
       let newLayer = {
-        sourceType: "pgMulti", //记录数据来源类型，用于区别mbTlie的添加和删除
+        sourceType: "multiPG", //记录数据来源类型，用于区别mbTlie的添加和删除
         show: true,
-        originName: row.originName,
-        showName: row.originName, //用于展示图层名字
+        // originName: row.originName,
+        showName: result.show, //用于展示图层名字
+        manageInfo: {layerKey:sourceId,sourceKey:sourceId},  // 记录layersNameObject和sourceNameObject的key
         bounds: row.bounds,
         shpAttribute: typeof row.attrInfo != "undefined" ? row.attrInfo : [],
         mutiPgInfo: this.mutiPgInfo, //用来记录多源pg信息
@@ -669,64 +690,36 @@ export default {
         attrShowList: {},
         filterValueSet: {},
         nodeType: "layer", //组和图层区分
-        id: row.originName+'_'+nanoid(5),
+        id: row.originName + "_" + nanoid(5),
         type: geoType,
         filter: ["all"],
         layout: JSON.parse(
           JSON.stringify(layerStyleProperties[geoType].layout)
         ),
         maxzoom: 22,
-        metadata: { "mapbox:type": "pgMulti" },
+        metadata: { "mapbox:type": "multiPG" },
         minzoom: 0,
         paint: JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint)),
-        source: this.sourceNameObject[row.id], //添加的sourceId
+        source: sourceId, //添加的sourceId
         "source-layer": row.originName,
       };
-
+      // 设置随机色
       if (geoType !== "symbol") {
         newLayer.paint[geoType + "-color"] =
           "#" + Math.random().toString(16).substr(2, 6);
       }
-
-      if (
-        !Object.prototype.hasOwnProperty.call(
-          this.layersNameObject,
-          newLayer.originName
-        )
-      ) {
-        this.layersNameObject[newLayer.originName] = 1;
-      } else {
-        this.layersNameObject[newLayer.originName] += 1;
-        newLayer.id =
-          row.originName + this.layersNameObject[newLayer.originName];
-        newLayer.showName =
-          row.originName + this.layersNameObject[newLayer.originName];
-      }
+      // 图层信息更新
       this.layers.unshift(newLayer);
-      this.layersName.unshift(newLayer.id);
       this.originStyle.unshift({
         paint: newLayer.paint,
         layout: newLayer.layout,
       });
       this.addLayerToMap(true, newLayer);
-      // 更新vuex参数
-      this.UPDATEPARM({ parm: "layers", value: this.layers });
-      this.UPDATEPARM({ parm: "sources", value: this.sources });
-      this.UPDATEPARM({ parm: "layersName", value: this.layersName });
-      this.UPDATEPARM({ parm: "originStyle", value: this.originStyle });
-      this.UPDATEPARM({
-        parm: "sourceNameObject",
-        value: this.sourceNameObject,
-      });
-      this.UPDATEPARM({
-        parm: "layersNameObject",
-        value: this.layersNameObject,
-      });
     },
     async addDataMbTileShp(row) {
       console.log("add mbDate shp row: ", row);
-      let name = this.mbTileJsonList[this.mbTileSelectIndex].name + '_meta';    // 同一个mbTile数据源的标识符
-      let layerName = row.id + '_meta';     // 图层间的标识符作为sourceId
+      let name = this.mbTileJsonList[this.mbTileSelectIndex].name + "_#meta"; // 同一个mbTile数据源的标识符
+      let layerName = row.id + "_#meta"; // 图层间的标识符作为sourceId
       //判断该shp是否已添加
       if (
         !Object.prototype.hasOwnProperty.call(
@@ -737,7 +730,8 @@ export default {
         //添加mbTile的shp图层时，相关json已经入库
         // json写法
         let sourceJsonId = this.mbTileInfo.tileJsonId;
-        let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceJsonId + ".json";
+        let tileJsonUrl =
+          this.reqUrl + "/getTileJson/" + sourceJsonId + ".json";
         let newSourceJson = {
           sourceName: name,
           sourceType: "vector",
@@ -756,27 +750,33 @@ export default {
       // 添加layer
       let geoType = this.mbsource[row.id];
       // 检查是否添加过同源layer 返回[showName,layersNameObject]
-      let result = JSON.parse(JSON.stringify(nameIndex(this.layers,layerName,row.id,this.layersNameObject)));   
-      this.layersNameObject = result.object;      
+      let result = JSON.parse(
+        JSON.stringify(
+          nameIndex(this.layers, layerName, row.id, this.layersNameObject)
+        )
+      );
+      this.layersNameObject = result.object;
       //前八个是自己用的属性
       let newLayer = {
         sourceType: "mbTile", //记录数据来源类型，用于区别mbTlie的添加和删除
-        show: true,       // 用于记录图层的开关
+        show: true, // 用于记录图层的开关
         // originName: row.id,
         showName: result.show, //用于展示图层名字
+        manageInfo: {layerKey:layerName,sourceKey:name},  // 记录layersNameObject和sourceNameObject的key
         shpAttribute: [],
         attrValueSet: {},
         attrShowList: {},
         filterValueSet: {},
         nodeType: "layer", //组和图层区分
-        id: row.id+'_'+nanoid(5),
+        id: row.id + "_" + nanoid(5),
         type: geoType,
         filter: ["all"],
         layout: JSON.parse(
           JSON.stringify(layerStyleProperties[geoType].layout)
         ),
         maxzoom: typeof row["maxzoom"] != "undefined" ? row["maxzoom"] : 22,
-        metadata: {                       // metadata会被mapbox识别，保存到layers信息中
+        metadata: {
+          // metadata会被mapbox识别，保存到layers信息中
           "mapbox:type": "mbSource",
           "mapbox:isOSM": this.mbTileInfo.osmMbtilesBoolean,
         },
@@ -799,10 +799,10 @@ export default {
       this.addLayerToMap(true, newLayer);
     },
 
-    async addStyleMbTileShp(row,JsonName) {
+    async addStyleMbTileShp(row, JsonName) {
       console.log("add mbStyle shp row: ", row);
-      let name = this.mbTileJsonList[this.mbTileSelectIndex].name + '_meta';    // 同一个mbTile数据源的标识符
-      let layerName = row.id + `_${JsonName}`;     // 图层间的标识符添加_name作为sourceId   
+      let name = JSON.parse(JSON.stringify(this.mbTileJsonList[this.mbTileSelectIndex].name)) + "_#meta"; // 同一个mbTile数据源的标识符
+      let layerName = row.id + `_${JsonName}#style`; // 图层间的标识符添加_name作为sourceId
       //判断该shp是否已添加
       if (
         !Object.prototype.hasOwnProperty.call(
@@ -813,7 +813,8 @@ export default {
         //添加mbTile的shp图层时，相关json已经入库
         // json写法
         let sourceJsonId = this.mbTileInfo.tileJsonId;
-        let tileJsonUrl = this.reqUrl + "/getTileJson/" + sourceJsonId + ".json";
+        let tileJsonUrl =
+          this.reqUrl + "/getTileJson/" + sourceJsonId + ".json";
         let newSourceJson = {
           sourceName: name,
           sourceType: "vector",
@@ -829,24 +830,32 @@ export default {
         this.sourceNameObject[name] = sourceJsonId;
       }
       // 添加layer styleJson有对应属性,按对应类型添加，并对已有属性进行替换
-      const newLayout = JSON.parse(JSON.stringify(layerStyleProperties[row.type].layout));
+      const newLayout = JSON.parse(
+        JSON.stringify(layerStyleProperties[row.type].layout)
+      );
       if ("layout" in row) {
         for (let key in row.layout) {
-          if(row.layout[key].constructor == Object&&key.includes('width')){
-            newLayout[key] = JSON.parse(JSON.stringify(renderSplit(row.layout[key]).zoomCondition1));
-          }else{
+          if (row.layout[key].constructor == Object && key.includes("width")) {
+            newLayout[key] = JSON.parse(
+              JSON.stringify(renderSplit(row.layout[key]).zoomCondition1)
+            );
+          } else {
             newLayout[key] = row.layout[key];
           }
         }
       }
-      const newPaint = JSON.parse(JSON.stringify(layerStyleProperties[row.type].paint));
+      const newPaint = JSON.parse(
+        JSON.stringify(layerStyleProperties[row.type].paint)
+      );
       if ("paint" in row) {
         for (let key in row.paint) {
-          if(row.paint[key].constructor == Object&&key.includes('width')){
-            newPaint[key] = JSON.parse(JSON.stringify(renderSplit(row.paint[key]).zoomCondition1));
-          }else{
+          if (row.paint[key].constructor == Object && key.includes("width")) {
+            newPaint[key] = JSON.parse(
+              JSON.stringify(renderSplit(row.paint[key]).zoomCondition1)
+            );
+          } else {
             newPaint[key] = row.paint[key];
-          }          
+          }
           newPaint[key] = row.paint[key];
         }
       }
@@ -859,12 +868,13 @@ export default {
         show: true,
         // originName: row.id,
         showName: row.id, //用于展示图层名字，使用json文件即可
+        manageInfo: {layerKey:layerName,sourceKey:name},  // 记录layersNameObject和sourceNameObject的key
         shpAttribute: [],
         attrValueSet: {},
         attrShowList: {},
         filterValueSet: {},
         nodeType: "layer", //组和图层区分
-        id: row.id+'_'+nanoid(5),
+        id: row.id + "_" + nanoid(5),
         type: geoType,
         filter: typeof row["filter"] != "undefined" ? row["filter"] : ["all"],
         layout: JSON.parse(JSON.stringify(newLayout)),
@@ -932,6 +942,7 @@ export default {
         show: true,
         originName: "",
         showName: row.name, //用于展示图层名字
+        manageInfo: {layerKey:row.id,sourceKey:row.id},  // 记录layersNameObject和sourceNameObject的key
         attrValueSet: {},
         attrShowList: {},
         filterValueSet: {},
@@ -989,19 +1000,24 @@ export default {
         }
       }
       // 检查是否添加过同源layer 返回[showName,layersNameObject]
-      let result = JSON.parse(JSON.stringify(nameIndex(this.layers,'background','背景',this.layersNameObject)));   
-      this.layersNameObject = result.object;      
+      let result = JSON.parse(
+        JSON.stringify(
+          nameIndex(this.layers, "background", "背景", this.layersNameObject)
+        )
+      );
+      this.layersNameObject = result.object;
       const backLayer = {
         sourceType: sourceType, //记录数据来源类型，用于区别mbTlie的添加和删除
         show: true,
         // originName: "background",
         showName: result.show, //用于展示图层名字
+        manageInfo: {layerKey:'background',sourceKey:''},  // 记录layersNameObject和sourceNameObject的key
         shpAttribute: [],
         attrValueSet: {},
         attrShowList: {},
         filterValueSet: {},
         nodeType: "layer", //组和图层区分
-        id: "背景"+nanoid(5),
+        id: "背景" + nanoid(5),
         type: "background",
         paint: newPaint,
         layout: newLayout,
@@ -1070,11 +1086,12 @@ export default {
           item["type"] != "raster" &&
           item["type"] != "background"
         ) {
-          this.addStyleMbTileShp(item,this.mbTileStyleJson.name);
+          this.addStyleMbTileShp(item, this.mbTileStyleJson.name);
         } else if (item["type"] == "background") {
           this.addBackground("mbTile", item);
         }
       }
+      this.$bus.$emit('layerTree',{type:'style',layersTree:this.mbTileStyleJson.layersTree});
       console.log("添加所有styleJson图层");
     },
     addAllSources(List) {
@@ -1144,7 +1161,7 @@ export default {
     PgBaseChange(val) {
       let index = 0; //val表示选择的value值
       //获取select选择内容的下标
-      this.pgShpList.forEach((e, ind) => {
+      this.dataBaseList.forEach((e, ind) => {
         if (e.id == val) {
           index = ind;
         }
@@ -1153,8 +1170,8 @@ export default {
       this.dataBaseSelect =
         this.PgBaseSelect == "defaultPG" ? "defaultPG" : "multiPG";
       if (this.PgBaseSelect != "defaultPG") {
-        this.shpTableData = this.pgShpList[index].dataInfo;
-        this.mutiPgInfo = this.pgShpList[index]; //用于展示IP、端口信息
+        this.shpTableData = this.dataBaseList[index].dataInfo;
+        this.mutiPgInfo = this.dataBaseList[index]; //用于展示IP、端口信息
       } else {
         this.addShpData();
       }
@@ -1207,7 +1224,7 @@ export default {
       });
       this.mbTileStyleJson = this.mbTileStyleList[index];
       this.styleLayers = this.mbTileStyleJson.layers;
-    },    
+    },
 
     // ·OSM服务
     getMbtilesList() {
@@ -1316,9 +1333,9 @@ export default {
         });
     },
   },
-  beforeDestroy(){
+  beforeDestroy() {
     this.$bus.$off("init");
-  }
+  },
 };
 </script>
 

@@ -1222,10 +1222,12 @@ export default {
             .then((res) => {
               console.log("数据库源:", res);
               this.dataBaseList = res.data.data;
-              this.pgBaseSelect = JSON.parse(
-                JSON.stringify(this.dataBaseList[0])
-              ); //默认 优化
-              this.handleDataView(this.pgBaseSelect);
+              if(this.dataBaseList.length != 0){
+                this.pgBaseSelect = JSON.parse(
+                  JSON.stringify(this.dataBaseList[0])
+                ); //默认 优化
+                this.handleDataView(this.pgBaseSelect);
+              }
             })
             .catch((error) => {
               console.log(error);
