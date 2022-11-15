@@ -131,13 +131,11 @@ export default {
     layers:{ 
       deep:true,
       handler:function(val){
-        let List = [];
         val.forEach(element => {
-          List.push(element.id);
+          if(this.layerIdList.indexOf(element.id) == -1){
+            this.layerIdList.push(element.id);
+          }
         });    
-        this.layerIdList = List;
-        // 响应图层的地图事件
-        this.mapLayerEvent();
       }
     }
   },
@@ -283,14 +281,6 @@ export default {
       // map.on('mouseenter',layerIdList,  function (e) {
       // console.log("eeeeeeeeee gid:", e);
       // });
-    },
-    // 对图层进行事件添加（受layerIdList进行响应）
-    mapLayerEvent(){
-      // console.log('出发了');
-      // map.on('moveend', () => {
-      //     const features = map.queryRenderedFeatures({ layers: ['water_V3GNe'] }); 
-      //     console.log('筛选',features);
-      // })     
       //center
       map.on("mousemove", this.layerIdList,() => {
         map.getCanvas().style.cursor = "pointer";
@@ -298,10 +288,12 @@ export default {
       // Change it back to a pointer when it leaves.
       map.on("mouseleave", this.layerIdList, function () {
         map.getCanvas().style.cursor = "";
-      });      
+      });       
       // 点击事件
       map.on("click",this.layerIdList, (e) => {
         //点击范围
+        console.log('触发了');
+
         const bbox = [
           [e.point.x - 5, e.point.y - 5],
           [e.point.x + 5, e.point.y + 5],
@@ -354,7 +346,8 @@ export default {
           .setLngLat(e.lngLat)
           .setDOMContent(container)
           .addTo(map);
-      });
+      });      
+      console.log('地图初始化');
     },
     // 数据回来后初始化地图
     initMapWithData() {
