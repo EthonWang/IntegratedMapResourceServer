@@ -119,7 +119,7 @@
                     slot="reference"
                     type="warning"
                     @click="
-                      addAllStyles(styleLayers);
+                      addAllStyles(mbTileStyleJson);
                       addMbTileStyleShow = false;
                     "
                     >全部添加</el-button
@@ -211,9 +211,9 @@
       <el-button type="danger" size="mini" @click="addBackground('multiPG', {})"
         >添加背景</el-button
       >
-      <!-- <el-button type="primary" @click="test1">测试</el-button>
-      <el-button type="primary" @click="test2">测试2</el-button>
-      <el-button type="primary" @click="test3">测试3</el-button> -->
+      <!-- <el-button type="primary" @click="test1">测试</el-button> -->
+      <!-- <el-button type="primary" @click="test2">测试2</el-button> -->
+      <!-- <el-button type="primary" @click="test3">测试3</el-button> -->
     </div>
     <el-divider class="divider">图层</el-divider>
   </div>
@@ -223,12 +223,14 @@ import requestApi from "../../api/requestApi";
 import { mapState, mapActions, mapMutations } from "vuex";
 import initTileJson from "@/assets/js/initTileJson";
 import layerStyleProperties from "@/assets/js/layerStyleProperties";
+import project from "@/assets/js/project";
 import { renderSplit, filterSplit, textSplit } from "@/serve/JsonToValue";
 import { nameIndex } from "@/serve/interpolation";
 import { nanoid } from "nanoid";
 
 export default {
   name: "ProjButtons",
+  inject:['reload'],  //  接受上级组件方法用于全局刷新
   props: [],
   data() {
     return {
@@ -238,7 +240,7 @@ export default {
       // layers: [],
       // sources: {},
       // layersName: [],
-      // mapProjectId: "",
+      mapProjectId: "",
       // originStyle: [],
       // #添加数据
       // 公用参数
@@ -309,7 +311,6 @@ export default {
       urlBase: { TERRAIN: [], TMS: [], WMTS: [] },
 
       // #发布
-      publicBoolean: false,
     };
   },
   computed: {
@@ -371,6 +372,14 @@ export default {
         this.UPDATEPARM({ parm: "originStyle", value: val });
       },
     },     
+    publicBoolean: {
+      get() {
+        return this.$store.state.publicBoolean;
+      },
+      set(val) {
+        this.UPDATEPARM({ parm: "publicBoolean", value: val });
+      },
+    },     
   },
   mounted() {
     // 等初始组件信息加载完
@@ -379,12 +388,31 @@ export default {
     });
   },
   methods: {
-    test1() {
-      this.$bus.$emit("mapEdit", {
-        type: "open",
-        layer: this.layersProp[0],
-        index: 0,
-      });
+    async test1() {
+      // this.$bus.$emit("mapEdit", {
+      //   type: "open",
+      //   layer: this.layersProp[0],
+      //   index: 0,
+      // });
+      let styleJson = JSON.parse(JSON.stringify(project));
+      let List = styleJson.layers;
+      let layerGroups = styleJson.metadata['mapbox:groups'];
+      await this.$bus.$emit('layerTree',{type:'groups',groups:layerGroups});
+      for (let i in List) {
+        let item = List[i];
+        console.log("item", item);
+        if (
+          item["source"] != "natural_earth_shaded_relief" &&
+          item["type"] != "raster" &&
+          item["type"] != "background"
+        ) {
+          await this.addStyleMbTileShp(item, this.mbTileStyleJson.name);
+        } else if (item["type"] == "background") {
+          await this.addBackground("mbTile", item);
+        }
+      }
+      // this.$bus.$emit('layerTree',{type:'style',layersTree:this.mbTileStyleJson.layersTree});
+      // console.log("添加所有styleJson图层");      
     },
     test2() {
       // this.$bus.$emit("styleTemp", {
@@ -859,6 +887,19 @@ export default {
           newPaint[key] = row.paint[key];
         }
       }
+      // style文件metadata中有分组信息
+      if("metadata" in row){
+        row["metadata"] = {
+          ...row["metadata"],
+          "mapbox:type": "mbStyle",
+          "mapbox:isOSM": this.mbTileInfo.osmMbtilesBoolean,
+        }
+      }else{
+        row["metadata"] = {
+          "mapbox:type": "mbStyle",
+          "mapbox:isOSM": this.mbTileInfo.osmMbtilesBoolean,
+        }        
+      }
       // styleJson图层按理只需添加一次
       this.layersNameObject[layerName] += 1;
       let geoType = row.type;
@@ -879,10 +920,7 @@ export default {
         filter: typeof row["filter"] != "undefined" ? row["filter"] : ["all"],
         layout: JSON.parse(JSON.stringify(newLayout)),
         maxzoom: typeof row["maxzoom"] != "undefined" ? row["maxzoom"] : 22,
-        metadata: {
-          "mapbox:type": "mbStyle",
-          "mapbox:isOSM": this.mbTileInfo.osmMbtilesBoolean,
-        },
+        metadata: row["metadata"],
         minzoom: typeof row["minzoom"] != "undefined" ? row["minzoom"] : 0,
         paint: JSON.parse(JSON.stringify(newPaint)),
         source: name, //通过记录的source名字与id对应，拿到sourceId
@@ -1068,6 +1106,9 @@ export default {
                 this.$message.info("地图发布失败");
               }
             })
+            .then(() => {
+              this.reload();    // 刷新页面
+            })            
             .catch((error) => {
               console.log(error);
             });
@@ -1077,7 +1118,12 @@ export default {
         });
     },
     // 添加所有styleJson图层
-    addAllStyles(List) {
+    async addAllStyles(json) {
+      let styleJson = JSON.parse(JSON.stringify(json));
+      let List = styleJson.layers;
+      console.log('style信息',styleJson);
+      let layerGroups = styleJson.metadata['mapbox:groups'];
+      await this.$bus.$emit('layerTree',{type:'groups',groups:layerGroups});
       for (let i in List) {
         let item = List[i];
         console.log("item", item);
@@ -1090,8 +1136,24 @@ export default {
         } else if (item["type"] == "background") {
           this.addBackground("mbTile", item);
         }
-      }
-      this.$bus.$emit('layerTree',{type:'style',layersTree:this.mbTileStyleJson.layersTree});
+      }      
+      // let styleJson = JSON.parse(JSON.stringify(json));
+      // let List = styleJson.layers;
+      // let layerGroups = styleJson.matadata['mapbox:groups'];
+      // await this.$bus.$emit('map',{type:'addGroups',groups:layerGroups});
+      // for (let i in List) {
+      //   let item = List[i];
+      //   console.log("item", item);
+      //   if (
+      //     item["source"] != "natural_earth_shaded_relief" &&
+      //     item["type"] != "raster" &&
+      //     item["type"] != "background"
+      //   ) {
+      //     this.addStyleMbTileShp(item, this.mbTileStyleJson.name);
+      //   } else if (item["type"] == "background") {
+      //     this.addBackground("mbTile", item);
+      //   }
+      // }
       console.log("添加所有styleJson图层");
     },
     addAllSources(List) {
@@ -1138,19 +1200,19 @@ export default {
       }
     },
     //向地图添加layer
-    addLayerToMap(flag, val) {
+    addLayerToMap(flag, value) {
       if (flag) {
         const data = {
           type: "addLayer1",
-          layer: val,
+          layer: value,
         };
         this.$bus.$emit("map", data);
       } else {
         // flag=false表示添加在指定图层后
         const data = {
           type: "addLayer2",
-          id: val.id,
-          layer: val.layer,
+          id: value.id,
+          layer: value.layer,
         };
         this.$bus.$emit("map", data);
       }

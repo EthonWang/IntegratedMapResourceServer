@@ -14,7 +14,6 @@ import { mapState, mapActions, mapMutations } from "vuex";
 var map = null;
 export default {
   name: "MapPanel",
-  props: ["", ""],
   data() {
     return {
       // vuex参数
@@ -131,13 +130,13 @@ export default {
     layers:{ 
       deep:true,
       handler:function(val){
-        let List = [];
+        // 清空layerIdList数组但不能改变的内存地址，防止map事件绑定的图层数组不响应
+        this.layerIdList.length = 0;
         val.forEach(element => {
-          List.push(element.id);
+          // if(this.layerIdList.indexOf(element.id) == -1){
+            this.layerIdList.push(element.id);
+          // }
         });    
-        this.layerIdList = List;
-        // 响应图层的地图事件
-        this.mapLayerEvent();
       }
     }
   },
@@ -161,7 +160,7 @@ export default {
         case "addLayer1": // data:{type:'',layer:{},(isReplace)}        addLayer同时在图层树组件中触发
           this.addLayerToMap(true, data.layer);
           break;
-        case "addLayer2": // data:{type:'',id:'',layer:{},(isReplace)}  添加在指定图层后(添加背景,更换指定图层样式)，isReplace表示替换图层，不对目录树做修改
+        case "addLayer2": // data:{type:'',id:'',layer:{},(isReplace)}  添加在指定图层后(添加背景,更换指定图层样式)，isReplace表示替换图层，不对目录树做修改，即在图层树组件响应事件不做修改
           this.addLayerToMap(false, data);
           break;
         case "addSource1": // data:{type:'',source:{}}  tileJson写法
@@ -198,6 +197,8 @@ export default {
           break;
       }
     });
+    console.log('map组件初始化了');
+
   },
   methods: {
     // vuex
@@ -283,14 +284,7 @@ export default {
       // map.on('mouseenter',layerIdList,  function (e) {
       // console.log("eeeeeeeeee gid:", e);
       // });
-    },
-    // 对图层进行事件添加（受layerIdList进行响应）
-    mapLayerEvent(){
-      // console.log('出发了');
-      // map.on('moveend', () => {
-      //     const features = map.queryRenderedFeatures({ layers: ['water_V3GNe'] }); 
-      //     console.log('筛选',features);
-      // })     
+      // #注：通过对layerIdList进行浅拷贝，来响应图层的变化
       //center
       map.on("mousemove", this.layerIdList,() => {
         map.getCanvas().style.cursor = "pointer";
@@ -298,10 +292,12 @@ export default {
       // Change it back to a pointer when it leaves.
       map.on("mouseleave", this.layerIdList, function () {
         map.getCanvas().style.cursor = "";
-      });      
+      });       
       // 点击事件
       map.on("click",this.layerIdList, (e) => {
         //点击范围
+        console.log('触发了');
+
         const bbox = [
           [e.point.x - 5, e.point.y - 5],
           [e.point.x + 5, e.point.y + 5],
@@ -333,13 +329,16 @@ export default {
             iconItem.className = this.layerIcon[feature.layer.type];
           }
 
+          let aimLayer = this.layers.filter(item=>(
+            item.id == feature.layer["id"]
+          ))
           var index = this.layerIdList.indexOf(feature.layer["id"]);
           container.appendChild(item).className = "item";
           item.appendChild(iconBox).className = "iconBox";
           item.appendChild(colorBox).className = "colorBox";
           item.appendChild(item_name).className = "item_name";
-          item_name.innerHTML = this.layers[index].showName; //显示的是showName
-          item_name.title = this.layers[index].showName;
+          item_name.innerHTML = aimLayer[0].showName; //显示的是showName
+          item_name.title = aimLayer[0].showName;
 
           //根据index获取相关图层信息
           const color_name = feature.layer.type + "-" + "color";
@@ -347,14 +346,15 @@ export default {
             "background-color",
             feature.layer.paint[color_name]
           );
-          this.addItemEvent(item, this.layers[index], index);
+          this.addItemEvent(item, aimLayer[0], index);
         }
         // 弹出框控件
         new mapboxgl.Popup()
           .setLngLat(e.lngLat)
           .setDOMContent(container)
           .addTo(map);
-      });
+      });      
+      console.log('地图初始化');
     },
     // 数据回来后初始化地图
     initMapWithData() {
@@ -422,13 +422,17 @@ export default {
     // 向地图添加layer
     addLayerToMap(flag, data) {
       if (flag) {
+        let val = JSON.parse(JSON.stringify(data));
+        delete val.paint[`${val.type}-pattern`];         
         console.log("add new layer：", data);
-        map.addLayer(data); //默认添加
+        map.addLayer(val); //默认添加
       } else {
         //value:{index:'',layer:{}}
+        let val = JSON.parse(JSON.stringify(data.layer));
+        delete val.paint[`${val.type}-pattern`];          
         console.log("add new layer：", data.layer);
-        const id = data.id;
-        map.addLayer(data.layer, id); //添加在对应图层之前
+        const id = val.id;
+        map.addLayer(val.layer, id); //添加在对应图层之前
       }
     },
     //设置对地图进行筛选
@@ -521,6 +525,9 @@ export default {
                   .then(() => {
                     this.deleteTileJson();
                   })
+                  .then(() => {
+                    this.reload();    // 刷新页面
+                  })
                   .catch((error) => {
                     console.log(error);
                   });
@@ -545,6 +552,18 @@ export default {
               })
               .then(() => {
                 this.deleteTileJson();
+                // requestApi
+                //   .publicMap(id)
+                //   .then((res) => {
+                //     if (res.data.code === 0) {
+                //       this.$message.success("地图发布成功:" + this.mapProjectInfo.name);
+                //     } else {
+                //       this.$message.info("地图发布失败");
+                //     }
+                //   })
+                //   .catch((error) => {
+                //     console.log(error);
+                //   });                
               })
               .catch((error) => {
                 console.log(error);

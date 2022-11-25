@@ -13,10 +13,11 @@ export default {
             "line-color":"#000000",
             "line-dasharray": [1],
             "line-gap-width": 0,
-           // "line-gradient":"",  //ignore  Requires source to be "geojson".
+            // "line-gradient":"",  //ignore  Requires source to be "geojson".
             "line-offset": 0,
             "line-opacity": 1,
-           // "line-pattern": "",  //ignore  Optional resolvedImage.
+            "line-pattern": '',  //ignore  Optional resolvedImage.
+            // "line-pattern": "ae-national-3",  //ignore  Optional resolvedImage.
             "line-translate": [0,0],
             "line-translate-anchor": "map", //One of "map", "viewport".
             "line-width": 1,
@@ -51,7 +52,8 @@ export default {
             "fill-color":"#000000",
             "fill-opacity":1,
             "fill-outline-color":"rgba(255, 255, 255, 0)",
-            //"fill-pattern":''  //ignore  Optional resolvedImage.
+            "fill-pattern": '',  //ignore  Optional resolvedImage.
+            // "fill-pattern":"ae-national-3",  //ignore  Optional resolvedImage.
             "fill-translate":[0,0],
             "fill-translate-anchor":"map", // One of "map", "viewport"
         }

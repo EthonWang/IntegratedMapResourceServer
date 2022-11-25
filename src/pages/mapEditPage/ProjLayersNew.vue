@@ -16,13 +16,13 @@
           title="添加组"
           @click="addGroup">
         </el-button>
-        <!-- <el-button 
+        <el-button 
           class="treeBtn"
           type="text" plain
           icon="el-icon-document-copy" 
           title="复制图层"
           @click="copyLayer">
-        </el-button> -->
+        </el-button>
         <el-popconfirm
             title="确定删除全部图层吗？"
             @confirm="allLayerDelete()"
@@ -42,12 +42,13 @@
 
     <div @click.stop class="treeBox">
       <el-tree
+          :key="treeKey"
           :data="layersTree"
           node-key="id"
           ref="tree"
           default-expand-all
           @node-drop="handleDrop"
-          highlight-current
+          :highlight-current="true"
           :expand-on-click-node="false"
           draggable
           @node-click="handleNodeClick"
@@ -175,6 +176,7 @@
 import {mapActions, mapMutations, mapState} from 'vuex'
 import {nanoid} from 'nanoid'
 import requestApi from "../../api/requestApi";
+import { nameIndex } from "@/serve/interpolation";
 
 export default {
   name: "ProjLayersNew",
@@ -191,6 +193,7 @@ export default {
       // layersTree: [],
 
       allLayerShow: true,
+      treeKey:0,    // 用于目录树组件强制渲染
 
 
       groupIds: [],
@@ -310,17 +313,23 @@ export default {
         layers.forEach((layer)=>{
           const aimLayer = JSON.parse(JSON.stringify(layer));
           for (let i = 0; i < this.layersTree.length; i++) {
-            let node=this.layersTree[i]
-            if(node.nodeType=="group")
+            let node=this.layersTree[i];
+            if(node.nodeType=="group"){
               for (let k = 0; k < node.children.length; k++)
                 if(node.children[k].id==aimLayer.id)
                   node.children[k]=aimLayer
-            else
-              if(node.id==aimLayer.id)
-                node=aimLayer
+            }
+            else{
+              if(node.id==aimLayer.id){
+                this.layersTree[i]=aimLayer
+              }
+            }
           }
         })
-        // this.UPDATEPARM({parm: 'layersTree', value: this.layersTree});
+        // 等计算完再进行数组件渲染
+        this.$nextTick(()=>{
+          this.treeKey += 1;
+        }) 
         console.log("update tree")
       }
     },
@@ -363,8 +372,8 @@ export default {
         case 'highLight':              // data:{type:'',id:''}
           this.highLightNode(data.id);
           break;
-        case 'style':                  // data:{type:'',layersTree}
-          this.addTemplate(data)
+        case 'groups':                  // data:{type:'',groups:{}}
+          this.addGroups(data.groups)
       }   
     })
   },
@@ -416,9 +425,27 @@ export default {
     },
 
     addLayerToTree(layerData) {
-      console.log('layerTree刷新了',this.layersTree);
-      this.layersTree.unshift(layerData)
-      this.UPDATEPARM({parm: 'layersTree', value: this.layersTree});
+      let groupId = '1';      // 默认为'1',为style
+      if('metadata' in layerData){
+        groupId = layerData.metadata['mapbox:group'] || '';
+      }
+      if(groupId.length > 1){           // 有分组信息，添加在改组最前
+        let index = this.layersTree.findIndex(
+          (currentValue)=>currentValue.nodeType == 'group'&&currentValue.id == groupId) 
+        if(index !== -1){
+          this.layersTree[index].children.unshift(layerData);
+        }else{
+          console.log('分组信息错误')
+        }
+      }
+      else if(groupId.length == 1){     // 没有分组的图层，因为是按顺序添加，所以添加在第一个有图层的组之前
+        let index = this.layersTree.findIndex(
+          (currentValue)=>('children' in currentValue) && currentValue['children'].length !== 0)
+        this.layersTree.splice(index,0,layerData) 
+      }
+      else{       // 除style外的其余添加方式
+        this.layersTree.unshift(layerData)
+      }
     },
 
     showSwitchChange(val, row) {
@@ -447,7 +474,7 @@ export default {
       }
       let index = this.getLayerIndex(row.id)
       this.layers[index]["show"] = val
-      this.UPDATEPARM({parm: 'layers', value: this.layers});
+      console.log('出发了开关',this.layers,this.layersTree);
     },
 
     deleteTileJson(tileJsonId) {
@@ -469,16 +496,25 @@ export default {
       let layerKey = row.manageInfo.layerKey;
       let sourceKey = row.manageInfo.sourceKey      
       let layerid = row.id;
+      let hasMbData = false;
       this.layers.splice(index, 1);
       this.originStyle.splice(index, 1);
       this.layersNameObject[layerKey] -= 1;
       this.handleRemoveLayer(layerid);
+      // 验证是否还有mbtile数据
+      this.layers.every(item=>{
+        if(item.source === sourceKey){
+          hasMbData = true;
+          return false
+        }
+      })     
       //如果没有layer使用source，则删除source记录
-      if (this.layersNameObject[layerKey] === 0) {
+      if (this.layersNameObject[layerKey] === 0&&!row.metadata['mapbox:type'].includes('mb')) {
         delete this.layersNameObject[layerKey];
         // 背景没有source
         if(row.metadata['mapbox:type'] != "background"){
           delete this.sources[sourceKey];
+          // mbTile数据只有删除全部mbTile数据才删除
           this.handleRemoveSource(row.source);
           //只有multiPG删除source的tileJson
           if (row.metadata['mapbox:type'] == "multiPG") {          
@@ -487,6 +523,12 @@ export default {
             // this.deleteTileJson(row.source);
             this.tileJsonList.push(sourceJsonId);
           }
+          delete this.sourceNameObject[sourceKey];
+        }
+      }else if(row.metadata['mapbox:type'].includes('mb')){
+        if(!hasMbData){
+          delete this.sources[sourceKey];
+          this.handleRemoveSource(row.source);
           delete this.sourceNameObject[sourceKey];
         }
       }
@@ -499,7 +541,6 @@ export default {
       const children = parent.data.children || parent.data;
       const index = children.findIndex(d => d.id === aimLayerData.id);
       children.splice(index, 1);
-      this.UPDATEPARM({parm: 'layersTree', value: this.layersTree});
     },
 
     deleteGroupFromTree(data,node) {
@@ -511,7 +552,6 @@ export default {
       const childrenData = parent.data.children || parent.data;
       const index = childrenData.findIndex(d => d.id === data.id);
       childrenData.splice(index, 1);
-      this.UPDATEPARM({parm: 'layersTree', value: this.layersTree});
     },
 
     // #多图层操作
@@ -537,43 +577,47 @@ export default {
           this.handleLayoutChange(this.layers[i].id, "visibility", "none");
         }
       }
-      this.UPDATEPARM({parm: 'layers', value: this.layers});
 
     },
     // 一键删除
     allLayerDelete() {
-      // 先关闭图层样式编辑框，防止报错
-      this.$bus.$emit("mapEdit", {type: 'off'});
-      for (let i in this.layers) {
-        let item = JSON.parse(JSON.stringify(this.layers[i]));
-        let layerKey = item.manageInfo.layerKey;
-        let sourceKey = item.manageInfo.sourceKey
-        let layerid = item.id;
-        this.layersNameObject[layerKey] -= 1;
-        this.handleRemoveLayer(layerid);
-        //如果没有layer使用source，则删除source
-        if (this.layersNameObject[layerKey] === 0) {
-          delete this.layersNameObject[layerKey];
-          // 背景没有source
-          if(item.metadata['mapbox:type'] != "background"){
-            delete this.sources[sourceKey];
-            this.handleRemoveSource(item.source);
-            //只有multiPG删除source的tileJson
-            if (item.metadata['mapbox:type'] == "multiPG") {
-              let sourceJsonId = JSON.parse(JSON.stringify(this.sourceNameObject[sourceKey]));
-              //source没有再使用时,删除后台的tileJson(防止未保存，将删除Json的步骤放到保存中执行)
-              // this.deleteTileJson(item.source);
-              this.tileJsonList.push(sourceJsonId);
+      if(this.layers.length > 0){
+        // 先关闭图层样式编辑框，防止报错
+        this.$bus.$emit("mapEdit", {type: 'off'});
+        let mbDataId = '';
+        for (let i in this.layers) {
+          let item = JSON.parse(JSON.stringify(this.layers[i]));
+          let layerKey = item.manageInfo.layerKey;
+          let sourceKey = item.manageInfo.sourceKey
+          let layerid = item.id;
+          this.handleRemoveLayer(layerid);
+          this.layersNameObject[layerKey] -= 1;
+          //如果没有layer使用source，则删除source，mbtile放到最后删
+          if (this.layersNameObject[layerKey] === 0&&!item.metadata['mapbox:type'].includes('mb')) {
+            // 背景没有source
+            if(item.metadata['mapbox:type'] != "background"){
+              this.handleRemoveSource(item.source);
+              //只有multiPG删除source的tileJson
+              if (item.metadata['mapbox:type'] == "multiPG") {
+                let sourceJsonId = JSON.parse(JSON.stringify(this.sourceNameObject[sourceKey]));
+                this.tileJsonList.push(sourceJsonId);
+              }
             }
-            delete this.sourceNameObject[sourceKey];
-          }
+          }else if(item.metadata['mapbox:type'].includes('mb')){
+            mbDataId = sourceKey;
+          } 
         }
+        // mbtile的公用一个source，最后统一删除
+        this.handleRemoveSource(mbDataId);
+        // 循环完再进行视图数据初始化,避免循环中渲染。
+        this.layersNameObject = {};
+        this.sourceNameObject = {};
+        this.layers = [];
+        this.sources = [];
+        this.originStyle = [];
+        this.layersTree = [];
+        console.log('一键删除:',this.layers,'\n',this.layersNameObject,'\n',this.sourceNameObject,'\n',this.tileJsonList)
       }
-      // 循环完再进行视图数据初始化,避免循环中渲染。
-      this.layers = [];
-      this.originStyle = [];
-      this.layersTree = []
-      console.log('一键删除:',this.layers,'\n',this.layersNameObject,'\n',this.sourceNameObject,'\n',this.tileJsonList)
     },
 
     // #对map组件方法的封装
@@ -665,11 +709,25 @@ export default {
     // #树组件事件
     highLightNode(id){
       this.$refs.tree.setCurrentKey(id);
+      console.log('触发高亮',id,this.$refs.tree.getCurrentKey());
     },
     // 添加style的模板
-    addTemplate(data){
-      this.layersTree = JSON.parse(JSON.stringify(data));
-      console.log('添加模板',data);
+    addGroups(data){
+      let groupsInfo = JSON.parse(JSON.stringify(data));
+      for(let item in groupsInfo){
+        let index = this.layersTree.findIndex(
+          (currentValue)=>currentValue.nodeType == 'group'&&currentValue.showName == groupsInfo[item].name)        
+        if(index == -1){
+          let node = {
+            id:item,
+            showName:groupsInfo[item].name,
+            nodeType:'group',
+            children:[],
+            show:true
+          }
+          this.addGroup({node});
+        }
+      }
     },
 
     allowDrop(draggingNode, dropNode, type) {
@@ -718,15 +776,38 @@ export default {
     },
 
 
-    addGroup() {
-      let groupNode = {}
-      groupNode["id"] = nanoid()
-      groupNode["showName"] = "组"
-      groupNode["nodeType"] = "group"
-      groupNode["children"] = []
-      groupNode["show"] = true
+    addGroup({node=0}={}) {
+      let groupNode = node || {};
+      if(!node){    // 非style添加方式
+        groupNode["id"] = nanoid()
+        groupNode["showName"] = "组"
+        groupNode["nodeType"] = "group"
+        groupNode["children"] = []
+        groupNode["show"] = true
+      }
       this.layersTree.unshift(groupNode)
-      this.UPDATEPARM({parm: 'layersTree', value: this.layersTree});
+    },
+    copyLayer(){
+      // 复制目标图层信息，修改id和showName，layersNameObject添加图层
+      let aimNode = JSON.parse(JSON.stringify(this.$refs.tree.getCurrentNode())) || {};
+      if(aimNode != {} && aimNode.nodeType == 'layer'){
+        let newNode = JSON.parse(JSON.stringify(aimNode));
+        let name = newNode.id.slice(0,-6);
+        newNode.id = name+'_'+nanoid(5);
+        let result = JSON.parse(
+          JSON.stringify(
+            nameIndex(this.layers, newNode.manageInfo.layerKey, name, this.layersNameObject)
+          )
+        );
+        this.layersNameObject = result.object;
+        newNode.showName = result.show;
+        // 将图层添加到目标图层前同时更新layerTree
+        this.$refs.tree.insertBefore(newNode,aimNode);
+        let index = this.getLayerIndex(aimNode.id);
+        this.layers.splice(index,0,newNode);
+        this.handleAddLayer(index,newNode);
+        this.$refs.tree.setCurrentKey(aimNode.id);
+      }
     },
 
     getLayerIndex(layerId) {

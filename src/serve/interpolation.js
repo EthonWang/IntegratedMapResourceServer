@@ -47,7 +47,7 @@ export const nameIndex = (a1,a2,a3,a4)=>{
     layersNameObject[layerId] = 1;
     showName = originName;
   }
-  console.log('返回结果',showName,layersNameObject);
+  console.log('返回结果',showName,layersNameObject,layersName,layers);
   return {show:showName,object:layersNameObject};
 }
 

@@ -11,6 +11,7 @@ const state = {
   spritePath:'',  
   layersTree:[],
   tileJsonList: [],     // 保存后待删除的json名单
+  publicBoolean: '',
 }
 // 不常修改的就放入localStorage
 export default state;

@@ -843,7 +843,7 @@
               tab="line-translate"
               @callback="callback"
             ></ConditionRender>
-          </el-tab-pane>
+          </el-tab-pane>         
           <el-tab-pane label="平移参考" name="eighth">
             <h3>平移参考</h3>
             &nbsp;
@@ -996,6 +996,119 @@
               @callback="callback"
             ></ConditionRender>
           </el-tab-pane>
+          <el-tab-pane label="图案填充" name="twelve">
+            <h3>图标选择</h3>
+            &nbsp;
+            <span v-if="!menuButtonShowList['line-pattern']">{{
+              menuShowList["line-pattern"]
+            }}</span>
+            <br />
+            <el-row
+              v-if="menuButtonShowList['line-pattern']"
+              style="display: flex; margin-top: 10px"
+            >
+              <el-input
+                v-model="layers[nowLayerIndex].paint['line-pattern']"
+                @change="
+                  handlePaintChange(
+                    layers[nowLayerIndex]['id'],
+                    'line-pattern',
+                    layers[nowLayerIndex].paint['line-pattern']
+                  )
+                "
+                placeholder="something"
+              ></el-input>
+              <el-popover
+                ref="iconPopover"
+                placement="right"
+                width="400"
+                trigger="click"
+              >
+                <el-tabs>
+                  <el-tab-pane
+                    label="精灵图"
+                    style="height: 400px; overflow-y: scroll"
+                  >
+                    <el-row>
+                      <el-select
+                        v-model="spriteNameSelect"
+                        placeholder="请选择精灵图"
+                        @change="spriteChange"
+                      >
+                        <el-option
+                          v-for="item in spriteClassList"
+                          :key="item"
+                          :label="item"
+                          :value="item"
+                        >
+                        </el-option> </el-select
+                      >&nbsp;
+                      <div style="width: 400px; display: flex; flex-wrap: wrap">
+                        <div
+                          v-for="(item, key, index) in spriteJsonSelect"
+                          :key="index"
+                          :title="key"
+                          @click="clickSprite(item, key, index)"
+                          class="spriteCard"
+                          body-style="padding:0"
+                          :style="{
+                            padding: 0,
+                            width: item.width + 30 + 'px',
+                            height: item.height + 30 + 'px',
+                            cursor: 'pointer',
+                          }"
+                        >
+                          <div
+                            :style="{
+                              'background-image': `url(${spritePngSelect})`,
+                              width: item.width + 'px',
+                              height: item.height + 'px',
+                              'background-position':
+                                '-' + item.x + 'px -' + item.y + 'px',
+                            }"
+                          ></div>
+                        </div>
+                      </div>
+                    </el-row>
+                  </el-tab-pane>
+                  <el-tab-pane label="自定义">
+                    <el-row
+                      type="flex"
+                      justify="start"
+                      style="flex-wrap: wrap; width: 100%"
+                    >
+                      <el-card
+                        class="spriteImage"
+                        v-for="(item, index) in symbolTableData"
+                        :key="index"
+                      >
+                        <el-image
+                          style="width: 100px; height: 100px"
+                          :src="reqUrl + item.webAddress"
+                          fit="cover"
+                          class="cursor"
+                          @click="iconSelect(item)"
+                        >
+                        </el-image>
+                      </el-card>
+                    </el-row>
+                  </el-tab-pane>
+                </el-tabs>
+
+                <el-button
+                  type="text"
+                  icon="el-icon-s-unfold"
+                  slot="reference"
+                ></el-button>
+              </el-popover>
+            </el-row>
+            <el-divider></el-divider>
+            <ConditionRender
+              :layerSelect="layers[nowLayerIndex]"
+              tab="line-pattern"
+              @callback="callback"
+            ></ConditionRender>
+          </el-tab-pane> 
         </el-tabs>
         <!--    面图层编辑面板-->
         <el-tabs
@@ -1260,6 +1373,119 @@
               @callback="callback"
             ></ConditionRender>
           </el-tab-pane>
+          <el-tab-pane label="图案填充" name="twelve">
+            <h3>图标选择</h3>
+            &nbsp;
+            <span v-if="!menuButtonShowList['fill-pattern']">{{
+              menuShowList["fill-pattern"]
+            }}</span>
+            <br />
+            <el-row
+              v-if="menuButtonShowList['fill-pattern']"
+              style="display: flex; margin-top: 10px"
+            >
+              <el-input
+                v-model="layers[nowLayerIndex].paint['fill-pattern']"
+                @change="
+                  handlePaintChange(
+                    layers[nowLayerIndex]['id'],
+                    'fill-pattern',
+                    layers[nowLayerIndex].paint['fill-pattern']
+                  )
+                "
+                placeholder="something"
+              ></el-input>
+              <el-popover
+                ref="iconPopover"
+                placement="right"
+                width="400"
+                trigger="click"
+              >
+                <el-tabs>
+                  <el-tab-pane
+                    label="精灵图"
+                    style="height: 400px; overflow-y: scroll"
+                  >
+                    <el-row>
+                      <el-select
+                        v-model="spriteNameSelect"
+                        placeholder="请选择精灵图"
+                        @change="spriteChange"
+                      >
+                        <el-option
+                          v-for="item in spriteClassList"
+                          :key="item"
+                          :label="item"
+                          :value="item"
+                        >
+                        </el-option> </el-select
+                      >&nbsp;
+                      <div style="width: 400px; display: flex; flex-wrap: wrap">
+                        <div
+                          v-for="(item, key, index) in spriteJsonSelect"
+                          :key="index"
+                          :title="key"
+                          @click="clickSprite(item, key, index)"
+                          class="spriteCard"
+                          body-style="padding:0"
+                          :style="{
+                            padding: 0,
+                            width: item.width + 30 + 'px',
+                            height: item.height + 30 + 'px',
+                            cursor: 'pointer',
+                          }"
+                        >
+                          <div
+                            :style="{
+                              'background-image': `url(${spritePngSelect})`,
+                              width: item.width + 'px',
+                              height: item.height + 'px',
+                              'background-position':
+                                '-' + item.x + 'px -' + item.y + 'px',
+                            }"
+                          ></div>
+                        </div>
+                      </div>
+                    </el-row>
+                  </el-tab-pane>
+                  <el-tab-pane label="自定义">
+                    <el-row
+                      type="flex"
+                      justify="start"
+                      style="flex-wrap: wrap; width: 100%"
+                    >
+                      <el-card
+                        class="spriteImage"
+                        v-for="(item, index) in symbolTableData"
+                        :key="index"
+                      >
+                        <el-image
+                          style="width: 100px; height: 100px"
+                          :src="reqUrl + item.webAddress"
+                          fit="cover"
+                          class="cursor"
+                          @click="iconSelect(item)"
+                        >
+                        </el-image>
+                      </el-card>
+                    </el-row>
+                  </el-tab-pane>
+                </el-tabs>
+
+                <el-button
+                  type="text"
+                  icon="el-icon-s-unfold"
+                  slot="reference"
+                ></el-button>
+              </el-popover>
+            </el-row>
+            <el-divider></el-divider>
+            <ConditionRender
+              :layerSelect="layers[nowLayerIndex]"
+              tab="fill-pattern"
+              @callback="callback"
+            ></ConditionRender>
+          </el-tab-pane> 
         </el-tabs>
         <!--    三维面图层编辑面板-->
         <el-tabs
@@ -1781,7 +2007,7 @@
             ></ConditionRender>
           </el-tab-pane>
         </el-tabs>
-        <!--    图标图层编辑面板-->
+        <!--    图标标注图层编辑面板-->
         <div v-if="editorShow == 'symbolEditorShow'" class="symbolSort">
           <span
             type="text"
@@ -1796,6 +2022,7 @@
             >标注</span
           >
         </div>
+        <!-- 图标 -->
         <el-tabs
           class="symbolBox"
           v-if="editorShow == 'symbolEditorShow'"
@@ -2412,6 +2639,7 @@
             ></ConditionRender>
           </el-tab-pane>
         </el-tabs>
+        <!-- 标注 -->
         <el-tabs
           class="symbolBox"
           v-if="editorShow == 'symbolEditorShow'"
@@ -4126,6 +4354,7 @@ import { nanoid } from 'nanoid';
 
 export default {
   name: "LayerEditPanel",
+  inject:['reload'],  //  接受上级组件方法用于全局刷新
   components: { ConditionRender },
   props: [],
   data() {
@@ -4416,7 +4645,7 @@ export default {
       const end = this.spritePath.lastIndexOf("/");
       this.spriteNameSelect = this.spritePath.substring(15, end);
       // 精灵图JSON和png
-      if (this.spriteNameSelect != "") {
+      if (this.spriteNameSelect != "mpx_sprite") {
         const url =
           this.reqUrl +
           "/store/sprites/" +
@@ -4697,7 +4926,7 @@ export default {
         }
       )
         .then(() => {
-          if (this.spriteNameSelect != "") {
+          if (this.spriteNameSelect != "mpx_sprite") {
             const url =
               this.reqUrl +
               "/store/sprites/" +
@@ -4722,7 +4951,6 @@ export default {
           this.spritePath =
             "/store/sprites/" + this.spriteNameSelect + "/sprite";
           // 更新vuex再保存
-          this.UPDATEPARM({ parm: "spritePath", value: this.spritePath });
           this.$bus.$emit("map", { type: "save", flag: false });
         })
         .catch(() => {
@@ -5241,7 +5469,13 @@ export default {
       this.$bus.$emit("map", data);
     },
     // 向地图添加layer
-    addLayerToMap(flag, val, isReplace) {
+    addLayerToMap(flag, val, isReplace, patternProp) {
+      console.log('模式',patternProp);
+      if(!patternProp){
+        delete val['line-pattern'];
+        delete val['fill-pattern'];
+        console.log('现在的',val);
+      }
       if (flag) {
         const data = {
           type: "addLayer1",
@@ -5326,7 +5560,7 @@ export default {
         url: url,
         name: name,
       };
-      this.$bus.$emit(data);
+      this.$bus.$emit("map",data);
     },
   },
   beforeDestroy() {
