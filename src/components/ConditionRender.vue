@@ -8,7 +8,8 @@
           !attribute.includes('pitch-alignment') &&
           !attribute.includes('pitch-scale') &&
           !attribute.includes('gradient') &&
-          !attribute.includes('rotation-alignment')
+          !attribute.includes('rotation-alignment') &&
+          !attribute.includes('pattern')
         "
         :disabled="
           attribute == 'fill-outline-color' &&
@@ -112,7 +113,8 @@
             !attribute.includes('text-line-height') &&
             !attribute.includes('text-translate') &&
             !attribute.includes('rotation-alignment') &&
-            !attribute.includes('heatmap-opacity')
+            !attribute.includes('heatmap-opacity') &&
+            !attribute.includes('pattern')
           "
           :disabled="
             attribute == 'fill-outline-color' &&
@@ -231,7 +233,8 @@
             !attribute.includes('text-line-height') &&
             !attribute.includes('text-translate') &&
             !attribute.includes('rotation-alignment') &&
-            !attribute.includes('heatmap-opacity')
+            !attribute.includes('heatmap-opacity') &&
+            !attribute.includes('pattern')
           "
           :disabled="
             attribute == 'fill-outline-color' &&
@@ -263,6 +266,7 @@
           !attribute.includes('text-line-height') &&
           !attribute.includes('text-translate') &&
           !attribute.includes('rotation-alignment') &&
+          !attribute.includes('pattern') &&
           false
         "
         class="menuButton"
@@ -2000,6 +2004,7 @@ export default {
         "line-join": "线连接",
         "line-miter-limit": "最大斜接长度",
         "line-round-limit": "最小圆角半径",
+        "line-pattern": "图案填充",
         "fill-color": "颜色",
         "fill-opacity": "不透明度",
         "fill-outline-color": "边线颜色",
@@ -2013,6 +2018,7 @@ export default {
         "fill-extrusion-translate": "平移",
         "fill-extrusion-translate-anchor": "平移参考",
         "fill-extrusion-vertical-gradient": "渐变填充",
+        "fill-pattern":"图案填充",
         "icon-image": "图标",
         "icon-size": "图标大小",
         "icon-opacity": "不透明度",
@@ -2277,9 +2283,9 @@ export default {
         this.layoutOrpaint = "paint";
       } else {
         this.$message("数据layout和paint属性有误");
-        console.log("no this attribute：", this.attribute, this.layer.layout);
+        console.log("no this attribute：", this.attribute, this.layer);
       }
-      // 初始化tab显示列表（也可以对style样式的属性进行转换）
+      // 初始化tab显示列表（也可以对style样式的属性进行转换 ）
       for (let tab in this.layer["paint"]) {
         if (
           this.layer.attrValueSet[tab] == "primary" ||

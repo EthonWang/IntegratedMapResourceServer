@@ -4,7 +4,16 @@ export default
     "version": 8,
     "name": "test",
     "metadata": {
-        "mapbox:groups": {}
+        "mapbox:groups": {
+            "83dec66879dff3f41177a1a368bf994d": {
+                "name": "Group_sc",
+                "collapsed": false
+            },
+            "862868b6974eb5a7d68fe521ce667cb1": {
+                "name": "Group",
+                "collapsed": false
+            }
+        }
     },
     "sources": {
         "re_63203a0ac8a4a6c3edffb5fd#defaultPG": {

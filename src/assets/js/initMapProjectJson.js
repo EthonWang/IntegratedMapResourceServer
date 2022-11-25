@@ -13,6 +13,6 @@ export default {
     "modified": "",
     "owner": null,
     "visibility": "private",
-    "sprite": "/store/sprites/mpx_sprite/sprite",
+    "sprite": "/store/sprites//sprite",     // 原先为空用于判断是否选择精灵图
     "glyphs": "/store/fonts/{fontstack}/{range}.pbf",
 }

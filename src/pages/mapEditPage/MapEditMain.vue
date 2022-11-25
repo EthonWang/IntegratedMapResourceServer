@@ -1,26 +1,35 @@
 <template>
-  <div class="mainPage">
+  <div class="mainPage" v-if="projectShow">
     <ProjMenus></ProjMenus>
     <LayerEditPanel></LayerEditPanel>
     <StyleTemplate></StyleTemplate>
     <MapPanel></MapPanel>
-  </div>  
+  </div>
 </template>
 
 <script>
-import LayerEditPanel from "./LayerEditPanel.vue"; 
-import MapPanel from "./MapPanel.vue"; 
-import StyleTemplate from "./StyleTemplate.vue"; 
-import ProjMenus from "./ProjMenus.vue"; 
+import LayerEditPanel from "./LayerEditPanel.vue";
+import MapPanel from "./MapPanel.vue";
+import StyleTemplate from "./StyleTemplate.vue";
+import ProjMenus from "./ProjMenus.vue";
 import requestApi from "@/api/requestApi";
-import {mapState,mapActions,mapMutations} from 'vuex'
+import { mapState, mapActions, mapMutations } from "vuex";
 export default {
-  components: { ProjMenus,MapPanel,LayerEditPanel,StyleTemplate },
+  name: 'MapEditMain',
+  components: { ProjMenus, MapPanel, LayerEditPanel, StyleTemplate },
+  provide(){  
+    return {
+        reload:this.reLoad  // 给子孙组件提供接口用于全局刷新
+      }
+  },
   data() {
-    return{
+    return {
+      // 全局参数
+      projectShow: true,
+
       // 项目工程参数
-      mapProjectId: '',
-      mapProjectInfo: '',
+      mapProjectId: "",
+      mapProjectInfo: "",
 
       // 地图相关信息
       zoom: 6,
@@ -29,7 +38,7 @@ export default {
       glyphsPath: "",
       sources: {},
       layers: [],
-      layersTree:[],
+      layersTree: [],
       layersNameObject: {}, //检测重复  后端字段为nameObject
       layersName: [], //加载的图层id集合，用于展示图层按index的排列
       sourceNameObject: {}, //检测source重复
@@ -38,30 +47,29 @@ export default {
       originStyle: [],
 
       // 精灵图
-      spriteNameSelect: '',
+      spriteNameSelect: "",
 
       // 发布
       publicBoolean: false,
-
-    }
+    };
   },
-  computed:{
+  computed: {
     ...mapState({
       // mapProjectInfoProp: "mapProjectInfo",
       // layersNameProp: "layersName",
       // layersProp: "layers",
       // sourcesProp: "sources",
-    }),    
+    }),
   },
   mounted() {
     this.mapProjectId = this.$route.params.mapProjectId;
     localStorage.setItem("mapProjectId", this.mapProjectId);
     this.getMapProjectInfo();
-  },  
-  methods:{
+  },
+  methods: {
     // vuex
-    ...mapActions({updateParm:'update'}),        //将 `this.updateParm(data)` 映射为 `this.$store.dispatch('update',data)`
-    ...mapMutations({UPDATEPARM:'UPDATE'}),      //将 `this.UPDATEPARM(data)` 映射为 `this.$store.commit('UPDATE',data)`
+    ...mapActions({ updateParm: "update" }), //将 `this.updateParm(data)` 映射为 `this.$store.dispatch('update',data)`
+    ...mapMutations({ UPDATEPARM: "UPDATE" }), //将 `this.UPDATEPARM(data)` 映射为 `this.$store.commit('UPDATE',data)`
     // #项目信息初始化
     getMapProjectInfo() {
       requestApi
@@ -75,7 +83,7 @@ export default {
           this.spritePath = this.mapProjectInfo.sprite;
           const end = this.spritePath.lastIndexOf("/");
           this.spriteNameSelect = this.spritePath.substring(15, end);
-          if (this.spriteNameSelect != "") {
+          if (this.spriteNameSelect != "mpx_sprite") {
             const url =
               this.reqUrl +
               "/store/sprites/" +
@@ -88,7 +96,6 @@ export default {
               })
               .then((json) => {
                 this.spriteJsonSelect = json;
-                console.log("精灵图json", this.spriteJsonSelect);
               });
             this.spritePngSelect =
               this.reqUrl +
@@ -96,11 +103,11 @@ export default {
               this.spriteNameSelect +
               "/" +
               "sprite.png";
-          }          
+          }
           this.glyphsPath = this.mapProjectInfo.glyphs;
           this.sources = this.mapProjectInfo.sources;
           this.layers = this.mapProjectInfo.layers;
-          this.layersTree=this.mapProjectInfo.layersTree
+          this.layersTree = this.mapProjectInfo.layersTree;
           this.layersNameObject =
             JSON.stringify(this.mapProjectInfo.nameObject) == "{}"
               ? {}
@@ -120,14 +127,24 @@ export default {
             }
           }
           // 将相关参数放入vuex管理
-          this.UPDATEPARM({parm:'mapProjectInfo',value:this.mapProjectInfo})
-          this.UPDATEPARM({parm:'layers',value:this.layers});
-          this.UPDATEPARM({parm:'sources',value:this.sources});
-          this.UPDATEPARM({parm:'layersName',value:this.layersName});
-          this.UPDATEPARM({parm:'layersNameObject',value:this.layersNameObject});
-          this.UPDATEPARM({parm:'sourceNameObject',value:this.sourceNameObject});
-          this.UPDATEPARM({parm:'originStyle',value:this.originStyle});
-          this.UPDATEPARM({parm:'layersTree',value:this.layersTree});
+          this.UPDATEPARM({
+            parm: "mapProjectInfo",
+            value: this.mapProjectInfo,
+          });
+          this.UPDATEPARM({ parm: "layers", value: this.layers });
+          this.UPDATEPARM({ parm: "sources", value: this.sources });
+          this.UPDATEPARM({ parm: "layersName", value: this.layersName });
+          this.UPDATEPARM({
+            parm: "layersNameObject",
+            value: this.layersNameObject,
+          });
+          this.UPDATEPARM({
+            parm: "sourceNameObject",
+            value: this.sourceNameObject,
+          });
+          this.UPDATEPARM({ parm: "originStyle", value: this.originStyle });
+          this.UPDATEPARM({ parm: "layersTree", value: this.layersTree });
+          this.UPDATEPARM({ parm: "publicBoolean", value: this.publicBoolean });
           document.title = "地图项目" + this.mapProjectInfo.name;
 
           // 加载完参数，其他组件开始初始化
@@ -136,14 +153,22 @@ export default {
         .catch((error) => {
           console.log(error);
         });
-    },   
-
-  }    
-}
+    },
+    // 用于全局组件刷新
+    reLoad(){
+      // this.mainKey += 1;
+      this.projectShow = false;
+      this.$nextTick(()=>{
+        this.projectShow = true;
+        this.getMapProjectInfo();   // 本组件不刷新，内部组件刷新
+      })
+    }
+  },
+};
 </script>
 
 <style scoped>
-.mainPage{
+.mainPage {
   position: relative;
   width: 100%;
 }
