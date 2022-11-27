@@ -1121,8 +1121,10 @@ export default {
     async addAllStyles(json) {
       let styleJson = JSON.parse(JSON.stringify(json));
       let List = styleJson.layers;
-      console.log('style信息',styleJson);
-      let layerGroups = styleJson.metadata['mapbox:groups'];
+      let layerGroups = {};
+      if('metadata' in styleJson){
+        layerGroups = styleJson.metadata['mapbox:groups']
+      }
       await this.$bus.$emit('layerTree',{type:'groups',groups:layerGroups});
       for (let i in List) {
         let item = List[i];
@@ -1137,23 +1139,6 @@ export default {
           this.addBackground("mbTile", item);
         }
       }      
-      // let styleJson = JSON.parse(JSON.stringify(json));
-      // let List = styleJson.layers;
-      // let layerGroups = styleJson.matadata['mapbox:groups'];
-      // await this.$bus.$emit('map',{type:'addGroups',groups:layerGroups});
-      // for (let i in List) {
-      //   let item = List[i];
-      //   console.log("item", item);
-      //   if (
-      //     item["source"] != "natural_earth_shaded_relief" &&
-      //     item["type"] != "raster" &&
-      //     item["type"] != "background"
-      //   ) {
-      //     this.addStyleMbTileShp(item, this.mbTileStyleJson.name);
-      //   } else if (item["type"] == "background") {
-      //     this.addBackground("mbTile", item);
-      //   }
-      // }
       console.log("添加所有styleJson图层");
     },
     addAllSources(List) {

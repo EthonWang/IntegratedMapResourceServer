@@ -708,24 +708,29 @@ export default {
 
     // #树组件事件
     highLightNode(id){
-      this.$refs.tree.setCurrentKey(id);
-      console.log('触发高亮',id,this.$refs.tree.getCurrentKey());
+      // 先等tree组件刷新完  setTimeout作为微服务，打开编辑框为主进程
+      setTimeout(() => {
+        this.$refs.tree.setCurrentKey(id);
+        console.log('触发高亮',id,this.$refs.tree.getCurrentKey());
+      }, 0);
     },
     // 添加style的模板
     addGroups(data){
-      let groupsInfo = JSON.parse(JSON.stringify(data));
-      for(let item in groupsInfo){
-        let index = this.layersTree.findIndex(
-          (currentValue)=>currentValue.nodeType == 'group'&&currentValue.showName == groupsInfo[item].name)        
-        if(index == -1){
-          let node = {
-            id:item,
-            showName:groupsInfo[item].name,
-            nodeType:'group',
-            children:[],
-            show:true
+      if(data == {}){
+        let groupsInfo = JSON.parse(JSON.stringify(data));
+        for(let item in groupsInfo){
+          let index = this.layersTree.findIndex(
+            (currentValue)=>currentValue.nodeType == 'group'&&currentValue.showName == groupsInfo[item].name)        
+          if(index == -1){
+            let node = {
+              id:item,
+              showName:groupsInfo[item].name,
+              nodeType:'group',
+              children:[],
+              show:true
+            }
+            this.addGroup({node});
           }
-          this.addGroup({node});
         }
       }
     },

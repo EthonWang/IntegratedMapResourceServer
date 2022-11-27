@@ -296,8 +296,6 @@ export default {
       // 点击事件
       map.on("click",this.layerIdList, (e) => {
         //点击范围
-        console.log('触发了');
-
         const bbox = [
           [e.point.x - 5, e.point.y - 5],
           [e.point.x + 5, e.point.y + 5],
@@ -467,8 +465,8 @@ export default {
           index: index,
           layer: feature,
         };
-        _this.$bus.$emit("mapEdit", data);
-        _this.$bus.$emit("layerTree", { type: "highLight", id: feature.id });
+        _this.$bus.$emit("mapEdit", data);            // 先打开图层编辑框，但会对layers进行修改进而影响layersTree使tree组件更新
+        _this.$bus.$emit("layerTree", { type: "highLight", id: feature.id });   // 因为tree组件会更新，所以要等刷新完再进行高亮显示
       };
     },
     setCanvasSrc() {
