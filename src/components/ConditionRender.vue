@@ -2961,6 +2961,7 @@ export default {
           zoomValue: this.zoomValue,
           zoomRate: this.zoomRate,
           zoomValueOrigin: this.zoomValueOrigin,
+          rateValue: this.rateValue,
         },
         type: "zoom",
       };
@@ -3104,6 +3105,7 @@ export default {
           datalength: this.datalength,
           dataInsertIndex: this.dataInsertIndex,
           dataRate: this.dataRate,
+          rateValue: this.rateValue,
         },
         type: "data",
       };

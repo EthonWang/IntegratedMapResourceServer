@@ -10,7 +10,6 @@
       editorShow == 'backgroundEditorShow' ||
       editorShow == 'heatMapEditorShow'
     "
-    :key="componentKey"
   >
     <div
       v-show="nameEdit === false"
@@ -1024,7 +1023,7 @@
                 width="400"
                 trigger="click"
               >
-                <el-tabs>
+                <el-tabs @tab-click="imgSourceChange">
                   <el-tab-pane
                     label="精灵图"
                     style="height: 400px; overflow-y: scroll"
@@ -1048,7 +1047,7 @@
                           v-for="(item, key, index) in spriteJsonSelect"
                           :key="index"
                           :title="key"
-                          @click="clickSprite(item, key, index)"
+                          @click="clickSprite('line-pattern', key, index)"
                           class="spriteCard"
                           body-style="padding:0"
                           :style="{
@@ -1087,7 +1086,7 @@
                           :src="reqUrl + item.webAddress"
                           fit="cover"
                           class="cursor"
-                          @click="iconSelect(item)"
+                          @click="iconSelect('line-pattern',item)"
                         >
                         </el-image>
                       </el-card>
@@ -1401,7 +1400,7 @@
                 width="400"
                 trigger="click"
               >
-                <el-tabs>
+                <el-tabs @tab-click="imgSourceChange">
                   <el-tab-pane
                     label="精灵图"
                     style="height: 400px; overflow-y: scroll"
@@ -1425,7 +1424,7 @@
                           v-for="(item, key, index) in spriteJsonSelect"
                           :key="index"
                           :title="key"
-                          @click="clickSprite(item, key, index)"
+                          @click="clickSprite('fill-pattern', key, index)"
                           class="spriteCard"
                           body-style="padding:0"
                           :style="{
@@ -1464,7 +1463,7 @@
                           :src="reqUrl + item.webAddress"
                           fit="cover"
                           class="cursor"
-                          @click="iconSelect(item)"
+                          @click="iconSelect('fill-pattern',item)"
                         >
                         </el-image>
                       </el-card>
@@ -2059,7 +2058,7 @@
                 width="400"
                 trigger="click"
               >
-                <el-tabs>
+                <el-tabs @tab-click="imgSourceChange">
                   <el-tab-pane
                     label="精灵图"
                     style="height: 400px; overflow-y: scroll"
@@ -2083,7 +2082,7 @@
                           v-for="(item, key, index) in spriteJsonSelect"
                           :key="index"
                           :title="key"
-                          @click="clickSprite(item, key, index)"
+                          @click="clickSprite('icon', key, index)"
                           class="spriteCard"
                           body-style="padding:0"
                           :style="{
@@ -2122,14 +2121,13 @@
                           :src="reqUrl + item.webAddress"
                           fit="cover"
                           class="cursor"
-                          @click="iconSelect(item)"
+                          @click="iconSelect('icon',item)"
                         >
                         </el-image>
                       </el-card>
                     </el-row>
                   </el-tab-pane>
                 </el-tabs>
-
                 <el-button
                   type="text"
                   icon="el-icon-s-unfold"
@@ -4354,7 +4352,6 @@ import { nanoid } from 'nanoid';
 
 export default {
   name: "LayerEditPanel",
-  inject:['reload'],  //  接受上级组件方法用于全局刷新
   components: { ConditionRender },
   props: [],
   data() {
@@ -4367,7 +4364,6 @@ export default {
       // spritePath: "",
 
       // 公共参数
-      componentKey: 0, // 组件的key，用于组件重新渲染
       editorShow: "",
       glyphsPath: "",
       isMbTile: false,
@@ -4620,7 +4616,8 @@ export default {
     this.$bus.$on("mapEdit", (data) => {
       switch (data.type) {
         case "off": // data:{type:''}
-          this.editorShow = "";
+          // this.$bus.$emit('main',{type:'reload',name:'editor'});   // 整个组件渲染，在上一级组件MapEditMain中使用
+          this.editorShow = "";     // 仅使dom关闭，组件没刷新，生命周期没更新
           break;
         case "open": // data:{type:'',index:'',layer:''}      #需要index是用于将修改后的layer更新到对应的layers中
           this.handleLayerEdit(data.index, data.layer);
@@ -4636,10 +4633,6 @@ export default {
     // 初始化相关参数
     infoInit() {
       // 初始化vuex管理参数
-      // this.mapProjectInfo = this.mapProjectInfoProp;
-      // this.layersName = this.layersNameProp;
-      // this.layers = this.layersProp;
-      // this.nowLayerIndex = this.nowLayerIndexProp;
       this.spritePath = this.mapProjectInfo.sprite;
       this.glyphsPath = this.mapProjectInfo.glyphs;
       const end = this.spritePath.lastIndexOf("/");
@@ -4658,7 +4651,6 @@ export default {
           })
           .then((json) => {
             this.spriteJsonSelect = json;
-            console.log("精灵图json", this.spriteJsonSelect);
           });
         this.spritePngSelect =
           this.reqUrl +
@@ -4671,9 +4663,8 @@ export default {
     },
     // #总体函数
     // 打开图层样式编辑面板
-    handleLayerEdit(index, row) {
+    async handleLayerEdit(index, row) {
       console.log("now edit layer: row", row);
-      this.componentKey += 1;
       // #信息预处理
       // 判断当前页面数据是否为mbtile,以及是否为osm数据
       this.nowLayerIndex = index;
@@ -4718,7 +4709,6 @@ export default {
           this.editorShow = "fillExtrusionEditorShow";
         } else if (row.type === "symbol") {
           this.editorShow = "symbolEditorShow";
-          this.getSymbolList();
           this.getFontList();
         } else if (row.type === "heatmap") {
           this.editorShow = "heatMapEditorShow";
@@ -4815,6 +4805,7 @@ export default {
     // #图标
     // 获取自定义图标列表
     getSymbolList() {
+      console.log('cchuafauh');
       requestApi
         .getSymbolList({
           asc: false,
@@ -4898,21 +4889,35 @@ export default {
           console.log(error);
         });
     },
-    iconSelect(item) {
-      this.layers[this.nowLayerIndex].layout["icon-image"] = item.originName;
+    // 图片相关
+    imgSourceChange(val){
+      console.log(val.index);
+      if(val.index == 1){
+        console.log('chufale ');
+        this.getSymbolList();
+      }
+    },
+    iconSelect(type,item) {
       this.$refs.iconPopover.doClose();
-
       this.loadAndAddImg(
         this.reqUrl + "/symbol/getSymbolById/" + item.id,
         item.originName
       );
-      this.handleLayoutChange(
-        this.layers[this.nowLayerIndex]["id"],
-        "icon-image",
-        this.layers[this.nowLayerIndex].layout["icon-image"]
-      );
-      // 更新vuex参数
-      this.UPDATEPARM({ parm: "layers", value: this.layers });
+      if(type.includes('pattern')){
+        this.layers[this.nowLayerIndex].paint[type] = item.originName;
+        this.handlePaintChange(
+          this.layers[this.nowLayerIndex]["id"],
+          type,
+          item.originName
+        );        
+      }else{ 
+        this.layers[this.nowLayerIndex].layout["icon-image"] = item.originName;
+        this.handleLayoutChange(
+          this.layers[this.nowLayerIndex]["id"],
+          "icon-image",
+          item.originName
+        );
+      }     
     },
     spriteChange() {
       this.$confirm(
@@ -4959,21 +4964,28 @@ export default {
         });
     },
     clickSprite(item, key, index) {
-      this.layers[this.nowLayerIndex].layout["icon-image"] = key;
-      this.handleLayoutChange(
-        this.layers[this.nowLayerIndex]["id"],
-        "icon-image",
-        key
-      );
+      if(item.includes('pattern')){
+        this.layers[this.nowLayerIndex].paint[item] = key;
+        this.handlePaintChange(
+          this.layers[this.nowLayerIndex]["id"],
+          item,
+          key
+        );        
+      }else{
+        this.layers[this.nowLayerIndex].layout["icon-image"] = key;
+        this.handleLayoutChange(
+          this.layers[this.nowLayerIndex]["id"],
+          "icon-image",
+          key
+        );
+      }
+      this.$refs.iconPopover.doClose();
       console.log("当前点击的精灵图信息", item, key, index);
-      // 更新vuex参数
-      this.UPDATEPARM({ parm: "layers", value: this.layers });
     },
     spriteInit() {
       requestApi
         .getSpriteList()
         .then((res) => {
-          console.log('精灵图：',res.data.data);
           this.spriteClassList = res.data.data;
 
           // this.spriteNameSelect = this.spriteClassList[0];

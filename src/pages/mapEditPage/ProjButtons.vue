@@ -3,7 +3,7 @@
     <!-- 工程项目按钮框 -->
     <div class="flexRowSpaceAround" style="width: 100%">
       <!-- 添加数据 -->
-      <el-popover placement="right" width="300" trigger="click">
+      <el-popover ref="dataPopover" placement="right" width="300" trigger="click">
         <el-tabs value="PG" @tab-click="dataBaseClick">
           <el-tab-pane label="PG" name="PG">
             <el-row type="flex" align="middle">
@@ -230,7 +230,6 @@ import { nanoid } from "nanoid";
 
 export default {
   name: "ProjButtons",
-  inject:['reload'],  //  接受上级组件方法用于全局刷新
   props: [],
   data() {
     return {
@@ -239,7 +238,6 @@ export default {
       // layersNameObject: {}, //检测重复  后端字段为nameObject
       // layers: [],
       // sources: {},
-      // layersName: [],
       mapProjectId: "",
       // originStyle: [],
       // #添加数据
@@ -314,14 +312,7 @@ export default {
     };
   },
   computed: {
-    ...mapState({
-      //   sourceNameObjectProp: "sourceNameObject",
-      //   layersNameObjectProp: "layersNameObject",
-      //   layersProp: "layers",
-      //   layersNameProp: "layersName",
-      //   sourcesProp: "sources",
-      //   originStyleProp: "originStyle",
-    }),
+    ...mapState({}),
 
     // 切换到这种方式用于对computer进行set
     sourceNameObject: {
@@ -346,14 +337,6 @@ export default {
       },
       set(val) {
         this.UPDATEPARM({ parm: "layers", value: val });
-      },
-    },
-    layersName: {
-      get() {
-        return this.$store.state.layersName;
-      },
-      set(val) {
-        this.UPDATEPARM({ parm: "layersName", value: val });
       },
     },
     sources: {
@@ -444,13 +427,6 @@ export default {
     ...mapMutations({ UPDATEPARM: "UPDATE" }), //将 `this.UPDATEPARM(data)` 映射为 `this.$store.commit('UPDATE',data)`
     // 初始化数据
     infoInit() {
-      // 初始化公共参数
-      // this.sourceNameObject = this.sourceNameObjectProp;
-      // this.layersNameObject = this.layersNameObjectProp;
-      // this.layers = this.layersProp;
-      // this.layersName = this.layersNameProp;
-      // this.sources = this.sourcesProp;
-      // this.originStyle = this.originStyleProp;
       // 初始化其余参数
       this.mapProjectId = localStorage.getItem("mapProjectId");
     },
@@ -894,7 +870,7 @@ export default {
           "mapbox:type": "mbStyle",
           "mapbox:isOSM": this.mbTileInfo.osmMbtilesBoolean,
         }
-      }else{
+      }else{    // 没有分组信息，不设mapbox:group
         row["metadata"] = {
           "mapbox:type": "mbStyle",
           "mapbox:isOSM": this.mbTileInfo.osmMbtilesBoolean,
@@ -1005,20 +981,7 @@ export default {
         newLayer.showName = row.name + this.layersNameObject[newLayer.name];
       }
       this.layers.unshift(newLayer);
-      this.layersName.unshift(newLayer.id);
       this.addLayerToMap(true, newLayer);
-      // 更新vuex参数
-      this.UPDATEPARM({ parm: "layers", value: this.layers });
-      this.UPDATEPARM({ parm: "sources", value: this.sources });
-      this.UPDATEPARM({ parm: "layersName", value: this.layersName });
-      this.UPDATEPARM({
-        parm: "sourceNameObject",
-        value: this.sourceNameObject,
-      });
-      this.UPDATEPARM({
-        parm: "layersNameObject",
-        value: this.layersNameObject,
-      });
     },
     addBackground(sourceType, row) {
       const index = this.layers.length; // 判断是否有图层，有则添加在最后一位，否则直接添加
@@ -1107,7 +1070,7 @@ export default {
               }
             })
             .then(() => {
-              this.reload();    // 刷新页面
+              this.$bus.$emit('main',{type:'reload',name:'main'});    // 刷新页面
             })            
             .catch((error) => {
               console.log(error);
@@ -1122,9 +1085,10 @@ export default {
       let styleJson = JSON.parse(JSON.stringify(json));
       let List = styleJson.layers;
       let layerGroups = {};
-      if('metadata' in styleJson){
+      if('metadata' in styleJson){    // 有分组信息，没分组信息为{}
         layerGroups = styleJson.metadata['mapbox:groups']
       }
+      console.log('组信息',layerGroups);
       await this.$bus.$emit('layerTree',{type:'groups',groups:layerGroups});
       for (let i in List) {
         let item = List[i];
@@ -1138,7 +1102,9 @@ export default {
         } else if (item["type"] == "background") {
           this.addBackground("mbTile", item);
         }
-      }      
+      }    
+      this.addMbTileStyleShow = false;
+      this.$refs.dataPopover.doClose();
       console.log("添加所有styleJson图层");
     },
     addAllSources(List) {

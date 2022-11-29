@@ -2,13 +2,30 @@
   <div style="width: 100% ">
 
     <div class="treeGroupBtns">
-      <el-switch
-          :width="30"
-          v-model="allLayerShow"
-          @change="allLayerShowSwitchChange(allLayerShow)"
-      >
-      </el-switch>
+      <div>
+        <el-button 
+          style="margin-right:2px"
+          type="text" 
+          :icon="collapseIcon"
+          @click="allGroupClose"
+        ></el-button>
+        <el-switch
+            :width="30"
+            v-model="allLayerShow"
+            @change="allLayerShowSwitchChange(allLayerShow)"
+        >
+        </el-switch>
+      </div>
       <div class="treeBtns">
+        <!-- 图层搜索功能 -->
+        <!-- <el-popover
+          ref="searchPopover"
+          placement="top-start"
+          width="200"
+          trigger="click">
+          <el-input v-model="nameSearch" placeholder="请输入图层名"></el-input>
+          <el-button type="primary" slot="reference">1</el-button>
+        </el-popover> -->
         <el-button 
           class="treeBtn"
           type="text" plain
@@ -37,7 +54,6 @@
           </el-button>
         </el-popconfirm>
       </div>
-
     </div>
 
     <div @click.stop class="treeBox">
@@ -46,6 +62,7 @@
           :data="layersTree"
           node-key="id"
           ref="tree"
+          id="classTree"
           default-expand-all
           @node-drop="handleDrop"
           :highlight-current="true"
@@ -183,15 +200,10 @@ export default {
   props: [],
   data() {
     return {
-      // vuex参数
-      // mapProjectInfo: '',
-      // layersName: '',
-      // layers: '',
-      // sources: '',
-      // nowLayerIndex: 0,
-      // originStyle: {},
-      // layersTree: [],
-
+      // 全局参数
+      nameSearch: '',       // 图层搜索
+      allGroupExpand: true,
+      collapseIcon: 'el-icon-caret-bottom',
       allLayerShow: true,
       treeKey:0,    // 用于目录树组件强制渲染
 
@@ -213,17 +225,7 @@ export default {
     }
   },
   computed: {
-    ...mapState({
-      // mapProjectInfoProp: 'mapProjectInfo',
-      // layersNameProp: 'layersName',
-      // layersProp: 'layers',
-      // nowLayerIndexProp: 'nowLayerIndex',
-      // originStyleProp: 'originStyle',
-      // sourcesProp: 'sources',
-      // layersTreeProp: 'layersTree',
-      // sourceNameObjectProp: 'sourceNameObject',
-      // layersNameObjectProp: 'layersNameObject'
-    }),
+    ...mapState({}),
     // 切换到这种方式用于对computer进行set
     sourceNameObject:{
       get(){
@@ -247,14 +249,6 @@ export default {
       },
       set(val) {
         this.UPDATEPARM({ parm: "layers", value: val })
-      }      
-    },
-    layersName:{
-      get(){
-        return this.$store.state.layersName;
-      },
-      set(val) {
-        this.UPDATEPARM({ parm: "layersName", value: val })
       }      
     },
     sources:{
@@ -377,22 +371,13 @@ export default {
       }   
     })
   },
-  methods: {
+  methods: {  
     // vuex
     ...mapActions({updateParm: 'update'}),        //将 `this.updateParm(data)` 映射为 `this.$store.dispatch('update',data)`
     ...mapMutations({UPDATEPARM: 'UPDATE'}),      //将 `this.UPDATEPARM(data)` 映射为 `this.$store.commit('UPDATE',data)`
     infoInit() {
-      // 初始化vuex管理参数
-      // this.mapProjectInfo = this.mapProjectInfoProp;
-      // this.layersName = this.layersNameProp;
-      // this.layers = this.layersProp;
-      // this.sources = this.sourcesProp;
-      // this.nowLayerIndex = this.nowLayerIndexProp;
-      // this.originStyle = this.originStyleProp;
-      // this.layersTree = this.layersTreeProp
-      // this.layersNameObject = this.layersNameObjectProp
-      // this.sourceNameObject = this.sourceNameObjectProp
-
+      console.log('目录树组件更新');
+      // // 由layers生成layersTree
       // for (let i = 0; i < this.layers.length; i++) {
       //   let layer=this.layers[i]
       //   let groupId=layer["metadata"]["mapbox:group"]
@@ -416,18 +401,13 @@ export default {
       //       }
       //     }
       //   }
-      //
-      //   // let node={
-      //   //
-      //   // }
-      //
       // }
     },
 
     addLayerToTree(layerData) {
-      let groupId = '1';      // 默认为'1',为style
-      if('metadata' in layerData){
-        groupId = layerData.metadata['mapbox:group'] || '';
+      let groupId = '';      // 默认为'',除style外其余的
+      if(layerData.metadata['mapbox:type'] == 'mbStyle'){
+        groupId = layerData.metadata['mapbox:group'] || '1';   // 有组则赋组，没有则设为1
       }
       if(groupId.length > 1){           // 有分组信息，添加在改组最前
         let index = this.layersTree.findIndex(
@@ -439,8 +419,14 @@ export default {
         }
       }
       else if(groupId.length == 1){     // 没有分组的图层，因为是按顺序添加，所以添加在第一个有图层的组之前
-        let index = this.layersTree.findIndex(
-          (currentValue)=>('children' in currentValue) && currentValue['children'].length !== 0)
+        let index = 0;
+        if(layerData.type === 'background'){      // 背景图层添加在最后
+          index = this.layersTree.length;
+        }else{
+          index = this.layersTree.findIndex(
+            (currentValue)=>('children' in currentValue) && currentValue['children'].length !== 0)
+            console.log('未分组图层',index);
+        }
         this.layersTree.splice(index,0,layerData) 
       }
       else{       // 除style外的其余添加方式
@@ -474,7 +460,6 @@ export default {
       }
       let index = this.getLayerIndex(row.id)
       this.layers[index]["show"] = val
-      console.log('出发了开关',this.layers,this.layersTree);
     },
 
     deleteTileJson(tileJsonId) {
@@ -616,8 +601,15 @@ export default {
         this.sources = [];
         this.originStyle = [];
         this.layersTree = [];
-        console.log('一键删除:',this.layers,'\n',this.layersNameObject,'\n',this.sourceNameObject,'\n',this.tileJsonList)
+        console.log('一键删除:',this.layers,'\n',this.layersTree,'\n',this.tileJsonList)
       }
+    },
+    allGroupClose(){
+      for (let i = 0; i < this.$refs.tree.store._getAllNodes().length; i++) {
+        this.$refs.tree.store._getAllNodes()[i].expanded = !this.allGroupExpand;
+      }    
+      this.allGroupExpand = !this.allGroupExpand;
+      this.collapseIcon = this.allGroupExpand ? 'el-icon-caret-bottom' :'el-icon-caret-right';
     },
 
     // #对map组件方法的封装
@@ -682,7 +674,7 @@ export default {
     },    
 
     // #对地图样式编辑框组件的封装
-    handleLayerEdit(layerData) {
+    async handleLayerEdit(layerData) {
       let index = this.getLayerIndex(layerData["id"])
       console.log("nowlayer", layerData, this.layers[index])
       const data = {
@@ -690,11 +682,16 @@ export default {
         layer: layerData,
         index: index
       }
-      this.$bus.$emit("mapEdit", data);
+      await this.$bus.$emit('main',{type:'reload',name:'editor'});
+      // 等editor组件加载完成
+      setTimeout(() => {
+        this.$bus.$emit("mapEdit", data);
+        this.$bus.$emit("layerTree", { type: "highLight", id: layerData.id });
+      }, 0); 
     },
 
     // 对样式模板组件的封装
-    openTemplateEdit(layerData) {
+    async openTemplateEdit(layerData) {
       let index = this.getLayerIndex(layerData["id"])
       console.log("nowlayer", layerData, index)      
       this.UPDATEPARM({parm: 'nowLayerIndex', value: index});
@@ -703,20 +700,33 @@ export default {
         layer: layerData,
         index: index
       }
-      this.$bus.$emit("styleTemp", data);
+      await this.$bus.$emit('main',{type:'reload',name:'style'});
+      // 等editor组件加载完成
+      setTimeout(() => {
+        this.$bus.$emit("styleTemp", data);
+        this.$bus.$emit("layerTree", { type: "highLight", id: layerData.id });
+      }, 0);       
     },
 
     // #树组件事件
     highLightNode(id){
-      // 先等tree组件刷新完  setTimeout作为微服务，打开编辑框为主进程
+      // 先等tree组件刷新完  setTimeout作为微服务，打开编辑框为主进程      
       setTimeout(() => {
-        this.$refs.tree.setCurrentKey(id);
-        console.log('触发高亮',id,this.$refs.tree.getCurrentKey());
+        this.$refs.tree.setCurrentKey(id);       
+      }, 0);
+      setTimeout(() => {
+        let node = document.querySelector("#classTree .is-current");
+        if(!node){
+          console.log('目录树错误！');
+        }
+        else{
+          node.scrollIntoView({ block: 'start' })        
+        }
       }, 0);
     },
     // 添加style的模板
     addGroups(data){
-      if(data == {}){
+      if(data !== {}){      // 
         let groupsInfo = JSON.parse(JSON.stringify(data));
         for(let item in groupsInfo){
           let index = this.layersTree.findIndex(
@@ -730,6 +740,7 @@ export default {
               show:true
             }
             this.addGroup({node});
+            console.log('添加组',groupsInfo[item].name);
           }
         }
       }
@@ -868,7 +879,7 @@ export default {
   display: flex;
   justify-content: space-between;    
   align-items: center;
-  padding: 0 5px 10px 24px;
+  padding: 0 5px 10px 5px;
 }
 /* 按钮组（右部） */
 .treeBtns{
