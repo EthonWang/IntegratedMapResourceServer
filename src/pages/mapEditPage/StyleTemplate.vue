@@ -202,13 +202,6 @@ export default {
   props: [],
   data() {
     return{
-      // vuex参数
-      // mapProjectInfo: '',
-      // layersName: '',
-      // layers: '',
-      // nowLayerIndex: 0,
-      // originStyle: {},          //图层初始样式，用于应用类型样式后还原样式，注意图层顺序改变时及时更改
-
       // 公共参数
       stylesBoxShow: false,
       layerSource: '',          // 用于判断当前图层的数据源，依据图层的matadata属性中的'mapbox:type'属性
@@ -265,14 +258,7 @@ export default {
     }
   },
   computed:{
-    ...mapState({
-      // mapProjectInfoProp:'mapProjectInfo',
-      // layersNameProp:'layersName',
-      // layersProp:'layers',
-      // nowLayerIndexProp:'nowLayerIndex',
-      // originStyleProp:'originStyle',
-    }),  
-
+    ...mapState({}),  
     // 切换到这种方式用于对computer进行set
     mapProjectInfo:{
       get(){
@@ -288,14 +274,6 @@ export default {
       },
       set(val) {
         this.UPDATEPARM({ parm: "layers", value: val })
-      }      
-    },
-    layersName:{
-      get(){
-        return this.$store.state.layersName;
-      },
-      set(val) {
-        this.UPDATEPARM({ parm: "layersName", value: val })
       }      
     },
     nowLayerIndex:{
@@ -323,7 +301,8 @@ export default {
     this.$bus.$on("styleTemp",(data)=>{
       switch (data.type) {
         case 'off':                  // data:{type:''}
-          this.stylesBoxShow = false;
+          // await this.$bus.$emit('main',{type:'reload',name:'style'});        // 整个组件渲染，在上一级组件MapEditMain中使用
+          this.stylesBoxShow = false;       // 仅使dom关闭，组件没刷新，生命周期没更新
           break;
         case 'open':                 // data:{type:'',index:'',layer:''}    #需要index是用于将修改后的layer更新到对应的layers中
           this.openTemplateEdit(data.index,data.layer);
@@ -338,14 +317,8 @@ export default {
 
     // 初始化相关参数
     infoInit(){
-      // 初始化vuex管理参数
-      // this.mapProjectInfo = this.mapProjectInfoProp;
-      // this.layersName = this.layersNameProp;
-      // this.layers = this.layersProp;
-      // this.nowLayerIndex = this.nowLayerIndexProp;
-      // this.originStyle = this.originStyleProp;
-
-    },  
+      console.log('样式模板初始化');
+    },
     openTemplateEdit(index,layer) {
       // 先关闭图层编辑框避免冲突
       this.$bus.$emit('mapEdit',{type:'off'});
@@ -484,6 +457,7 @@ export default {
         const body = {
           layout: layer.layout,
           paint: layer.paint,
+          attrValueSet: layer.attrValueSet,
           type: this.styleTypeSelect,
           styleImgUrl: { ImgUrl: canvasSrc },
           description: "",
@@ -505,7 +479,7 @@ export default {
               message: "取消样式上传",
             });
           });
-      }, 500);
+      }, 0);
     },
     // 删除自定义模板样式
     tempCardDelete(id) {
@@ -543,6 +517,7 @@ export default {
       );
       aimLayer.paint = JSON.parse(JSON.stringify(row.paint));
       aimLayer.layout = JSON.parse(JSON.stringify(row.layout));
+      aimLayer.attrValueSet = JSON.parse(JSON.stringify(row.attrValueSet));
       console.log("应用完图层样式", aimLayer);
       this.handleRemoveLayer(aimLayer.id);
       if (this.nowLayerIndex === 0) {
@@ -550,9 +525,6 @@ export default {
       } else {
         this.addLayerToMap(false,{id:this.layers[this.nowLayerIndex - 1].id,layer:aimLayer},true);
       }
-      // 更新vuex
-      this.UPDATEPARM({parm:'layers',value:this.layers});
-      this.UPDATEPARM({parm:'originStyle',value:this.originStyle});
     },
     //给自己数据添加mbTile样式，不需要filter属性
     addMbTileToSelf(row) {

@@ -61,6 +61,7 @@
             drag
             :action="multiShpUploadUrl"
             :on-success="handleMultiShpUpSuccess"
+            :auto-upload="true"
             accept=".zip"
           >
             <i class="el-icon-upload"></i>

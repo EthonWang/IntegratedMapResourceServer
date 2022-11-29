@@ -1,9 +1,9 @@
 <template>
-  <div class="mainPage" v-if="projectShow">
+  <div class="mainPage" v-if="showList['main']">
     <ProjMenus></ProjMenus>
-    <LayerEditPanel></LayerEditPanel>
-    <StyleTemplate></StyleTemplate>
-    <MapPanel></MapPanel>
+    <LayerEditPanel v-if="showList['editor']"></LayerEditPanel>
+    <StyleTemplate v-if="showList['style']"></StyleTemplate>
+    <MapPanel v-if="showList['map']"></MapPanel>
   </div>
 </template>
 
@@ -17,15 +17,13 @@ import { mapState, mapActions, mapMutations } from "vuex";
 export default {
   name: 'MapEditMain',
   components: { ProjMenus, MapPanel, LayerEditPanel, StyleTemplate },
-  provide(){  
-    return {
-        reload:this.reLoad  // 给子孙组件提供接口用于全局刷新
-      }
-  },
   data() {
     return {
       // 全局参数
+      showList:{main:true,editor:true,style:true,map:true},   // 控制组件显示，用于组件刷新
       projectShow: true,
+      editorShow: true,
+      styleShow: true,
 
       // 项目工程参数
       mapProjectId: "",
@@ -40,7 +38,6 @@ export default {
       layers: [],
       layersTree: [],
       layersNameObject: {}, //检测重复  后端字段为nameObject
-      layersName: [], //加载的图层id集合，用于展示图层按index的排列
       sourceNameObject: {}, //检测source重复
 
       // 样式模板
@@ -54,17 +51,18 @@ export default {
     };
   },
   computed: {
-    ...mapState({
-      // mapProjectInfoProp: "mapProjectInfo",
-      // layersNameProp: "layersName",
-      // layersProp: "layers",
-      // sourcesProp: "sources",
-    }),
+    ...mapState({}),
   },
   mounted() {
     this.mapProjectId = this.$route.params.mapProjectId;
     localStorage.setItem("mapProjectId", this.mapProjectId);
     this.getMapProjectInfo();
+    this.$bus.$on("main",(data)=>{
+      switch (data.type){
+        case 'reload':        // {type:'',name:''}      name有[main,menu,editor,style,map]
+          this.reload(data.name);
+      }
+    });
   },
   methods: {
     // vuex
@@ -78,7 +76,7 @@ export default {
           this.mapProjectInfo = res.data.data;
           console.log("mapProjectInfo:", this.mapProjectInfo);
           // 初始项目参数
-          this.center = this.mapProjectInfo.center.split(",");
+          this.center = this.mapProjectInfo.center;
           this.zoom = this.mapProjectInfo.zoom;
           this.spritePath = this.mapProjectInfo.sprite;
           const end = this.spritePath.lastIndexOf("/");
@@ -118,7 +116,6 @@ export default {
               : this.mapProjectInfo.nameObject.sourceNameObject;
           this.publicBoolean = this.mapProjectInfo.publicBoolean;
           for (const item of this.layers) {
-            this.layersName.push(item.id);
             if (item.type != "background") {
               this.originStyle.push({
                 paint: item["paint"],
@@ -133,7 +130,6 @@ export default {
           });
           this.UPDATEPARM({ parm: "layers", value: this.layers });
           this.UPDATEPARM({ parm: "sources", value: this.sources });
-          this.UPDATEPARM({ parm: "layersName", value: this.layersName });
           this.UPDATEPARM({
             parm: "layersNameObject",
             value: this.layersNameObject,
@@ -154,16 +150,21 @@ export default {
           console.log(error);
         });
     },
-    // 用于全局组件刷新
-    reLoad(){
-      // this.mainKey += 1;
-      this.projectShow = false;
+
+    // 用于组件刷新
+    reload(name){
+      this.showList[name] = false;
       this.$nextTick(()=>{
-        this.projectShow = true;
-        this.getMapProjectInfo();   // 本组件不刷新，内部组件刷新
+        this.showList[name] = true;
+        if(name == 'main'){
+          this.getMapProjectInfo();   // 本组件不刷新，内部组件刷新,要刷新本组件时触发初始化函数
+        }
       })
-    }
+    },
   },
+  beforeDestroy() {
+    this.$bus.$off("main");
+  },  
 };
 </script>
 

@@ -16,11 +16,6 @@ export default {
   name: "MapPanel",
   data() {
     return {
-      // vuex参数
-      // mapProjectInfo: '',
-      // layers:[],
-      // sources:{},
-      // layersName: [],
 
       // 项目参数
       glyphsPath: "",
@@ -45,12 +40,7 @@ export default {
     };
   },
   computed: {
-    ...mapState({
-      // mapProjectInfoProp:'mapProjectInfo',
-      // layersNameProp:'layersName',
-      // layersProp:'layers',
-      // sourcesProp:'sources'
-    }),
+    ...mapState({}),
     // 切换到这种方式用于对computer进行set
     mapProjectInfo: {
       get() {
@@ -82,14 +72,6 @@ export default {
       },
       set(val) {
         this.UPDATEPARM({ parm: "sources", value: val });
-      },
-    },
-    layersName: {
-      get() {
-        return this.$store.state.layersName;
-      },
-      set(val) {
-        this.UPDATEPARM({ parm: "layersName", value: val });
       },
     },
     spritePath: {
@@ -208,13 +190,7 @@ export default {
     // 初始化参数
     infoInit() {
       // 初始化公共参数
-      // this.mapProjectInfo = this.mapProjectInfoProp;
-      // this.layersName = this.layersNameProp;
-      // this.layers = this.layersProp;
-      // this.sources = this.sourcesProp
       this.mapProjectId = localStorage.getItem("mapProjectId");
-      // 初始化项目参数
-      this.center = this.mapProjectInfo.center.split(",");
       this.zoom = this.mapProjectInfo.zoom;
       // this.sources = this.mapProjectInfo.sources;
       // this.layers = this.mapProjectInfo.layers;
@@ -296,8 +272,6 @@ export default {
       // 点击事件
       map.on("click",this.layerIdList, (e) => {
         //点击范围
-        console.log('触发了');
-
         const bbox = [
           [e.point.x - 5, e.point.y - 5],
           [e.point.x + 5, e.point.y + 5],
@@ -366,11 +340,11 @@ export default {
         glyphs: this.reqUrl + this.glyphsPath, // 设置字体访问接口，mapbox会自动请求
       };
       console.log("initstyle", initStyle);
+
       map.setStyle(initStyle).on("load", () => {
         map.setZoom(this.zoom);
-        map.setCenter(this.center);
-        //需要按字符串来保存坐标
-        this.center = this.center.join(",");
+        let center = this.center.split(',');
+        map.setCenter(center);
         // 添加source
         for (let i in this.sources) {
           let newSource = {
@@ -422,17 +396,17 @@ export default {
     // 向地图添加layer
     addLayerToMap(flag, data) {
       if (flag) {
-        let val = JSON.parse(JSON.stringify(data));
-        delete val.paint[`${val.type}-pattern`];         
+        let layer = JSON.parse(JSON.stringify(data));
+        delete layer.paint[`${layer.type}-pattern`];         
         console.log("add new layer：", data);
-        map.addLayer(val); //默认添加
+        map.addLayer(layer); //默认添加
       } else {
         //value:{index:'',layer:{}}
-        let val = JSON.parse(JSON.stringify(data.layer));
-        delete val.paint[`${val.type}-pattern`];          
+        let layer = JSON.parse(JSON.stringify(data.layer));
+        let id = JSON.parse(JSON.stringify(data.id));
+        delete layer.paint[`${layer.type}-pattern`];          
         console.log("add new layer：", data.layer);
-        const id = val.id;
-        map.addLayer(val.layer, id); //添加在对应图层之前
+        map.addLayer(layer, id); //添加在对应图层之前
       }
     },
     //设置对地图进行筛选
@@ -447,8 +421,21 @@ export default {
     },
     // 修改paint属性
     handlePaintChange(layerName, key, value) {
+      // 当为pattern属性，且值为空时，删除mapbox中的图层和pattern属性重新加载
+      if(key.includes('pattern') && value == ''){
+        let index = this.layers.findIndex(item => item.id == layerName);
+        let aimLayer = JSON.parse(JSON.stringify(this.layers[index]));
+        delete aimLayer.paint[key];
+        map.removeLayer(layerName);
+        if(index){
+          map.addLayer(aimLayer);
+        }else{
+          map.addLayer(aimLayer,this.layers[index-1].id)
+        }
+      }else{
+        map.setPaintProperty(layerName, key, value);
+      }
       console.log("paint:", layerName, key, value);
-      map.setPaintProperty(layerName, key, value);
     },
     // 修改zoom显示范围
     handleZoomChange(layerName, min, max) {
@@ -460,15 +447,19 @@ export default {
     addItemEvent(item, feature, index) {
       //因为item是html元素，在其事件中this指向该元素无法获取vue的实例属性和方法\
       let _this = this;
-      item.onclick = function test() {
+      item.onclick = async function test() {
         // 实现编辑面板的handleLayerEdit(index, feature);
         const data = {
           type: "open",
           index: index,
           layer: feature,
         };
-        _this.$bus.$emit("mapEdit", data);
-        _this.$bus.$emit("layerTree", { type: "highLight", id: feature.id });
+        await _this.$bus.$emit('main',{type:'reload',name:'editor'});
+        // 等editor组件加载完成   
+        setTimeout(() => {
+          _this.$bus.$emit("mapEdit", data);            // 先打开图层编辑框，但会对layers进行修改进而影响layersTree使tree组件更新
+          _this.$bus.$emit("layerTree", { type: "highLight", id: feature.id });   // 因为tree组件会更新，所以要等刷新完再进行高亮显示
+        }, 0);              
       };
     },
     setCanvasSrc() {
@@ -526,7 +517,7 @@ export default {
                     this.deleteTileJson();
                   })
                   .then(() => {
-                    this.reload();    // 刷新页面
+                    this.$bus.$emit('main',{type:'reload',name:'main'});      // 刷新页面
                   })
                   .catch((error) => {
                     console.log(error);
@@ -578,7 +569,6 @@ export default {
     handleLayerClick(row) {
       // 用于控制台信息查看
       console.log("layers:", this.layers);
-      // console.log("layersName", this.layersName);
       console.log("layersTree", this.$store.state.layersTree);
       if (row.type != "background") {
         // 背景没有source

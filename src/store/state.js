@@ -2,7 +2,6 @@
 const state = {
   layers:[],
   sources:{},
-  layersName: [],       // 图层名列表，nameShow数组——用于验证图层名是否重复
   mapProjectInfo:{},
   layersNameObject: {},
   sourceNameObject: {}, 

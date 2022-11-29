@@ -1,10 +1,21 @@
 <template>
   <div class="menuPanel">
     <!-- 标题 -->
+<!-- <el-breadcrumb separator-class="el-icon-arrow-right">
+  <el-breadcrumb-item :to="{ path: '/Map/MyProject' }"><h2>项目工程</h2></el-breadcrumb-item>
+  <el-breadcrumb-item><h2>{{ mapProjectInfo.name }}</h2></el-breadcrumb-item>
+</el-breadcrumb>     -->
     <div class="menuTitle">
+      <el-button 
+        plain size="mini" 
+        icon="el-icon-back" 
+        title="返回项目工程"
+        @click="toMyProject"
+      ></el-button>
       <h2>{{ mapProjectInfo.name }}</h2>
-      <el-divider class="divider"></el-divider>
+      <el-button plain size="mini" icon="el-icon-back" style="visibility:hidden"></el-button>
     </div>
+    <el-divider class="divider"></el-divider>
     <!-- 按钮组 -->
     <ProjButtons></ProjButtons>
     <ProjLayersNew></ProjLayersNew>
@@ -25,20 +36,13 @@ export default {
       // 公共参数
       mapProjectId: "",
       layers: [],
-      // mapProjectInfo: '',
-      // layersName: '',
 
       // 发布
       publicBoolean: false,
     };
   },
   computed: {
-    ...mapState({
-      // mapProjectInfoProp: "mapProjectInfo",
-      // layersNameProp: "layersName",
-      // layersProp: "layers",
-      // sourcesProp: "sources",
-    }),
+    ...mapState({}),
     // 切换到这种方式用于对computer进行set
     mapProjectInfo:{
       get(){
@@ -63,12 +67,12 @@ export default {
     ...mapActions({ updateParm: "update" }), //将 `this.updateParm(data)` 映射为 `this.$store.dispatch('update',data)`
     ...mapMutations({ UPDATEPARM: "UPDATE" }), //将 `this.UPDATEPARM(data)` 映射为 `this.$store.commit('UPDATE',data)`
     infoInit() {
-      // 初始化公共参数
-      // this.mapProjectInfo = this.mapProjectInfoProp;
-      // this.layersName = this.layersNameProp;
-      // this.layers = this.layersProp;
-      // this.sources = this.sourcesProp;
+      console.log('左菜单组件更新');
     },
+    toMyProject(){
+      let newUrl = this.$router.resolve({ path: '/Map/MyProject' });
+      window.open(newUrl.href, "_blank");      
+    }
   },
   beforeDestroy(){
     this.$bus.$off("init");
@@ -90,7 +94,8 @@ export default {
 .menuTitle {
   width: 100%;
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  /* flex-direction: column; */
+  justify-content: space-around;
+  align-items: baseline;
 }
 </style>

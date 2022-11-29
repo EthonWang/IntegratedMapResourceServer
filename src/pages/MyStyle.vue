@@ -63,6 +63,7 @@
         <!-- <div class="leftUpload">
           <el-divider content-position="center">字体文件上传</el-divider>
           <el-upload
+            ref="fontUpload"
             name="fontZip"
             drag
             :action="fontUploadUrl"
@@ -170,6 +171,7 @@
         <div class="leftUpload">
           <el-divider content-position="center">精灵图文件上传</el-divider>
           <el-upload
+            ref="spriteUpload"
             name="spriteZip"
             drag
             :action="spriteUploadUrl"
@@ -267,6 +269,7 @@
         <div class="leftUpload">
           <el-divider content-position="center">图标文件上传</el-divider>
           <el-upload
+            ref="symbolUpload"
             name="symbolFile"
             drag
             :action="symbolUploadUrl"
