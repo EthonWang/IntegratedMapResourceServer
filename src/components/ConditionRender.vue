@@ -2890,7 +2890,7 @@ export default {
       // 设置多级显示
       // 设置插值类型值
       const rateWay = [this.zoomRate];
-      switch (this.zoomRate) {
+      switch (this.zoomRate) {      // 只有exp和cubic需要赋值
         case "exponential":
           rateWay.push(this.rateValue["exp"]);
           break;
