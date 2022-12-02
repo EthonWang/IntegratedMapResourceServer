@@ -295,8 +295,15 @@ export default {
   },  
   mounted(){   
     // 等初始组件信息加载完
-    this.$bus.$on("init",()=>{
-      this.infoInit();
+    this.$bus.$on("init", (data) => {
+      switch (data.type) {
+        case "all":
+        case "style":
+          this.infoInit();
+          break;
+        default:
+          break;
+      }
     })   
     this.$bus.$on("styleTemp",(data)=>{
       switch (data.type) {

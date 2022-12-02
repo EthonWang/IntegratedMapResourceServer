@@ -339,8 +339,14 @@ export default {
   },
   mounted() {
     // 等初始组件信息加载完
-    this.$bus.$on("init", () => {
-      this.infoInit();
+    this.$bus.$on("init", (data) => {
+      switch (data.type) {
+        case "all":
+          this.infoInit();
+          break;
+        default:
+          break;
+      }
     })
 
     // 当地图组件添加图层时，更新图层树
@@ -419,18 +425,17 @@ export default {
         }
       }
       else if(groupId.length == 1){     // 没有分组的图层，因为是按顺序添加，所以添加在第一个有图层的组之前
-        let index = 0;
-        if(layerData.type === 'background'){      // 背景图层添加在最后
-          index = this.layersTree.length;
-        }else{
-          index = this.layersTree.findIndex(
-            (currentValue)=>('children' in currentValue) && currentValue['children'].length !== 0)
-            console.log('未分组图层',index);
-        }
+        let index = this.layersTree.findIndex(
+          (currentValue)=>('children' in currentValue) && currentValue['children'].length !== 0)
+          console.log('未分组图层',index);
         this.layersTree.splice(index,0,layerData) 
       }
       else{       // 除style外的其余添加方式
-        this.layersTree.unshift(layerData)
+        let index = 0 ;
+        if(layerData.type === 'background'){      // 背景图层添加在最后
+          index = this.layersTree.length;
+        }      
+        this.layersTree.splice(index,0,layerData);
       }
     },
 
@@ -598,7 +603,7 @@ export default {
         this.layersNameObject = {};
         this.sourceNameObject = {};
         this.layers = [];
-        this.sources = [];
+        this.sources = {};
         this.originStyle = [];
         this.layersTree = [];
         console.log('一键删除:',this.layers,'\n',this.layersTree,'\n',this.tileJsonList)

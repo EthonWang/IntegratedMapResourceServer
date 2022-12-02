@@ -278,7 +278,7 @@
         "
         >按表达式设置样式</el-button
       >
-      <el-button class="menuButton" plain @click="reset('close')"
+      <el-button class="menuButton" plain @click="reset('open')"
         >重置</el-button
       >
     </el-row>
@@ -1923,12 +1923,12 @@
       ></el-input>
       <el-button type="success" @click="formulaRender">渲染</el-button>
     </el-row>
-
+    <!-- 打开条件设置内部按钮 -->
     <el-button
       v-if="!menuButtonShowList[attribute]"
       class="menuButton"
       plain
-      @click="reset('open')"
+      @click="reset('close')"
       >重置</el-button
     >
     <!-- <el-button class="menuButton" plain @click="test">test</el-button> -->
@@ -2578,21 +2578,19 @@ export default {
     },
     menuBtnReset(val) {
       // 内部重置按钮功能
-      if (val === "open") {
+      if (val === "close") {
         console.log("attr", this.menuButtonShowList);
         //在一个图层中，属性的显示情况和值同时存储，先发送再修改显示值，否则组件关闭没法发送事件
         this.$bus.$emit("show", { param1: this.attribute, param2: true });
-        this.menuButtonShowList[this.attribute] = true;
         this.layer.attrValueSet[this.attribute] = "primary";
+        this.menuButtonShowList[this.attribute] = true;
         // zoom相关
         if (this.zoomShow) {
           this.zoomShow = false;
           // 初始化zoomValue为刚加载的值
-          const value2 = this.zoomValueOrigin;
-          this.zoomValue = value2;
+          this.zoomValue = JSON.parse(JSON.stringify(this.zoomValueOrigin));
           // 将父组件传来的参数设为原来的值
-          const value1 = this.zoomValueOrigin[0]["value"];
-          this.layer[this.layoutOrpaint][this.attribute] = value1;
+          this.layer[this.layoutOrpaint][this.attribute] = JSON.parse(JSON.stringify(this.zoomValueOrigin[0]["value"]));
           this.zoomEditIndex = 0;
         }
         //data相关
@@ -2627,10 +2625,12 @@ export default {
         }
       }
       // 外部重置按钮功能
-      else if (val === "close") {
+      else if (val === "open") {
         // 设置为默认样式,使用const保证之后不会赋予另外的对象
         const value1 = this.layerOrigin[this.layoutOrpaint][this.attribute];
         this.layer[this.layoutOrpaint][this.attribute] = value1;
+        this.$bus.$emit("show", { param1: this.attribute, param2: true });
+        this.layer.attrValueSet[this.attribute] = "primary";        
       }
       //向父组件传递要修改的参数
       const value = this.layer[this.layoutOrpaint][this.attribute];
@@ -2732,7 +2732,6 @@ export default {
           JSON.parse(JSON.stringify(valueOrigin2))
         );
       }
-      console.log("aaa", typeof this.zoomValue[0].value);
       this.zoomValueOrigin = JSON.parse(JSON.stringify(this.zoomValue));
 
       //先初始化参数，再打开相关编辑面板
@@ -2890,7 +2889,7 @@ export default {
       // 设置多级显示
       // 设置插值类型值
       const rateWay = [this.zoomRate];
-      switch (this.zoomRate) {
+      switch (this.zoomRate) {      // 只有exp和cubic需要赋值
         case "exponential":
           rateWay.push(this.rateValue["exp"]);
           break;

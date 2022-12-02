@@ -4572,8 +4572,16 @@ export default {
   },
   mounted() {
     // 等初始组件信息加载完
-    this.$bus.$on("init", () => {
-      this.infoInit();
+    this.$bus.$on("init", (data) => {
+      switch (data.type) {
+        case "all":
+        case "editor":
+          this.infoInit();
+          console.log('editor初始化',data.type);
+          break;
+        default:
+          break;
+      }
     });
     // 同ConditionRender组件的通信
     this.$bus.$on("show", (data) => {
@@ -4607,10 +4615,11 @@ export default {
         if (value2) {
           this.attrValueSet[value1] = "primary";
         }
-        this.$nextTick(() => {
-          this.menuButtonShowList[value1] = value2;
-          console.log("测试", value1, this.menuButtonShowList[value1]);
-        });
+        this.menuButtonShowList['test'] = true;
+        // this.$nextTick(() => {
+        //   delete this.menuButtonShowList['test'];
+        //   console.log('显示列表',this.menuButtonShowList);
+        // });
       }
     });
     this.$bus.$on("mapEdit", (data) => {
@@ -4624,6 +4633,18 @@ export default {
           break;
       }
     });
+  },
+  watch:{
+    menuButtonShowList:{ 
+      deep:true,
+      handler:function(val){
+        if('test' in this.menuButtonShowList){
+          delete this.menuButtonShowList['test'];
+
+        }
+        console.log('显示情况',val,this.menuButtonShowList);
+      }
+    }    
   },
   methods: {
     // vuex
