@@ -339,8 +339,14 @@ export default {
   },
   mounted() {
     // 等初始组件信息加载完
-    this.$bus.$on("init", () => {
-      this.infoInit();
+    this.$bus.$on("init", (data) => {
+      switch (data.type) {
+        case "all":
+          this.infoInit();
+          break;
+        default:
+          break;
+      }
     })
 
     // 当地图组件添加图层时，更新图层树

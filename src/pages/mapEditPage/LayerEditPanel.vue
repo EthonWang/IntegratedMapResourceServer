@@ -4572,8 +4572,16 @@ export default {
   },
   mounted() {
     // 等初始组件信息加载完
-    this.$bus.$on("init", () => {
-      this.infoInit();
+    this.$bus.$on("init", (data) => {
+      switch (data.type) {
+        case "all":
+        case "editor":
+          this.infoInit();
+          console.log('editor初始化',data.type);
+          break;
+        default:
+          break;
+      }
     });
     // 同ConditionRender组件的通信
     this.$bus.$on("show", (data) => {

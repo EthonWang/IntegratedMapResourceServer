@@ -155,7 +155,7 @@ export default {
           document.title = "地图项目" + this.mapProjectInfo.name;
 
           // 加载完参数，其他组件开始初始化
-          this.$bus.$emit("init");
+          this.$bus.$emit("init",{type:"all"});
         })
         .catch((error) => {
           console.log(error);
@@ -169,6 +169,10 @@ export default {
         this.showList[name] = true;
         if(name == 'main'){
           this.getMapProjectInfo();   // 本组件不刷新，内部组件刷新,要刷新本组件时触发初始化函数
+        }else{
+          setTimeout(() => {
+            this.$bus.$emit("init",{type:`${name}`})
+          }, 0);
         }
       })
     },
