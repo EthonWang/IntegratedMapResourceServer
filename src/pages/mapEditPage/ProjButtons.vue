@@ -910,6 +910,9 @@ export default {
       });
       this.addLayerToMap(true, newLayer);
     },
+    addGeoJSON(){
+
+    },
     async addTMS(row) {
       console.log("add TMS shp row: ", row);
       //判断该shp是否已添加

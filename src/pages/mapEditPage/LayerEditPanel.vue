@@ -4607,10 +4607,11 @@ export default {
         if (value2) {
           this.attrValueSet[value1] = "primary";
         }
-        this.$nextTick(() => {
-          this.menuButtonShowList[value1] = value2;
-          console.log("测试", value1, this.menuButtonShowList[value1]);
-        });
+        this.menuButtonShowList['test'] = true;
+        // this.$nextTick(() => {
+        //   delete this.menuButtonShowList['test'];
+        //   console.log('显示列表',this.menuButtonShowList);
+        // });
       }
     });
     this.$bus.$on("mapEdit", (data) => {
@@ -4624,6 +4625,18 @@ export default {
           break;
       }
     });
+  },
+  watch:{
+    menuButtonShowList:{ 
+      deep:true,
+      handler:function(val){
+        if('test' in this.menuButtonShowList){
+          delete this.menuButtonShowList['test'];
+
+        }
+        console.log('显示情况',val,this.menuButtonShowList);
+      }
+    }    
   },
   methods: {
     // vuex

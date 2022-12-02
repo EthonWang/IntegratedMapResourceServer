@@ -14,6 +14,7 @@ import StyleTemplate from "./StyleTemplate.vue";
 import ProjMenus from "./ProjMenus.vue";
 import requestApi from "@/api/requestApi";
 import { mapState, mapActions, mapMutations } from "vuex";
+import projInit from "@/serve/parameterInit";
 export default {
   name: 'MapEditMain',
   components: { ProjMenus, MapPanel, LayerEditPanel, StyleTemplate },
@@ -122,6 +123,16 @@ export default {
                 layout: item["layout"],
               });
             }
+          }
+          let sourceKeyList = Object.keys(this.sources);
+          console.log("source的列表",sourceKeyList,!sourceKeyList[0].indexOf('_'));
+          if(this.mapProjectInfo.layers.length > 0 && this.mapProjectInfo.nameObject == "{}" && sourceKeyList[0].indexOf('_') == -1){
+            let object = projInit(this.layers,this.sources,this.layersTree);
+            console.log("初始化结果",object);
+            // this.layers = object.layerRes;
+            // this.sources = object.sourceRes;
+            // this.layersNameObject = object.layerObj;
+            // this.sourceNameObject = object.sourceObj;
           }
           // 将相关参数放入vuex管理
           this.UPDATEPARM({

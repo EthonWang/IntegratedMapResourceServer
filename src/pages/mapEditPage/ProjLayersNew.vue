@@ -597,7 +597,7 @@ export default {
         this.layersNameObject = {};
         this.sourceNameObject = {};
         this.layers = [];
-        this.sources = [];
+        this.sources = {};
         this.originStyle = [];
         this.layersTree = [];
         console.log('一键删除:',this.layers,'\n',this.layersTree,'\n',this.tileJsonList)
