@@ -882,15 +882,20 @@ export default {
           "mapbox:isOSM": this.mbTileInfo.osmMbtilesBoolean,
         }        
       }
-      // styleJson图层按理只需添加一次
-      this.layersNameObject[layerName] += 1;
       let geoType = row.type;
+      // 检查是否添加过同源layer 返回[showName,layersNameObject]
+      let result = JSON.parse(
+        JSON.stringify(
+          nameIndex(this.layers, layerName, row.id, this.layersNameObject)
+        )
+      );
+      this.layersNameObject = result.object;      
       //前八个是自己用的属性
       let newLayer = {
         sourceType: "mbTile", //记录数据来源类型，用于区别是否为mbTlie，mbtile图层sourceJson不删除
         show: true,
         // originName: row.id,
-        showName: row.id, //用于展示图层名字，使用json文件即可
+        showName: result.show, //用于展示图层名字，使用json文件即可
         manageInfo: {layerKey:layerName,sourceKey:name},  // 记录layersNameObject和sourceNameObject的key
         shpAttribute: [],
         attrValueSet: {},
@@ -1027,7 +1032,7 @@ export default {
         attrShowList: {},
         filterValueSet: {},
         nodeType: "layer", //组和图层区分
-        id: "背景" + nanoid(5),
+        id: "背景_" + nanoid(5),
         type: "background",
         paint: newPaint,
         layout: newLayout,
@@ -1078,9 +1083,9 @@ export default {
                 this.$message.info("地图发布失败");
               }
             })
-            .then(() => {
-              this.$bus.$emit('main',{type:'reload',name:'main'});    // 刷新页面
-            })            
+            // .then(() => {
+            //   this.$bus.$emit('main',{type:'reload',name:'main'});    // 刷新页面
+            // })            
             .catch((error) => {
               console.log(error);
             });

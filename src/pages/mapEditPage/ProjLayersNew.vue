@@ -731,7 +731,7 @@ export default {
     },
     // 添加style的模板
     addGroups(data){
-      if(data !== {}){      // 
+      if(JSON.stringify(data) !== '{}'){      // 有分组信息
         let groupsInfo = JSON.parse(JSON.stringify(data));
         for(let item in groupsInfo){
           let index = this.layersTree.findIndex(
@@ -811,7 +811,7 @@ export default {
     copyLayer(){
       // 复制目标图层信息，修改id和showName，layersNameObject添加图层
       let aimNode = JSON.parse(JSON.stringify(this.$refs.tree.getCurrentNode())) || {};
-      if(aimNode != {} && aimNode.nodeType == 'layer'){
+      if(JSON.stringify(aimNode) !== '{}' && aimNode.nodeType == 'layer'){
         let newNode = JSON.parse(JSON.stringify(aimNode));
         let name = newNode.id.slice(0,-6);
         newNode.id = name+'_'+nanoid(5);

@@ -22,7 +22,7 @@
 <!--      </li>-->
     </ul>
 
-    <a href="#" style="visibility:hidden;" class="logo"><h2>泛在地理信息聚合服务平台</h2></a>
+    <a href="#" style="visibility:hidden;" class="logo"><h1>泛在地理信息聚合服务平台</h1></a>
 
   </header>
 </template> 
@@ -65,6 +65,7 @@ header .navigation {
   display: flex;
   justify-content: center;
   min-width: 450px;
+  padding: 0;
 }
 header .navigation li {
   list-style: none;

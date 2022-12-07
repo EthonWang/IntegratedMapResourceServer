@@ -45,7 +45,7 @@
       </el-input>
       <i class="el-icon-check" @click="nameConfirm"></i>
     </div>
-
+    <!-- 样式设置 -->
     <el-tabs value="first">
       <el-tab-pane label="样式设置" name="first">
         <!--    圆点图层编辑面板-->
@@ -3961,7 +3961,7 @@
           </el-tab-pane>
         </el-tabs>
       </el-tab-pane>
-
+    <!-- 数据设置 -->
       <el-tab-pane
         v-if="editorShow != 'backgroundEditorShow'"
         label="数据设置"
@@ -3969,12 +3969,6 @@
       >
         <h4>数据源配置</h4>
         <el-form label-position="right" label-width="100px">
-          <el-form-item v-if="layers[nowLayerIndex]['metadata']['mapbox:type'].includes('PG')" label="数据源类型">
-            <span>{{ layers[nowLayerIndex]["metadata"]['mapbox:type'] == 'multiPG' ? '远程PG' : '本地PG' }}</span>
-          </el-form-item>
-          <el-form-item v-if="layers[nowLayerIndex]['metadata']['mapbox:type'] == 'multiPG'" label="数据库">
-            <span>{{ layers[nowLayerIndex]["mutiPgInfo"].name }}</span>
-          </el-form-item>
           <!-- mbTile数据要更换的数据源 -->
           <el-form-item v-if="!layers[nowLayerIndex]['metadata']['mapbox:type'].includes('PG')" label="数据源类型">
             <span
@@ -4001,6 +3995,12 @@
             <span>{{ layers[nowLayerIndex]["source-layer"] }}</span>
           </el-form-item>
           <!-- PG数据要更换的数据源 -->
+          <el-form-item v-if="layers[nowLayerIndex]['metadata']['mapbox:type'].includes('PG')" label="数据源类型">
+            <span>{{ layers[nowLayerIndex]["metadata"]['mapbox:type'] == 'multiPG' ? '远程PG' : '本地PG' }}</span>
+          </el-form-item>
+          <el-form-item v-if="layers[nowLayerIndex]['metadata']['mapbox:type'] == 'multiPG'" label="数据库">
+            <span>{{ layers[nowLayerIndex]["mutiPgInfo"].name }}</span>
+          </el-form-item>          
           <el-form-item v-if="layers[nowLayerIndex]['metadata']['mapbox:type'].includes('PG')" label="数据图层">
             <span
               v-if="!isSourceEdit"
@@ -4034,6 +4034,7 @@
             <el-button v-if="!isSourceEdit" type="text" icon="el-icon-setting" style="margin-left:5px" @click="sourceInit(layers[nowLayerIndex])"></el-button>
             <el-button v-if="isSourceEdit" type="text" icon="el-icon-check" style="margin-left:5px" @click="sourceChange(layers[nowLayerIndex])"></el-button>
           </el-form-item>
+          <!-- 类型转换 -->
           <el-form-item label="图层类型">
             <el-select
               v-model="layers[nowLayerIndex].type"
@@ -5066,6 +5067,7 @@ export default {
       this.layers[this.nowLayerIndex].layout = JSON.parse(
         JSON.stringify(layerStyleProperties[val].layout)
       );
+      this.layers[this.nowLayerIndex].attrValueSet = {};
       let aimLayer = JSON.parse(
         JSON.stringify(this.layers[this.nowLayerIndex])
       );
@@ -5080,7 +5082,6 @@ export default {
         this.addLayerToMap(false, data, true);
       }
       this.handleLayerEdit(this.nowLayerIndex, aimLayer);
-      this.UPDATEPARM({ parm: "layers", value: this.layers });
     },
     // filter功能
     filterValueInit(val, index) {
