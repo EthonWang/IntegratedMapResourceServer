@@ -171,6 +171,21 @@
               </el-table-column>
             </el-table>
           </el-tab-pane>
+          <el-tab-pane label="TERRAIN" name="TERRAIN">
+            <el-table :data="terrainList" style="width: 100%">
+              <el-table-column prop="name" label="名称"> </el-table-column>
+              <el-table-column width="80" label="操作">
+                <template slot-scope="scope">
+                  <el-button
+                    size="mini"
+                    type="primary"
+                    @click="addTerrain(scope.row)"
+                    >添加
+                  </el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-tab-pane>
         </el-tabs>
 
         <el-button
@@ -214,6 +229,7 @@
       <!-- <el-button type="primary" @click="test1">测试</el-button> -->
       <!-- <el-button type="primary" @click="test2">测试2</el-button> -->
       <!-- <el-button type="primary" @click="test3">测试3</el-button> -->
+      <!-- <el-button type="primary" @click="test4">测试4</el-button> -->
     </div>
     <el-divider class="divider">图层</el-divider>
   </div>
@@ -233,6 +249,7 @@ export default {
   props: [],
   data() {
     return {
+      terrainList: [],
       // 传递的参数
       // sourceNameObject: {}, //检测source重复
       // layersNameObject: {}, //检测重复  后端字段为nameObject
@@ -403,14 +420,93 @@ export default {
       // this.$bus.$emit('layerTree',{type:'style',layersTree:this.mbTileStyleJson.layersTree});
       // console.log("添加所有styleJson图层");      
     },
-    test2() {
+    async test2() {
       // this.$bus.$emit("styleTemp", {
       //   type: "open",
       //   index: 0,
       //   layer: this.layers[0],
       // });
-      let c = nameIndex(["a"], "place", { place1: 0 });
-      console.log("测试", c);
+      // let c = nameIndex(["a"], "place", { place1: 0 });
+      // console.log("测试", c);
+
+      // let row = {
+      //   id:'test1_aaaaa',
+      //   name:'test1',
+      //   url:'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+      // }
+      //判断该shp是否已添加
+        // let newTileJson = initTileJson;
+        // newTileJson.name = 'test1';
+        // newTileJson.tiles = ['https://klokantech.github.io/naturalearthtiles/tiles/natural_earth_2_shaded_relief.raster/{z}/{x}/{y}.png'];
+        // // let vector_layer = {
+        // //   description: "",
+        // //   fields: "",
+        // //   id: 'test1',
+        // // };
+        // // newTileJson.vector_layers = [vector_layer];
+        // newTileJson.tileJsonType = 'TMS';
+        // let res = await this.createTileJson(newTileJson);
+        // if (res.data.code !== 0) {
+        //   console.log("添加source失败");
+        //   return;
+        // }
+        //添加source
+        // let sourceJsonId = res.data.data.tileJsonId;
+        // let sourceJsonId = res.data.data.tileJsonId;
+        // let tileJsonUrl =
+        //   this.reqUrl + "/getTileJson/" + sourceJsonId + ".json";        
+        let tileJsonUrl = this.reqUrl + '/tms1/TMS2/{z}/{x}/{y}.png';
+        // let tileJsonUrl = this.reqUrl + '/terrain/terrain2/{z}/{x}/{y}.png';
+        // let tileJsonUrl = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+        // let tileJsonUrl = 'https://klokantech.github.io/naturalearthtiles/tiles/natural_earth_2_shaded_relief.raster/{z}/{x}/{y}.png';
+        // let tileJsonUrl = 'mapbox://mapbox.satellite';
+        let newSourceJson = {
+          sourceName: 'test1_aaaaa',
+          sourceType: "raster",
+          sourceUrl: tileJsonUrl,
+        };
+        // Raster添加
+        this.addSourceToMap(newSourceJson);
+        // 记录shp图层和对应的id
+        this.sources[newSourceJson.sourceName] = {
+          type: newSourceJson.sourceType,
+          tiles: [newSourceJson.sourceUrl],
+          tileSize: 256,
+        };
+        // this.sourceNameObject['test1'] = sourceJsonId;
+      //添加layer
+      //前八个是自己用的属性
+      let newLayer = {
+        sourceType: "TMS", //记录数据来源类型，用于区别mbTlie的添加和删除
+        show: true,
+        originName: "",
+        showName: 'test1', //用于展示图层名字
+        manageInfo: {layerKey:'test1',sourceKey:'test1'},  // 记录layersNameObject和sourceNameObject的key
+        attrValueSet: {},
+        attrShowList: {},
+        filterValueSet: {},
+        nodeType: "layer", //组和图层区分
+        id: 'test1',
+        type: "raster",
+        maxzoom: 22,
+        metadata: { "mapbox:type": "TMS" },
+        minzoom: 0,
+        source: 'test1_aaaaa', //通过记录的source名字与id对应，拿到sourceId
+      };
+      if (
+        !Object.prototype.hasOwnProperty.call(
+          this.layersNameObject,
+          newLayer.originName
+        )
+      ) {
+        this.layersNameObject[newLayer.name] = 1;
+      } else {
+        this.layersNameObject[newLayer.name] += 1;
+        newLayer.id = 'test1' + this.layersNameObject[newLayer.name];
+        newLayer.showName = 'test1' + this.layersNameObject[newLayer.name];
+      }
+      this.layers.unshift(newLayer);
+      this.addLayerToMap(true, newLayer);
     },
     test3() {
       let a = renderSplit({
@@ -427,6 +523,27 @@ export default {
       ]);
       let c = textSplit("{name:latin} {name:nonlatin}");
       console.log("测试", a, "\n", b, "\n", c);
+    },
+    test4(){
+        // let tileJsonUrl = this.reqUrl + '/terrain/terrain2/{z}/{x}/{y}.png';
+        let tileJsonUrl = "mapbox://mapbox.mapbox-terrain-dem-v1";
+        let newSourceJson = {
+          sourceName: 'terrain',
+          sourceType: "raster-dem",
+          sourceUrl: tileJsonUrl,
+        };
+        // Raster添加
+        this.addSourceToMap(newSourceJson);
+        // 记录shp图层和对应的id
+        this.sources[newSourceJson.sourceName] = {
+          type: newSourceJson.sourceType,
+          tiles: [newSourceJson.sourceUrl],
+          tileSize: 256,
+        };   
+        setTimeout(()=>{
+          this.$bus.$emit('map',{type:'addTerrain',terrain:{source:newSourceJson.sourceName,exaggeration: 1.5}}) 
+        },0)  
+
     },
     // vuex
     ...mapActions({ updateParm: "update" }), //将 `this.updateParm(data)` 映射为 `this.$store.dispatch('update',data)`
@@ -474,6 +591,9 @@ export default {
       switch (tab.name) {
         case "TMS":
           this.getOutService();
+          break;
+        case "TERRAIN":
+          this.getTerrainList();
           break;
       }
     },
@@ -537,7 +657,7 @@ export default {
           sourceType: "vector",
           sourceUrl: tileJsonUrl,
         };
-        this.addSourceToMap(true, newSourceJson);
+        this.addSourceToMap(newSourceJson);
         this.sources[newSourceJson.sourceName] = {
           type: newSourceJson.sourceType,
           url: newSourceJson.sourceUrl,
@@ -655,7 +775,7 @@ export default {
           sourceType: "vector",
           sourceUrl: tileJsonUrl,
         };
-        this.addSourceToMap(true, newSourceJson);
+        this.addSourceToMap(newSourceJson);
         this.sources[newSourceJson.sourceName] = {
           type: newSourceJson.sourceType,
           url: newSourceJson.sourceUrl,
@@ -748,7 +868,7 @@ export default {
           sourceUrl: tileJsonUrl,
         };
         console.log("请求数据：", newSourceJson);
-        this.addSourceToMap(true, newSourceJson);
+        this.addSourceToMap(newSourceJson);
         this.sources[newSourceJson.sourceName] = {
           type: newSourceJson.sourceType,
           url: newSourceJson.sourceUrl,
@@ -831,7 +951,7 @@ export default {
           sourceUrl: tileJsonUrl,
         };
         console.log("请求数据：", newSourceJson);
-        this.addSourceToMap(true, newSourceJson);
+        this.addSourceToMap(newSourceJson);
         this.sources[newSourceJson.sourceName] = {
           type: newSourceJson.sourceType,
           url: newSourceJson.sourceUrl,
@@ -954,7 +1074,7 @@ export default {
           sourceUrl: tileJsonUrl,
         };
         // Raster添加
-        this.addSourceToMap(false, newSourceJson);
+        this.addSourceToMap(newSourceJson);
         // 记录shp图层和对应的id
         this.sources[newSourceJson.sourceName] = {
           type: newSourceJson.sourceType,
@@ -1149,20 +1269,12 @@ export default {
         });
     },
     //向地图添加数据源source
-    addSourceToMap(flag, newSource) {
-      if (flag) {
-        const data = {
-          type: "addSource1",
-          source: newSource,
-        };
-        this.$bus.$emit("map", data);
-      } else {
-        const data = {
-          type: "addSource2",
-          source: newSource,
-        };
-        this.$bus.$emit("map", data);
-      }
+    addSourceToMap(newSource) {
+      let data = {
+        type: "addSource",
+        source: newSource,  
+      };
+      this.$bus.$emit("map", data);
     },
     //向地图添加layer
     addLayerToMap(flag, value) {
@@ -1359,6 +1471,41 @@ export default {
           console.log(err);
         });
     },
+    // Terrain服务
+    getTerrainList() {
+      requestApi
+        .getTerrainList()
+        .then((res) => {
+          if (res.data.code == 0) {
+            this.terrainList = res.data.data;
+          } else {
+            console.log(res.data.csg);
+          }
+          console.log("terrainList", this.terrainList);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },  
+    addTerrain(row){
+        let tileJsonUrl = `${this.reqUrl}/terrain/${row.name}/{z}/{x}/{y}.png`;
+        let newSourceJson = {
+          sourceName: `${row.name}_TERRAIN`,
+          sourceType: "raster-dem",
+          sourceUrl: tileJsonUrl,
+        };
+        // Raster添加
+        this.addSourceToMap(newSourceJson);
+        // 记录shp图层和对应的id
+        this.sources[newSourceJson.sourceName] = {
+          type: newSourceJson.sourceType,
+          tiles: [newSourceJson.sourceUrl],
+          tileSize: 256,
+        };   
+        setTimeout(()=>{
+          this.$bus.$emit('map',{type:'addTerrain',terrain:{source:newSourceJson.sourceName,exaggeration: 1.5}}) 
+        },0)        
+    },  
   },
   beforeDestroy() {
     this.$bus.$off("init");

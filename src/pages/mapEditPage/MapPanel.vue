@@ -152,11 +152,8 @@ export default {
         case "addLayer2": // data:{type:'',id:'',layer:{},(isReplace)}  添加在指定图层后(添加背景,更换指定图层样式)，isReplace表示替换图层，不对目录树做修改，即在图层树组件响应事件不做修改
           this.addLayerToMap(false, data);
           break;
-        case "addSource1": // data:{type:'',source:{}}  tileJson写法
-          this.addSourceToMap(true, data.source);
-          break;
-        case "addSource2": // data:{type:'',source:{}}  Raster写法
-          this.addSourceToMap(false, data.source);
+        case "addSource": // data:{type:'',source:{}}  
+          this.addSourceToMap(data);
           break;
         case "removeLayer": // data:{type:'',id:''}
           map.removeLayer(data.id);
@@ -181,6 +178,18 @@ export default {
             if (error) throw error;
             map.addImage(data.name, image);
           });
+          break;
+        case "addTerrain": // data:{type:'',terrain:{source:'',...}}
+          this.setTerrain(data.terrain);
+          // map.setTerrain({
+          //   'source': 'terrain',
+          //   'exaggeration': 1.5,
+          //   'encoding': "mapbox"
+          // }).on('load',()=>{
+          //   console.log('添加地形：',map.getTerrain);
+          // })
+          //   console.log('添加地形：',map.getTerrain);
+          // map.setTerrain(data.terrain);
           break;
         default:
           break;
@@ -359,7 +368,7 @@ export default {
             sourceType: this.sources[i].type,
             sourceUrl: this.sources[i].url,
           };
-          this.addSourceToMap(true, newSource);
+          this.addSourceToMap(newSource);
         }
         // 添加layer
         for (let i = this.layers.length - 1; i >= 0; i--) {
@@ -383,35 +392,47 @@ export default {
     },
     // #地图api
     //向地图添加数据源source
-    addSourceToMap(flag, newSource) {
+    addSourceToMap(data) {
+      let newSource = data.source;
       console.log("add new source：", newSource);
-      if (flag) {
-        //tileJson写法
-        map.addSource(newSource.sourceName, {
-          type: newSource.sourceType,
-          url: newSource.sourceUrl,
-        });
-      } else {
-        // Raster添加方法
+      switch(newSource.sourceType){
+        case 'vector':
+          map.addSource(newSource.sourceName, {
+            type: newSource.sourceType,
+            url: newSource.sourceUrl,
+          });   
+          break;
+        case 'raster':
         map.addSource(newSource.sourceName, {
           type: newSource.sourceType,
           tiles: [newSource.sourceUrl],
           tileSize: 256,
-        });
+          maxzoom: 6,
+          // scheme: 'tms'
+        });  
+          break;
+        case 'raster-dem':
+          map.addSource(newSource.sourceName, {
+            type: newSource.sourceType,
+            url: newSource.sourceUrl,
+            // tiles: [newSource.sourceUrl],
+            tileSize: 512,
+          });   
+          break;
       }
     },
     // 向地图添加layer
     addLayerToMap(flag, data) {
       if (flag) {
         let layer = JSON.parse(JSON.stringify(data));
-        delete layer.paint[`${layer.type}-pattern`];         
+        if(['line','fill'].indexOf(layer.type) != -1){delete layer.paint[`${layer.type}-pattern`]}         
         console.log("add new layer：", data);
         map.addLayer(layer); //默认添加
       } else {
         //value:{index:'',layer:{}}
         let layer = JSON.parse(JSON.stringify(data.layer));
         let id = JSON.parse(JSON.stringify(data.id));
-        delete layer.paint[`${layer.type}-pattern`];          
+        if(['line','fill'].indexOf(layer.type) != -1){delete layer.paint[`${layer.type}-pattern`]}          
         console.log("add new layer：", data.layer);
         map.addLayer(layer, id); //添加在对应图层之前
       }
@@ -472,6 +493,11 @@ export default {
     setCanvasSrc() {
       const canvasSrc = map.getCanvas().toDataURL("image/png");
       localStorage.setItem("canvasSrc", canvasSrc);
+    },
+    setTerrain(val){
+      map.setTerrain(val)
+      // map.setProjection('globe');
+      console.log('添加地形：',map.getTerrain,'\n',map.getProjection());      
     },
 
     // #其余组件函数

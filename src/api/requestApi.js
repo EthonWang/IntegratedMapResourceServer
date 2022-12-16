@@ -70,6 +70,15 @@ export default {
         return instance.get(Vue.prototype.reqUrl+"/dataSource/deleteThirdPartSourceById/" + id)
     },       
 
+    // terrain
+    addTerrain(data){
+        return instance.post(Vue.prototype.reqUrl+"/dataSource/addTerrain",data)
+    },
+    getTerrainList(){
+        return instance.get(Vue.prototype.reqUrl+"/dataSource/getTerrainList")
+    },
+
+
 
 
 // 字体相关

@@ -5424,7 +5424,7 @@ export default {
         };
         //记录shp图层和对应的id
         this.sourceNameObject[item['sourceId_new']] = sourceJsonId;
-        await this.addSourceToMap(true, newSourceJson);
+        await this.addSourceToMap(newSourceJson);
       }
       // 删除旧source
       let layerKey = layer.manageInfo.layerKey;
@@ -5527,21 +5527,13 @@ export default {
       }
     },
     //向地图添加数据源source
-    addSourceToMap(flag, newSource) {
-      if (flag) {
-        const data = {
-          type: "addSource1",
-          source: newSource,
-        };
-        this.$bus.$emit("map", data);
-      } else {
-        const data = {
-          type: "addSource2",
-          source: newSource,
-        };
-        this.$bus.$emit("map", data);
-      }
-    },  
+    addSourceToMap(newSource) {
+      let data = {
+        type: "addSource",
+        source: newSource,  
+      };
+      this.$bus.$emit("map", data);
+    }, 
     handleRemoveSource(sourceName) {
       const data = {
         type: 'removeSource',
