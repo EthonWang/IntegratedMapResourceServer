@@ -3,7 +3,12 @@
     <!-- 工程项目按钮框 -->
     <div class="flexRowSpaceAround" style="width: 100%">
       <!-- 添加数据 -->
-      <el-popover ref="dataPopover" placement="right" width="300" trigger="click">
+      <el-popover
+        ref="dataPopover"
+        placement="right"
+        width="300"
+        trigger="click"
+      >
         <el-tabs value="PG" @tab-click="dataBaseClick">
           <el-tab-pane label="PG" name="PG">
             <el-row type="flex" align="middle">
@@ -158,13 +163,98 @@
           </el-tab-pane>
           <el-tab-pane label="TMS" name="TMS">
             <el-table :data="urlBase[dataBaseSelect]" style="width: 100%">
-              <el-table-column prop="name" label="名称"> </el-table-column>
+              <el-table-column prop="name">
+                <template v-slot:header>
+                  <span
+                    >{{
+                      isOutService["TMS"] ? "外部服务" : "本地服务"
+                    }}&nbsp;</span
+                  >
+                  <el-button
+                    type="text"
+                    :title="
+                      isOutService['TMS'] ? '切换为本地服务' : '切换为外部服务'
+                    "
+                    icon="el-icon-refresh"
+                    @click="serviceChange('TMS')"
+                    style="padding: 0"
+                  ></el-button>
+                </template>
+              </el-table-column>
               <el-table-column width="80" label="操作">
                 <template slot-scope="scope">
                   <el-button
                     size="mini"
                     type="primary"
                     @click="handleAddShpLayer(scope.row)"
+                    >添加
+                  </el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-tab-pane>
+          <el-tab-pane label="TERRAIN" name="TERRAIN">
+            <el-table :data="urlBase[dataBaseSelect]" style="width: 100%">
+              <el-table-column prop="name" label="名称">
+                <template v-slot:header>
+                  <span
+                    >{{
+                      isOutService["TERRAIN"] ? "外部服务" : "本地服务"
+                    }}&nbsp;</span
+                  >
+                  <el-button
+                    type="text"
+                    :title="
+                      isOutService['TERRAIN']
+                        ? '切换为本地服务'
+                        : '切换为外部服务'
+                    "
+                    icon="el-icon-refresh"
+                    @click="serviceChange('TERRAIN')"
+                    style="padding: 0"
+                  ></el-button>
+                </template>
+              </el-table-column>
+              <el-table-column width="80" label="操作">
+                <template slot-scope="scope">
+                  <el-button
+                    size="mini"
+                    type="primary"
+                    @click="addTerrain(scope.row)"
+                    >添加
+                  </el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-tab-pane>
+          <el-tab-pane label="WMTS" name="WMTS">
+            <el-table :data="urlBase[dataBaseSelect]" style="width: 100%">
+              <el-table-column prop="name" label="名称">
+                <template v-slot:header>
+                  <span
+                    >{{
+                      isOutService["TERRAIN"] ? "外部服务" : "本地服务"
+                    }}&nbsp;</span
+                  >
+                  <el-button
+                    type="text"
+                    :title="
+                      isOutService['TERRAIN']
+                        ? '切换为本地服务'
+                        : '切换为外部服务'
+                    "
+                    icon="el-icon-refresh"
+                    @click="serviceChange('TERRAIN')"
+                    style="padding: 0"
+                  ></el-button>
+                </template>
+              </el-table-column>
+              <el-table-column width="80" label="操作">
+                <template slot-scope="scope">
+                  <el-button
+                    size="mini"
+                    type="primary"
+                    @click="addTerrain(scope.row)"
                     >添加
                   </el-button>
                 </template>
@@ -214,6 +304,7 @@
       <!-- <el-button type="primary" @click="test1">测试</el-button> -->
       <!-- <el-button type="primary" @click="test2">测试2</el-button> -->
       <!-- <el-button type="primary" @click="test3">测试3</el-button> -->
+      <!-- <el-button type="primary" @click="test4">测试4</el-button> -->
     </div>
     <el-divider class="divider">图层</el-divider>
   </div>
@@ -224,8 +315,8 @@ import { mapState, mapActions, mapMutations } from "vuex";
 import initTileJson from "@/assets/js/initTileJson";
 import layerStyleProperties from "@/assets/js/layerStyleProperties";
 import project from "@/assets/js/project";
-import { renderSplit, filterSplit, textSplit } from "@/serve/JsonToValue";
-import { nameIndex } from "@/serve/interpolation";
+import { renderSplit, filterSplit, textSplit } from "@/utils/JsonToValue";
+import { nameIndex } from "@/utils/interpolation";
 import { nanoid } from "nanoid";
 
 export default {
@@ -233,6 +324,7 @@ export default {
   props: [],
   data() {
     return {
+      terrainList: [],
       // 传递的参数
       // sourceNameObject: {}, //检测source重复
       // layersNameObject: {}, //检测重复  后端字段为nameObject
@@ -244,6 +336,7 @@ export default {
       // 公用参数
       dataBaseSelect: "defaultPG", //选中的数据源，PG默认为defaultPG 总共：defaultPG、multiPG、cacheTile、mbTile(作为添加tileJson的tileJsonType)
       dataBaseList: [],
+      isOutService: { TMS: true, TERRAIN: true }, // 用来控制TMS等外部和本地服务切换
       // PG服务
       PgBaseSelect: "defaultPG",
       shpTableData: [],
@@ -354,7 +447,7 @@ export default {
       set(val) {
         this.UPDATEPARM({ parm: "originStyle", value: val });
       },
-    },     
+    },
     publicBoolean: {
       get() {
         return this.$store.state.publicBoolean;
@@ -362,7 +455,7 @@ export default {
       set(val) {
         this.UPDATEPARM({ parm: "publicBoolean", value: val });
       },
-    },     
+    },
   },
   mounted() {
     // 等初始组件信息加载完
@@ -385,8 +478,11 @@ export default {
       // });
       let styleJson = JSON.parse(JSON.stringify(project));
       let List = styleJson.layers;
-      let layerGroups = styleJson.metadata['mapbox:groups'];
-      await this.$bus.$emit('layerTree',{type:'groups',groups:layerGroups});
+      let layerGroups = styleJson.metadata["mapbox:groups"];
+      await this.$bus.$emit("layerTree", {
+        type: "groups",
+        groups: layerGroups,
+      });
       for (let i in List) {
         let item = List[i];
         console.log("item", item);
@@ -401,16 +497,95 @@ export default {
         }
       }
       // this.$bus.$emit('layerTree',{type:'style',layersTree:this.mbTileStyleJson.layersTree});
-      // console.log("添加所有styleJson图层");      
+      // console.log("添加所有styleJson图层");
     },
-    test2() {
+    async test2() {
       // this.$bus.$emit("styleTemp", {
       //   type: "open",
       //   index: 0,
       //   layer: this.layers[0],
       // });
-      let c = nameIndex(["a"], "place", { place1: 0 });
-      console.log("测试", c);
+      // let c = nameIndex(["a"], "place", { place1: 0 });
+      // console.log("测试", c);
+
+      // let row = {
+      //   id:'test1_aaaaa',
+      //   name:'test1',
+      //   url:'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+      // }
+      //判断该shp是否已添加
+      // let newTileJson = initTileJson;
+      // newTileJson.name = 'test1';
+      // newTileJson.tiles = ['https://klokantech.github.io/naturalearthtiles/tiles/natural_earth_2_shaded_relief.raster/{z}/{x}/{y}.png'];
+      // // let vector_layer = {
+      // //   description: "",
+      // //   fields: "",
+      // //   id: 'test1',
+      // // };
+      // // newTileJson.vector_layers = [vector_layer];
+      // newTileJson.tileJsonType = 'TMS';
+      // let res = await this.createTileJson(newTileJson);
+      // if (res.data.code !== 0) {
+      //   console.log("添加source失败");
+      //   return;
+      // }
+      //添加source
+      // let sourceJsonId = res.data.data.tileJsonId;
+      // let sourceJsonId = res.data.data.tileJsonId;
+      // let tileJsonUrl =
+      //   this.reqUrl + "/getTileJson/" + sourceJsonId + ".json";
+      // let tileJsonUrl = this.reqUrl + '/tms1/TMS1/{z}/{x}/{y}.png';
+      // let tileJsonUrl = this.reqUrl + '/terrain/terrain2/{z}/{x}/{y}.png';
+      let tileJsonUrl = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+      // let tileJsonUrl = 'https://klokantech.github.io/naturalearthtiles/tiles/natural_earth_2_shaded_relief.raster/{z}/{x}/{y}.png';
+      // let tileJsonUrl = 'mapbox://mapbox.satellite';
+      let newSourceJson = {
+        sourceName: "test1_aaaaa",
+        sourceType: "raster",
+        sourceUrl: tileJsonUrl,
+      };
+      // Raster添加
+      this.addSourceToMap(newSourceJson);
+      // 记录shp图层和对应的id
+      this.sources[newSourceJson.sourceName] = {
+        type: newSourceJson.sourceType,
+        tiles: [newSourceJson.sourceUrl],
+        tileSize: 256,
+      };
+      // this.sourceNameObject['test1'] = sourceJsonId;
+      //添加layer
+      //前八个是自己用的属性
+      let newLayer = {
+        sourceType: "TMS", //记录数据来源类型，用于区别mbTlie的添加和删除
+        show: true,
+        originName: "",
+        showName: "test1", //用于展示图层名字
+        manageInfo: { layerKey: "test1", sourceKey: "test1" }, // 记录layersNameObject和sourceNameObject的key
+        attrValueSet: {},
+        attrShowList: {},
+        filterValueSet: {},
+        nodeType: "layer", //组和图层区分
+        id: "test1",
+        type: "raster",
+        maxzoom: 22,
+        metadata: { "mapbox:type": "TMS" },
+        minzoom: 0,
+        source: "test1_aaaaa", //通过记录的source名字与id对应，拿到sourceId
+      };
+      if (
+        !Object.prototype.hasOwnProperty.call(
+          this.layersNameObject,
+          newLayer.originName
+        )
+      ) {
+        this.layersNameObject[newLayer.name] = 1;
+      } else {
+        this.layersNameObject[newLayer.name] += 1;
+        newLayer.id = "test1" + this.layersNameObject[newLayer.name];
+        newLayer.showName = "test1" + this.layersNameObject[newLayer.name];
+      }
+      this.layers.unshift(newLayer);
+      this.addLayerToMap(true, newLayer);
     },
     test3() {
       let a = renderSplit({
@@ -427,6 +602,29 @@ export default {
       ]);
       let c = textSplit("{name:latin} {name:nonlatin}");
       console.log("测试", a, "\n", b, "\n", c);
+    },
+    test4() {
+      // let tileJsonUrl = this.reqUrl + '/terrain/terrain2/{z}/{x}/{y}.png';
+      let tileJsonUrl = "mapbox://mapbox.mapbox-terrain-dem-v1";
+      let newSourceJson = {
+        sourceName: "terrain",
+        sourceType: "raster-dem",
+        sourceUrl: tileJsonUrl,
+      };
+      // Raster添加
+      this.addSourceToMap(newSourceJson);
+      // 记录shp图层和对应的id
+      this.sources[newSourceJson.sourceName] = {
+        type: newSourceJson.sourceType,
+        tiles: [newSourceJson.sourceUrl],
+        tileSize: 256,
+      };
+      setTimeout(() => {
+        this.$bus.$emit("map", {
+          type: "addTerrain",
+          terrain: { source: newSourceJson.sourceName, exaggeration: 1 },
+        });
+      }, 0);
     },
     // vuex
     ...mapActions({ updateParm: "update" }), //将 `this.updateParm(data)` 映射为 `this.$store.dispatch('update',data)`
@@ -473,7 +671,19 @@ export default {
       console.log("dataBaseSelect", this.dataBaseSelect);
       switch (tab.name) {
         case "TMS":
-          this.getOutService();
+          if (this.isOutService.TMS) {
+            this.getOutService();
+          } else {
+            this.getNativeService("TMS");
+          }
+          break;
+        case "TERRAIN":
+          if (this.isOutService.TERRAIN) {
+            this.getOutService();
+          } else {
+            this.getNativeService("TERRAIN");
+          }
+
           break;
       }
     },
@@ -505,6 +715,8 @@ export default {
             }
           }
           break;
+        case "TERRAIN":
+          this.addTERRAIN(row);
       }
       this.$bus.$emit("mapEdit", { type: "off" });
     },
@@ -537,7 +749,7 @@ export default {
           sourceType: "vector",
           sourceUrl: tileJsonUrl,
         };
-        this.addSourceToMap(true, newSourceJson);
+        this.addSourceToMap(newSourceJson);
         this.sources[newSourceJson.sourceName] = {
           type: newSourceJson.sourceType,
           url: newSourceJson.sourceUrl,
@@ -575,7 +787,7 @@ export default {
         show: true,
         // originName: row.originName,    // 可在source-layer中展示
         showName: result.show, //用于展示图层名字
-        manageInfo: {layerKey:sourceId,sourceKey:sourceId},  // 记录layersNameObject和sourceNameObject的key
+        manageInfo: { layerKey: sourceId, sourceKey: sourceId }, // 记录layersNameObject和sourceNameObject的key
         bounds: row.bounds,
         shpAttribute: typeof row.attrInfo != "undefined" ? row.attrInfo : [],
         attrValueSet: {},
@@ -614,10 +826,7 @@ export default {
       let sourceId = row.originName + "_#multiPG";
       //判断该shp是否已添加
       if (
-        !Object.prototype.hasOwnProperty.call(
-          this.sourceNameObject,
-          sourceId 
-        )
+        !Object.prototype.hasOwnProperty.call(this.sourceNameObject, sourceId)
       ) {
         // 远程pg无法在上传时生成tileJson，故在添加时生成
         let newTileJson = initTileJson;
@@ -640,7 +849,7 @@ export default {
           id: row.originName,
         };
         newTileJson.vector_layers = [vector_layer];
-        newTileJson.tileJsonType = 'multiPG';
+        newTileJson.tileJsonType = "multiPG";
         let res = await this.createTileJson(newTileJson);
         if (res.data.code !== 0) {
           console.log("添加source失败");
@@ -655,7 +864,7 @@ export default {
           sourceType: "vector",
           sourceUrl: tileJsonUrl,
         };
-        this.addSourceToMap(true, newSourceJson);
+        this.addSourceToMap(newSourceJson);
         this.sources[newSourceJson.sourceName] = {
           type: newSourceJson.sourceType,
           url: newSourceJson.sourceUrl,
@@ -692,7 +901,7 @@ export default {
         show: true,
         // originName: row.originName,
         showName: result.show, //用于展示图层名字
-        manageInfo: {layerKey:sourceId,sourceKey:sourceId},  // 记录layersNameObject和sourceNameObject的key
+        manageInfo: { layerKey: sourceId, sourceKey: sourceId }, // 记录layersNameObject和sourceNameObject的key
         bounds: row.bounds,
         shpAttribute: typeof row.attrInfo != "undefined" ? row.attrInfo : [],
         mutiPgInfo: this.mutiPgInfo, //用来记录多源pg信息
@@ -748,7 +957,7 @@ export default {
           sourceUrl: tileJsonUrl,
         };
         console.log("请求数据：", newSourceJson);
-        this.addSourceToMap(true, newSourceJson);
+        this.addSourceToMap(newSourceJson);
         this.sources[newSourceJson.sourceName] = {
           type: newSourceJson.sourceType,
           url: newSourceJson.sourceUrl,
@@ -772,7 +981,7 @@ export default {
         show: true, // 用于记录图层的开关
         // originName: row.id,
         showName: result.show, //用于展示图层名字
-        manageInfo: {layerKey:layerName,sourceKey:name},  // 记录layersNameObject和sourceNameObject的key
+        manageInfo: { layerKey: layerName, sourceKey: name }, // 记录layersNameObject和sourceNameObject的key
         shpAttribute: [],
         attrValueSet: {},
         attrShowList: {},
@@ -811,7 +1020,10 @@ export default {
 
     async addStyleMbTileShp(row, JsonName) {
       console.log("add mbStyle shp row: ", row);
-      let name = JSON.parse(JSON.stringify(this.mbTileJsonList[this.mbTileSelectIndex].name)) + "_#meta"; // 同一个mbTile数据源的标识符
+      let name =
+        JSON.parse(
+          JSON.stringify(this.mbTileJsonList[this.mbTileSelectIndex].name)
+        ) + "_#meta"; // 同一个mbTile数据源的标识符
       let layerName = row.id + `_${JsonName}#style`; // 图层间的标识符添加_name作为sourceId
       //判断该shp是否已添加
       if (
@@ -831,7 +1043,7 @@ export default {
           sourceUrl: tileJsonUrl,
         };
         console.log("请求数据：", newSourceJson);
-        this.addSourceToMap(true, newSourceJson);
+        this.addSourceToMap(newSourceJson);
         this.sources[newSourceJson.sourceName] = {
           type: newSourceJson.sourceType,
           url: newSourceJson.sourceUrl,
@@ -870,28 +1082,34 @@ export default {
         }
       }
       // style文件metadata中有分组信息
-      if("metadata" in row){
+      if ("metadata" in row) {
         row["metadata"] = {
           ...row["metadata"],
           "mapbox:type": "mbStyle",
           "mapbox:isOSM": this.mbTileInfo.osmMbtilesBoolean,
-        }
-      }else{    // 没有分组信息，不设mapbox:group
+        };
+      } else {
+        // 没有分组信息，不设mapbox:group
         row["metadata"] = {
           "mapbox:type": "mbStyle",
           "mapbox:isOSM": this.mbTileInfo.osmMbtilesBoolean,
-        }        
+        };
       }
-      // styleJson图层按理只需添加一次
-      this.layersNameObject[layerName] += 1;
       let geoType = row.type;
+      // 检查是否添加过同源layer 返回[showName,layersNameObject]
+      let result = JSON.parse(
+        JSON.stringify(
+          nameIndex(this.layers, layerName, row.id, this.layersNameObject)
+        )
+      );
+      this.layersNameObject = result.object;
       //前八个是自己用的属性
       let newLayer = {
         sourceType: "mbTile", //记录数据来源类型，用于区别是否为mbTlie，mbtile图层sourceJson不删除
         show: true,
         // originName: row.id,
-        showName: row.id, //用于展示图层名字，使用json文件即可
-        manageInfo: {layerKey:layerName,sourceKey:name},  // 记录layersNameObject和sourceNameObject的key
+        showName: result.show, //用于展示图层名字，使用json文件即可
+        manageInfo: { layerKey: layerName, sourceKey: name }, // 记录layersNameObject和sourceNameObject的key
         shpAttribute: [],
         attrValueSet: {},
         attrShowList: {},
@@ -916,17 +1134,23 @@ export default {
       });
       this.addLayerToMap(true, newLayer);
     },
-    addGeoJSON(){
-
-    },
+    addGeoJSON() {},
     async addTMS(row) {
       console.log("add TMS shp row: ", row);
+      // 判断TMS为链接还是本地服务
+      let url = "";
+      if (this.isOutService["TMS"]) {
+        url = row.url;
+      } else {
+        let y = row.ydirection === "up" ? "tms1" : "tms2";
+        url = `${this.reqUrl}/${y}/${row.name}/{z}/{x}/{y}.png`;
+      }
       //判断该shp是否已添加
       if (
         !Object.prototype.hasOwnProperty.call(this.sourceNameObject, row.id)
       ) {
         let newTileJson = initTileJson;
-        newTileJson.name = row.name;
+        newTileJson.name = `${row.name}_TMS`;
         newTileJson.tiles = [row.url];
         let vector_layer = {
           description: "",
@@ -942,14 +1166,14 @@ export default {
         }
         //添加source
         let sourceId = res.data.data.tileJsonId;
-        let tileJsonUrl = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+        let tileJsonUrl = url;
         let newSourceJson = {
           sourceName: sourceId,
           sourceType: "raster",
           sourceUrl: tileJsonUrl,
         };
         // Raster添加
-        this.addSourceToMap(false, newSourceJson);
+        this.addSourceToMap(newSourceJson);
         // 记录shp图层和对应的id
         this.sources[newSourceJson.sourceName] = {
           type: newSourceJson.sourceType,
@@ -965,7 +1189,7 @@ export default {
         show: true,
         originName: "",
         showName: row.name, //用于展示图层名字
-        manageInfo: {layerKey:row.id,sourceKey:row.id},  // 记录layersNameObject和sourceNameObject的key
+        manageInfo: { layerKey: row.id, sourceKey: row.id }, // 记录layersNameObject和sourceNameObject的key
         attrValueSet: {},
         attrShowList: {},
         filterValueSet: {},
@@ -991,6 +1215,36 @@ export default {
       }
       this.layers.unshift(newLayer);
       this.addLayerToMap(true, newLayer);
+    },
+
+    addTerrain(row) {
+      // 判断为链接还是本地服务
+      let tileJsonUrl;
+      if (this.isOutService["TERRAIN"]) {
+        tileJsonUrl = row.url;
+      } else {
+        tileJsonUrl = `${this.reqUrl}/terrain/${row.name}/{z}/{x}/{y}.png`;
+      }
+      let newSourceJson = {
+        sourceName: `${row.name}_TERRAIN`,
+        sourceType: "raster-dem",
+        sourceUrl: tileJsonUrl,
+        isOutService: this.isOutService["TERRAIN"]
+      };
+      // Raster添加
+      this.addSourceToMap(newSourceJson);
+      // 记录shp图层和对应的id
+      this.sources[newSourceJson.sourceName] = {
+        type: newSourceJson.sourceType,
+        tiles: [newSourceJson.sourceUrl],
+        tileSize: 256,
+      };
+      setTimeout(() => {
+        this.$bus.$emit("map", {
+          type: "addTerrain",
+          terrain: { source: newSourceJson.sourceName, exaggeration: 1 },
+        });
+      }, 0);
     },
     addBackground(sourceType, row) {
       const index = this.layers.length; // 判断是否有图层，有则添加在最后一位，否则直接添加
@@ -1021,13 +1275,13 @@ export default {
         show: true,
         // originName: "background",
         showName: result.show, //用于展示图层名字
-        manageInfo: {layerKey:'background',sourceKey:''},  // 记录layersNameObject和sourceNameObject的key
+        manageInfo: { layerKey: "background", sourceKey: "" }, // 记录layersNameObject和sourceNameObject的key
         shpAttribute: [],
         attrValueSet: {},
         attrShowList: {},
         filterValueSet: {},
         nodeType: "layer", //组和图层区分
-        id: "背景" + nanoid(5),
+        id: "背景_" + nanoid(5),
         type: "background",
         paint: newPaint,
         layout: newLayout,
@@ -1078,9 +1332,9 @@ export default {
                 this.$message.info("地图发布失败");
               }
             })
-            .then(() => {
-              this.$bus.$emit('main',{type:'reload',name:'main'});    // 刷新页面
-            })            
+            // .then(() => {
+            //   this.$bus.$emit('main',{type:'reload',name:'main'});    // 刷新页面
+            // })
             .catch((error) => {
               console.log(error);
             });
@@ -1094,11 +1348,15 @@ export default {
       let styleJson = JSON.parse(JSON.stringify(json));
       let List = styleJson.layers;
       let layerGroups = {};
-      if('metadata' in styleJson){    // 有分组信息，没分组信息为{}
-        layerGroups = styleJson.metadata['mapbox:groups']
+      if ("metadata" in styleJson) {
+        // 有分组信息，没分组信息为{}
+        layerGroups = styleJson.metadata["mapbox:groups"];
       }
-      console.log('组信息',layerGroups);
-      await this.$bus.$emit('layerTree',{type:'groups',groups:layerGroups});
+      console.log("组信息", layerGroups);
+      await this.$bus.$emit("layerTree", {
+        type: "groups",
+        groups: layerGroups,
+      });
       for (let i in List) {
         let item = List[i];
         console.log("item", item);
@@ -1111,7 +1369,7 @@ export default {
         } else if (item["type"] == "background") {
           this.addBackground("mbTile", item);
         }
-      }    
+      }
       this.addMbTileStyleShow = false;
       this.$refs.dataPopover.doClose();
       console.log("添加所有styleJson图层");
@@ -1144,20 +1402,12 @@ export default {
         });
     },
     //向地图添加数据源source
-    addSourceToMap(flag, newSource) {
-      if (flag) {
-        const data = {
-          type: "addSource1",
-          source: newSource,
-        };
-        this.$bus.$emit("map", data);
-      } else {
-        const data = {
-          type: "addSource2",
-          source: newSource,
-        };
-        this.$bus.$emit("map", data);
-      }
+    addSourceToMap(newSource) {
+      let data = {
+        type: "addSource",
+        source: newSource,
+      };
+      this.$bus.$emit("map", data);
     },
     //向地图添加layer
     addLayerToMap(flag, value) {
@@ -1338,7 +1588,50 @@ export default {
         });
     },
 
-    // TMS服务
+    // #TMS、TERRAIN、WMTS服务
+    // 切换服务来源（本地，外部）
+    serviceChange(type) {
+      if (this.isOutService[type]) {
+        this.getNativeService(type);
+      } else {
+        this.getOutService();
+      }
+      this.isOutService[type] = !this.isOutService[type];
+    },
+    // 获取本地服务列表
+    getNativeService(type) {
+      switch (type) {
+        case "TMS":
+          requestApi
+            .getTMSList()
+            .then((res) => {
+              if (res.data.code == 0) {
+                this.urlBase[type] = res.data.data;
+              } else {
+                console.log(res.data.csg);
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+          break;
+        case "TERRAIN":
+          requestApi
+            .getTerrainList()
+            .then((res) => {
+              if (res.data.code == 0) {
+                this.urlBase[type] = res.data.data;
+              } else {
+                console.log(res.data.csg);
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+          break;
+      }
+    },
+    // 获取外部服务链接
     getOutService() {
       requestApi
         .getThirdPartSourceList(this.dataBaseSelect)

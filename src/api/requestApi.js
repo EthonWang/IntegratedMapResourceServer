@@ -22,7 +22,7 @@ const instance= axios.create({
 
 export default {
 
-// 数据源相关
+    // #数据源相关
     addMbtiles(data){
         return instance.post(Vue.prototype.reqUrl+"/dataSource/addMbtiles",data)
     },    
@@ -47,19 +47,18 @@ export default {
     updateShpsInfoByPgId(pgId){
         return instance.get(Vue.prototype.reqUrl+"/dataSource/updateShpsInfoByPgId/"+pgId)
     },
-    //获取style样式列表
+    // 获取style样式列表
     getStyleListById(tileJsonId){
         return instance.get(Vue.prototype.reqUrl+"/dataSource/getStyleList/"+tileJsonId)
     },   
-    //保存其他来源的地图样式
+    // 保存其他来源的地图样式
     saveOtherMapStyle(data){
         return instance.post(Vue.prototype.reqUrl+"/dataSource/saveOtherMapStyle",data)
     },   
     deleteStyleJson(styleJsonId){
         return instance.get(Vue.prototype.reqUrl+"/dataSource/deleteStyleJson/"+styleJsonId)
     },    
-
-// mvt
+    // ##外部链接服务
     addThirdPartSource(data){
         return instance.post(Vue.prototype.reqUrl+"/dataSource/addThirdPartSource",data)
     },
@@ -69,32 +68,56 @@ export default {
     deleteThirdPartSourceById(id){
         return instance.get(Vue.prototype.reqUrl+"/dataSource/deleteThirdPartSourceById/" + id)
     },       
+    editThirdPartSourceById(id,data){
+        return instance.get(Vue.prototype.reqUrl+"/dataSource/editThirdPartSourceById/" + id,data)
+    },
+    // ##本地terrain服务
+    addTerrain(data){
+        return instance.post(Vue.prototype.reqUrl+"/dataSource/addTerrain",data)
+    },
+    getTerrainList(){
+        return instance.get(Vue.prototype.reqUrl+"/dataSource/getTerrainList")
+    },
+    deleteTerrain(id){
+        return instance.get(Vue.prototype.reqUrl+"/dataSource/deleteTerrain/" + id)
+    },     
+    // ##本地tms服务
+    addTMS(data){
+        return instance.post(Vue.prototype.reqUrl+"/dataSource/addTMS",data)
+    },
+    getTMSList(){
+        return instance.get(Vue.prototype.reqUrl+"/dataSource/getTMSList")
+    }, 
+    deleteTMS(id){
+        return instance.get(Vue.prototype.reqUrl+"/dataSource/deleteTMS/" + id)
+    },     
 
 
 
-// 字体相关
+
+    // #字体相关
     deleteFont(fontName){
         return instance.get(Vue.prototype.reqUrl+"/deleteFont/"+fontName)
     },
-    //字体
+    // 字体
     getFontList(){
         return instance.get(Vue.prototype.reqUrl+"/getFontList")
     }, 
 
-// 图标相关
-    // 精灵图
-        // 可用精灵图套型列表
+    // #图标相关
+    // ##精灵图
+    // 可用精灵图套型列表
     getSpriteList(){
         return instance.post(Vue.prototype.reqUrl+"/getSpriteList")
     },
-        // 获取某套精灵图
+    // 获取某套精灵图
     getSpriteItem(spriteName,spriteClass,type){
         return instance.get(Vue.prototype.reqUrl+"/store/sprites/"+spriteName+"/"+spriteClass[type])
     },    
     deleteSpriteItem(spriteName){
         return instance.get(Vue.prototype.reqUrl+"/deleteSprite/"+spriteName)
     },    
-    // 自定义图标
+    // ##自定义图标
     getSymbolList(data){
         return instance.post(Vue.prototype.reqUrl+"/symbol/getSymbolList",data)
     },
@@ -105,12 +128,12 @@ export default {
         return instance.get(Vue.prototype.reqUrl+"/symbol/deleteSymbolById" + symbolId)
     },
 
-// OSM样式模板
-    //获取style样式列表
+    // #OSM样式模板
+    // 获取style样式列表
     getOsmStyleTemplateList(){
         return instance.get(Vue.prototype.reqUrl+"/styleTemplate/getOsmStyleTemplateList")
     },   
-    //保存其他来源的地图样式
+    // 保存其他来源的地图样式
     saveOsmStyleTemplate(data){
         return instance.post(Vue.prototype.reqUrl+"/styleTemplate/saveOsmStyleTemplate",data)
     },   
@@ -118,7 +141,7 @@ export default {
         return instance.get(Vue.prototype.reqUrl+"/styleTemplate/deleteOsmStyleTemplate/"+styleTemplateId)
     },      
 
-    //shpData
+    // #shpData
     requestTest() {
         return instance.get(Vue.prototype.reqUrl+"/shp/hello")
     },
@@ -175,7 +198,7 @@ export default {
     //     return instance.post("/project/copyProject",data)
     // },
 
-    //mapProject
+    // #mapProject
     getMapProjectList(data){
         return instance.post(Vue.prototype.reqUrl+"/mapProject/getMapProjectList",data)
     },
@@ -204,7 +227,7 @@ export default {
     },    
 
 
-    //地图发布相关
+    // #地图发布相关
     //获取发布的地图样式
     getPublishedMap(mapProjectId){
         return instance.post(Vue.prototype.reqUrl+"/mapProject/getPublishedMap/"+mapProjectId)

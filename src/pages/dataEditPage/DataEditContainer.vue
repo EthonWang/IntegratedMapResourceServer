@@ -1,121 +1,20 @@
 <template>
-  <div class="Container">
-    <!-- 右上角zoom坐标显示 -->
-    <el-tag class="mapZoomLngLat" type="info"
-    >Zoom:{{ currentZoom }} &nbsp; LngLat:{{ currentLngLat }}
-    </el-tag
-    >
-    <div class="leftBar">
-      <div class="leftBarTitle">
-        <h1 style="margin: 1.2rem 0">编辑区</h1>
-        <el-divider class="divider"></el-divider>
-      </div>
-
-      <div class="flewRowSpaceAround" style="width: 100%">
-        <!--        添加shplayer数据-->
-        <div>
-          <el-popover
-              placement="right"
-              width="250"
-              trigger="click">
-            <el-table :data="shpTableData">
-              <el-table-column property="originName" width="170" show-overflow-tooltip label="名称"></el-table-column>
-              <el-table-column width="80" label="操作">
-                <template slot-scope="scope">
-                  <el-button
-                      size="mini"
-                      type="primary"
-                      @click="handleEdit(scope.$index, scope.row)"
-                  >添加
-                  </el-button>
-                </template>
-              </el-table-column>
-            </el-table>
-            <el-pagination
-                small
-                @current-change="handleCurrentChangeShp"
-                :current-page="currentPageShp"
-                :page-size="pageSizeShp"
-                layout="total, prev, pager, next"
-                :total="totalDataCountShp"
-                class="flexRowCenter"
-            >
-            </el-pagination>
-            <el-button type="primary" slot="reference" @click="addShpData">添加数据</el-button>
-          </el-popover>
-        </div>
-        <el-button size="mini" @click="handleSelect">切换底图</el-button>
-        <el-button size="mini" @click="addMyLayer">添加图层</el-button>
-        <el-button size="mini" @click="removeMyLayer">移除图层</el-button>
-      </div>
-
-      <!--      shp图层-->
-      <el-divider class="divider">图层</el-divider>
-      <div class="layerTable">
-        <el-table :data="layerTableData" size="mini" style="width: 100%">
-          <el-table-column width="50">
-            <template slot-scope="scope">
-              <el-switch :width="30" v-model="scope.row.isShow">
-
-              </el-switch>
-            </template>
-          </el-table-column>
-          <el-table-column
-              label="类型"
-              prop="type"
-              min-width="50"
-              show-overflow-tooltip
-          >
-          </el-table-column>
-          <el-table-column
-              label="名称"
-              prop="name"
-              min-width="150"
-              show-overflow-tooltip
-          >
-          </el-table-column>
-          <el-table-column label="操作" min-width="100">
-            <template slot-scope="scope">
-              <el-button
-                  size="mini"
-                  type="success"
-                  @click="handleEdit(scope.$index, scope.row)"
-                  icon="el-icon-edit"
-                  circle
-              >
-              </el-button
-              >
-              <el-button
-                  size="mini"
-                  type="danger"
-                  @click="handleDelete(scope.$index, scope.row)"
-                  icon="el-icon-delete"
-                  circle
-              >
-              </el-button
-              >
-            </template>
-          </el-table-column>
-        </el-table>
-      </div>
-
-
-    </div>
-
-    <div class="rightMap">
-      <div id="map" class="mapStyle"></div>
-    </div>
+  <div class="dataContainer">
+    <DataEditInfo></DataEditInfo>
+    <MapContainer></MapContainer>
   </div>
 </template>
 
 <script>
 import mapboxgl from "mapbox-gl";
-import requestApi from "../api/requestApi";
+import requestApi from "../../api/requestApi";
+import MapContainer from '@/pages/dataEditPage/MapContainer';
+import DataEditInfo from '@/pages/dataEditPage/DataEditInfo';
 
 var map = null;
 export default {
-
-
+  name: 'DataEditContainer',
+  components: { DataEditInfo,MapContainer},
   data() {
     return {
       projectId: "", //地图项目id
@@ -138,7 +37,7 @@ export default {
   },
   mounted() {
     // this.initMap();
-    this.initMapbox();
+    // this.initMapbox();
   },
 
   methods: {
@@ -150,10 +49,10 @@ export default {
 
       map = new mapboxgl.Map({
         container: "map", // container ID
-        // style: 'mapbox://styles/mapbox/streets-v11',
+        style: 'mapbox://styles/mapbox/streets-v11',
         // style:"http://127.0.0.1/api/v1/styles/3eada7e0ae4411ec8cb88b1eae413f21/draft?access_token=tk.fb799200ae8311ec8cb88b1eae413f21",
         // style:"https://api.mapbox.com/styles/v1/mapbox/streets-v11?access_token=pk.eyJ1Ijoid3lqcSIsImEiOiJjbDBnZDdwajUxMXRzM2htdWxubDh1MzJrIn0.2e2_rdU2nOUvtwltBIZtZg",
-        style:this.reqUrl + "/mapServer/626a592bc27f00a2b6b029f1",
+        // style:this.reqUrl + "/mapServer/626a592bc27f00a2b6b029f1",
         // center: [-122.486052, 37.830348], // starting position [lng, lat]
         // zoom: 7, // starting zoom
       });
@@ -490,50 +389,8 @@ export default {
 </script>
 
 <style scoped>
-.Container {
+.dataContainer {
   width: 100%;
   height: 100%;
-  display: flex;
-}
-
-.leftBar {
-  min-width: 400px;
-  display: flex;
-  /* border: 2px solid black; */
-  flex-direction: column;
-  align-items: center;
-}
-
-.leftBarTitle {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.layerTable {
-  width: 100%;
-}
-
-.rightMap {
-  width: 100%;
-}
-
-.mapZoomLngLat {
-  position: absolute;
-  top: 10px;
-  right: 60px;
-  z-index: 99;
-  background-color: #ffffff !important;
-  font-size: 13px;
-}
-
-.mapStyle {
-  width: 100%;
-  height: 100%;
-}
-
-.divider {
-  margin: 12px 0;
 }
 </style>

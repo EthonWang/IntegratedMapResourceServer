@@ -1,5 +1,6 @@
 <template>
   <div style="width: 100%">
+    <!-- 按钮 -->
     <div class="search-box-project">
       <el-button
         type="primary"
@@ -31,10 +32,17 @@
       >
       </el-input>
       &nbsp;&nbsp;
-      <el-button type="success" icon="el-icon-search" @click="getMapProjectList()">搜索</el-button>
-      <el-button type="primary" title="刷新数据源ip" @click="updateIp()">更新数据源</el-button>
-
+      <el-button
+        type="success"
+        icon="el-icon-search"
+        @click="getMapProjectList()"
+        >搜索</el-button
+      >
+      <el-button type="primary" title="刷新数据源ip" @click="updateIp()"
+        >更新数据源</el-button
+      >
     </div>
+    <!-- 导入弹窗 -->
     <el-dialog
       title="项目导入"
       :visible.sync="importEditorShow"
@@ -42,7 +50,12 @@
       :modal="false"
       center
     >
-      <el-table :data="sources" style="width: 100%" max-height="600px" :header-cell-style="{background:'#f4f3f9',color:'#606266'}">
+      <el-table
+        :data="sources"
+        style="width: 100%"
+        max-height="600px"
+        :header-cell-style="{ background: '#f4f3f9', color: '#606266' }"
+      >
         <el-table-column label="原数据源" width="100">
           <template slot-scope="scope">
             <el-tag :type="typeContent[scope.row.type][0]">{{
@@ -64,7 +77,14 @@
               v-if="scope.row.newType != 'multiPG'"
               v-model="scope.row.jsonId"
               clearable
-              @change="selectPG(dataList[scope.row.newType],scope.row.jsonId,scope.row.newType,scope.$index)"
+              @change="
+                selectPG(
+                  dataList[scope.row.newType],
+                  scope.row.jsonId,
+                  scope.row.newType,
+                  scope.$index
+                )
+              "
               :placeholder="typeContent[scope.row.newType][2]"
             >
               <el-option
@@ -79,12 +99,12 @@
             <el-select
               v-if="scope.row.newType == 'multiPG'"
               v-model="scope.row.dataBase"
-              @change="dataBaseSelect(scope.$index,$event)"
+              @change="dataBaseSelect(scope.$index, $event)"
               clearable
               :placeholder="typeContent[scope.row.newType][2]"
             >
               <el-option
-                v-for="(item,index) in dataList[scope.row.newType]"
+                v-for="(item, index) in dataList[scope.row.newType]"
                 :key="item.id"
                 :label="item[typeContent[scope.row.newType][3]]"
                 :value="index"
@@ -98,7 +118,7 @@
             <!-- 允许defaultPG类型添加数据 -->
             <el-upload
               v-if="scope.row.newType == 'defaultPG'"
-              :action="reqUrl+'/shp/uploadMultiShp'"
+              :action="reqUrl + '/shp/uploadMultiShp'"
               :on-success="handleMultiShpUpSuccess"
               ref="shpUpload"
               accept=".zip"
@@ -113,14 +133,21 @@
                 type="primary"
                 >选取文件</el-button
               >
-            </el-upload>            
+            </el-upload>
             <!-- multiPG数据选择 -->
             <el-select
               v-if="scope.row.newType == 'multiPG'"
               :disabled="scope.row.dataBase === ''"
               v-model="scope.row.jsonId"
               clearable
-              @change="selectPG(multiDataBase[scope.$index],scope.row.jsonId,scope.row.newType,scope.$index)"
+              @change="
+                selectPG(
+                  multiDataBase[scope.$index],
+                  scope.row.jsonId,
+                  scope.row.newType,
+                  scope.$index
+                )
+              "
               value-key="originName"
               placeholder="请选择远程PG数据"
             >
@@ -131,7 +158,7 @@
                 :value="item"
               >
               </el-option>
-            </el-select>            
+            </el-select>
             <div v-if="!scope.row.newType.includes('PG')">
               <i class="el-icon-info"></i>&nbsp;
               <span>请在数据服务中添加</span>
@@ -140,20 +167,25 @@
         </el-table-column>
         <el-table-column label="切换" width="50">
           <template slot-scope="scope">
-            <el-tooltip 
-              effect="dark" 
-              :content="scope.row.newType != 'defaultPG' ? '切换至本地PG' : '切换至远程PG'" 
-              placement="right">
-              <el-button 
-                v-if="scope.row.newType.includes('PG')" 
-                type="text" 
+            <el-tooltip
+              effect="dark"
+              :content="
+                scope.row.newType != 'defaultPG'
+                  ? '切换至本地PG'
+                  : '切换至远程PG'
+              "
+              placement="right"
+            >
+              <el-button
+                v-if="scope.row.newType.includes('PG')"
+                type="text"
                 icon="el-icon-refresh"
-                @click="changePG(scope.row.newType,scope.$index)"
-                >
-            </el-button>
+                @click="changePG(scope.row.newType, scope.$index)"
+              >
+              </el-button>
             </el-tooltip>
           </template>
-        </el-table-column>        
+        </el-table-column>
       </el-table>
 
       <span slot="footer" class="dialog-footer">
@@ -163,6 +195,7 @@
         >
       </span>
     </el-dialog>
+    <!-- 工程文件 -->
     <div class="projectsBox">
       <el-card
         class="project-item"
@@ -170,6 +203,13 @@
         :key="item.date"
         shadow="hover"
       >
+        <el-button
+          class="viewBtn"
+          type="text"
+          icon="el-icon-view"
+          title="预览"
+          @click="mapPreview(item)"
+        ></el-button>
         <el-image
           @click="editMapProject1(item)"
           class="project-item-image"
@@ -294,10 +334,10 @@
         </div>
       </el-card>
     </div>
+    <!-- 分页 -->
     <div style="width: 80vw; margin: 0 auto">
       <el-divider></el-divider>
     </div>
-
     <el-pagination
       background
       @size-change="handleSizeChange"
@@ -310,19 +350,32 @@
       class="flexRowCenter"
     >
     </el-pagination>
+    <el-dialog
+      :title="projName"
+      :visible.sync="mapShow"
+      :modal="false"
+      center
+      :close="closeDialog"
+    >
+      <div id="mapBox"></div>
+    </el-dialog>    
+    <!-- <div v-if="mapShow" class="mapDialog">
+      <div id="mapBox"></div>
+    </div> -->
   </div>
 </template>
 
 <script>
+import mapboxgl from "mapbox-gl";
 import requestApi from "../api/requestApi";
 import FileSaver from "file-saver";
 // import jsonInfo from "../assets/js/project";
-import { fileImport } from "@/serve/interpolation";
+import { fileImport } from "@/utils/interpolation";
 import initTileJson from "@/assets/js/initTileJson";
 
 // import initProjectJson from "../assets/js/initMapProjectJson";
 // import config from "../config";
-
+var map = null;
 export default {
   data() {
     return {
@@ -336,16 +389,29 @@ export default {
       importEditorShow: false,
       uploadFile: null,
       // uploadFile: jsonInfo,
-      sources: [],          // [{name:'',type:'',sourceId:'',jsonId:'',newType:'', newSourceInfo(sourceId,source-layer):[]}],用于替换为本地source
-      typeContent: {        // 记录各个类型要展示的信息
-        defaultPG: ["primary","本地PG","请选择本地PG数据","originName","tilejsonId"],
-        multiPG: ["success","远程PG","请选择远程PG数据库","name","geoType"],
-        mbTile: ["warning","mbTile","请选择mbTile数据","name","tileJsonId"],
-        TMS: ["info","TMS","请选择TMS数据","name","url"],
+      sources: [], // [{name:'',type:'',sourceId:'',jsonId:'',newType:'', newSourceInfo(sourceId,source-layer):[]}],用于替换为本地source
+      typeContent: {
+        // 记录各个类型要展示的信息
+        defaultPG: [
+          "primary",
+          "本地PG",
+          "请选择本地PG数据",
+          "originName",
+          "tilejsonId",
+        ],
+        multiPG: ["success", "远程PG", "请选择远程PG数据库", "name", "geoType"],
+        mbTile: ["warning", "mbTile", "请选择mbTile数据", "name", "tileJsonId"],
+        TMS: ["info", "TMS", "请选择TMS数据", "name", "url"],
       },
-      multiDataBase: [],    // 所选远程PG的
+      multiDataBase: [], // 所选远程PG的
       dataList: { defaultPG: [], multiPG: [], mbTile: [], TMS: [] },
       uploadFileUrl: {},
+
+      // 工程按钮
+      // #预览
+      styleJson: {}, // 各工程保存的样式信息
+      mapShow: false,
+      projName: '',   
 
       currentPage: 1,
       pageSize: 8,
@@ -571,24 +637,28 @@ export default {
     },
 
     //刷新数据源ip
-    updateIp(){
-      this.$confirm('确认更新数据源IP, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        requestApi.updateDataIp()
-          .then((res) => {
-            console.log(res);
-            this.$message.success("更新成功")
-          }).catch((err) => {
-            console.log(err);
-          })
-      }).catch(() => {
-        this.$message.info("取消更新")
+    updateIp() {
+      this.$confirm("确认更新数据源IP, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
       })
+        .then(() => {
+          requestApi
+            .updateDataIp()
+            .then((res) => {
+              console.log(res);
+              this.$message.success("更新成功");
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        })
+        .catch(() => {
+          this.$message.info("取消更新");
+        });
     },
-    
+
     handleSizeChange(val) {
       this.pageSize = val;
       this.getMapProjectList();
@@ -620,9 +690,17 @@ export default {
         let type = item.slice(item.indexOf("#") + 1);
         type = type == "meta" ? "mbTile" : type;
         typeList.push(type);
-        let object = { name: name, type: type, sourceId: item, jsonId: "", newType: type, newSourceInfo: [] };
-        if(type.includes('PG')){     // 远程PG要先选数据库，之后本地和远程shp可能交叉使用，故本地pg也添加dataBase字段
-          object['dataBase'] = "";
+        let object = {
+          name: name,
+          type: type,
+          sourceId: item,
+          jsonId: "",
+          newType: type,
+          newSourceInfo: [],
+        };
+        if (type.includes("PG")) {
+          // 远程PG要先选数据库，之后本地和远程shp可能交叉使用，故本地pg也添加dataBase字段
+          object["dataBase"] = "";
         }
         this.sources.push(object);
       }
@@ -739,47 +817,59 @@ export default {
       return List;
     },
     // 远程PG数据库选择
-    dataBaseSelect(rowIndex,optionIndex){
-      if(optionIndex !== ''){
-        this.multiDataBase[rowIndex] = this.dataList['multiPG'][optionIndex]['dataInfo'];
+    dataBaseSelect(rowIndex, optionIndex) {
+      if (optionIndex !== "") {
+        this.multiDataBase[rowIndex] =
+          this.dataList["multiPG"][optionIndex]["dataInfo"];
       }
     },
     // 更换PG数据
-    selectPG(dataList,val,type,index){
+    selectPG(dataList, val, type, index) {
       // 只有PG数据需要修改sourceId和source-layer
-      if(type.includes('PG')){
-        if(val !== ''){
-          let List = dataList.filter(item => 
-            item[this.typeContent[type][4]] == val||item == val
-          )
+      if (type.includes("PG")) {
+        if (val !== "") {
+          let List = dataList.filter(
+            (item) => item[this.typeContent[type][4]] == val || item == val
+          );
           // 使用newSourceInfo管理sourceid和source-layer
-          switch(type){
-            case 'defaultPG':
-              this.sources[index].newSourceInfo = [`${List[0].tableName}#defaultPG`,List[0].tableName];
-              break
-            case 'multiPG':
-              this.sources[index].newSourceInfo = [`${List[0].originName}_#multiPG`,List[0].originName];
-              break
+          switch (type) {
+            case "defaultPG":
+              this.sources[index].newSourceInfo = [
+                `${List[0].tableName}#defaultPG`,
+                List[0].tableName,
+              ];
+              break;
+            case "multiPG":
+              this.sources[index].newSourceInfo = [
+                `${List[0].originName}_#multiPG`,
+                List[0].originName,
+              ];
+              break;
           }
         }
       }
-      console.log("PG",this.sources[index],this.dataList['multiPG'][this.sources[index]['dataBase']]);
+      console.log(
+        "PG",
+        this.sources[index],
+        this.dataList["multiPG"][this.sources[index]["dataBase"]]
+      );
     },
     // PG类型切换
-    changePG(type,index){
+    changePG(type, index) {
       this.sources[index].jsonId = "";
       this.sources[index].newSourceInfo = [];
       this.sources[index].dataBase = "";
-      this.sources[index].newType = type != 'defaultPG' ? 'defaultPG' : 'multiPG';
+      this.sources[index].newType =
+        type != "defaultPG" ? "defaultPG" : "multiPG";
     },
     // 替换为本地信息，进行本地项目构建
     async importConfirm() {
-      this.sources.forEach(item =>{
+      this.sources.forEach((item) => {
         // multiPG需要生成tileJson
-        if(item.newType == 'multiPG'){
+        if (item.newType == "multiPG") {
           let newTileJson = initTileJson;
           newTileJson.name = item.jsonId.originName;
-          let mutiPgInfo = this.dataList['multiPG'][item['dataBase']];
+          let mutiPgInfo = this.dataList["multiPG"][item["dataBase"]];
           newTileJson.tiles = [
             this.reqUrl +
               "/multiPgSource/" +
@@ -798,19 +888,18 @@ export default {
             id: item.jsonId.originName,
           };
           newTileJson.vector_layers = [vector_layer];
-          newTileJson.tileJsonType = 'multiPG';
-          requestApi.createTileJson(initTileJson)
-            .then(res=>{
-              if (res.data.code !== 0) {
-                console.log("添加source失败");
-              }else{
-                item.jsonId = res.data.data.tileJsonId;
-              }
-            });
+          newTileJson.tileJsonType = "multiPG";
+          requestApi.createTileJson(initTileJson).then((res) => {
+            if (res.data.code !== 0) {
+              console.log("添加source失败");
+            } else {
+              item.jsonId = res.data.data.tileJsonId;
+            }
+          });
         }
-      })
-      let file = await fileImport(this.sources,this.uploadFile);
-      console.log('file',file);
+      });
+      let file = await fileImport(this.sources, this.uploadFile);
+      console.log("file", file);
       requestApi.importProject(file).then((res) => {
         console.log(res);
         if (res.data.msg == "Success") {
@@ -844,7 +933,93 @@ export default {
         .catch((error) => {
           console.log("查询shp失败", error);
         });
-    },    
+    },
+
+    // 地图预览
+    createMap() {
+      mapboxgl.accessToken =
+        "pk.eyJ1IjoidnNpcjc0MyIsImEiOiJjbDJwdDdqbHAwOWh3M2JtdG93Mnl6bTVvIn0.aJxhvIpxq3cntQkT432vPw";
+      map = new mapboxgl.Map({
+        container: "mapBox",
+        // projection: 'globe'
+      });
+    },
+    async mapPreview(val) {
+      this.projName = val.name
+      this.mapShow = true;
+      this.$nextTick(()=>{
+        if(!map){
+          mapboxgl.accessToken =
+          "pk.eyJ1IjoidnNpcjc0MyIsImEiOiJjbDJwdDdqbHAwOWh3M2JtdG93Mnl6bTVvIn0.aJxhvIpxq3cntQkT432vPw";
+          map = new mapboxgl.Map({
+            container: "mapBox",
+            // projection: 'globe'
+          });        
+          // 添加比例尺
+          var scale = new mapboxgl.ScaleControl({
+            maxWidth: 120,
+            unit: "imperial",
+          });
+          map.addControl(scale);
+          scale.setUnit("metric");
+          // 添加控件缩放按钮和一个指南针.
+          var nav = new mapboxgl.NavigationControl();
+          map.addControl(nav, "top-right");
+          // 添加全局缩放
+          map.addControl(new mapboxgl.FullscreenControl());
+          //添加定位控件
+          map.addControl(
+            new mapboxgl.GeolocateControl({
+              positionOptions: {
+                enableHighAccuracy: true,
+              },
+              trackUserLocation: true,
+            })
+          );          
+        }
+        let { version, sources, glyphs, sprite, layers ,center ,bearing ,pitch ,zoom} = JSON.parse(
+          JSON.stringify(val)
+        );
+        // center数字化
+        center = center.split(',');
+        center[0] = Number(center[0]);
+        center[1] = Number(center[1]);
+        // 对pattern属性进行处理，line-pattern若为""就删去
+        layers.forEach(layer=>{
+          let type = layer.type;
+          if (`${type}-pattern` in layer['paint']){
+            if(layer['paint'][`${type}-pattern`] == ''){
+              delete layer['paint'][`${type}-pattern`];
+            }
+          }
+        })
+        // 需要对图层进行反转，发布链接中的layer由后端转换过
+        layers = layers.reverse();
+        // style基本属性
+        this.styleJson = {
+          version: version,
+          sources: sources,
+          glyphs: this.reqUrl + glyphs,
+          sprite: this.reqUrl + sprite,
+          layers: layers,
+        };
+        console.log("地图信息", this.styleJson, val);
+        // let bbox = [];
+        map.setStyle(this.styleJson).on("load", () => {
+          map.setZoom(zoom);
+          map.setCenter(center);
+          map.setBearing(bearing);
+          map.setPitch(pitch);        
+          // map.fitBounds(bbox, {
+          //   duration: 500,
+          //   padding: { top: 10, bottom: 25, left: 15, right: 5 },
+          // });
+        });
+      })
+    },
+    closeDialog(){
+      this.mapShow = false
+    }
   },
 };
 </script>
@@ -871,6 +1046,7 @@ export default {
 }
 
 .project-item {
+  position: relative;
   height: calc(15vh + 150px);
   max-height: 380px;
   width: 18%;
@@ -917,5 +1093,26 @@ export default {
   margin-top: 10px;
 }
 
-/* 导入项目框 */
+/* 预览按钮 */
+.viewBtn {
+  position: absolute;
+  right: 20px;
+  font-size: 20px;
+  z-index: 1;
+  background-color: rgba(192, 188, 188, 0.5);
+  color: hsl(0, 1%, 35%);
+  padding: 5px;
+}
+.viewBtn:hover {
+  background-color: #4b4b4d;
+  color: rgb(213, 214, 216);
+  /* border: 1px solid red; */
+}
+
+/* 预览项目框 */
+#mapBox {
+  background-color: antiquewhite;
+  height: 50vh;
+  width: 100%;  
+}
 </style>

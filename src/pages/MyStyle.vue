@@ -26,7 +26,7 @@
       <el-submenu index="3">
         <template slot="title">
           <i class="el-icon-menu"></i>
-          <span>样式库</span>
+          <span>图层样式库</span>
         </template>
         <el-menu-item index="3-1">
           <i class="fa fa-circle iconStyle"></i>

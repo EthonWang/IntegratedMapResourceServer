@@ -1,7 +1,7 @@
 import VueRouter from 'vue-router'
 
 import MainPage from "./pages/MainPage"
-import MapEditor from "./pages/MapEditor"
+import DataEditContainer from "./pages/dataEditPage/DataEditContainer"
 import MyData from "./pages/MyData"
 import MyProject from "./pages/MyProject"
 import MapProjectEditor from "./pages/MapProjectEditor"
@@ -53,8 +53,8 @@ const route = new VueRouter({
 			component: ConditionRender
 		},
 		{
-			path: "/MapEditor",
-			component: MapEditor
+			path: "/DataEditor",
+			component: DataEditContainer
 		},
 		{
       path: "/MapEditor/:mapProjectId",

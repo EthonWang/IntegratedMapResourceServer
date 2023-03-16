@@ -11,18 +11,18 @@
       <li>
         <router-link to="/Map/MyProject"><h2>地图项目</h2></router-link>
       </li>
+     <!-- <li>
+       <router-link target="_blank" to="/DataEditor"><h2>样式库</h2></router-link>
+     </li> -->
       <li>
         <router-link to="/Map/MyIntroduce"><h2>帮助</h2></router-link>
       </li>
-<!--      <li>-->
-<!--        <router-link target="_blank" to="/MapEditor"><h3>样式库</h3></router-link>-->
-<!--      </li>-->
 <!--      <li>-->
 <!--        <router-link to="/Map/MyTest"><h3>测试</h3></router-link>-->
 <!--      </li>-->
     </ul>
 
-    <a href="#" style="visibility:hidden;" class="logo"><h2>泛在地理信息聚合服务平台</h2></a>
+    <a href="#" style="visibility:hidden;" class="logo"><h1>泛在地理信息聚合服务平台</h1></a>
 
   </header>
 </template> 
@@ -65,6 +65,7 @@ header .navigation {
   display: flex;
   justify-content: center;
   min-width: 450px;
+  padding: 0;
 }
 header .navigation li {
   list-style: none;
