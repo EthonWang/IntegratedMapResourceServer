@@ -1,0 +1,28 @@
+
+
+
+
+.rightBox{
+  position: absolute;
+  top: 0;
+  left: 330px;
+  width: calc(100vw - 330px);
+  height: 100vh;
+}
+.mapZoomLngLatBox {
+  position: absolute;
+  top: 10px;
+  right: 60px;
+  z-index: 99;
+  background-color: #ffffff !important;
+  font-size: 13px;
+}
+.boxdraw {
+  background: rgba(56, 135, 190, 0.1);
+  border: 2px solid #3887be;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;  
+}

@@ -842,7 +842,7 @@
               tab="line-translate"
               @callback="callback"
             ></ConditionRender>
-          </el-tab-pane>         
+          </el-tab-pane>
           <el-tab-pane label="平移参考" name="eighth">
             <h3>平移参考</h3>
             &nbsp;
@@ -1086,7 +1086,7 @@
                           :src="reqUrl + item.webAddress"
                           fit="cover"
                           class="cursor"
-                          @click="iconSelect('line-pattern',item)"
+                          @click="iconSelect('line-pattern', item)"
                         >
                         </el-image>
                       </el-card>
@@ -1107,7 +1107,7 @@
               tab="line-pattern"
               @callback="callback"
             ></ConditionRender>
-          </el-tab-pane> 
+          </el-tab-pane>
         </el-tabs>
         <!--    面图层编辑面板-->
         <el-tabs
@@ -1463,7 +1463,7 @@
                           :src="reqUrl + item.webAddress"
                           fit="cover"
                           class="cursor"
-                          @click="iconSelect('fill-pattern',item)"
+                          @click="iconSelect('fill-pattern', item)"
                         >
                         </el-image>
                       </el-card>
@@ -1484,7 +1484,7 @@
               tab="fill-pattern"
               @callback="callback"
             ></ConditionRender>
-          </el-tab-pane> 
+          </el-tab-pane>
         </el-tabs>
         <!--    三维面图层编辑面板-->
         <el-tabs
@@ -2121,7 +2121,7 @@
                           :src="reqUrl + item.webAddress"
                           fit="cover"
                           class="cursor"
-                          @click="iconSelect('icon',item)"
+                          @click="iconSelect('icon', item)"
                         >
                         </el-image>
                       </el-card>
@@ -3961,7 +3961,7 @@
           </el-tab-pane>
         </el-tabs>
       </el-tab-pane>
-    <!-- 数据设置 -->
+      <!-- 数据设置 -->
       <el-tab-pane
         v-if="editorShow != 'backgroundEditorShow'"
         label="数据设置"
@@ -3970,69 +3970,165 @@
         <h4>数据源配置</h4>
         <el-form label-position="right" label-width="100px">
           <!-- mbTile数据要更换的数据源 -->
-          <el-form-item v-if="!layers[nowLayerIndex]['metadata']['mapbox:type'].includes('PG')" label="数据源类型">
-            <span
-              v-if="!isSourceEdit"
-            >{{ layers[nowLayerIndex]["source"].slice(0,layers[nowLayerIndex]["source"].lastIndexOf('_'))+'(mbTile)' }}</span>
-            <el-select 
+          <el-form-item
+            v-if="
+              !layers[nowLayerIndex]['metadata']['mapbox:type'].includes('PG')
+            "
+            label="数据源类型"
+          >
+            <span v-if="!isSourceEdit">{{
+              layers[nowLayerIndex]["source"].slice(
+                0,
+                layers[nowLayerIndex]["source"].lastIndexOf("_")
+              ) + "(mbTile)"
+            }}</span>
+            <el-select
               v-if="isSourceEdit"
-              @change="sourceSelect($event,layers[nowLayerIndex]['metadata']['mapbox:type'])"
-              v-model="sourceObject['tileJsonId']" size="mini">
+              @change="
+                sourceSelect(
+                  $event,
+                  layers[nowLayerIndex]['metadata']['mapbox:type']
+                )
+              "
+              v-model="sourceObject['tileJsonId']"
+              size="mini"
+            >
               <el-option
                 v-for="item in sourceObject['option']"
                 :key="item.id"
                 :label="item.name"
-                :value="item.tileJsonId">
+                :value="item.tileJsonId"
+              >
               </el-option>
-            </el-select>            
-            <el-button v-if="!isSourceEdit" type="text" icon="el-icon-setting" style="margin-left:5px" @click="sourceInit(layers[nowLayerIndex])"></el-button>
-            <el-button v-if="isSourceEdit" type="text" icon="el-icon-check" style="margin-left:5px" @click="sourceChange(layers[nowLayerIndex])"></el-button>
+            </el-select>
+            <el-button
+              v-if="!isSourceEdit"
+              type="text"
+              icon="el-icon-setting"
+              style="margin-left: 5px"
+              @click="sourceInit(layers[nowLayerIndex])"
+            ></el-button>
+            <el-button
+              v-if="isSourceEdit"
+              type="text"
+              icon="el-icon-check"
+              style="margin-left: 5px"
+              @click="sourceChange(layers[nowLayerIndex])"
+            ></el-button>
           </el-form-item>
-          <el-form-item v-if="layers[nowLayerIndex]['metadata']['mapbox:type'] == 'mbStyle'" label="样式文件">
-            <span>{{ layers[nowLayerIndex]['manageInfo']['layerKey'].slice(layers[nowLayerIndex]['manageInfo']['layerKey'].lastIndexOf('_')+1,layers[nowLayerIndex]['manageInfo']['layerKey'].indexOf('#')) }}</span>
-          </el-form-item>          
-          <el-form-item v-if="!layers[nowLayerIndex]['metadata']['mapbox:type'].includes('PG')" label="数据图层">
+          <el-form-item
+            v-if="layers[nowLayerIndex]['metadata']['mapbox:type'] == 'mbStyle'"
+            label="样式文件"
+          >
+            <span>{{
+              layers[nowLayerIndex]["manageInfo"]["layerKey"].slice(
+                layers[nowLayerIndex]["manageInfo"]["layerKey"].lastIndexOf(
+                  "_"
+                ) + 1,
+                layers[nowLayerIndex]["manageInfo"]["layerKey"].indexOf("#")
+              )
+            }}</span>
+          </el-form-item>
+          <el-form-item
+            v-if="
+              !layers[nowLayerIndex]['metadata']['mapbox:type'].includes('PG')
+            "
+            label="数据图层"
+          >
             <span>{{ layers[nowLayerIndex]["source-layer"] }}</span>
           </el-form-item>
           <!-- PG数据要更换的数据源 -->
-          <el-form-item v-if="layers[nowLayerIndex]['metadata']['mapbox:type'].includes('PG')" label="数据源类型">
-            <span>{{ layers[nowLayerIndex]["metadata"]['mapbox:type'] == 'multiPG' ? '远程PG' : '本地PG' }}</span>
+          <el-form-item
+            v-if="
+              layers[nowLayerIndex]['metadata']['mapbox:type'].includes('PG')
+            "
+            label="数据源类型"
+          >
+            <span>{{
+              layers[nowLayerIndex]["metadata"]["mapbox:type"] == "multiPG"
+                ? "远程PG"
+                : "本地PG"
+            }}</span>
           </el-form-item>
-          <el-form-item v-if="layers[nowLayerIndex]['metadata']['mapbox:type'] == 'multiPG'" label="数据库">
+          <el-form-item
+            v-if="layers[nowLayerIndex]['metadata']['mapbox:type'] == 'multiPG'"
+            label="数据库"
+          >
             <span>{{ layers[nowLayerIndex]["mutiPgInfo"].name }}</span>
-          </el-form-item>          
-          <el-form-item v-if="layers[nowLayerIndex]['metadata']['mapbox:type'].includes('PG')" label="数据图层">
-            <span
-              v-if="!isSourceEdit"
-            >{{ layers[nowLayerIndex]["source"].slice(0,layers[nowLayerIndex]["source"].lastIndexOf('_')) }}</span>
+          </el-form-item>
+          <el-form-item
+            v-if="
+              layers[nowLayerIndex]['metadata']['mapbox:type'].includes('PG')
+            "
+            label="数据图层"
+          >
+            <span v-if="!isSourceEdit">{{
+              layers[nowLayerIndex]["source"].slice(
+                0,
+                layers[nowLayerIndex]["source"].lastIndexOf("_")
+              )
+            }}</span>
             <!-- 本地PG -->
-            <el-select 
-              v-if="isSourceEdit&&layers[nowLayerIndex]['metadata']['mapbox:type']=='defaultPG'"
-              v-model="sourceObject['tileJsonId']" size="mini"
-              @change="sourceSelect($event,layers[nowLayerIndex]['metadata']['mapbox:type'])">
+            <el-select
+              v-if="
+                isSourceEdit &&
+                layers[nowLayerIndex]['metadata']['mapbox:type'] == 'defaultPG'
+              "
+              v-model="sourceObject['tileJsonId']"
+              size="mini"
+              @change="
+                sourceSelect(
+                  $event,
+                  layers[nowLayerIndex]['metadata']['mapbox:type']
+                )
+              "
+            >
               <el-option
                 v-for="item in sourceObject['option']"
                 :key="item.id"
                 :label="item.originName"
-                :value="item.tilejsonId">
-              </el-option>
-            </el-select>  
-            <!-- 远程PG -->
-            <el-select 
-              v-if="isSourceEdit&&layers[nowLayerIndex]['metadata']['mapbox:type']!='defaultPG'"
-              v-model="sourceObject['tileJsonId']" size="mini"
-              value-key="originName"
-              @change="sourceSelect($event,layers[nowLayerIndex]['metadata']['mapbox:type'])"              
+                :value="item.tilejsonId"
               >
+              </el-option>
+            </el-select>
+            <!-- 远程PG -->
+            <el-select
+              v-if="
+                isSourceEdit &&
+                layers[nowLayerIndex]['metadata']['mapbox:type'] != 'defaultPG'
+              "
+              v-model="sourceObject['tileJsonId']"
+              size="mini"
+              value-key="originName"
+              @change="
+                sourceSelect(
+                  $event,
+                  layers[nowLayerIndex]['metadata']['mapbox:type']
+                )
+              "
+            >
               <el-option
                 v-for="item in sourceObject['option']"
                 :key="item.originName"
                 :label="item.originName"
-                :value="item">
+                :value="item"
+              >
               </el-option>
-            </el-select>                          
-            <el-button v-if="!isSourceEdit" type="text" icon="el-icon-setting" style="margin-left:5px" @click="sourceInit(layers[nowLayerIndex])"></el-button>
-            <el-button v-if="isSourceEdit" type="text" icon="el-icon-check" style="margin-left:5px" @click="sourceChange(layers[nowLayerIndex])"></el-button>
+            </el-select>
+            <el-button
+              v-if="!isSourceEdit"
+              type="text"
+              icon="el-icon-setting"
+              style="margin-left: 5px"
+              @click="sourceInit(layers[nowLayerIndex])"
+            ></el-button>
+            <el-button
+              v-if="isSourceEdit"
+              type="text"
+              icon="el-icon-check"
+              style="margin-left: 5px"
+              @click="sourceChange(layers[nowLayerIndex])"
+            ></el-button>
           </el-form-item>
           <!-- 类型转换 -->
           <el-form-item label="图层类型">
@@ -4346,10 +4442,10 @@ import { mapState, mapActions, mapMutations } from "vuex";
 import ConditionRender from "../../components/ConditionRender.vue";
 import layerStyleProperties from "@/assets/js/layerStyleProperties";
 import filedValue from "@/assets/js/field_value.js";
-import { filterSplit, textSplit } from "@/serve/JsonToValue";
-import { nameIndex } from "@/serve/interpolation";
+import { filterSplit, textSplit } from "@/utils/JsonToValue";
+import { nameIndex } from "@/utils/interpolation";
 import initTileJson from "@/assets/js/initTileJson";
-import { nanoid } from 'nanoid';
+import { nanoid } from "nanoid";
 
 export default {
   name: "LayerEditPanel",
@@ -4426,15 +4522,29 @@ export default {
 
       // #数据源配置
       isSourceEdit: false,
-      sourceObject: {options:[],option:{},sourceId_old:'',sourceId_new:'',name:'',tileJsonId:'',type:''},    // 将需要更换source的操作数据进行统一管理
-      geoTypeChange: {circle:'POINT',line:'LINE',fill:'POLYGON',symbol:'SYMBOL'},
-      typeContent: {        // 记录各个类型要展示的信息
-        defaultPG: ["originName","tilejsonId"],
-        multiPG: ["originName","geoType"],
-        mbSource: ["name","tileJsonId"],
-        mbStyle: ["name","tileJsonId"],
-        TMS: ["name","url"],
-      },      
+      sourceObject: {
+        options: [],
+        option: {},
+        sourceId_old: "",
+        sourceId_new: "",
+        name: "",
+        tileJsonId: "",
+        type: "",
+      }, // 将需要更换source的操作数据进行统一管理
+      geoTypeChange: {
+        circle: "POINT",
+        line: "LINE",
+        fill: "POLYGON",
+        symbol: "SYMBOL",
+      },
+      typeContent: {
+        // 记录各个类型要展示的信息
+        defaultPG: ["originName", "tilejsonId"],
+        multiPG: ["originName", "geoType"],
+        mbSource: ["name", "tileJsonId"],
+        mbStyle: ["name", "tileJsonId"],
+        TMS: ["name", "url"],
+      },
 
       // #过滤条件配置
       filterWay: "all",
@@ -4559,7 +4669,7 @@ export default {
     //     List[item] = id;
     //   }
     //   return List;
-    // }, 
+    // },
     // layersNameObject: function () {
     //   let List = {};
     //   for(let item in this.layers){
@@ -4569,7 +4679,7 @@ export default {
     //     List[item] = id;
     //   }
     //   return List;
-    // }, 
+    // },
   },
   mounted() {
     // 等初始组件信息加载完
@@ -4578,7 +4688,7 @@ export default {
         case "all":
         case "editor":
           this.infoInit();
-          console.log('editor初始化',data.type);
+          console.log("editor初始化", data.type);
           break;
         default:
           break;
@@ -4616,7 +4726,7 @@ export default {
         if (value2) {
           this.attrValueSet[value1] = "primary";
         }
-        this.menuButtonShowList['test'] = true;
+        this.menuButtonShowList["test"] = true;
         // this.$nextTick(() => {
         //   delete this.menuButtonShowList['test'];
         //   console.log('显示列表',this.menuButtonShowList);
@@ -4627,7 +4737,7 @@ export default {
       switch (data.type) {
         case "off": // data:{type:''}
           // this.$bus.$emit('main',{type:'reload',name:'editor'});   // 整个组件渲染，在上一级组件MapEditMain中使用
-          this.editorShow = "";     // 仅使dom关闭，组件没刷新，生命周期没更新
+          this.editorShow = ""; // 仅使dom关闭，组件没刷新，生命周期没更新
           break;
         case "open": // data:{type:'',index:'',layer:''}      #需要index是用于将修改后的layer更新到对应的layers中
           this.handleLayerEdit(data.index, data.layer);
@@ -4635,17 +4745,16 @@ export default {
       }
     });
   },
-  watch:{
-    menuButtonShowList:{ 
-      deep:true,
-      handler:function(val){
-        if('test' in this.menuButtonShowList){
-          delete this.menuButtonShowList['test'];
-
+  watch: {
+    menuButtonShowList: {
+      deep: true,
+      handler: function (val) {
+        if ("test" in this.menuButtonShowList) {
+          delete this.menuButtonShowList["test"];
         }
-        console.log('显示情况',val,this.menuButtonShowList);
-      }
-    }    
+        console.log("显示情况", val, this.menuButtonShowList);
+      },
+    },
   },
   methods: {
     // vuex
@@ -4827,7 +4936,7 @@ export default {
     // #图标
     // 获取自定义图标列表
     getSymbolList() {
-      console.log('cchuafauh');
+      console.log("cchuafauh");
       requestApi
         .getSymbolList({
           asc: false,
@@ -4912,34 +5021,34 @@ export default {
         });
     },
     // 图片相关
-    imgSourceChange(val){
+    imgSourceChange(val) {
       console.log(val.index);
-      if(val.index == 1){
-        console.log('chufale ');
+      if (val.index == 1) {
+        console.log("chufale ");
         this.getSymbolList();
       }
     },
-    iconSelect(type,item) {
+    iconSelect(type, item) {
       this.$refs.iconPopover.doClose();
       this.loadAndAddImg(
         this.reqUrl + "/symbol/getSymbolById/" + item.id,
         item.originName
       );
-      if(type.includes('pattern')){
+      if (type.includes("pattern")) {
         this.layers[this.nowLayerIndex].paint[type] = item.originName;
         this.handlePaintChange(
           this.layers[this.nowLayerIndex]["id"],
           type,
           item.originName
-        );        
-      }else{ 
+        );
+      } else {
         this.layers[this.nowLayerIndex].layout["icon-image"] = item.originName;
         this.handleLayoutChange(
           this.layers[this.nowLayerIndex]["id"],
           "icon-image",
           item.originName
         );
-      }     
+      }
     },
     spriteChange() {
       this.$confirm(
@@ -4986,14 +5095,14 @@ export default {
         });
     },
     clickSprite(item, key, index) {
-      if(item.includes('pattern')){
+      if (item.includes("pattern")) {
         this.layers[this.nowLayerIndex].paint[item] = key;
         this.handlePaintChange(
           this.layers[this.nowLayerIndex]["id"],
           item,
           key
-        );        
-      }else{
+        );
+      } else {
         this.layers[this.nowLayerIndex].layout["icon-image"] = key;
         this.handleLayoutChange(
           this.layers[this.nowLayerIndex]["id"],
@@ -5260,127 +5369,164 @@ export default {
     },
 
     // #数据源设置相关
-    sourceInit(layer){
+    sourceInit(layer) {
       // 初始化参数
-      console.log('sourceNameObject',this.sourceNameObject);
+      console.log("sourceNameObject", this.sourceNameObject);
 
-      this.sourceObject = {options:[],option:{},sourceId_old:'',sourceId_new:'',name:'',tileJsonId:'',type:''};
-      let type =  layer['metadata']['mapbox:type'];
-      let dataName = ('mutiPgInfo' in layer) ? layer['mutiPgInfo']['name']: '';
-      let layerType = this.geoTypeChange[layer.type];       // 点线面类型
+      this.sourceObject = {
+        options: [],
+        option: {},
+        sourceId_old: "",
+        sourceId_new: "",
+        name: "",
+        tileJsonId: "",
+        type: "",
+      };
+      let type = layer["metadata"]["mapbox:type"];
+      let dataName = "mutiPgInfo" in layer ? layer["mutiPgInfo"]["name"] : "";
+      let layerType = this.geoTypeChange[layer.type]; // 点线面类型
       // 对sourceObject内容进行赋值
-      this.sourceObject['tileJsonId'] = type == 'multiPG' ? 
-      JSON.parse(JSON.stringify(layer.source.slice(0,layer.source.lastIndexOf('_')))) : 
-      JSON.parse(JSON.stringify(this.sourceNameObject[layer.source]));      // select组件会自动识别是否为列表的value值，然后显示label
+      this.sourceObject["tileJsonId"] =
+        type == "multiPG"
+          ? JSON.parse(
+              JSON.stringify(
+                layer.source.slice(0, layer.source.lastIndexOf("_"))
+              )
+            )
+          : JSON.parse(JSON.stringify(this.sourceNameObject[layer.source])); // select组件会自动识别是否为列表的value值，然后显示label
 
-      this.sourceObject['sourceId_old'] = JSON.parse(JSON.stringify(layer.source));      
-      this.sourceObject['name'] = JSON.parse(JSON.stringify(layer.source.slice(0,layer.source.lastIndexOf('_'))));
-      this.sourceObject['type'] = JSON.parse(JSON.stringify(layer.metadata['mapbox:type']));
-      if(type == 'defaultPG'){
-        requestApi.getShpList({
-          asc: false,
-          page: 1,
-          shpPageSize: 10,
-          searchText: "",
-          sortField: "createTime",
-        })
-        .then((res) => {
-          console.log("shpDataList", res.data,layerType);
-          this.sourceObject['option'] = res.data.data.content.filter(
-            data => data.geoType.indexOf(layerType) != -1
-          );
-        })
-        .catch((error) => {
-          console.log("查询shp失败", error);
-        });
-      }
-      else if(type == 'multiPG'){
-        requestApi.getPgList()
-        .then((res) => {
-          console.log("数据库源:", res,layerType);
-          let List = res.data.data.filter(
-            data => data.name == dataName
-          );
-          this.sourceObject['option'] = List[0].dataInfo.filter(
-            data => data.geoType.indexOf(layerType) != -1
-          );
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      }
-      else if(type.includes('mb')){
-        requestApi.getMbtilesList()
-        .then((res) => {
-          console.log("mbtile数据:", res);
-          this.sourceObject['option'] = res.data.data;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      }
-      else if(type == 'TMS'){
-        requestApi.getThirdPartSourceList("TMS")
-        .then((res) => {
-          if (res.data.code == 0) {
-            this.sourceObject['option'] = res.data.data;
-
-          } else {
-            console.log(res.data.csg);
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      this.sourceObject["sourceId_old"] = JSON.parse(
+        JSON.stringify(layer.source)
+      );
+      this.sourceObject["name"] = JSON.parse(
+        JSON.stringify(layer.source.slice(0, layer.source.lastIndexOf("_")))
+      );
+      this.sourceObject["type"] = JSON.parse(
+        JSON.stringify(layer.metadata["mapbox:type"])
+      );
+      if (type == "defaultPG") {
+        requestApi
+          .getShpList({
+            asc: false,
+            page: 1,
+            shpPageSize: 10,
+            searchText: "",
+            sortField: "createTime",
+          })
+          .then((res) => {
+            console.log("shpDataList", res.data, layerType);
+            this.sourceObject["option"] = res.data.data.content.filter(
+              (data) => data.geoType.indexOf(layerType) != -1
+            );
+          })
+          .catch((error) => {
+            console.log("查询shp失败", error);
+          });
+      } else if (type == "multiPG") {
+        requestApi
+          .getPgList()
+          .then((res) => {
+            console.log("数据库源:", res, layerType);
+            let List = res.data.data.filter((data) => data.name == dataName);
+            this.sourceObject["option"] = List[0].dataInfo.filter(
+              (data) => data.geoType.indexOf(layerType) != -1
+            );
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      } else if (type.includes("mb")) {
+        requestApi
+          .getMbtilesList()
+          .then((res) => {
+            console.log("mbtile数据:", res);
+            this.sourceObject["option"] = res.data.data;
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      } else if (type == "TMS") {
+        requestApi
+          .getThirdPartSourceList("TMS")
+          .then((res) => {
+            if (res.data.code == 0) {
+              this.sourceObject["option"] = res.data.data;
+            } else {
+              console.log(res.data.csg);
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       }
       this.isSourceEdit = true;
     },
-    sourceSelect(val,type){
+    sourceSelect(val, type) {
       // 筛选出所选的图层
-      let List = this.sourceObject.option.filter(data=>
-        data[this.typeContent[type][1]] == val || data == val
-      )
-      switch (type){
-        case 'defaultPG':
-          this.sourceObject['sourceId_new'] = `${List[0].tableName}#defaultPG`;
-          this.sourceObject['option'] = List[0];
-          break
-        case 'multiPG':
-          this.sourceObject['sourceId_new'] = `${List[0].originName}_#multiPG`;
-          this.sourceObject['option'] = List[0];
-          break
-        case 'mbSource':
-        case 'mbStyle':
-          this.sourceObject['sourceId_new'] = `${List[0].name}_#meta`;
-          this.sourceObject['option'] = List[0];
-          break
+      let List = this.sourceObject.option.filter(
+        (data) => data[this.typeContent[type][1]] == val || data == val
+      );
+      switch (type) {
+        case "defaultPG":
+          this.sourceObject["sourceId_new"] = `${List[0].tableName}#defaultPG`;
+          this.sourceObject["option"] = List[0];
+          break;
+        case "multiPG":
+          this.sourceObject["sourceId_new"] = `${List[0].originName}_#multiPG`;
+          this.sourceObject["option"] = List[0];
+          break;
+        case "mbSource":
+        case "mbStyle":
+          this.sourceObject["sourceId_new"] = `${List[0].name}_#meta`;
+          this.sourceObject["option"] = List[0];
+          break;
       }
-      this.sourceObject['name'] = JSON.parse(JSON.stringify(List[0][this.typeContent[type][0]]));
+      this.sourceObject["name"] = JSON.parse(
+        JSON.stringify(List[0][this.typeContent[type][0]])
+      );
     },
-    async sourceChange(layer){
-      let originName = JSON.parse(JSON.stringify(layer.source.slice(0,layer.source.lastIndexOf('_'))));
+    async sourceChange(layer) {
+      let originName = JSON.parse(
+        JSON.stringify(layer.source.slice(0, layer.source.lastIndexOf("_")))
+      );
       // 只有source变化才执行替换操作
-      if(this.sourceObject.name != originName){
+      if (this.sourceObject.name != originName) {
         await this.sourceReplace();
-        this.isSourceEdit=false;
-        this.sourceObject = {options:[],option:{},sourceId_old:'',sourceId_new:'',name:'',tileJsonId:'',type:''};   // 将需要更换source的操作数据进行统一管理
-      }else{
-        this.isSourceEdit=false;
-        this.sourceObject = {options:[],option:{},sourceId_old:'',sourceId_new:'',name:'',tileJsonId:'',type:''};   // 将需要更换source的操作数据进行统一管理
+        this.isSourceEdit = false;
+        this.sourceObject = {
+          options: [],
+          option: {},
+          sourceId_old: "",
+          sourceId_new: "",
+          name: "",
+          tileJsonId: "",
+          type: "",
+        }; // 将需要更换source的操作数据进行统一管理
+      } else {
+        this.isSourceEdit = false;
+        this.sourceObject = {
+          options: [],
+          option: {},
+          sourceId_old: "",
+          sourceId_new: "",
+          name: "",
+          tileJsonId: "",
+          type: "",
+        }; // 将需要更换source的操作数据进行统一管理
       }
     },
-    async sourceReplace(){
+    async sourceReplace() {
       let item = JSON.parse(JSON.stringify(this.sourceObject));
       let layer = JSON.parse(JSON.stringify(this.layers[this.nowLayerIndex]));
       // 先删除mapbox中的图层，才能对source进行更改（本地layers进行更新不进行删除）
-      this.handleRemoveLayer(layer.id)
+      this.handleRemoveLayer(layer.id);
       // 添加source
-      if(!(item.sourceId_new in this.sourceObject)){
+      if (!(item.sourceId_new in this.sourceObject)) {
         // 准备source信息
-        if(item.type == 'multiPG'){
+        if (item.type == "multiPG") {
           let newTileJson = initTileJson;
           newTileJson.name = item.tileJsonId.originName;
-          let mutiPgInfo = layer.mutiPgInfo;   // 替换的是同一个数据库中的图层，故数据库信息一致 
+          let mutiPgInfo = layer.mutiPgInfo; // 替换的是同一个数据库中的图层，故数据库信息一致
           newTileJson.tiles = [
             this.reqUrl +
               "/multiPgSource/" +
@@ -5399,16 +5545,15 @@ export default {
             id: item.tileJsonId.originName,
           };
           newTileJson.vector_layers = [vector_layer];
-          newTileJson.tileJsonType = 'multiPG';
-          requestApi.createTileJson(initTileJson)
-            .then(res=>{
-              if (res.data.code !== 0) {
-                console.log("添加source失败");
-              }else{
-                item.tileJsonId = res.data.data.tileJsonId;
-              }
-            });          
-        }        
+          newTileJson.tileJsonType = "multiPG";
+          requestApi.createTileJson(initTileJson).then((res) => {
+            if (res.data.code !== 0) {
+              console.log("添加source失败");
+            } else {
+              item.tileJsonId = res.data.data.tileJsonId;
+            }
+          });
+        }
         // 添加source
         let sourceJsonId = item.tileJsonId; // defaultPG在上传shp的同时生成json，并把id记录在shp表中
         let tileJsonUrl =
@@ -5423,26 +5568,28 @@ export default {
           url: newSourceJson.sourceUrl,
         };
         //记录shp图层和对应的id
-        this.sourceNameObject[item['sourceId_new']] = sourceJsonId;
+        this.sourceNameObject[item["sourceId_new"]] = sourceJsonId;
         await this.addSourceToMap(newSourceJson);
       }
       // 删除旧source
       let layerKey = layer.manageInfo.layerKey;
       let sourceKey = layer.manageInfo.sourceKey;
       // 没有其余图层使用该source
-      if(this.layersNameObject[layerKey] == 1){
+      if (this.layersNameObject[layerKey] == 1) {
         delete this.sources[sourceKey];
         await this.handleRemoveSource(layer.source);
         //只有multiPG删除source的tileJson
-        if (layer.metadata['mapbox:type'] == "multiPG") {
-          let sourceJsonId = JSON.parse(JSON.stringify(this.sourceNameObject[sourceKey]));
+        if (layer.metadata["mapbox:type"] == "multiPG") {
+          let sourceJsonId = JSON.parse(
+            JSON.stringify(this.sourceNameObject[sourceKey])
+          );
           //source没有再使用时,删除后台的tileJson(防止未保存，将删除Json的步骤放到保存中执行)
           // this.deleteTileJson(layer.source);
           this.tileJsonList.push(sourceJsonId);
         }
-        delete this.sourceNameObject[sourceKey];                
+        delete this.sourceNameObject[sourceKey];
       }
-      // 替换layer信息    
+      // 替换layer信息
       let result = JSON.parse(
         JSON.stringify(
           nameIndex(this.layers, layerKey, item.name, this.layersNameObject)
@@ -5450,20 +5597,31 @@ export default {
       );
       this.layersNameObject = result.object;
       this.layers[this.nowLayerIndex].showName = result.show;
-      this.layers[this.nowLayerIndex].source = item['sourceId_new'];
-      if(item.type == 'defaultPG'){
-        let name = item['sourceId_new'].slice(0,item['sourceId_new'].indexOf('#'));
-        this.layers[this.nowLayerIndex]['source-layer'] = name;         // `${row.tableName}#defaultPG`
-        this.layers[this.nowLayerIndex]['shpAttribute'] = typeof item.option.attrInfo != "undefined" ? item.option.attrInfo : [];         // `${row.tableName}#defaultPG`
-        this.layers[this.nowLayerIndex]['bounds'] = item.option.bounds;
-        this.layers[this.nowLayerIndex]['id'] = item.name + "_" + nanoid(5);
-      }
-      else if(item.type == 'multiPG'){
-        let name = item['sourceId_new'].slice(0,item['sourceId_new'].indexOf('_#'));     // row.originName + "_#multiPG"
-        this.layers[this.nowLayerIndex]['source-layer'] = name;
-        this.layers[this.nowLayerIndex]['shpAttribute'] = typeof item.option.attrInfo != "undefined" ? item.option.attrInfo : [];         // `${row.tableName}#defaultPG`
-        this.layers[this.nowLayerIndex]['bounds'] = item.option.bounds;
-        this.layers[this.nowLayerIndex]['id'] = item.name + "_" + nanoid(5);        
+      this.layers[this.nowLayerIndex].source = item["sourceId_new"];
+      if (item.type == "defaultPG") {
+        let name = item["sourceId_new"].slice(
+          0,
+          item["sourceId_new"].indexOf("#")
+        );
+        this.layers[this.nowLayerIndex]["source-layer"] = name; // `${row.tableName}#defaultPG`
+        this.layers[this.nowLayerIndex]["shpAttribute"] =
+          typeof item.option.attrInfo != "undefined"
+            ? item.option.attrInfo
+            : []; // `${row.tableName}#defaultPG`
+        this.layers[this.nowLayerIndex]["bounds"] = item.option.bounds;
+        this.layers[this.nowLayerIndex]["id"] = item.name + "_" + nanoid(5);
+      } else if (item.type == "multiPG") {
+        let name = item["sourceId_new"].slice(
+          0,
+          item["sourceId_new"].indexOf("_#")
+        ); // row.originName + "_#multiPG"
+        this.layers[this.nowLayerIndex]["source-layer"] = name;
+        this.layers[this.nowLayerIndex]["shpAttribute"] =
+          typeof item.option.attrInfo != "undefined"
+            ? item.option.attrInfo
+            : []; // `${row.tableName}#defaultPG`
+        this.layers[this.nowLayerIndex]["bounds"] = item.option.bounds;
+        this.layers[this.nowLayerIndex]["id"] = item.name + "_" + nanoid(5);
       }
       // mbTile数据的
       if (this.nowLayerIndex === 0) {
@@ -5475,8 +5633,7 @@ export default {
         };
         this.addLayerToMap(false, data, true);
       }
-    }, 
-
+    },
 
     // #对ConditionRender组件的方法通信
     callback(layoutOrpaint, attribute, value, parameters) {
@@ -5502,11 +5659,11 @@ export default {
     },
     // 向地图添加layer
     addLayerToMap(flag, val, isReplace, patternProp) {
-      console.log('模式',patternProp);
-      if(!patternProp){
-        delete val['line-pattern'];
-        delete val['fill-pattern'];
-        console.log('现在的',val);
+      console.log("模式", patternProp);
+      if (!patternProp) {
+        delete val["line-pattern"];
+        delete val["fill-pattern"];
+        console.log("现在的", val);
       }
       if (flag) {
         const data = {
@@ -5530,17 +5687,17 @@ export default {
     addSourceToMap(newSource) {
       let data = {
         type: "addSource",
-        source: newSource,  
+        source: newSource,
       };
       this.$bus.$emit("map", data);
-    }, 
+    },
     handleRemoveSource(sourceName) {
       const data = {
-        type: 'removeSource',
-        id: sourceName
-      }
+        type: "removeSource",
+        id: sourceName,
+      };
       this.$bus.$emit("map", data);
-    },      
+    },
     handleLayoutChange(layerName, key, value) {
       const data = {
         type: "setLayout",
@@ -5584,7 +5741,7 @@ export default {
         url: url,
         name: name,
       };
-      this.$bus.$emit("map",data);
+      this.$bus.$emit("map", data);
     },
   },
   beforeDestroy() {

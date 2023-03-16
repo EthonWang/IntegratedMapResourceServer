@@ -26,8 +26,12 @@
         <span slot="title">WMTS数据源</span>
       </el-menu-item>
       <el-menu-item index="6">
-        <i class="fa fa-cubes iconStyle"></i>
+        <i class="fa fa-delicious iconStyle"></i>
         <span slot="title">TMS数据源</span>
+      </el-menu-item>
+      <el-menu-item index="7">
+        <i class="fa fa-cubes iconStyle"></i>
+        <span slot="title">三维影像源</span>
       </el-menu-item>
     </el-menu>
     <!--    shp文件管理-->
@@ -420,7 +424,7 @@
         <h3>MbTiles源</h3>
       </div>
       <div>
-        <el-button type="primary" round size="small" @click="openMbEdit"
+        <el-button type="primary" round size="small" @click="mbTilesEditShow=true"
           >添加mbTiles</el-button
         >
         <el-divider content-position="center">mbTiles源信息</el-divider>
@@ -526,7 +530,9 @@
           width="30%"
           :modal="false"
           center
+          :before-close="val=>dialogClean(val,'mb')"
           :close-on-click-modal="false"
+          :destroy-on-close="false"
         >
           <el-form
             ref="mbEditForm"
@@ -813,143 +819,256 @@
       shadow="never"
     >
       <div slot="header">
-        <h3>{{ outUrlItem + " 源管理" }}</h3>
+        <h3>{{ serviceItem + " 源管理" }}</h3>
       </div>
-      <div>
-        <el-button type="primary" round size="small" @click="openUrlEdit">{{
-          "添加 " + outUrlItem + " 链接"
-        }}</el-button>
-        <el-divider content-position="center">{{
-          outUrlItem + " 源信息"
-        }}</el-divider>
-        <el-table
-          :data="urlBase[outUrlItem]"
-          stripe
-          :row-style="{ height: '10px', padding: '0' }"
-          style="width: 100%"
-          max-height="500"
-        >
-          <el-table-column prop="name" label="名称" width="200">
-          </el-table-column>
-          <el-table-column prop="description" label="描述" width="400">
-          </el-table-column>
-          <el-table-column prop="url" label="外部服务链接">
-          </el-table-column>
-          <el-table-column label="操作" show-overflow-tooltip width="400">
-            <template slot-scope="scope">
-              <!-- <el-button
-                type="primary"
-                style="margin: 0px"
-                circle
-                size="mini"
-                class="el-icon-view"
-                title="查看数据信息"
-                @click="handleOutview(scope.row)"
-              >
-              </el-button> -->
-              <el-popconfirm
-                title="确定删除吗？"
-                @confirm="deleteThirdPartSource(scope.row)"
-              >
+      <el-row type="flex" justify="space-around">
+        <el-col :span="12">
+          <el-button type="primary" round size="small" @click="openUrlEdit">{{
+            "添加 " + serviceItem + " 外部服务链接"
+          }}</el-button>
+          <el-divider content-position="center">{{
+            serviceItem + " 源信息"
+          }}</el-divider>
+          <el-table
+            :data="urlBase[serviceItem]"
+            stripe
+            :row-style="{ height: '10px', padding: '0' }"
+            style="width: 100%"
+            max-height="500"
+          >
+            <el-table-column prop="name" label="名称" min-width="20">
+            </el-table-column>
+            <el-table-column prop="description" label="描述" min-width="40" show-overflow-tooltip>
+            </el-table-column>
+            <el-table-column prop="url" label="外部服务链接" min-width="40">
+              <template slot-scope="scope">
+                <el-tooltip :content="scope.row.url" placement="top-start">
+                  <div class="cellCopy">{{scope.row.url}}</div>
+                </el-tooltip>
+              </template>               
+            </el-table-column>
+            <el-table-column label="操作" min-width="20">
+              <template slot-scope="scope">
                 <el-button
-                  slot="reference"
-                  style="margin: 0 5px"
-                  size="mini"
-                  class="el-icon-delete"
-                  type="danger"
-                  title="删除第三方数据源"
+                  type="primary"
+                  style="margin: 0px"
                   circle
+                  size="mini"
+                  class="el-icon-edit"
+                  title="编辑数据信息"
+                  @click="openUrlUpdate(scope.row)"
                 >
                 </el-button>
-              </el-popconfirm>
-            </template>
-<!--            <template slot-scope="scope">-->
-<!--              <el-popconfirm-->
-<!--                title="确定删除吗？"-->
-<!--                @confirm="deleteOutUrl(scope.row)"-->
-<!--              >-->
-<!--                <el-button-->
-<!--                  slot="reference"-->
-<!--                  style="margin: 0 5px"-->
-<!--                  size="mini"-->
-<!--                  class="el-icon-delete"-->
-<!--                  type="danger"-->
-<!--                  title="删除mbTiles源"-->
-<!--                  circle-->
-<!--                >-->
-<!--                </el-button>-->
-<!--              </el-popconfirm>-->
-<!--            </template>-->
-          </el-table-column>
-        </el-table>
-        <br />
-        <el-dialog
-          title="mbTiles信息编辑"
-          :visible.sync="addUrlEditShow"
-          width="30%"
-          :modal="false"
-          center
-          :close-on-click-modal="false"
-        >
-          <el-form
-            ref="urlEditForm"
-            label-position="right"
-            label-width="150px"
-            :model="addUrlInfo"
-          >
-            <el-form-item
-              label="类型:"
-              :rules="{
-                required: true,
-                message: '请选择数据类型',
-                trigger: 'blur',
-              }"
-            >
-              <el-select
-                v-model="addUrlInfo.classification"
-                placeholder="请选择数据类型"
-              >
-                <el-option
-                  v-for="item in ['TMS', 'WMTS', 'TERRAIN']"
-                  :key="item"
-                  :label="item"
-                  :value="item"
+                <el-popconfirm
+                  title="确定删除吗？"
+                  @confirm="deleteThirdPartSource(scope.row)"
                 >
-                </el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="描述:" prop="description">
-              <el-input v-model="addUrlInfo.description"></el-input>
-            </el-form-item>
-            <el-form-item
-              label="名称:"
-              prop="name"
-              :rules="{
-                required: true,
-                message: '名称不能为空',
-                trigger: 'blur',
-              }"
+                  <el-button
+                    slot="reference"
+                    style="margin: 0 5px"
+                    size="mini"
+                    class="el-icon-delete"
+                    type="danger"
+                    title="删除第三方数据源"
+                    circle
+                  >
+                  </el-button>
+                </el-popconfirm>
+              </template>
+  <!--            <template slot-scope="scope">-->
+  <!--              <el-popconfirm-->
+  <!--                title="确定删除吗？"-->
+  <!--                @confirm="deleteOutUrl(scope.row)"-->
+  <!--              >-->
+  <!--                <el-button-->
+  <!--                  slot="reference"-->
+  <!--                  style="margin: 0 5px"-->
+  <!--                  size="mini"-->
+  <!--                  class="el-icon-delete"-->
+  <!--                  type="danger"-->
+  <!--                  title="删除mbTiles源"-->
+  <!--                  circle-->
+  <!--                >-->
+  <!--                </el-button>-->
+  <!--              </el-popconfirm>-->
+  <!--            </template>-->
+            </el-table-column>
+          </el-table>
+          <br />
+          <el-dialog
+            :title="`${serviceItem}服务链接编辑`"
+            :visible.sync="addUrlEditShow"
+            width="30%"
+            :modal="false"
+            center
+            :close-on-click-modal="false"
+          >
+            <el-form
+              ref="urlEditForm"
+              label-position="right"
+              label-width="100px"
+              :model="addUrlInfo"
+              @close="urlEditClose"
             >
-              <el-input v-model="addUrlInfo.name"></el-input>
-            </el-form-item>
-            <el-form-item
-              label="链接:"
-              prop="url"
-              :rules="{
-                required: true,
-                message: '请输入服务链接',
-                trigger: 'blur',
-              }"
+              <el-form-item label="描述:" prop="description">
+                <el-input v-model="addUrlInfo.description"></el-input>
+              </el-form-item>
+              <el-form-item
+                label="名称:"
+                prop="name"
+                :rules="{
+                  required: true,
+                  message: '名称不能为空',
+                  trigger: 'blur',
+                }"
+              >
+                <el-input v-model="addUrlInfo.name"></el-input>
+              </el-form-item>
+              <el-form-item
+                label="链接:"
+                prop="url"
+                :rules="{
+                  required: true,
+                  message: '请输入服务链接',
+                  trigger: 'blur',
+                }"
+              >
+                <el-input v-model="addUrlInfo.url"></el-input>
+              </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+              <el-button @click="addUrlEditShow = false;isServiceUpdate = false">取 消</el-button>
+              <el-button type="primary" @click="isServiceUpdate ? updateUrlInfo() : addOutUrl('urlEditForm')">确 定</el-button>
+            </span>
+          </el-dialog>
+        </el-col>
+        <el-divider
+          direction="vertical"
+          class="deviderHeight">
+        </el-divider>
+        <el-col :span="12">
+          <el-button type="primary" round size="small" @click="openServiceEdit">{{
+            "挂载 " + serviceItem + " 本地服务"
+          }}</el-button>
+          <el-divider content-position="center">{{
+            serviceItem + " 源信息"
+          }}</el-divider>
+          <el-table
+            :data="nativeService[serviceItem]"
+            stripe
+            :row-style="{ height: '10px', padding: '0' }"
+            style="width: 100%"
+            max-height="500"
+          >
+            <el-table-column prop="name" label="名称" min-width="20">
+            </el-table-column>
+            <el-table-column prop="description" label="描述" min-width="20" show-overflow-tooltip>
+            </el-table-column>
+            <el-table-column 
+              v-if="serviceItem === 'TMS'"
+              prop="ydirection" label="纵轴方向" min-width="20" show-overflow-tooltip>
+              <template slot-scope="scope">
+                <span>{{scope.row.ydirection == 'up' ? '朝上' : '朝下'}}</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="path" label="数据地址" min-width="40">
+              <template slot-scope="scope">
+                <el-tooltip :content="scope.row.path" placement="top-start">
+                  <div class="cellCopy">{{scope.row.path}}</div>
+                </el-tooltip>
+              </template>              
+            </el-table-column>
+            <el-table-column label="操作" show-overflow-tooltip min-width="20">
+              <template slot-scope="scope">
+                <el-popconfirm
+                  title="确定删除吗？"
+                  @confirm="deleteServiceSource(scope.row)"
+                >
+                  <el-button
+                    slot="reference"
+                    style="margin: 0 5px"
+                    size="mini"
+                    class="el-icon-delete"
+                    type="danger"
+                    title="删除第三方数据源"
+                    circle
+                  >
+                  </el-button>
+                </el-popconfirm>
+              </template>
+            </el-table-column>
+          </el-table>
+          <br />
+          <el-dialog
+            :title="`${serviceItem}本地服务挂载`"
+            :visible.sync="addServiceEditShow"
+            width="30%"
+            :modal="false"
+            center
+            :close-on-click-modal="false"
+          >
+            <el-form
+              ref="serviceEditForm"
+              label-position="right"
+              label-width="100px"
+              :model="addServiceInfo[serviceItem]"
             >
-              <el-input v-model="addUrlInfo.url"></el-input>
-            </el-form-item>
-          </el-form>
-          <span slot="footer" class="dialog-footer">
-            <el-button @click="addUrlEditShow = false">取 消</el-button>
-            <el-button type="primary" @click="addOutService">确 定</el-button>
-          </span>
-        </el-dialog>
-      </div>
+              <el-form-item
+                label="名称:"
+                prop="name"
+                :rules="{
+                  required: true,
+                  message: '名称不能为空',
+                  trigger: 'blur',
+                }"
+              >
+                <el-input v-model="addServiceInfo[serviceItem].name"></el-input>
+              </el-form-item>            
+              <el-form-item label="描述:" prop="description">
+                <el-input v-model="addServiceInfo[serviceItem].description"></el-input>
+              </el-form-item>
+              <el-form-item
+                label="地址:"
+                prop="path"
+                :rules="{
+                  required: true,
+                  message: '请输入数据地址',
+                  trigger: 'blur',
+                }"
+              >
+                <el-input v-model="addServiceInfo[serviceItem].path"></el-input>
+              </el-form-item>
+              <el-form-item
+                v-if="serviceItem === 'TMS'"
+                label="纵轴方向:"
+                prop="ydirection"
+                :rules="{
+                  required: true,
+                  message: '请选择纵轴方向',
+                  trigger: 'blur',
+                }"
+              >
+                <el-select
+                  v-model="addServiceInfo[serviceItem].ydirection"
+                  placeholder="请选择纵轴方向"
+                >
+                  <el-option
+                    v-for="item in [{name:'朝上',direction:'up'}, {name:'朝下',direction:'down'}]"
+                    :key="item.direction"
+                    :label="item.name"
+                    :value="item.direction"
+                  >
+                  </el-option>
+                </el-select>
+              </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+              <el-button @click="addServiceEditShow = false">取 消</el-button>
+              <el-button type="primary" @click="addNativeService('serviceEditForm')">确 定</el-button>
+            </span>
+          </el-dialog>
+        </el-col>        
+      </el-row>
     </el-card>
 
     <!-- pg数据信息展示 -->
@@ -1148,10 +1267,20 @@ export default {
       mbStyleAddInfo: { mapStyleFile: null, mbtilesId: "" },
 
       // 外部数据源
-      outUrlItem: "",
-      addUrlInfo: { classification: "", description: "", name: "", url: "" },
+      serviceItem: "",            // 目录参数（TMS，TERRAIN，WMTS）
+      isServiceUpdate: false,     // 作为信息更改界面，同信息添加编辑面板作区分（公用一个dialog）
+      // #链接
+      addUrlInfo: { description: "", name: "", url: "" },
       addUrlEditShow: false,
       urlBase: { TERRAIN: [], TMS: [], WMTS: [] },
+      // #本地服务
+      addServiceInfo: {
+        TERRAIN: {description: "", name: "", path: ""}, 
+        TMS: {description: "", name: "", path: "", ydirection: ""}, 
+        WMTS: {description: "", name: "", path: ""}
+      },
+      addServiceEditShow: false,
+      nativeService: {TERRAIN: [], TMS: [], WMTS: []},
 
       // 信息展示页
       // pg
@@ -1253,18 +1382,21 @@ export default {
             });
           break;
         case "4":
-          this.outUrlItem = "TERRAIN";
-          this.getOutService()
+          this.serviceItem = "TERRAIN";
+          this.getOutService();
+          this.getNativeService();
 
           break;
         case "5":
-          this.outUrlItem = "WMTS";
-          this.getOutService()
+          this.serviceItem = "WMTS";
+          this.getOutService();
+          this.getNativeService();
 
           break;
         case "6":
-          this.outUrlItem = "TMS";
-          this.getOutService()
+          this.serviceItem = "TMS";
+          this.getOutService();
+          this.getNativeService();
 
           break;
         default:
@@ -1412,20 +1544,6 @@ export default {
         JSON.parse(JSON.stringify(this.mbTileSelect["tileJsonInfo"])),
       ];
     },
-    openMbEdit() {
-      this.mbAddInfo = {
-        classification: "",
-        description: "",
-        mbTilesJsonFile: null,
-        name: "",
-        osmMbtilesBoolean: false,
-        path: "",
-      };
-      this.mbTilesEditShow = true;
-      this.$nextTick(() => {
-        this.$refs.mbEditForm.resetFields();
-      });
-    },
     openMbStyleEdit() {
       this.mbStyleAddInfo = { mapStyleFile: null, mbtilesId: "" };
       this.mbStyleEditShow = true;
@@ -1433,7 +1551,7 @@ export default {
         this.$refs.mbStyleEdit.resetFields();
       });
     },
-    deleteOutUrl(row){
+    deleteOutUrl(row){0
       console.log('a',row)
     },
 
@@ -1503,24 +1621,6 @@ export default {
         });
     },
 
-    //删除外部数据源
-    deleteThirdPartSource(row) {
-      requestApi
-        .deleteThirdPartSourceById(row.id)
-        .then((res) => {
-          if (res.data.code == 0) {
-            this.$message.success("删除数据源：" + row.name);
-            this.getThirdSourceList(this.outUrlItem);
-          } else {
-            this.$message.info("删除数据源失败！");
-          }
-        })
-        .catch((err) => {
-          this.$message.info("删除数据源失败！");
-          console.log(err);
-        });
-    },
-
     deleteStyleJson(row) {
       requestApi
         .deleteStyleJson(row.id)
@@ -1555,23 +1655,27 @@ export default {
         });
     },
 
-    //获取第三方数据源信息
-    getThirdSourceList(classification) {
-      requestApi
-        .getThirdPartSourceList(classification)
-        .then((res) => {
-          this.urlBase[classification] = res.data.data;
-          // this.mbTileSelect = JSON.parse(
-          //   JSON.stringify(this.mbtilesTableData[0])
-          // );
-          // this.mbTileJsonList = [
-          //   JSON.parse(JSON.stringify(this.mbTileSelect["tileJsonInfo"])),
-          // ];
-          console.log("thirdList", this.urlBase[classification]);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+    // 关闭dialog，清除信息
+    dialogClean(done,type){
+      switch(type){
+        case 'mb':
+          this.mbTilesTypeSelect = [];
+          this.mbAddInfo = {
+            classification: "",
+            description: "",
+            mbTilesJsonFile: null,
+            name: "",
+            osmMbtilesBoolean: false,
+            path: "",
+          };
+          this.$refs.mbFile.value = '';
+          done();
+          break
+        case 'thirdUrl':
+          this.addUrlInfo = { classification: "", description: "", name: "", url: "" }
+          done();
+          break
+      }
     },
 
     handleMbtilesview(row) {
@@ -1691,13 +1795,14 @@ export default {
       }
     },
 
-    // 外部url服务
+    // #外部url服务
+    // 获取第三方数据源信息
     getOutService() {
       requestApi
-        .getThirdPartSourceList(this.outUrlItem)
+        .getThirdPartSourceList(this.serviceItem)
         .then((res) => {
           if (res.data.code == 0) {
-            this.urlBase[this.outUrlItem] = res.data.data;
+            this.urlBase[this.serviceItem] = res.data.data;
           } else {
             console.log(res.data.csg);
           }
@@ -1707,34 +1812,219 @@ export default {
         });
     },
     openUrlEdit() {
-      this.addUrlInfo = {
-        classification: "",
-        description: "",
-        name: "",
-        url: "",
-      };
       this.addUrlEditShow = true;
       this.$nextTick(() => {
         this.$refs.urlEditForm.resetFields();
       });
     },
-    addOutService() {
+    addOutUrl(formName) {
+      this.addUrlInfo.classification = this.serviceItem;
+      this.$refs[formName].validate((valid)=>{
+        if(valid){
+          requestApi
+            .addThirdPartSource(this.addUrlInfo)
+            .then((res) => {
+              if (res.data.code == 0) {
+                this.$message.success(this.serviceItem + "源添加成功！");
+                this.getOutService();
+              } else {
+                this.$message.info(this.serviceItem + "源添加失败！");
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+              this.$message.info(this.serviceItem + "源添加失败！");
+            });
+          this.addUrlEditShow = false;
+        }else{
+          return false;
+        }
+      })
+    },
+    // 关闭对话框
+    urlEditClose(){
+      if(this.isServiceUpdate){
+        this.isServiceUpdate = false;
+      }
+      this.addUrlEditShow = false;
+    },
+    //删除外部数据源
+    deleteThirdPartSource(row) {
       requestApi
-        .addThirdPartSource(this.addUrlInfo)
+        .deleteThirdPartSourceById(row.id)
         .then((res) => {
           if (res.data.code == 0) {
-            this.$message.success(this.outUrlItem + "源添加成功！");
+            this.$message.success("删除数据源：" + row.name);
             this.getOutService();
           } else {
-            this.$message.info(this.outUrlItem + "源添加失败！");
+            this.$message.info("删除数据源失败！");
           }
         })
         .catch((err) => {
+          this.$message.info("删除数据源失败！");
           console.log(err);
-          this.$message.info(this.outUrlItem + "源添加失败！");
         });
-      this.addUrlEditShow = false;
+    },    
+    // ##更改信息
+    // 打开更新面板
+    openUrlUpdate(value){
+      this.addUrlInfo = JSON.parse(JSON.stringify(value));
+      this.addUrlEditShow = true;
+      this.serviceId = value.id;
     },
+    // 更新服务信息
+    updateUrlInfo(){
+      let object = {};
+      object.description = this.addUrlInfo.description;
+      object.name = this.addUrlInfo.name;
+      object.url = this.addUrlInfo.url;
+      requestApi
+        .editThirdPartSourceById(this.addUrlInfo.id,object)
+        .then((res) => {
+          if (res.data.code == 0) {
+            this.$message.success("更新数据源：" + this.addUrlInfo.name);
+            this.getOutService();
+          } else {
+            this.$message.info("更新数据源失败！");
+          }
+        })
+        .catch((err) => {
+          this.$message.info("更新数据源失败！");
+          console.log(err);
+        });      
+    },
+
+    // #数据源本地服务
+    // 获取本地服务列表
+    getNativeService(){
+      switch(this.serviceItem){
+        case 'TMS':
+          requestApi
+            .getTMSList()
+            .then((res) => {
+              if (res.data.code == 0) {
+                this.nativeService[this.serviceItem] = res.data.data;
+              } else {
+                console.log(res.data.csg);
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+            });  
+          break
+        case 'TERRAIN':
+          requestApi
+            .getTerrainList()
+            .then((res) => {
+              if (res.data.code == 0) {
+                this.nativeService[this.serviceItem] = res.data.data;
+              } else {
+                console.log(res.data.csg);
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+            });  
+          break          
+
+      }
+    },
+    openServiceEdit(){
+      // this.addUrlInfo = {
+      //   TERRAIN: {description: "", name: "", path: ""}, 
+      //   TMS: {description: "", name: "", path: "", ydirection: ""}, 
+      //   WMTS: {description: "", name: "", path: ""}
+      // };
+      this.addServiceEditShow = true;
+      this.$nextTick(() => {
+        this.$refs.serviceEditForm.resetFields();
+      });      
+    },
+    addNativeService(formName) {
+      this.$refs[formName].validate((valid)=>{
+        if(valid){
+          switch(this.serviceItem){
+            case 'TMS':
+              requestApi
+                .addTMS(this.addServiceInfo[this.serviceItem])
+                .then((res) => {
+                  if (res.data.code == 0) {
+                    this.$message.success(`${this.serviceItem}数据源服务挂载成功！`);
+                    this.getOutService();
+                  } else {
+                    this.$message.info(`${this.serviceItem}数据源服务挂载失败！`);
+                  }
+                })
+                .catch((err) => {
+                  console.log(err);
+                  this.$message.info(`${this.serviceItem}数据源服务挂载失败！`);
+                });
+              this.addServiceEditShow = false;
+              break
+            case 'TERRAIN':
+              requestApi
+                .addTerrain(this.addServiceInfo[this.serviceItem])
+                .then((res) => {
+                  if (res.data.code == 0) {
+                    this.$message.success(`${this.serviceItem}数据源服务挂载成功！`);
+                    this.getOutService();
+                  } else {
+                    this.$message.info(`${this.serviceItem}数据源服务挂载失败！`);
+                  }
+                })
+                .catch((err) => {
+                  console.log(err);
+                  this.$message.info(`${this.serviceItem}数据源服务挂载失败！`);
+                });
+              this.addServiceEditShow = false;
+              break
+          }
+          this.$nextTick(()=>{
+            this.getNativeService();
+          })
+        }else{
+          return false;
+        }
+      })
+    }, 
+    deleteServiceSource(row) {
+      switch(this.serviceItem){
+        case 'TMS':      
+          requestApi
+            .deleteTMS(row.id)
+            .then((res) => {
+              if (res.data.code == 0) {
+                this.$message.success("删除数据源：" + row.name);
+                this.getNativeService();
+              } else {
+                this.$message.info("删除数据源失败！");
+              }
+            })
+            .catch((err) => {
+              this.$message.info("删除数据源失败！");
+              console.log(err);
+            });
+          break
+        case 'TERRAIN':      
+          requestApi
+            .deleteTerrain(row.id)
+            .then((res) => {
+              if (res.data.code == 0) {
+                this.$message.success("删除数据源：" + row.name);
+                this.getNativeService();
+              } else {
+                this.$message.info("删除数据源失败！");
+              }
+            })
+            .catch((err) => {
+              this.$message.info("删除数据源失败！");
+              console.log(err);
+            });
+          break
+
+      }
+    },       
+    
 
     // 图标操作
     handlePreview(val, type) {
@@ -1883,7 +2173,7 @@ export default {
 
         let source_layer = null;
         let id = null;
-
+        // 按类别设置参数
         switch (type) {
           case "defaultPg":
             id = row.tableName;
@@ -1900,7 +2190,9 @@ export default {
             source_layer = row["source-layer"];
             break;
         }
-
+        // 预览不设置pattern属性，会和color冲突
+        let paint_new = JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint));
+        delete paint_new[`${geoType}-pattern`];
         //前八个是自己用的属性
         let newLayer = {
           id: row.originName,
@@ -1912,9 +2204,7 @@ export default {
           maxzoom: 22,
           metadata: "",
           minzoom: 0,
-          paint: JSON.parse(
-            JSON.stringify(layerStyleProperties[geoType].paint)
-          ),
+          paint: paint_new,
           source: id, //通过记录的source名字与id对应，拿到sourceId
           "source-layer": source_layer,
         };

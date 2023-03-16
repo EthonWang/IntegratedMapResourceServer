@@ -4387,7 +4387,7 @@ import initTileJson from "../assets/js/initTileJson";
 // import filedValue from "../assets/js/field_value.js";
 // import colorFormat from "../assets/js/colorFormat.js";
 // import myConfig from "../config";
-import { renderSplit } from "@/serve/JsonToValue";
+import { renderSplit } from "@/utils/JsonToValue";
 
 import Sortable from "sortablejs";
 import ConditionRender from "../components/ConditionRender";

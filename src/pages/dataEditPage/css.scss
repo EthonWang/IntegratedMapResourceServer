@@ -1,0 +1,119 @@
+// 自定义样式值
+$btnColorDefault:#66b1ff;
+$btnColorHover:#3592f7;
+// 自定义元素样式
+%btn-delete{
+  color: red;
+}
+%btn-Info{
+  font-size: 20px;
+  font-weight: bold;
+  padding-left: 10px;
+  padding-right: 0;
+  color:$btnColorDefault;
+}
+@mixin btnStyle($font-size,$color:$btnColorDefault){
+  font-size: $font-size;
+  font-weight: bold;  
+  color: $color;
+}
+
+// 
+.leftBox {
+  box-sizing: border-box;
+  width: 330px;
+  height: 100vh;
+  border-right: 1px solid #dcdfe6;
+  display: flex;
+  flex-direction: column;
+}
+
+.leftBoxTitle {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  flex-direction: row;
+  align-items: baseline;
+}
+
+// #数据添加按钮组
+.btnGroup{
+  align-items: center;
+  button{
+    font-size: 15px;
+    font-weight: bold;
+  }
+}
+
+// #数据概览
+.dataList{
+  padding: 5px 0 5px 10%;
+  .el-button-group{
+    width:30%;
+    button{
+      @extend %btn-Info;
+      &:nth-child(2){
+        @extend %btn-delete;
+      }
+    }
+  }
+}
+.tagInfo{
+  display: flex;
+  width:70%;
+  height: 40px;
+  align-items: baseline;
+  font-size: 15px;
+  font-weight: bold;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  &:hover{
+    background-color: #cfd2d6;
+    cursor: pointer;
+  }
+  i{
+    margin-right: 5px;
+  }
+}
+
+// #数据信息
+.dataInfo{
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0 10px;
+  background-clip: content-box;
+
+  // 条目介绍
+  .el-tag{
+    width:60%;
+  }
+  .el-row .el-row{
+    width:40%;
+    button{
+      @extend %btn-Info;
+      &:nth-child(3){
+        @extend %btn-delete;
+      }
+    }
+  }  
+
+  // 数据表
+  table{
+    background-color: #66b1ff;
+    button{
+      font-size: 20px;
+      font-weight: bold;
+      @extend %btn-delete;
+    }
+  }
+  // 添加按钮
+  .btnInfoEdit{
+    margin-top: 5px;
+    float: right;
+  }
+}
+.columnHeight{
+  max-height: 700px;
+  overflow-y: scroll;
+}

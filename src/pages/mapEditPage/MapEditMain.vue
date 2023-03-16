@@ -14,14 +14,14 @@ import StyleTemplate from "./StyleTemplate.vue";
 import ProjMenus from "./ProjMenus.vue";
 import requestApi from "@/api/requestApi";
 import { mapState, mapActions, mapMutations } from "vuex";
-import {projInit} from "@/serve/parameterInit";
+import { projInit } from "@/utils/parameterInit";
 export default {
-  name: 'MapEditMain',
+  name: "MapEditMain",
   components: { ProjMenus, MapPanel, LayerEditPanel, StyleTemplate },
   data() {
     return {
       // 全局参数
-      showList:{main:true,editor:true,style:true,map:true},   // 控制组件显示，用于组件刷新
+      showList: { main: true, editor: true, style: true, map: true }, // 控制组件显示，用于组件刷新
       projectShow: true,
       editorShow: true,
       styleShow: true,
@@ -58,9 +58,9 @@ export default {
     this.mapProjectId = this.$route.params.mapProjectId;
     localStorage.setItem("mapProjectId", this.mapProjectId);
     this.getMapProjectInfo();
-    this.$bus.$on("main",(data)=>{
-      switch (data.type){
-        case 'reload':        // {type:'',name:''}      name有[main,menu,editor,style,map]
+    this.$bus.$on("main", (data) => {
+      switch (data.type) {
+        case "reload": // {type:'',name:''}      name有[main,menu,editor,style,map]
           this.reload(data.name);
       }
     });
@@ -125,9 +125,13 @@ export default {
             }
           }
           let sourceKeyList = Object.keys(this.sources);
-          if(this.mapProjectInfo.layers.length > 0 && JSON.stringify(this.mapProjectInfo.nameObject) == "{}" && sourceKeyList[0].indexOf('_') == -1){
-            let object = projInit(this.layers,this.sources,this.layersTree);
-            console.log("初始化结果",object);
+          if (
+            this.mapProjectInfo.layers.length > 0 &&
+            JSON.stringify(this.mapProjectInfo.nameObject) == "{}" &&
+            sourceKeyList[0].indexOf("_") == -1
+          ) {
+            let object = projInit(this.layers, this.sources, this.layersTree);
+            console.log("初始化结果", object);
             this.layers = object.layerRes;
             this.sources = object.sourceRes;
             this.layersTree = object.layersTreeRes;
@@ -155,7 +159,7 @@ export default {
           document.title = "地图项目" + this.mapProjectInfo.name;
 
           // 加载完参数，其他组件开始初始化
-          this.$bus.$emit("init",{type:"all"});
+          this.$bus.$emit("init", { type: "all" });
         })
         .catch((error) => {
           console.log(error);
@@ -163,23 +167,23 @@ export default {
     },
 
     // 用于组件刷新
-    reload(name){
+    reload(name) {
       this.showList[name] = false;
-      this.$nextTick(()=>{
+      this.$nextTick(() => {
         this.showList[name] = true;
-        if(name == 'main'){
-          this.getMapProjectInfo();   // 本组件不刷新，内部组件刷新,要刷新本组件时触发初始化函数
-        }else{
+        if (name == "main") {
+          this.getMapProjectInfo(); // 本组件不刷新，内部组件刷新,要刷新本组件时触发初始化函数
+        } else {
           setTimeout(() => {
-            this.$bus.$emit("init",{type:`${name}`})
+            this.$bus.$emit("init", { type: `${name}` });
           }, 0);
         }
-      })
+      });
     },
   },
   beforeDestroy() {
     this.$bus.$off("main");
-  },  
+  },
 };
 </script>
 

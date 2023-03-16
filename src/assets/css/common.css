@@ -35,4 +35,11 @@
     background: rgba(253, 250, 250, 0.4);
 }
 
+.cellCopy{
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    word-break: break-all;
+}
 

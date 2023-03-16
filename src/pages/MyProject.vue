@@ -203,13 +203,13 @@
         :key="item.date"
         shadow="hover"
       >
-        <!-- <el-button
+        <el-button
           class="viewBtn"
           type="text"
           icon="el-icon-view"
           title="预览"
           @click="mapPreview(item)"
-        ></el-button> -->
+        ></el-button>
         <el-image
           @click="editMapProject1(item)"
           class="project-item-image"
@@ -350,9 +350,18 @@
       class="flexRowCenter"
     >
     </el-pagination>
-      <div id="map" v-show="mapShow"></div>
-    <el-dialog :visible.sync="mapShow">
-    </el-dialog>
+    <el-dialog
+      :title="projName"
+      :visible.sync="mapShow"
+      :modal="false"
+      center
+      :close="closeDialog"
+    >
+      <div id="mapBox"></div>
+    </el-dialog>    
+    <!-- <div v-if="mapShow" class="mapDialog">
+      <div id="mapBox"></div>
+    </div> -->
   </div>
 </template>
 
@@ -361,7 +370,7 @@ import mapboxgl from "mapbox-gl";
 import requestApi from "../api/requestApi";
 import FileSaver from "file-saver";
 // import jsonInfo from "../assets/js/project";
-import { fileImport } from "@/serve/interpolation";
+import { fileImport } from "@/utils/interpolation";
 import initTileJson from "@/assets/js/initTileJson";
 
 // import initProjectJson from "../assets/js/initMapProjectJson";
@@ -402,6 +411,7 @@ export default {
       // #预览
       styleJson: {}, // 各工程保存的样式信息
       mapShow: false,
+      projName: '',   
 
       currentPage: 1,
       pageSize: 8,
@@ -413,7 +423,6 @@ export default {
   mounted() {
     document.title = "地图项目";
     this.getMapProjectList();
-    this.createMap();
     // this.importInfoInit();
   },
   methods: {
@@ -927,41 +936,90 @@ export default {
     },
 
     // 地图预览
-    createMap(){
-      mapboxgl.accessToken = 'pk.eyJ1IjoidnNpcjc0MyIsImEiOiJjbDJwdDdqbHAwOWh3M2JtdG93Mnl6bTVvIn0.aJxhvIpxq3cntQkT432vPw';
+    createMap() {
+      mapboxgl.accessToken =
+        "pk.eyJ1IjoidnNpcjc0MyIsImEiOiJjbDJwdDdqbHAwOWh3M2JtdG93Mnl6bTVvIn0.aJxhvIpxq3cntQkT432vPw";
       map = new mapboxgl.Map({
-        container: 'map', 
+        container: "mapBox",
         // projection: 'globe'
-      });    
+      });
     },
     async mapPreview(val) {
-      let bbox = [];
-      let { version, sources, glyphs, sprite, layers } = JSON.parse(
-        JSON.stringify(val)
-      );
-      this.styleJson = {
-        'version':version, 
-        'sources':sources, 
-        'glyphs':this.reqUrl+glyphs, 
-        'sprite':this.reqUrl+sprite, 
-        'layers':layers,
-      };
-      if ("bounds" in val) {
-        bbox = [
-          [val.bounds[0] + 0, val.bounds[1] + 0],
-          [val.bounds[2] + 0, val.bounds[3] + 0],
-        ];
-        console.log('center',bbox);
-      }      
-      console.log('ditu信息',this.styleJson,val);
-      map.setStyle(this.styleJson).on('load', () => {
-        map.fitBounds(bbox, {
-          duration: 500,
-          padding: { top: 10, bottom: 25, left: 15, right: 5 },
-        });        
-      });
-      // this.mapShow = !this.mapShow;
+      this.projName = val.name
+      this.mapShow = true;
+      this.$nextTick(()=>{
+        if(!map){
+          mapboxgl.accessToken =
+          "pk.eyJ1IjoidnNpcjc0MyIsImEiOiJjbDJwdDdqbHAwOWh3M2JtdG93Mnl6bTVvIn0.aJxhvIpxq3cntQkT432vPw";
+          map = new mapboxgl.Map({
+            container: "mapBox",
+            // projection: 'globe'
+          });        
+          // 添加比例尺
+          var scale = new mapboxgl.ScaleControl({
+            maxWidth: 120,
+            unit: "imperial",
+          });
+          map.addControl(scale);
+          scale.setUnit("metric");
+          // 添加控件缩放按钮和一个指南针.
+          var nav = new mapboxgl.NavigationControl();
+          map.addControl(nav, "top-right");
+          // 添加全局缩放
+          map.addControl(new mapboxgl.FullscreenControl());
+          //添加定位控件
+          map.addControl(
+            new mapboxgl.GeolocateControl({
+              positionOptions: {
+                enableHighAccuracy: true,
+              },
+              trackUserLocation: true,
+            })
+          );          
+        }
+        let { version, sources, glyphs, sprite, layers ,center ,bearing ,pitch ,zoom} = JSON.parse(
+          JSON.stringify(val)
+        );
+        // center数字化
+        center = center.split(',');
+        center[0] = Number(center[0]);
+        center[1] = Number(center[1]);
+        // 对pattern属性进行处理，line-pattern若为""就删去
+        layers.forEach(layer=>{
+          let type = layer.type;
+          if (`${type}-pattern` in layer['paint']){
+            if(layer['paint'][`${type}-pattern`] == ''){
+              delete layer['paint'][`${type}-pattern`];
+            }
+          }
+        })
+        // 需要对图层进行反转，发布链接中的layer由后端转换过
+        layers = layers.reverse();
+        // style基本属性
+        this.styleJson = {
+          version: version,
+          sources: sources,
+          glyphs: this.reqUrl + glyphs,
+          sprite: this.reqUrl + sprite,
+          layers: layers,
+        };
+        console.log("地图信息", this.styleJson, val);
+        // let bbox = [];
+        map.setStyle(this.styleJson).on("load", () => {
+          map.setZoom(zoom);
+          map.setCenter(center);
+          map.setBearing(bearing);
+          map.setPitch(pitch);        
+          // map.fitBounds(bbox, {
+          //   duration: 500,
+          //   padding: { top: 10, bottom: 25, left: 15, right: 5 },
+          // });
+        });
+      })
     },
+    closeDialog(){
+      this.mapShow = false
+    }
   },
 };
 </script>
@@ -1052,9 +1110,9 @@ export default {
 }
 
 /* 预览项目框 */
-#map{
-  width: 50vw;
+#mapBox {
+  background-color: antiquewhite;
   height: 50vh;
-  margin: auto;
+  width: 100%;  
 }
 </style>

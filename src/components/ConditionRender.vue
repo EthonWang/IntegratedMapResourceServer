@@ -37,7 +37,9 @@
             propertyList.filter(
               (data) =>
                 !dataSearch ||
-                data.column_name.toLowerCase().includes(dataSearch.toLowerCase())
+                data.column_name
+                  .toLowerCase()
+                  .includes(dataSearch.toLowerCase())
             )
           "
           row-key="id"
@@ -131,11 +133,11 @@
         <h4>选择属性</h4>
         <!-- 非mbTile -->
         <el-input
-                v-model="search"
-                size="mini"
-                placeholder="搜索"
-                prefix-icon="el-icon-search"
-              />
+          v-model="search"
+          size="mini"
+          placeholder="搜索"
+          prefix-icon="el-icon-search"
+        />
         <el-table
           v-if="!isMbTile"
           :data="
@@ -1937,7 +1939,7 @@
 <script>
 import requestApi from "../api/requestApi";
 import filedValue from "../assets/js/field_value.js";
-import { renderSplit } from "@/serve/JsonToValue";
+import { renderSplit } from "@/utils/JsonToValue";
 
 export default {
   name: "ConditionRender",
@@ -2018,7 +2020,7 @@ export default {
         "fill-extrusion-translate": "平移",
         "fill-extrusion-translate-anchor": "平移参考",
         "fill-extrusion-vertical-gradient": "渐变填充",
-        "fill-pattern":"图案填充",
+        "fill-pattern": "图案填充",
         "icon-image": "图标",
         "icon-size": "图标大小",
         "icon-opacity": "不透明度",
@@ -2590,7 +2592,9 @@ export default {
           // 初始化zoomValue为刚加载的值
           this.zoomValue = JSON.parse(JSON.stringify(this.zoomValueOrigin));
           // 将父组件传来的参数设为原来的值
-          this.layer[this.layoutOrpaint][this.attribute] = JSON.parse(JSON.stringify(this.zoomValueOrigin[0]["value"]));
+          this.layer[this.layoutOrpaint][this.attribute] = JSON.parse(
+            JSON.stringify(this.zoomValueOrigin[0]["value"])
+          );
           this.zoomEditIndex = 0;
         }
         //data相关
@@ -2630,7 +2634,7 @@ export default {
         const value1 = this.layerOrigin[this.layoutOrpaint][this.attribute];
         this.layer[this.layoutOrpaint][this.attribute] = value1;
         this.$bus.$emit("show", { param1: this.attribute, param2: true });
-        this.layer.attrValueSet[this.attribute] = "primary";        
+        this.layer.attrValueSet[this.attribute] = "primary";
       }
       //向父组件传递要修改的参数
       const value = this.layer[this.layoutOrpaint][this.attribute];
@@ -2889,7 +2893,9 @@ export default {
       // 设置多级显示
       // 设置插值类型值
       const rateWay = [this.zoomRate];
-      switch (this.zoomRate) {      // 只有exp和cubic需要赋值
+      switch (
+        this.zoomRate // 只有exp和cubic需要赋值
+      ) {
         case "exponential":
           rateWay.push(this.rateValue["exp"]);
           break;

@@ -183,7 +183,7 @@ export default {
           this.setTerrain(data.terrain);
           // map.setTerrain({
           //   'source': 'terrain',
-          //   'exaggeration': 1.5,
+          //   'exaggeration': 1,
           //   'encoding': "mapbox"
           // }).on('load',()=>{
           //   console.log('添加地形：',map.getTerrain);
@@ -208,6 +208,7 @@ export default {
       // 初始化公共参数
       this.mapProjectId = localStorage.getItem("mapProjectId");
       this.zoom = this.mapProjectInfo.zoom;
+      this.center = this.mapProjectInfo.center;
       // this.sources = this.mapProjectInfo.sources;
       // this.layers = this.mapProjectInfo.layers;
       this.glyphsPath = this.mapProjectInfo.glyphs;
@@ -353,14 +354,15 @@ export default {
         sources: {},
         layers: [],
         sprite: this.reqUrl + this.spritePath, // 设置精灵图访问接口，mapbox会自动请求json和png
-        glyphs: this.reqUrl + this.glyphsPath, // 设置字体访问接口，mapbox会自动请求
+        glyphs: this.reqUrl + this.glyphsPath, // 设置字体访问接口，mapbox会自动请求      
       };
-      console.log("initstyle", initStyle);
-
       map.setStyle(initStyle).on("load", () => {
+        // 初始化地图显示样式
         map.setZoom(this.zoom);
         let center = this.center.split(',');
         map.setCenter(center);
+        map.setBearing(this.mapProjectInfo.bearing);
+        map.setPitch(this.mapProjectInfo.pitch);
         // 添加source
         for (let i in this.sources) {
           let newSource = {
@@ -368,7 +370,7 @@ export default {
             sourceType: this.sources[i].type,
             sourceUrl: this.sources[i].url,
           };
-          this.addSourceToMap(newSource);
+          this.addSourceToMap({source:newSource});
         }
         // 添加layer
         for (let i = this.layers.length - 1; i >= 0; i--) {
@@ -393,8 +395,9 @@ export default {
     // #地图api
     //向地图添加数据源source
     addSourceToMap(data) {
+      // console.log("add new source1：", data);
       let newSource = data.source;
-      console.log("add new source：", newSource);
+      // console.log("add new source：", newSource);
       switch(newSource.sourceType){
         case 'vector':
           map.addSource(newSource.sourceName, {
@@ -407,17 +410,23 @@ export default {
           type: newSource.sourceType,
           tiles: [newSource.sourceUrl],
           tileSize: 256,
-          maxzoom: 6,
           // scheme: 'tms'
         });  
           break;
         case 'raster-dem':
-          map.addSource(newSource.sourceName, {
-            type: newSource.sourceType,
-            url: newSource.sourceUrl,
-            // tiles: [newSource.sourceUrl],
-            tileSize: 512,
-          });   
+          if(newSource.isOutService){
+            map.addSource(newSource.sourceName, {
+              type: newSource.sourceType,
+              url: newSource.sourceUrl,
+              tileSize: 256,
+            });
+          }else{
+            map.addSource(newSource.sourceName, {
+              type: newSource.sourceType,
+              tiles: [newSource.sourceUrl],
+              tileSize: 256,
+            });   
+          }
           break;
       }
     },
@@ -426,7 +435,7 @@ export default {
       if (flag) {
         let layer = JSON.parse(JSON.stringify(data));
         if(['line','fill'].indexOf(layer.type) != -1){delete layer.paint[`${layer.type}-pattern`]}         
-        console.log("add new layer：", data);
+        // console.log("add new layer：", data);
         map.addLayer(layer); //默认添加
       } else {
         //value:{index:'',layer:{}}
@@ -516,6 +525,8 @@ export default {
       // 变动的参数需要重新赋值
       this.mapProjectInfo.zoom = this.zoom;
       this.mapProjectInfo.center = this.center;
+      this.mapProjectInfo.pitch = map.getPitch();
+      this.mapProjectInfo.bearing = map.getBearing();
       this.mapProjectInfo.sprite = this.spritePath;
       this.mapProjectInfo.glyphs = this.glyphsPath;
       this.mapProjectInfo.sources = this.sources;
@@ -603,6 +614,7 @@ export default {
       // 用于控制台信息查看
       console.log("layers:", this.layers);
       console.log("layersTree", this.$store.state.layersTree);
+      console.log('row',row);
       if (row.type != "background") {
         // 背景没有source
         const source = map.getSource(row["source"]);

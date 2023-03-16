@@ -11,6 +11,9 @@ const state = {
   layersTree:[],
   tileJsonList: [],     // 保存后待删除的json名单
   publicBoolean: '',
+
+  // mapEdit
+  dataList: [],
 }
 // 不常修改的就放入localStorage
 export default state;
