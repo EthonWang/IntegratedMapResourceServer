@@ -803,7 +803,7 @@ export default {
         maxzoom: 22,
         metadata: { "mapbox:type": "defaultPG" },
         minzoom: 0,
-        paint: JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint)),
+        paint: JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint)),       // pattern 在map添加图层部分做判断
         source: sourceId, //通过记录的source名字与id对应，拿到sourceId
         "source-layer": row.tableName,
       };
