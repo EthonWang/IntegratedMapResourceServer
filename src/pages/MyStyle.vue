@@ -400,7 +400,7 @@
             <!-- 图片展示 -->
             <div v-if="!isSymbolList" class="symbol-box">
               <div
-                v-for="(item, index) in symbolTableData"
+                v-for="(item, index) in allSymbolTableData"
                 :key="index"
                 :title="item.originName"
                 class="symbolItemCard"
@@ -774,7 +774,8 @@ export default {
       // deleteSelect: [],     //用于展示精灵图checkbox的选择情况
       // spriteDelteList: [],  //要删除的精灵图name列表
       // 自定义图标
-      symbolTableData: [],
+      symbolTableData: [],    // 分页数据
+      allSymbolTableData: [],  // 全部数据
       symbolCurrentPage: 1, //请求信息
       symbolPageSize: 10,
       symbolSearchText: "",
@@ -849,9 +850,10 @@ export default {
     this.getFontList();
 
     //窗口适应问题
+    this.symbolTableHeight = document.documentElement.clientHeight - 450;
     const that = this;
     window.onresize = function listen() {
-      that.symbolTableHeight = `${document.documentElement.clientHeight}` - 350;
+      that.symbolTableHeight = `${document.documentElement.clientHeight}` - 450;
       // that.styleContainerWidth = `${document.getElementById('styleContainer').offsetWidth}`;
     };
   },
@@ -1112,12 +1114,13 @@ export default {
         page: this.symbolCurrentPage,
         pageSize: this.symbolPageSize,
         searchText: this.symbolSearchText,
-        sortField: this.symbolSearchType,
+        sortField: this.symbolSearchType
       };
       requestApi.getSymbolList(data).then((res) => {
         console.log(res);
-        this.symbolTableData = res.data.data.content;
-        this.symbolTotalDataCount = res.data.data.totalElements;
+        this.symbolTableData = res.data.data.page.content;
+        this.symbolTotalDataCount = res.data.data.page.totalElements;
+        this.allSymbolTableData = res.data.data.list;
       });
     },
     handleSymbolSizeChange(val) {
@@ -1575,10 +1578,12 @@ h3 {
   height: 360px;
 }
 .symbol-box {
+  height: calc(100vh - 350px);
   display: flex;
   align-items: top;
   flex-wrap: wrap;
   width: 100%;
+  overflow-y: scroll;
 }
 /* 图标显示框 */
 .symbolContainer {
