@@ -2127,11 +2127,12 @@ export default {
       }
       mapboxgl.accessToken =
         "pk.eyJ1Ijoid3lqcSIsImEiOiJjbDBnZDdwajUxMXRzM2htdWxubDh1MzJrIn0.2e2_rdU2nOUvtwltBIZtZg";
+      let center = 'bounds' in row ? [(row['bounds'][0]+row['bounds'][2])/2,(row['bounds'][1]+row['bounds'][3])/2] : [11.255, 43.77];
       map = new mapboxgl.Map({
         container: mapDiv,
         style: "mapbox://styles/mapbox/streets-v11",
-        center: [11.255, 43.77], // starting position
-        zoom: 13, // starting zoom
+        center: center, // starting position
+        zoom: 6, // starting zoom
         preserveDrawingBuffer: true, //为true，则可以使用map.getCanvas().toDataURL()转为PNG
       });
 
@@ -2363,6 +2364,7 @@ h3 {
   width: calc(80vw - 300px);
   height: 600px;
   border: 1px solid black;
+  background-color: antiquewhite;
 }
 /* mbTiles */
 /* 模板展示框样式 */

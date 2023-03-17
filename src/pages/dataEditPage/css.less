@@ -1,21 +1,21 @@
 // 自定义样式值
-$btnColorDefault:#66b1ff;
-$btnColorHover:#3592f7;
+@btnColorDefault:#66b1ff;
+@btnColorHover:#3592f7;
 // 自定义元素样式
-%btn-delete{
+#btn-delete{
   color: red;
 }
-%btn-Info{
+#btn-Info{
   font-size: 20px;
   font-weight: bold;
   padding-left: 10px;
   padding-right: 0;
-  color:$btnColorDefault;
+  color:@btnColorDefault;
 }
-@mixin btnStyle($font-size,$color:$btnColorDefault){
-  font-size: $font-size;
+.mixin-btnStyle(@font-size,@color:@btnColorDefault){
+  font-size: @font-size;
   font-weight: bold;  
-  color: $color;
+  color: @color;
 }
 
 // 
@@ -51,9 +51,9 @@ $btnColorHover:#3592f7;
   .el-button-group{
     width:30%;
     button{
-      @extend %btn-Info;
+      &:extend(#btn-Info);
       &:nth-child(2){
-        @extend %btn-delete;
+        &:extend(#btn-delete);
       }
     }
   }
@@ -91,9 +91,9 @@ $btnColorHover:#3592f7;
   .el-row .el-row{
     width:40%;
     button{
-      @extend %btn-Info;
+      &:extend(#btn-Info);
       &:nth-child(3){
-        @extend %btn-delete;
+        &:extend(#btn-delete);
       }
     }
   }  
@@ -104,7 +104,7 @@ $btnColorHover:#3592f7;
     button{
       font-size: 20px;
       font-weight: bold;
-      @extend %btn-delete;
+      &:extend(#btn-delete);
     }
   }
   // 添加按钮

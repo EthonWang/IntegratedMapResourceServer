@@ -434,14 +434,24 @@ export default {
     addLayerToMap(flag, data) {
       if (flag) {
         let layer = JSON.parse(JSON.stringify(data));
-        if(['line','fill'].indexOf(layer.type) != -1){delete layer.paint[`${layer.type}-pattern`]}         
+        // 每个线、面图层有pattern属性，若为空
+        if(['line','fill'].indexOf(layer.type) != -1){
+          if(layer.paint[`${layer.type}-pattern`] == ''){       // 默认样式参数line/fill-pattern:''
+            delete layer.paint[`${layer.type}-pattern`]
+          }
+        }         
         // console.log("add new layer：", data);
         map.addLayer(layer); //默认添加
       } else {
         //value:{index:'',layer:{}}
         let layer = JSON.parse(JSON.stringify(data.layer));
         let id = JSON.parse(JSON.stringify(data.id));
-        if(['line','fill'].indexOf(layer.type) != -1){delete layer.paint[`${layer.type}-pattern`]}          
+        // 每个线、面图层有pattern属性，若为空
+        if(['line','fill'].indexOf(layer.type) != -1){
+          if(layer.paint[`${layer.type}-pattern`] == ''){       // 默认样式参数line/fill-pattern:''
+            delete layer.paint[`${layer.type}-pattern`]
+          }
+        }     
         console.log("add new layer：", data.layer);
         map.addLayer(layer, id); //添加在对应图层之前
       }
