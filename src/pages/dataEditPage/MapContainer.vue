@@ -371,7 +371,9 @@ export default {
   created () {
   },
   mounted () {
-    this.initMapbox();
+    this.$nextTick(()=>{
+      this.initMapbox();    //  等地图标签加载完毕
+    })
     this.$bus.$on("map", (data) => {
       switch (data.type) {
         case "addShp":                  // data:{type:'',value:''}
@@ -393,6 +395,6 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-@import "./map.scss";
+<style lang="less" scoped>
+@import "./map.less";
 </style>

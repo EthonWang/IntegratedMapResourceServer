@@ -9,9 +9,11 @@ import 'font-awesome/css/font-awesome.min.css'
 import "./assets/css/common.css"
 import '@/assets/font/font.css';
 import store from './store';
+import less from 'less';
 
 Vue.use(ElementUI);
-Vue.use(VueRouter)
+Vue.use(VueRouter);
+Vue.use(less);
 
 Vue.prototype.reqUrl="http://"+window.IPConfig.baseIP+":8899";
 Vue.prototype.reqBaseIp="http://"+window.IPConfig.baseIP;

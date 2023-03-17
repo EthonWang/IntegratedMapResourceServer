@@ -11,9 +11,9 @@
       <li>
         <router-link to="/Map/MyProject"><h2>地图项目</h2></router-link>
       </li>
-     <!-- <li>
+     <li>
        <router-link target="_blank" to="/DataEditor"><h2>样式库</h2></router-link>
-     </li> -->
+     </li>
       <li>
         <router-link to="/Map/MyIntroduce"><h2>帮助</h2></router-link>
       </li>

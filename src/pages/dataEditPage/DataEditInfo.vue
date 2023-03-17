@@ -312,6 +312,6 @@ export default {
   },
 }
 </script>
-<style lang="scss" scoped>
-@import "./css.scss"
+<style lang="less" scoped>
+@import "./css.less";
 </style>
