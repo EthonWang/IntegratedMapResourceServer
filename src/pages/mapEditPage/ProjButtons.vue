@@ -58,7 +58,7 @@
             >
             </el-pagination>
           </el-tab-pane>
-          <el-tab-pane label="mbTiles" name="mbTile">
+          <el-tab-pane label="OSM" name="mbTile">
             <el-row type="flex" align="middle">
               <h4>数据库源:&nbsp;</h4>
               <el-select
@@ -161,6 +161,43 @@
               </el-table-column>
             </el-table>
           </el-tab-pane>
+          <el-tab-pane label="Cache" name="Cache">
+            <el-row type="flex" align="middle">
+              <h4>数据源:&nbsp;</h4>
+              <el-select
+                v-model="cacheSelect"
+                placeholder="请选择"
+                style="width: 73%"
+                @change="cacheChange($event)"
+              >
+                <el-option
+                  v-for="item in cacheJsonList"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item"
+                >
+                </el-option> </el-select
+              >&nbsp;
+            </el-row>
+            <el-table :data="cacheLayer" height="313">
+              <el-table-column
+                property="id"
+                width="200"
+                show-overflow-tooltip
+                label="source"
+              ></el-table-column>
+              <el-table-column width="100">
+                <template slot-scope="scope">
+                  <el-button
+                    size="mini"
+                    type="primary"
+                    @click="handleAddShpLayer(scope.row)"
+                    >添加
+                  </el-button>
+                </template>
+              </el-table-column>
+            </el-table>            
+          </el-tab-pane>          
           <el-tab-pane label="TMS" name="TMS">
             <el-table :data="urlBase[dataBaseSelect]" style="width: 100%">
               <el-table-column prop="name">
@@ -193,7 +230,7 @@
               </el-table-column>
             </el-table>
           </el-tab-pane>
-          <el-tab-pane label="TERRAIN" name="TERRAIN">
+          <el-tab-pane label="Terrain" name="TERRAIN">
             <el-table :data="urlBase[dataBaseSelect]" style="width: 100%">
               <el-table-column prop="name" label="名称">
                 <template v-slot:header>
@@ -400,6 +437,11 @@ export default {
       },
       // TMS服务
       urlBase: { TERRAIN: [], TMS: [], WMTS: [] },
+
+      // cache
+      cacheJsonList: [],
+      cacheSelect: "",
+      cacheLayer: [],   // cache中json的
 
       // #发布
     };
@@ -698,7 +740,7 @@ export default {
         case "multiPG":
           this.addMultiPGShp(row);
           break;
-        case "cacheTile":
+        case "Cache":
           this.addCacheShp(row);
           break;
         case "TMS":
@@ -1502,7 +1544,9 @@ export default {
     getMbtilesList() {
       requestApi.getMbtilesList().then((res) => {
         if (res.data.data.length != 0) {
-          this.mbTileJsonList = res.data.data;
+          // 筛选osm数据
+          this.mbTileJsonList = res.data.data.filter((data)=> data.osmMbtilesBoolean );
+          this.cacheJsonList = res.data.data.filter((data)=> !data.osmMbtilesBoolean );  
           console.log("mbTileJsonList", this.mbTileJsonList);
           //mbTiles先默认为第一个osm数据
           this.mbTileSelect = this.mbTileJsonList[0].id;
@@ -1587,6 +1631,92 @@ export default {
           console.log(error);
         });
     },
+
+    // #cache缓存服务
+    cacheChange(val){
+      this.cacheLayer = val['tileJsonInfo']['vector_layers']
+    },
+    addCacheShp(row){
+      let name = this.cacheSelect.name + "_#cahce"; // 同一个mbTile数据源的标识符
+      let layerName = row.id + "_#cahce"; // 图层间的标识符作为sourceId
+      //判断该shp是否已添加
+      if (
+        !Object.prototype.hasOwnProperty.call(
+          this.sourceNameObject,
+          name //mbtile的souce都是一个,用该json的名字来统计记录
+        )
+      ) {
+        //添加mbTile的shp图层时，相关json已经入库
+        // json写法
+        let sourceJsonId = this.cacheSelect.tileJsonId;
+        let tileJsonUrl =
+          this.reqUrl + "/getTileJson/" + sourceJsonId + ".json";
+        let newSourceJson = {
+          sourceName: name,
+          sourceType: "vector",
+          sourceUrl: tileJsonUrl,
+        };
+        this.addSourceToMap(newSourceJson);
+        this.sources[newSourceJson.sourceName] = {
+          type: newSourceJson.sourceType,
+          url: newSourceJson.sourceUrl,
+        };
+        //记录shp图层和对应的id
+        this.sourceNameObject[name] = sourceJsonId;
+      }
+
+      // 添加layer
+      let geoType = row.type;
+      // 检查是否添加过同源layer 返回[showName,layersNameObject]
+      let result = JSON.parse(
+        JSON.stringify(
+          nameIndex(this.layers, layerName, row.id, this.layersNameObject)
+        )
+      );
+      this.layersNameObject = result.object;
+      //前八个是自己用的属性
+      let newLayer = {
+        sourceType: "mbTile", //记录数据来源类型，用于区别mbTlie的添加和删除
+        show: true, // 用于记录图层的开关
+        // originName: row.id,
+        showName: result.show, //用于展示图层名字
+        manageInfo: { layerKey: layerName, sourceKey: name }, // 记录layersNameObject和sourceNameObject的key
+        shpAttribute: [],
+        attrValueSet: {},
+        attrShowList: {},
+        filterValueSet: {},
+        nodeType: "layer", //组和图层区分
+        id: row.id + "_" + nanoid(5),
+        type: geoType,
+        filter: ["all"],
+        layout: JSON.parse(
+          JSON.stringify(layerStyleProperties[geoType].layout)
+        ),
+        maxzoom: typeof row["maxzoom"] != "undefined" ? row["maxzoom"] : 22,
+        metadata: {
+          // metadata会被mapbox识别，保存到layers信息中
+          "mapbox:type": "mbSource",
+          "mapbox:isOSM": this.cacheSelect.osmMbtilesBoolean,
+        },
+        minzoom: typeof row["minzoom"] != "undefined" ? row["minzoom"] : 0,
+        paint: JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint)),
+        source: name, //通过记录的source名字与id对应，拿到sourceId
+        "source-layer": row.id,
+      };
+      // 设置随机色
+      if (geoType !== "symbol") {
+        newLayer.paint[geoType + "-color"] =
+          "#" + Math.random().toString(16).substr(2, 6);
+      }
+      // 图层信息更新
+      this.layers.unshift(newLayer);
+      this.originStyle.unshift({
+        paint: newLayer.paint,
+        layout: newLayer.layout,
+      });
+      this.addLayerToMap(true, newLayer);
+    },
+
 
     // #TMS、TERRAIN、WMTS服务
     // 切换服务来源（本地，外部）
