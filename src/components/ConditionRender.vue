@@ -812,7 +812,7 @@
                   {{ item }}
                 </el-col>
               </el-tab-pane>
-              <el-tab-pane label="自定义">
+              <el-tab-pane label="自定义" style="height: 400px; overflow-y: scroll">
                 <el-row
                   type="flex"
                   justify="start"
@@ -1327,7 +1327,7 @@
                   {{ item }}
                 </el-col>
               </el-tab-pane>
-              <el-tab-pane label="自定义">
+              <el-tab-pane label="自定义" style="height: 400px; overflow-y: scroll">
                 <el-row
                   type="flex"
                   justify="start"
@@ -1859,7 +1859,7 @@
                   {{ item }}
                 </el-col>
               </el-tab-pane>
-              <el-tab-pane label="自定义">
+              <el-tab-pane label="自定义" style="height: 400px; overflow-y: scroll">
                 <el-row
                   type="flex"
                   justify="start"

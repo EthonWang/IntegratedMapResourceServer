@@ -1070,7 +1070,7 @@
                       </div>
                     </el-row>
                   </el-tab-pane>
-                  <el-tab-pane label="自定义">
+                  <el-tab-pane label="自定义" style="height: 400px; overflow-y: scroll">
                     <el-row
                       type="flex"
                       justify="start"
@@ -1447,7 +1447,7 @@
                       </div>
                     </el-row>
                   </el-tab-pane>
-                  <el-tab-pane label="自定义">
+                  <el-tab-pane label="自定义" style="height: 400px; overflow-y: scroll">
                     <el-row
                       type="flex"
                       justify="start"
@@ -2105,7 +2105,7 @@
                       </div>
                     </el-row>
                   </el-tab-pane>
-                  <el-tab-pane label="自定义">
+                  <el-tab-pane label="自定义" style="height: 400px; overflow-y: scroll">
                     <el-row
                       type="flex"
                       justify="start"
@@ -4166,7 +4166,7 @@
           <el-row type="flex" justify="space-between" align="middle">
             <h4>过滤条件配置</h4>
             &nbsp;
-            <el-select v-model="filterWay" placeholder="请选择" size="small">
+            <el-select v-model="filterWay" placeholder="请选择" size="small" @change="filterConfirm">
               <el-option
                 v-for="item in [
                   { value: 'all', label: '满足所有条件' },
@@ -4268,8 +4268,8 @@
             <el-col :span="10">
               <el-input
                 v-model="filterCondition[index]['value']"
-                @change="filterChange($event, filterHasValues)"
-                :placeholder="filterHasValues ? '' : '请输入数组'"
+                @change="filterChange($event, index, filterHasValues)"
+                :placeholder="filterHasValues ? '' : '如：value1,value2'"
                 size="small"
                 clearable
               >
@@ -4485,7 +4485,7 @@ export default {
       // 精灵图
       spriteClassList: [],
       spriteNameSelect: "", // 从连接中截取的项目精灵图名
-      symbolTableData: [],
+      symbolTableData: [],   // 自定义图（不排序）
       currentPageSymbol: 1,
       pageSizeSymbol: 5,
       searchInputSymbol: "",
@@ -4947,8 +4947,8 @@ export default {
         })
         .then((res) => {
           console.log("SymbolList:", res.data);
-          this.symbolTableData = res.data.data.content;
-          this.totalDataCountSymbol = res.data.data.totalElements;
+          this.symbolTableData = res.data.data.list;
+          // this.totalDataCountSymbol = res.data.data.page.totalElements;
         })
         .catch((error) => {
           console.log(error);
@@ -5319,17 +5319,26 @@ export default {
           row[this.filterOptionSelectList[this.nowFilterIndex]];
       }
     },
-    filterConfirm(list) {
+    filterConfirm() {
       let judge = this.filterWay;
-      const filters = [judge];
+      let filters = [judge];
       for (let i = 0; i < this.filterCondition.length; i++) {
         const filter = [];
         filter.push(this.filterCondition[i].type);
         filter.push(["get", this.filterCondition[i].option]);
-        //
+
+        // 添加筛选数值
         if (this.filterHasValues) {
           filter.push(this.filterCondition[i].value);
         } else {
+          const val = this.filterCondition[i].value;
+          // 筛选条件保存 val1,val2 渲染为[val1,val2]
+          let list =[];
+          if (val.includes(",")) {
+            list = val.split(",");
+          } else {
+            list = [val];
+          }          
           filter.push(...list);
         }
         if (judge == "none") {
@@ -5355,17 +5364,9 @@ export default {
       this.UPDATEPARM({ parm: "layers", value: this.layers });
     },
     // input框更换filter值
-    filterChange(val, hasValue) {
-      // 只有不包含值才触发
-      let list = [];
-      if (!hasValue) {
-        if (val.includes(",")) {
-          list = val.split(",");
-        } else {
-          list = [val];
-        }
-      }
-      this.filterConfirm(list);
+    filterChange(val, index) {
+      this.filterCondition[index].value = val.replaceAll("，",",");
+      this.filterConfirm();
     },
 
     // #数据源设置相关

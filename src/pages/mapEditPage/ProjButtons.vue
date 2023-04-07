@@ -174,7 +174,7 @@
                   v-for="item in cacheJsonList"
                   :key="item.id"
                   :label="item.name"
-                  :value="item"
+                  :value="item.id"
                 >
                 </el-option> </el-select
               >&nbsp;
@@ -440,8 +440,10 @@ export default {
 
       // cache
       cacheJsonList: [],
-      cacheSelect: "",
-      cacheLayer: [],   // cache中json的
+      cacheSelect: "",    // 选择的cache id
+      cacheSelectInfo: {},      // 选中cache的info
+      cacheSelectJson: {},
+      cacheLayer: [],   // 选中cache中json的
 
       // #发布
     };
@@ -1634,10 +1636,19 @@ export default {
 
     // #cache缓存服务
     cacheChange(val){
-      this.cacheLayer = val['tileJsonInfo']['vector_layers']
+      let index = 0;
+      this.cacheJsonList.forEach((e, ind) => {
+        if (e.id == val) {
+          index = ind;
+        }
+      });      
+      this.cacheSelectInfo = JSON.parse(JSON.stringify(this.cacheJsonList[index]))
+      this.cacheSelectJson = JSON.parse(JSON.stringify(this.cacheJsonList[index]['tileJsonInfo']))
+      this.cacheLayer = JSON.parse(JSON.stringify(this.cacheJsonList[index]['tileJsonInfo']['vector_layers']))
     },
     addCacheShp(row){
-      let name = this.cacheSelect.name + "_#cahce"; // 同一个mbTile数据源的标识符
+      console.log('cacheSelectInfo',this.cacheSelectInfo);
+      let name = this.cacheSelectInfo.name + "_#cahce"; // 同一个mbTile数据源的标识符
       let layerName = row.id + "_#cahce"; // 图层间的标识符作为sourceId
       //判断该shp是否已添加
       if (
@@ -1648,7 +1659,7 @@ export default {
       ) {
         //添加mbTile的shp图层时，相关json已经入库
         // json写法
-        let sourceJsonId = this.cacheSelect.tileJsonId;
+        let sourceJsonId = this.cacheSelectInfo.tileJsonId;
         let tileJsonUrl =
           this.reqUrl + "/getTileJson/" + sourceJsonId + ".json";
         let newSourceJson = {
@@ -1696,7 +1707,7 @@ export default {
         metadata: {
           // metadata会被mapbox识别，保存到layers信息中
           "mapbox:type": "mbSource",
-          "mapbox:isOSM": this.cacheSelect.osmMbtilesBoolean,
+          "mapbox:isOSM": this.cacheSelectInfo.osmMbtilesBoolean,
         },
         minzoom: typeof row["minzoom"] != "undefined" ? row["minzoom"] : 0,
         paint: JSON.parse(JSON.stringify(layerStyleProperties[geoType].paint)),
