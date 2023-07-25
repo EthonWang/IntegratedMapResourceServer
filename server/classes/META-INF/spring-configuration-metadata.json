@@ -1,0 +1,22 @@
+{
+  "groups": [
+    {
+      "name": "db-connect-settings",
+      "type": "mapbox_mvt_backend.entity.DBConnectSetting",
+      "sourceType": "mapbox_mvt_backend.entity.DBConnectSetting"
+    }
+  ],
+  "properties": [
+    {
+      "name": "db-connect-settings.pg-connect-info",
+      "type": "java.util.List<java.util.Map<java.lang.String,java.lang.String>>",
+      "sourceType": "mapbox_mvt_backend.entity.DBConnectSetting"
+    },
+    {
+      "name": "db-connect-settings.sqlite-connect-info",
+      "type": "java.util.List<java.util.Map<java.lang.String,java.lang.String>>",
+      "sourceType": "mapbox_mvt_backend.entity.DBConnectSetting"
+    }
+  ],
+  "hints": []
+}

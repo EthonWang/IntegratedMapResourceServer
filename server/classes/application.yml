@@ -1,0 +1,64 @@
+
+server:
+  port: 8899
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/MapboxDB?stringtype=unspecified
+    username: postgres
+    password: 123456
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.spatial.dialect.postgis.PostgisPG95Dialect
+    hibernate:
+      ddl-auto: update
+
+  servlet:
+    multipart:
+      max-file-size: 99999MB
+      max-request-size: 99999MB
+
+  web:
+    resources:
+      static-locations: classpath:/META-INF/resources/,classpath:/resources/, classpath:/static/, classpath:/public/, file:${dataStoreDir}
+  mvc:
+    static-path-pattern: /store/**
+
+#后台数据的存储位置
+dataStoreDir: E:/GitProject/MapboxDataStore
+#sqliteDBPath: E:/GitProject/MapboxDataStore/sqlites/2020-10-planet-14.mbtiles
+
+
+#后台所在服务器的ip
+backendIp: 172.21.212.14
+
+#pg的shp2pgsql.exe、psql.exe 及相关dll的存在文件夹路径,路径不能有空格，默认安装路径时这样子写：C:\\PROGRA~1\\PostgreSQL\\14\\bin
+postgresqlBinDir: I:\\postgresql14\\bin
+
+#shp导入pg的sql 参数0，1，2，3表示exe的路径,坐标系的srid,shp名字,导入后的表名字
+# ！！！数字是变量的占位符，除非添加其他命令行参数，否则不用变，！！！
+shp2pgSqlWin: cmd /c {0}\\shp2pgsql.exe -I -s {1} -W "LATIN1" {2}  {3} | {0}\\psql.exe -h localhost -U postgres -d MapboxDB -p 5433
+
+shp2pgSqlLinux: shp2pgsql -I -s {1} -W "LATIN1" {2} {3} | psql -h localhost -U postgres -d MapboxDB_Docker1 -p 5433
+
+#sqliteInfo:
+#  names: 2020-10-planet-14,s2
+#  paths: E:/GitProject/MapboxDataStore/sqlites/2020-10-planet-14.mbtiles,e:/456
+#
+#dbConnectSettings:
+#  pgConnectInfo:
+#    - dbName: MapboxPG1
+#      ip: 172.21.213.248
+#      port: 5432
+#      userName: postgres
+#      password: 123456
+#
+#  sqliteConnectInfo:
+#    - name: 2020-10-planet-14
+#      path: E:/GitProject/MapboxDataStore/sqlites/2020-10-planet-14.mbtiles
+#    - name: taiwan
+#      path: E:/GitProject/MapboxDataStore/sqlites/mapstew.mbtiles
+#
